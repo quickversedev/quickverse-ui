@@ -2,29 +2,21 @@ import React, {useState} from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
-  // TextInput,
-  // Dimensions,
   Animated,
   ActivityIndicator,
   StatusBar,
   FlatList,
-  Image,
   Dimensions,
 } from 'react-native';
 import {Appbar, Card, Text} from 'react-native-paper';
-// import foodCollection from '../data/foodCollection';
-// import foodItems from '../data/foodItems';
 import theme from '../theme';
 const {width} = Dimensions.get('window');
 import fetchFoodItems from '../services/foodItemsApi';
 import {FoodItem} from '../data/foodItems';
-// import {Item} from 'react-native-paper/lib/typescript/components/Drawer/Drawer';
 
 const SPACING: any = 10;
 const ITEM_SIZE: any = width * 0.54;
 const EMPTY_ITEM_SIZE: any = (width - ITEM_SIZE) / 2;
-const AUTO_SCROLL_INTERVAL = 1000;
 const Loading: React.FC = () => {
   return (
     <View style={styles.loadingContainer}>

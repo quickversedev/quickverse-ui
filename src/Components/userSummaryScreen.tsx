@@ -1,11 +1,17 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, Button} from 'react-native';
 import {Text} from 'react-native-paper';
+import {useAuth} from '../utils/AuthContext';
 
 const UserProfileScreen: React.FC = () => {
+  const auth = useAuth();
+  const signOut = () => {
+    auth.signOut();
+  };
   return (
     <View style={styles.container}>
       <Text>User Profile Screen</Text>
+      <Button title="Sign Out" onPress={signOut} />
     </View>
   );
 };

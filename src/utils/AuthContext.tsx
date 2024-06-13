@@ -19,7 +19,6 @@ type AuthContextData = {
     phoneNumber: string,
     campusId: string,
     email: string,
-    password: string,
   ): Promise<void>;
 };
 

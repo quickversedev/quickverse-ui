@@ -1,9 +1,9 @@
 export interface FoodItem {
   id: string;
-  name: string;
-  image: any; //base64
+  name?: string;
+  image?: any; //base64
   description?: string;
-  link: string;
+  link?: string;
 }
 
 const foodItems: FoodItem[] = [

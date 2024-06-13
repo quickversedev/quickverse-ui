@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, ScrollView, Modal} from 'react-native';
-import {Appbar, Text} from 'react-native-paper';
+import {Text} from 'react-native-paper';
 import theme from '../../theme';
 import HorizontalScroll from './HorizontalScroll';
 import VendorsList from './HomeScreenVendors';

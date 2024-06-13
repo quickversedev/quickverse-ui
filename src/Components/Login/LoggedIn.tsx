@@ -7,7 +7,7 @@ import theme from '../../theme';
 import HomeScreen from '../Home/HomeScreen';
 import UserProfileScreen from '../userSummaryScreen';
 import OrderDetailsScreen from '../OrderSummary';
-import Vandors from '../Vendors';
+import Vandors from '../Vendors/Vendors';
 import globalConfig from '../../utils/GlobalConfig';
 const Tab = createBottomTabNavigator();
 

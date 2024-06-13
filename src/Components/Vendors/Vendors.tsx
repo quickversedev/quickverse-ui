@@ -5,18 +5,17 @@ import {
   StyleSheet,
   StatusBar,
   Dimensions,
-  ActivityIndicator,
   ScrollView,
 } from 'react-native';
-import axios from 'axios';
-// import CardItem from './CardItem';
-import CardItem from './util/CardItem';
-// import AppHeader from './AppHeader';
-import AppHeader from '../utils/AppHeader';
-import venderList from '../data/venderList';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchVendorList} from '../../services/VendorListSlice';
+import {AppDispatch, RootState} from '../../store/store';
+import CardItem from '../util/CardItem';
+import AppHeader from '../../utils/AppHeader';
+import {Loading} from '../../utils/Loading';
+import VendorCards from './vendorCards';
 
 const {width} = Dimensions.get('window');
-
 const SPACING: number = 4;
 const ITEM_SIZE: number = (width - SPACING * 6) / 2;
 
@@ -25,17 +24,7 @@ const HorizontalCardList: React.FC = () => {
     <View style={styles.container}>
       <StatusBar hidden />
       <AppHeader headerText="Vendors" />
-      <ScrollView contentContainerStyle={styles.gridContainer}>
-        {venderList.map(item => (
-          <View key={item.id} style={styles.cardContainer}>
-            <CardItem
-              name={item.name}
-              distance={item.distance}
-              image={item.image}
-            />
-          </View>
-        ))}
-      </ScrollView>
+      <VendorCards />
     </View>
   );
 };

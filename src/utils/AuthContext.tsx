@@ -1,4 +1,3 @@
-// src/context/AuthContext.tsx
 import React, {
   createContext,
   useState,
@@ -7,7 +6,6 @@ import React, {
   ReactNode,
 } from 'react';
 import {storage} from './Storage';
-// import {AuthData, authService} from '../services/authService';
 import {AuthData, authService} from '../services/AuthService';
 
 type AuthContextData = {
@@ -48,29 +46,19 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       // Try to get the data from MMKV storage
       const authDataSerialized = storage.getString('@AuthData');
       if (authDataSerialized) {
-        // If there is data, it's converted to an Object and the state is updated.
         const _authData: AuthData = JSON.parse(authDataSerialized);
         setAuthData(_authData);
       }
     } catch (error) {
       console.error('Failed to load auth data from storage', error);
     } finally {
-      // loading finished
       setLoading(false);
     }
   }
 
   const signIn = async (username: string, password: string) => {
-    // Call the service passing credentials (email and password).
-    // In a real App, this data will be provided by the user from some InputText components.
     const _authData = await authService.signIn(username, password);
-
-    // Set the data in the context, so the App can be notified
-    // and send the user to the AuthStack
     setAuthData(_authData);
-
-    // Persist the data in the MMKV storage
-    // to be recovered in the next user session.
     storage.set('@AuthData', JSON.stringify(_authData));
   };
 
@@ -95,18 +83,11 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   };
 
   const signOut = async () => {
-    // Remove data from context, so the App can be notified
-    // and send the user to the AuthStack
     setAuthData(undefined);
-
-    // Remove the data from MMKV storage
-    // to NOT be recovered in the next session.
     storage.delete('@AuthData');
   };
 
   return (
-    // This component will be used to encapsulate the whole App,
-    // so all components will have access to the Context
     <AuthContext.Provider value={{authData, loading, signIn, signOut, signUp}}>
       {children}
     </AuthContext.Provider>
@@ -126,3 +107,37 @@ function useAuth(): AuthContextData {
 }
 
 export {AuthContext, AuthProvider, useAuth};
+
+// const API_URL = 'https://yourapi.com'; // Replace with your actual API URL
+
+// const signIn = async (email: string, password: string): Promise<AuthData> => {
+//   try {
+//     const response = await axios.post(`${API_URL}/signin`, { email, password });
+//     return response.data;
+//   } catch (error) {
+//     throw new Error(error.response?.data?.message || 'Failed to sign in');
+//   }
+// };
+
+// const signUp = async (
+//   firstName: string,
+//   lastName: string,
+//   phoneNumber: string,
+//   campusId: string,
+//   email: string,
+//   password: string
+// ): Promise<AuthData> => {
+//   try {
+//     const response = await axios.post(`${API_URL}/signup`, {
+//       firstName,
+//       lastName,
+//       phoneNumber,
+//       campusId,
+//       email,
+//       password
+//     });
+//     return response.data;
+//   } catch (error) {
+//     throw new Error(error.response?.data?.message || 'Failed to sign up');
+//   }
+// };

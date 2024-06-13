@@ -59,7 +59,7 @@ const LoggedIn: React.FC = () => {
           <></>
         )}
         <Tab.Screen
-          name="Map"
+          name="Vendors"
           component={Vandors}
           options={{
             tabBarIcon: ({focused, color}) => (

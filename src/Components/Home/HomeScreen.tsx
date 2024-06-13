@@ -5,6 +5,7 @@ import theme from '../../theme';
 import HorizontalScroll from './HorizontalScroll';
 import VendorsList from './HomeScreenVendors';
 import {useAuth} from '../../utils/AuthContext';
+import AppHeader from '../../utils/AppHeader';
 
 const HomeScreen: React.FC = () => {
   // const onChangeSearch = (query: string) => setSearchQuery(query);
@@ -20,7 +21,7 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Appbar.Header style={{backgroundColor: '#FFDC52', height: 90}}>
+      {/* <Appbar.Header style={{backgroundColor: '#FFDC52', height: 90}}>
         <View style={styles.headerContent}>
           <Text style={styles.textHeaderContent} variant="headlineMedium">
             Hi, QUICK!
@@ -29,7 +30,8 @@ const HomeScreen: React.FC = () => {
             Welcome to the lightning Fast universe
           </Text>
         </View>
-      </Appbar.Header>
+      </Appbar.Header> */}
+      <AppHeader headerText="Hi, Quick!" />
       <ScrollView>
         <HorizontalScroll />
         <VendorsList />

@@ -3,7 +3,11 @@ export type AuthData = {
   email: string;
   name: string;
 };
-const signIn = (email: string, _password: string): Promise<AuthData> => {
+const signIn = (
+  phoneNumber: string,
+  _pin: string,
+  _campusId: string,
+): Promise<AuthData> => {
   // this is a mock of an API call, in a real app
   // will be need connect with some real API,
   // send email and password, and if credential is corret
@@ -12,7 +16,7 @@ const signIn = (email: string, _password: string): Promise<AuthData> => {
     setTimeout(() => {
       resolve({
         token: JWTTokenMock,
-        email: email,
+        email: phoneNumber,
         name: 'Lucas Garcez',
       });
     }, 1000);

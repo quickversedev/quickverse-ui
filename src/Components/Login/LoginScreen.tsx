@@ -1,12 +1,6 @@
 // src/components/LoginScreen.tsx
 import React, {useState} from 'react';
 import {View, TextInput, Button, StyleSheet} from 'react-native';
-// import axios from 'axios';
-// import {storage} from '../utils/storage';
-// import {StackNavigationProp} from '@react-navigation/stack';
-// import {useNavigation} from '@react-navigation/native';
-// import {RouteProp} from '@react-navigation/native';
-// import {useAuth} from '../contexts/Auth';
 import {useAuth} from '../../utils/AuthContext';
 import {Loading} from '../../utils/Loading';
 import {useNavigation} from '@react-navigation/native';
@@ -76,10 +70,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 12,
     paddingHorizontal: 8,
-  },
-  error: {
-    color: 'red',
-    marginBottom: 12,
   },
 });
 

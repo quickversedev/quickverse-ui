@@ -24,7 +24,6 @@ const signUp = (
   phoneNumber: string,
   campusId: string,
   email: string,
-  _password: string,
 ): Promise<AuthData> => {
   // Mocked sign-up function for demonstration purposes
   // Replace this with your actual API call

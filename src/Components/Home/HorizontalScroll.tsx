@@ -1,60 +1,44 @@
-import React, {useState} from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   StyleSheet,
   Animated,
-  ActivityIndicator,
   StatusBar,
   FlatList,
   Dimensions,
 } from 'react-native';
 import {Card, Text} from 'react-native-paper';
 const {width} = Dimensions.get('window');
-import fetchFoodItems from '../../services/foodItemsApi';
+import {fetchFoodItems} from '../../services/FoodItemsSlice';
 import {FoodItem} from '../../data/foodItems';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../../store/store';
+import {Loading} from '../../utils/Loading';
 
 const SPACING: any = 4;
 const ITEM_SIZE: any = width * 0.76;
 const EMPTY_ITEM_SIZE: any = (width - ITEM_SIZE) / 2;
-const Loading: React.FC = () => {
-  return (
-    <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#0000ff" />
-      <Text style={styles.paragraph}>Loading...</Text>
-    </View>
-  );
-};
 const HorizontalScroll: React.FC = () => {
   const scrollx = React.useRef(new Animated.Value(0)).current;
-  const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const flatListRef = React.useRef<FlatList<FoodItem>>(null);
-
-  React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const items = await fetchFoodItems();
-        setFoodItems([{id: 'empty-left'}, ...items, {id: 'empty-right'}]);
-      } catch (error) {
-        console.error('Error fetching food items:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
+  const dispatch = useDispatch<AppDispatch>();
+  const {foodItemsList, loading} = useSelector(
+    (state: RootState) => state.foodItems,
+  );
+  useEffect(() => {
+    dispatch(fetchFoodItems());
+  }, [dispatch]);
   if (loading) {
     return <Loading />;
   }
+  const food = [{id: 'empty-left'}, ...foodItemsList, {id: 'empty-right'}];
   return (
     <View style={styles.container}>
       <StatusBar hidden />
       <Animated.FlatList
         ref={flatListRef}
         showsHorizontalScrollIndicator={false}
-        data={foodItems}
+        data={food}
         keyExtractor={item => item.id}
         horizontal
         contentContainerStyle={{alignItems: 'center'}}
@@ -123,17 +107,6 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     margin: 0,
     marginBottom: 10,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  paragraph: {
-    margin: 24,
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
   },
 });
 

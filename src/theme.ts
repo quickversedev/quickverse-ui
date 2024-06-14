@@ -6,6 +6,7 @@ const theme = {
     ...DefaultTheme.colors,
     primary: '#FFDC52', // your primary color
     secondary: '#8F1413', // your secondary color
+    ternary: '#113E50',
   },
   // fonts: {
   //   regular: {

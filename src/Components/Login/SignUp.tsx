@@ -1,5 +1,5 @@
 // src/components/SignupScreen.tsx
-import React, {isValidElement, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   TextInput,

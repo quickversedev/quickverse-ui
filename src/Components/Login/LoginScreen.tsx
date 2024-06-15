@@ -34,22 +34,20 @@ const LoginScreen: React.FC = () => {
   const [pin, setPin] = useState<string>('');
   const [phoneError, setPhoneError] = useState<string>('');
   const [pinError, setPinError] = useState<string>('');
+  const [campusIdError, setCampusIdError] = useState<string>('');
   const [loading, isLoading] = useState(false);
-  const [valid, setValid] = useState(true);
   const [loadingCampuses, isLoadingCampuses] = useState(true);
-  const [filteredOptions, setFilteredOptions] = useState<string[]>([]);
+  const [campusIds, setCampusIds] = useState<string[]>([]);
+  const [selectedCampusId, setSelectedCampusId] = useState<string>('');
 
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const fetchOptions = async () => {
     try {
-      // Replace with your actual API endpoint
       isLoadingCampuses(true);
       const response = await fetchCampusIds();
-      // const data = await response.json();
-      setFilteredOptions(response); // Assuming response structure has an array of options
+      setCampusIds(response);
     } catch (error) {
       console.error('Error fetching options:', error);
-      // Handle error fetching options
     } finally {
       isLoadingCampuses(false);
     }
@@ -65,33 +63,42 @@ const LoginScreen: React.FC = () => {
     return pinRegex.test(digitpin);
   };
   const auth = useAuth();
-  const signIn = async () => {
+  const validate = () => {
+    let isValid = true;
     setPhoneError('');
     setPinError('');
-
+    setCampusIdError('');
+    console.log('inside validate');
     if (!validatePhoneNumber(phoneNumber)) {
       setPhoneError('Please enter a valid 10-digit phone number.');
-      setValid(false);
+      isValid = false;
     }
 
     if (!validatePin(pin)) {
       setPinError('PIN must be exactly 4 digits.');
-      setValid(false);
-    }
 
-    if (valid) {
+      isValid = false;
+    }
+    if (!campusIds.includes(selectedCampusId)) {
+      setCampusIdError('Please select the campusId');
+
+      isValid = false;
+    }
+    return isValid;
+  };
+  const signIn = async () => {
+    if (validate()) {
       isLoading(true);
-      await auth.signIn(phoneNumber, pin, selectedOption);
+      await auth.signIn(phoneNumber, pin, selectedCampusId);
     }
   };
-  const [selectedOption, setSelectedOption] = useState<string>('');
 
   useEffect(() => {
     fetchOptions();
   }, []);
   const handleOptionSelected = (option: string) => {
-    setSelectedOption(option);
-    console.log('opt', selectedOption);
+    setSelectedCampusId(option);
+    console.log('opt', selectedCampusId);
   };
 
   return (
@@ -99,26 +106,6 @@ const LoginScreen: React.FC = () => {
       {loading ? (
         <Loading />
       ) : (
-        // <>
-        //   <TextInput
-        //     style={styles.input}
-        //     placeholder="Username"
-        //     value={username}
-        //     onChangeText={setUsername}
-        //   />
-        //   <TextInput
-        //     style={styles.input}
-        //     placeholder="Password"
-        //     secureTextEntry
-        //     value={password}
-        //     onChangeText={setPassword}
-        //   />
-        //   <Button title="Login" onPress={signIn} />
-        //   <Button
-        //     title="Sign Up"
-        //     onPress={() => navigation.navigate('Signup')}
-        //   />
-        // </>
         <View style={styles.container}>
           <Image
             source={require('../../data/images/qv-blue.png')}
@@ -137,6 +124,7 @@ const LoginScreen: React.FC = () => {
               placeholder="Phone Number"
               value={phoneNumber}
               onChangeText={text => {
+                setPhoneError('');
                 setPhoneNumber(text);
               }}
               placeholderTextColor={theme.colors.ternary}
@@ -155,6 +143,7 @@ const LoginScreen: React.FC = () => {
               placeholder="4-digit PIN"
               value={pin}
               onChangeText={text => {
+                setPinError('');
                 setPin(text);
               }}
               placeholderTextColor={theme.colors.ternary}
@@ -166,10 +155,12 @@ const LoginScreen: React.FC = () => {
           <View>
             {!loadingCampuses ? (
               <Dropdown
-                options={filteredOptions}
-                onOptionSelected={handleOptionSelected}
+                options={campusIds}
+                onOptionSelected={() => {
+                  setCampusIdError('');
+                  handleOptionSelected;
+                }}
                 isLoadingCampuses={loadingCampuses}
-                // placeholder={'Search..'}
               />
             ) : (
               <Loading />
@@ -177,6 +168,9 @@ const LoginScreen: React.FC = () => {
           </View>
           {phoneError ? <Text style={styles.error}>{phoneError}</Text> : null}
           {pinError ? <Text style={styles.error}>{pinError}</Text> : null}
+          {campusIdError ? (
+            <Text style={styles.error}>{campusIdError}</Text>
+          ) : null}
           <View style={styles.buttonContainer}>
             <CustomButton
               title="Login"
@@ -235,7 +229,6 @@ const styles = StyleSheet.create({
   },
   error: {
     color: 'red',
-    // marginBottom:,
     textAlign: 'center',
   },
   buttonContainer: {

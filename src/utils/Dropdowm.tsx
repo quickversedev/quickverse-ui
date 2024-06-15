@@ -98,7 +98,10 @@ const Dropdown: React.FC<DropdownProps> = ({
                 <TouchableOpacity
                   onPress={() => onOptionPress(item)}
                   style={styles.optionItem}>
-                  <Text>{item}</Text>
+                  <Text
+                    style={{fontWeight: 'bold', color: theme.colors.ternary}}>
+                    {item}
+                  </Text>
                 </TouchableOpacity>
               )}
               keyExtractor={item => item}
@@ -132,19 +135,25 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     paddingVertical: 10,
+    // fontWeight: 'bold',
   },
   optionsContainer: {
-    borderWidth: 1,
-    borderColor: theme.colors.ternary,
-    borderRadius: 5,
+    position: 'absolute',
+    top: 45,
+    left: 0,
+    right: 0,
     maxHeight: 150,
+    borderWidth: 2,
+    borderColor: theme.colors.ternary,
+    backgroundColor: theme.colors.primary,
+    zIndex: 1,
     overflow: 'scroll',
   },
   optionItem: {
     padding: 10,
   },
   separator: {
-    height: 1,
+    height: 2,
     backgroundColor: theme.colors.ternary,
   },
 });

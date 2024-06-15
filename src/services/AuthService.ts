@@ -1,6 +1,6 @@
 export type AuthData = {
   token: string;
-  email: string;
+  phoneNumber: string;
   name: string;
 };
 const signIn = (
@@ -8,35 +8,29 @@ const signIn = (
   _pin: string,
   _campusId: string,
 ): Promise<AuthData> => {
-  // this is a mock of an API call, in a real app
-  // will be need connect with some real API,
-  // send email and password, and if credential is corret
-  //the API will resolve with some token and another datas as the below
   return new Promise(resolve => {
     setTimeout(() => {
       resolve({
         token: JWTTokenMock,
-        email: phoneNumber,
+        phoneNumber: phoneNumber,
         name: 'Lucas Garcez',
       });
     }, 1000);
   });
 };
 const signUp = (
-  firstName: string,
-  lastName: string,
+  fullName: string,
   phoneNumber: string,
-  campusId: string,
-  email: string,
+  _campusId: string,
+  _email: string,
+  _pin: string,
 ): Promise<AuthData> => {
-  // Mocked sign-up function for demonstration purposes
-  // Replace this with your actual API call
   return new Promise(resolve => {
     setTimeout(() => {
       resolve({
         token: JWTTokenMock,
-        email: email,
-        name: 'Lucas Garcez',
+        phoneNumber: phoneNumber,
+        name: fullName,
       });
     }, 1000);
   });

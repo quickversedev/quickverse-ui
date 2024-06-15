@@ -14,11 +14,11 @@ type AuthContextData = {
   signIn(phoneNumber: string, pin: string, campusId: string): Promise<void>;
   signOut(): void;
   signUp(
-    firstName: string,
-    lastName: string,
+    fullName: string,
     phoneNumber: string,
     campusId: string,
     email: string,
+    pin: string,
   ): Promise<void>;
 };
 
@@ -67,20 +67,18 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   };
 
   const signUp = async (
-    firstName: string,
-    lastName: string,
+    fullName: string,
     phoneNumber: string,
     campusId: string,
     email: string,
-    password: string,
+    pin: string,
   ) => {
     const _authData = await authService.signUp(
-      firstName,
-      lastName,
+      fullName,
       phoneNumber,
       campusId,
       email,
-      password,
+      pin,
     );
     setAuthData(_authData);
     storage.set('@AuthData', JSON.stringify(_authData));

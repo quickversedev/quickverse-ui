@@ -11,7 +11,7 @@ const HomeScreen: React.FC = () => {
   // const onChangeSearch = (query: string) => setSearchQuery(query);
   const [modalVisible, setModalVisible] = useState<boolean>(true);
   const {authData} = useAuth();
-  const loggeedInAs = authData?.email;
+  const loggeedInAs = authData?.name;
   useEffect(() => {
     setTimeout(() => {
       setModalVisible(false);

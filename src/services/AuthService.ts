@@ -5,7 +5,7 @@ export type AuthData = {
 };
 const signIn = (
   phoneNumber: string,
-  _pin: number,
+  _pin: string,
   _campusId: string,
 ): Promise<AuthData> => {
   return new Promise(resolve => {
@@ -23,7 +23,7 @@ const signUp = (
   phoneNumber: string,
   _campusId: string,
   _email: string,
-  _pin: Number,
+  _pin: string,
 ): Promise<AuthData> => {
   return new Promise(resolve => {
     setTimeout(() => {

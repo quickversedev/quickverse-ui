@@ -1,12 +1,6 @@
 // src/components/HorizontalCardList.tsx
-import React, {useState, useEffect} from 'react';
-import {
-  View,
-  StyleSheet,
-  StatusBar,
-  Dimensions,
-  ScrollView,
-} from 'react-native';
+import React, {useEffect} from 'react';
+import {View, StyleSheet, Dimensions, ScrollView} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {fetchVendorList} from '../../services/VendorListSlice';
 import {AppDispatch, RootState} from '../../store/store';

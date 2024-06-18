@@ -61,9 +61,17 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     campusId: string,
   ) => {
     console.log('insode signin', campusId);
-    const _authData = await authService.signIn(_phoneNumber, pin, campusId);
-    setAuthData(_authData);
-    storage.set('@AuthData', JSON.stringify(_authData));
+    try {
+      const _authData = await authService.signIn(_phoneNumber, pin, campusId);
+
+      if (_authData) {
+        setAuthData(_authData);
+        storage.set('@AuthData', JSON.stringify(_authData));
+      }
+    } catch (error) {
+      console.error('Error signing in:', error);
+      throw error; // Rethrow the error to propagate it to the caller
+    }
   };
 
   const signUp = async (

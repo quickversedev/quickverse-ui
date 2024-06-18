@@ -81,7 +81,6 @@ const LoginScreen: React.FC = () => {
     }
     if (!campusIds.includes(selectedCampusId)) {
       setCampusIdError('Please select the campusId');
-
       isValid = false;
     }
     return isValid;
@@ -89,8 +88,11 @@ const LoginScreen: React.FC = () => {
   const signIn = async () => {
     if (validate()) {
       isLoading(true);
-      await auth.signIn(phoneNumber, pin, selectedCampusId);
+      await auth.signIn(phoneNumber, pin, selectedCampusId).catch(error => {
+        console.error('Error signing in:', error);
+      });
     }
+    isLoading(false);
   };
 
   useEffect(() => {
@@ -156,10 +158,7 @@ const LoginScreen: React.FC = () => {
             {!loadingCampuses ? (
               <Dropdown
                 options={campusIds}
-                onOptionSelected={() => {
-                  setCampusIdError('');
-                  handleOptionSelected;
-                }}
+                onOptionSelected={handleOptionSelected}
                 isLoadingCampuses={loadingCampuses}
               />
             ) : (

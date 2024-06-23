@@ -19,7 +19,7 @@ export const fetchVendorList = createAsyncThunk(
     return new Promise<VenderList[]>(resolve => {
       setTimeout(() => {
         resolve(venderList);
-      }, 5000); // Mock a delay for fetching data
+      }, 1000);
     });
   },
 );

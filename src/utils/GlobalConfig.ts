@@ -1,5 +1,5 @@
 const globalConfig = {
-  apiBaseUrl: 'https://your-backend-api.com',
+  apiBaseUrl: 'http://localhost:8080/',
   OrderSummeryEnabled: false,
 };
 

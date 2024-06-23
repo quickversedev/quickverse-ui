@@ -1,6 +1,6 @@
 // src/components/CardItem.tsx
 import React from 'react';
-import {View, StyleSheet, Text, Dimensions} from 'react-native';
+import {StyleSheet, Text, Dimensions, TouchableOpacity} from 'react-native';
 import {Card} from 'react-native-paper';
 const {width} = Dimensions.get('window');
 
@@ -8,12 +8,18 @@ interface CardItemProps {
   name: string;
   distance: string;
   image: string;
+  onPress: () => void;
 }
 const ITEM_SIZE: any = width * 0.76;
 const SPACING: any = 4;
-const CardItem: React.FC<CardItemProps> = ({name, distance, image}) => {
+const CardItem: React.FC<CardItemProps> = ({
+  name,
+  distance,
+  image,
+  onPress,
+}) => {
   return (
-    <View>
+    <TouchableOpacity onPress={onPress} style={styles.card}>
       <Card.Cover source={image} style={styles.posterImage} />
       <Card.Content style={{alignItems: 'center'}}>
         <Text style={styles.title} numberOfLines={1}>
@@ -23,7 +29,7 @@ const CardItem: React.FC<CardItemProps> = ({name, distance, image}) => {
           {distance}
         </Text>
       </Card.Content>
-    </View>
+    </TouchableOpacity>
   );
 };
 

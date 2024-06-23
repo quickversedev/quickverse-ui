@@ -57,7 +57,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
         const cookies = [
           {
             name: 'X_AMZ_JWT',
-            value: authData.token,
+            value: authData?.session?.token,
             domain: effectiveurl,
             path: '/',
             version: '1',
@@ -73,7 +73,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
           },
         ];
         for (const cookie of cookies) {
-          await CookieManager.set(Url, cookie)
+          await CookieManager.set(effectiveurl, cookie)
             .then(done => {
               console.log('CookieManager.set =>', done);
             })

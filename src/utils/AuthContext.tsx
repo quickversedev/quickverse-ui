@@ -63,7 +63,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     console.log('insode signin', campusId);
     try {
       const _authData = await authService.signIn(_phoneNumber, pin, campusId);
-
       if (_authData) {
         setAuthData(_authData);
         storage.set('@AuthData', JSON.stringify(_authData));

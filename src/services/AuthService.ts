@@ -1,10 +1,12 @@
 import axios from 'axios';
 
 export type AuthData = {
-  token: string;
-  phoneNumber: string;
-  name: string;
-  campus: string;
+  session: {
+    token: string;
+    phoneNumber: string;
+    name: string;
+    campus: string;
+  };
 };
 const signIn = (
   phoneNumber: string,
@@ -15,10 +17,12 @@ const signIn = (
   return new Promise(resolve => {
     setTimeout(() => {
       resolve({
-        token: JWTTokenMock,
-        phoneNumber: phoneNumber,
-        name: 'Lucas Garcez',
-        campus: 'IIM Udaipur',
+        session: {
+          token: JWTTokenMock,
+          phoneNumber: phoneNumber,
+          name: 'Lucas Garcez',
+          campus: 'IIM Udaipur',
+        },
       });
     }, 1000);
   });
@@ -65,10 +69,12 @@ const signUp = (
   return new Promise(resolve => {
     setTimeout(() => {
       resolve({
-        token: JWTTokenMock,
-        phoneNumber: phoneNumber,
-        name: fullName,
-        campus: 'IIM Udaipur',
+        session: {
+          token: JWTTokenMock,
+          phoneNumber: phoneNumber,
+          name: 'Lucas Garcez',
+          campus: 'IIM Udaipur',
+        },
       });
     }, 1000);
   });

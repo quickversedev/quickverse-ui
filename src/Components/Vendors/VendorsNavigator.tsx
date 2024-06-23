@@ -32,7 +32,10 @@ const VendorsNavigator: React.FC = () => {
           headerStyle: {
             backgroundColor: theme.colors.primary,
           },
-          title: authData ? authData.campus : 'Place an Order',
+          title:
+            authData && authData.session
+              ? authData?.session?.campus
+              : 'Place an Order',
         }}
       />
     </Stack.Navigator>

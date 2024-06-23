@@ -15,7 +15,7 @@ const Stack = createStackNavigator<RootStackParamListHome>();
 
 const HomeNavigation: React.FC = () => {
   const {authData} = useAuth();
-  console.log('authdata.campus:', authData?.campus);
+  console.log('authdata.campus:', authData?.session?.campus);
   return (
     <Stack.Navigator initialRouteName="HomeScreen">
       <Stack.Screen
@@ -30,7 +30,7 @@ const HomeNavigation: React.FC = () => {
           headerStyle: {
             backgroundColor: theme.colors.primary,
           },
-          title: authData?.campus,
+          title: authData?.session?.campus,
         }}
       />
     </Stack.Navigator>

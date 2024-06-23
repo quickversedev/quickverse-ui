@@ -18,7 +18,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Dropdown from '../../utils/Dropdowm';
 import {fetchCampusIds} from '../../services/fetchCampusIds';
 
-type RootStackParamList = {
+export type RootStackParamList = {
   Login: undefined;
   Signup: undefined;
   Home: undefined;
@@ -54,7 +54,7 @@ const LoginScreen: React.FC = () => {
   };
 
   const validatePhoneNumber = (phone: string) => {
-    const phoneRegex = /^[0-9]{10}$/; // Adjust the regex based on your phone number requirements
+    const phoneRegex = /^[0-9]{10}$/;
     return phoneRegex.test(phone);
   };
 

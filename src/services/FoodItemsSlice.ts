@@ -8,7 +8,7 @@ export const fetchFoodItems = createAsyncThunk(
     return new Promise<FoodItem[]>(resolve => {
       setTimeout(() => {
         resolve(foodItems);
-      }, 5000); // Mock a delay for fetching data
+      }, 1000); // Mock a delay for fetching data
     });
   },
 );

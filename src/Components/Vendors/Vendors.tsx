@@ -8,7 +8,7 @@ const {width} = Dimensions.get('window');
 const SPACING: number = 4;
 const ITEM_SIZE: number = (width - SPACING * 6) / 2;
 
-const HorizontalCardList: React.FC = () => {
+const Vendors: React.FC = () => {
   return (
     <View style={styles.container}>
       <StatusBar hidden />
@@ -40,4 +40,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HorizontalCardList;
+export default Vendors;

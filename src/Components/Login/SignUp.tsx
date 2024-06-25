@@ -20,6 +20,7 @@ import {fetchCampusIds} from '../../services/fetchCampusIds';
 const SignupScreen: React.FC = () => {
   const [fullName, setFullName] = useState<string>('');
   const [pin, setPin] = useState<string>('');
+  const [confirmPin,setconfirmPin] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -39,6 +40,17 @@ const SignupScreen: React.FC = () => {
       isLoadingCampuses(false);
     }
   };
+  const handlingconfirmPin = (value: string) => {
+    setconfirmPin(value); 
+  
+    if (pin !== value) {
+      setError('Confirmation pin does not match the original pin');
+    } 
+    else {
+      setError('');
+    }
+  };
+  
   const validateFields = () => {
     let isValid = true;
     if (
@@ -46,6 +58,7 @@ const SignupScreen: React.FC = () => {
       !phoneNumber.match(/^\d{10}$/) ||
       !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) ||
       !pin.match(/^\d{4}$/) ||
+      pin!= confirmPin ||
       !selectedCampusId
     ) {
       setError('Please fill out all fields correctly.');
@@ -54,6 +67,7 @@ const SignupScreen: React.FC = () => {
     // setError('');
     return isValid;
   };
+  
   const auth = useAuth();
   const signUp = async () => {
     if (validateFields()) {
@@ -153,6 +167,24 @@ const SignupScreen: React.FC = () => {
           maxLength={4}
         />
       </View>
+      <View style={styles.inputContainer}>
+        <MaterialCommunityIcons
+          name="lock"
+          size={24}
+          color={theme.colors.ternary}
+          style={styles.icon}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="confirmation Pin"
+          value={confirmPin}
+          onChangeText={handlingconfirmPin}
+          placeholderTextColor={theme.colors.ternary}
+          secureTextEntry
+          keyboardType="numeric"
+          maxLength={4}
+        />
+      </View>
       <View>
         {!loadingCampuses ? (
           <Dropdown
@@ -204,7 +236,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 50,
+    height: 40,
     borderColor: theme.colors.ternary,
     borderWidth: 1,
     borderRadius: 8,
@@ -223,8 +255,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   logo: {
-    width: 150,
-    height: 160,
+    width: 145,
+    height: 150,
     alignSelf: 'center',
     marginBottom: 20,
   },

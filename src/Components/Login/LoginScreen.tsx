@@ -156,10 +156,10 @@ const LoginScreen: React.FC = () => {
             {!loadingCampuses ? (
               <Dropdown
                 options={campusIds}
-                onOptionSelected={() => {
-                  setCampusIdError('');
-                  handleOptionSelected;
-                }}
+                onOptionSelected={
+                //  setCampusIdError('');
+                  handleOptionSelected
+                }
                 isLoadingCampuses={loadingCampuses}
               />
             ) : (

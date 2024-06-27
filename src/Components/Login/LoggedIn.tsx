@@ -4,11 +4,11 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Provider as PaperProvider} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../theme';
-import HomeScreen from '../Home/HomeScreen';
 import UserProfileScreen from '../userSummaryScreen';
 import OrderDetailsScreen from '../OrderSummary';
-import Vandors from '../Vendors/Vendors';
 import globalConfig from '../../utils/GlobalConfig';
+import VendorsNavigator from '../Vendors/VendorsNavigator';
+import HomeNavigation from '../Home/HomeNavigation';
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
@@ -21,14 +21,14 @@ const LoggedIn: React.FC = () => {
           tabBarShowLabel: false,
           tabBarStyle: {
             backgroundColor: theme.colors.primary,
-            height: 70, // Increased height of the tab bar
+            height: 70,
           },
 
           headerShown: false,
         }}>
         <Tab.Screen
-          name="Home"
-          component={HomeScreen}
+          name="HomeNavigator"
+          component={HomeNavigation}
           options={{
             tabBarIcon: ({focused, color}) => (
               <MaterialCommunityIcons
@@ -60,7 +60,7 @@ const LoggedIn: React.FC = () => {
         )}
         <Tab.Screen
           name="Vendors"
-          component={Vandors}
+          component={VendorsNavigator}
           options={{
             tabBarIcon: ({focused, color}) => (
               <MaterialCommunityIcons
@@ -77,10 +77,8 @@ const LoggedIn: React.FC = () => {
           options={{
             tabBarIcon: ({focused, color}) => (
               <MaterialCommunityIcons
-                // barStyle={{color: theme.colors.primary}}
                 name={focused ? 'account-circle' : 'account-circle-outline'}
                 color={color}
-                // backgroundColor={theme.colors.primary}
                 size={focused ? 36 : 26}
               />
             ),

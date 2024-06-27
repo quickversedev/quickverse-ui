@@ -4,7 +4,6 @@ export interface VenderList {
   image: any; //base64
   description: string;
   distance: string;
-  timing: string;
   link: string;
   enable: boolean;
 }
@@ -16,19 +15,17 @@ const venderList: VenderList[] = [
     image: require('../data/images/a1.jpg'),
     description: 'Delicious cheese pizza with toppings.',
     distance: '5km',
-    link: '',
-    enable: false,
-    timing: '',
+    link: 'https://www.smartbiz.in/paajikirasoi',
+    enable: true,
   },
   {
     id: '2',
-    name: 'minakshi hotel',
+    name: 'minakshi hotel1',
     image: require('../data/images/a2.jpg'),
     description: 'Juicy beef burger with fresh lettuce.',
-    distance: '5km',
-    link: '',
+    distance: '100km',
+    link: 'https://www.smartbiz.in/ashokafoodcorner',
     enable: false,
-    timing: '',
   },
   {
     id: '3',
@@ -36,9 +33,8 @@ const venderList: VenderList[] = [
     image: require('../data/images/a3.jpg'),
     description: 'Fresh sushi with a variety of seafood.',
     distance: '5km',
-    link: '',
-    enable: false,
-    timing: '',
+    link: 'https://www.smartbiz.in/AbhinavFreshFruitandJuice',
+    enable: true,
   },
   {
     id: '4',
@@ -46,9 +42,8 @@ const venderList: VenderList[] = [
     image: require('../data/images/a4.jpg'),
     description: 'Creamy pasta with Alfredo sauce.',
     distance: '5km',
-    link: '',
-    enable: false,
-    timing: '',
+    link: 'https://www.smartbiz.in/AbhinavFreshFruitandJuice',
+    enable: true,
   },
   //   {
   //     id: '5',
@@ -64,9 +59,8 @@ const venderList: VenderList[] = [
     image: require('../data/images/a2.jpg'),
     description: 'Juicy beef burger with fresh lettuce.',
     distance: '5km',
-    link: '',
-    enable: false,
-    timing: '',
+    link: 'https://www.smartbiz.in/AbhinavFreshFruitandJuice',
+    enable: true,
   },
   {
     id: '7',
@@ -74,9 +68,8 @@ const venderList: VenderList[] = [
     image: require('../data/images/a2.jpg'),
     description: 'Juicy beef burger with fresh lettuce.',
     distance: '5km',
-    link: '',
+    link: 'https://www.smartbiz.in/AbhinavFreshFruitandJuice',
     enable: false,
-    timing: '',
   },
   {
     id: '8',
@@ -84,9 +77,8 @@ const venderList: VenderList[] = [
     image: require('../data/images/a2.jpg'),
     description: 'Juicy beef burger with fresh lettuce.',
     distance: '5km',
-    link: '',
-    enable: false,
-    timing: '',
+    link: 'https://www.smartbiz.in/AbhinavFreshFruitandJuice',
+    enable: true,
   },
 ];
 

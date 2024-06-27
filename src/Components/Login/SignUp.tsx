@@ -169,14 +169,14 @@ const SignupScreen: React.FC = () => {
       </View>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons
-          name="lock"
+          name="lock-check"
           size={24}
           color={theme.colors.ternary}
           style={styles.icon}
         />
         <TextInput
           style={styles.input}
-          placeholder="confirmation Pin"
+          placeholder="confirm Pin"
           value={confirmPin}
           onChangeText={handlingconfirmPin}
           placeholderTextColor={theme.colors.ternary}
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 40,
+    height: 50,
     borderColor: theme.colors.ternary,
     borderWidth: 1,
     borderRadius: 8,
@@ -255,8 +255,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   logo: {
-    width: 145,
-    height: 150,
+    width: 150,
+    height: 160,
     alignSelf: 'center',
     marginBottom: 20,
   },

@@ -21,7 +21,7 @@ const SignupScreen: React.FC = () => {
   const [fullName, setFullName] = useState<string>('');
   const [pin, setPin] = useState<string>('');
   const [confirmPin,setconfirmPin] = useState<string>('');
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState<string>('+91');
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
   // const [valid, setValid] = useState<boolean>(true);
@@ -88,7 +88,16 @@ const SignupScreen: React.FC = () => {
     setSelectedCampusId(option);
     console.log('opt', selectedCampusId);
   };
-
+  const handlePhonenumber = (value: string) =>{
+    if(value.startsWith('+91'))
+      {
+        setPhoneNumber(value)
+      }
+    else
+    {
+      setPhoneNumber('+91' + value.replace(/^91/, ''));
+    }
+  }
   if (loading) {
     return <Loading />;
   }
@@ -126,7 +135,7 @@ const SignupScreen: React.FC = () => {
           style={styles.input}
           placeholder="Phone Number"
           value={phoneNumber}
-          onChangeText={setPhoneNumber}
+          onChangeText={handlePhonenumber}
           placeholderTextColor={theme.colors.ternary}
           keyboardType="phone-pad"
         />

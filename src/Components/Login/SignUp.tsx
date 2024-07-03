@@ -7,6 +7,7 @@ import {
   Text,
   Image,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import {Loading} from '../../utils/Loading';
 import {useAuth} from '../../utils/AuthContext';
@@ -20,7 +21,7 @@ import {fetchCampusIds} from '../../services/fetchCampusIds';
 const SignupScreen: React.FC = () => {
   const [fullName, setFullName] = useState<string>('');
   const [pin, setPin] = useState<string>('');
-  const [confirmPin,setconfirmPin] = useState<string>('');
+  const [confirmPin, setconfirmPin] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -30,6 +31,7 @@ const SignupScreen: React.FC = () => {
   const [loadingCampuses, isLoadingCampuses] = useState(true);
   const [campusIds, setcampusIds] = useState<string[]>([]);
   const [selectedCampusId, setSelectedCampusId] = useState<string>('');
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const fetchOptions = async () => {
     try {
@@ -41,16 +43,23 @@ const SignupScreen: React.FC = () => {
     }
   };
   const handlingconfirmPin = (value: string) => {
-    setconfirmPin(value); 
-  
+    setconfirmPin(value);
+
     if (pin !== value) {
       setError('Confirmation pin does not match the original pin');
-    } 
-    else {
+    } else {
       setError('');
     }
   };
-  
+  const handleSignUpError = (error: any) => {
+    if (error.includes('1005')) {
+      setError('Error occurred while creating the User.');
+    } else if (error.includes('1111')) {
+      setError('Unknown error.');
+    } else {
+      setError('An unknown error occurred. Please try again.');
+    }
+  };
   const validateFields = () => {
     let isValid = true;
     if (
@@ -58,7 +67,7 @@ const SignupScreen: React.FC = () => {
       !phoneNumber.match(/^\d{10}$/) ||
       !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) ||
       !pin.match(/^\d{4}$/) ||
-      pin!= confirmPin ||
+      pin != confirmPin ||
       !selectedCampusId
     ) {
       setError('Please fill out all fields correctly.');
@@ -67,15 +76,28 @@ const SignupScreen: React.FC = () => {
     // setError('');
     return isValid;
   };
-  
+
   const auth = useAuth();
   const signUp = async () => {
     if (validateFields()) {
       try {
         isLoading(true);
-        await auth.signUp(fullName, phoneNumber, selectedCampusId, email, pin);
+        const response = await auth.signUp(
+          fullName,
+          phoneNumber,
+          selectedCampusId,
+          email,
+          pin,
+        );
+        console.log('signup response', typeof response);
+        setModalVisible(true);
+        setTimeout(() => {
+          setModalVisible(false);
+          navigation.goBack();
+          console.log('registration SuccessFull');
+        }, 2000);
       } catch (error) {
-        setError('Signup failed. Please try again.');
+        handleSignUpError(error);
       } finally {
         isLoading(false);
       }
@@ -86,7 +108,6 @@ const SignupScreen: React.FC = () => {
   }, []);
   const handleOptionSelected = (option: string) => {
     setSelectedCampusId(option);
-    console.log('opt', selectedCampusId);
   };
 
   if (loading) {
@@ -210,6 +231,17 @@ const SignupScreen: React.FC = () => {
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Text style={styles.signUpText}>Already have an account? Sign Up</Text>
       </TouchableOpacity>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false);
+        }}>
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>Registration Successful!!</Text>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -268,6 +300,20 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 8,
+  },
+  modalView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalText: {
+    backgroundColor: theme.colors.ternary,
+    padding: 20,
+    borderRadius: 10,
+    fontSize: 18,
+    textAlign: 'center',
+    color: theme.colors.primary,
   },
 });
 export default SignupScreen;

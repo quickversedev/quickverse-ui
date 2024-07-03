@@ -78,15 +78,13 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     email: string,
     pin: string,
   ) => {
-    const _authData = await authService.signUp(
+    return await authService.signUp(
       fullName,
       phoneNumber,
       campusId,
       email,
       pin,
     );
-    setAuthData(_authData);
-    storage.set('@AuthData', JSON.stringify(_authData));
   };
 
   const signOut = async () => {

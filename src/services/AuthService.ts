@@ -5,14 +5,13 @@ export type AuthData = {
     token: string;
     phoneNumber: string;
     name: string;
-    campus: string;
     email: string;
   };
 };
 const signIn = (
   phoneNumber: string,
-  _pin: string,
-  _campusId: string,
+  pin: string,
+  campusId: string,
 ): Promise<AuthData> => {
   //*********************mock****************
   // return new Promise(resolve => {
@@ -30,12 +29,11 @@ const signIn = (
   return axios
     .post('http://192.168.31.144:8080/quickVerse/v1/login', {
       mobile: '91' + phoneNumber,
-      pin: _pin,
-      campusId: 'IIMU-313001',
+      pin: pin,
+      campusId: campusId,
     })
     .then(response => {
       const data1 = response.data;
-      console.log('Dataaa', data1);
       const data = data1?.session;
       return {
         session: {
@@ -64,16 +62,15 @@ const signIn = (
         console.error('Error setting up the request:', error.message);
       }
       // Throw the error again to propagate it to the caller
-      console.log('erorrrrrr', code);
       throw code;
     });
 };
 const signUp = (
   fullName: string,
   phoneNumber: string,
-  _campusId: string,
+  campusId: string,
   email: string,
-  _pin: string,
+  pin: string,
 ): Promise<any> => {
   // return new Promise(resolve => {
   //   setTimeout(() => {
@@ -91,15 +88,13 @@ const signUp = (
   return axios
     .post('http://192.168.31.144:8080/quickVerse/v1/registerUser', {
       loginId: '91' + phoneNumber,
-      pin: _pin,
-      campusId: 'IIMU-313001',
+      pin: pin,
+      campusId: campusId,
       emailId: email,
       userName: fullName,
       createdDate: '2024-02-04',
     })
     .then(response => {
-      console.log('Dataaa', response.status);
-
       return response;
     })
     .catch(error => {
@@ -119,7 +114,6 @@ const signUp = (
         console.error('Error setting up the request:', error.message);
       }
       // Throw the error again to propagate it to the caller
-      console.log('erorrrrrr', code);
       throw code;
     });
 };

@@ -32,7 +32,6 @@ const HorizontalCardList: React.FC = () => {
     return <Loading />;
   }
   const handleCardPress = (url: string) => {
-    console.log('url', url);
     navigation.navigate('WebView', {url});
   };
   const enabledVendors = vendors.filter(vendor => vendor.enable);

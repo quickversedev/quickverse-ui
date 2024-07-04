@@ -50,7 +50,6 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
         headerRight: () => <ReloadButton onPress={reloadWebView} />,
       });
     }
-    console.log('effectiveurl:', Url);
     const effectiveurl = Url.replace(/.+\/\/|/g, '');
     const setMultipleCookies = async () => {
       if (authData && effectiveurl) {
@@ -115,8 +114,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
 const retrieveAuthorizationCookie = async (
   effectiveUrl: string,
 ): Promise<void> => {
-  const authToken = await getAuthorizationCookie(effectiveUrl);
-  console.log('Authorization Token:', authToken);
+  await getAuthorizationCookie(effectiveUrl);
 };
 const styles = StyleSheet.create({
   webview: {

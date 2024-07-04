@@ -19,8 +19,6 @@ export const fetchCampusIds = (): Promise<Campus[]> => {
     .get('http://192.168.31.144:8080/quickVerse/v1/campus')
     .then(response => {
       const data = response.data;
-
-      console.log('campusses:', data.campuses);
       return data.campuses.campus;
     })
     .catch(error => {
@@ -40,7 +38,6 @@ export const fetchCampusIds = (): Promise<Campus[]> => {
         console.error('Error setting up the request:', error.message);
       }
       // Throw the error again to propagate it to the caller
-      console.log('erorrrrrr', code);
       throw code;
     });
 };

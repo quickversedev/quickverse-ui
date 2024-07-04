@@ -73,14 +73,7 @@ const SignupScreen: React.FC = () => {
     if (validateFields()) {
       try {
         isLoading(true);
-        const response = await auth.signUp(
-          fullName,
-          phoneNumber,
-          selectedCampusId,
-          email,
-          pin,
-        );
-        console.log('signup response', typeof response);
+        await auth.signUp(fullName, phoneNumber, selectedCampusId, email, pin);
         setModalVisible(true);
         setTimeout(() => {
           setModalVisible(false);

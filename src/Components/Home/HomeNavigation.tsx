@@ -3,8 +3,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import HomeScreen from './HomeScreen';
 import WebViewScreen from '../../utils/WebViewScreen';
 import theme from '../../theme';
-// import {useAuth} from '../utils/AuthContext';
-import {useAuth} from '../../utils/AuthContext';
+import {getCampus} from '../../utils/Storage';
 
 export type RootStackParamListHome = {
   HomeScreen: undefined;
@@ -14,8 +13,7 @@ export type RootStackParamListHome = {
 const Stack = createStackNavigator<RootStackParamListHome>();
 
 const HomeNavigation: React.FC = () => {
-  const {authData} = useAuth();
-  console.log('authdata.campus:', authData?.session?.campus);
+  console.log('authdata.campus:', getCampus());
   return (
     <Stack.Navigator initialRouteName="HomeScreen">
       <Stack.Screen
@@ -30,7 +28,7 @@ const HomeNavigation: React.FC = () => {
           headerStyle: {
             backgroundColor: theme.colors.primary,
           },
-          title: authData?.session?.campus,
+          title: getCampus(),
         }}
       />
     </Stack.Navigator>

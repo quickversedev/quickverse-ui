@@ -90,6 +90,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const signOut = async () => {
     setAuthData(undefined);
     storage.delete('@AuthData');
+    storage.delete('@CampusID');
   };
 
   return (

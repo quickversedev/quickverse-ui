@@ -58,7 +58,6 @@ const LoginScreen: React.FC = () => {
     setPhoneError('');
     setPinError('');
     setCampusIdError('');
-    console.log('inside validate');
     if (!validatePhoneNumber(phoneNumber)) {
       setPhoneError('Please enter a valid 10-digit phone number.');
       isValid = false;

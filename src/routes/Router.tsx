@@ -7,7 +7,6 @@ import {Loading} from '../utils/Loading';
 
 export const Router = () => {
   const {authData, loading} = useAuth();
-  console.log('authdata: ', authData);
   if (loading) {
     return <Loading />;
   }

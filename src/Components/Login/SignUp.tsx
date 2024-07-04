@@ -7,6 +7,7 @@ import {
   Text,
   Image,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import {Loading} from '../../utils/Loading';
 import {useAuth} from '../../utils/AuthContext';
@@ -15,12 +16,12 @@ import CustomButton from '../../utils/CustomButton';
 import {useNavigation} from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dropdown from '../../utils/Dropdowm';
-import {fetchCampusIds} from '../../services/fetchCampusIds';
+import fetchOptions from './getCampusList';
 
 const SignupScreen: React.FC = () => {
   const [fullName, setFullName] = useState<string>('');
   const [pin, setPin] = useState<string>('');
-  const [confirmPin,setconfirmPin] = useState<string>('');
+  const [confirmPin, setconfirmPin] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -28,29 +29,28 @@ const SignupScreen: React.FC = () => {
   const [loading, isLoading] = useState(false);
   const navigation = useNavigation();
   const [loadingCampuses, isLoadingCampuses] = useState(true);
-  const [campusIds, setcampusIds] = useState<string[]>([]);
+  const [campusIds, setcampusIds] = useState<string[]>();
   const [selectedCampusId, setSelectedCampusId] = useState<string>('');
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  const fetchOptions = async () => {
-    try {
-      isLoadingCampuses(true);
-      const response = await fetchCampusIds();
-      setcampusIds(response);
-    } finally {
-      isLoadingCampuses(false);
-    }
-  };
   const handlingconfirmPin = (value: string) => {
-    setconfirmPin(value); 
-  
+    setconfirmPin(value);
+
     if (pin !== value) {
       setError('Confirmation pin does not match the original pin');
-    } 
-    else {
+    } else {
       setError('');
     }
   };
-  
+  const handleSignUpError = (error: any) => {
+    if (error.includes('1005')) {
+      setError('Error occurred while creating the User.');
+    } else if (error.includes('1111')) {
+      setError('Unknown error.');
+    } else {
+      setError('An unknown error occurred. Please try again.');
+    }
+  };
   const validateFields = () => {
     let isValid = true;
     if (
@@ -58,7 +58,7 @@ const SignupScreen: React.FC = () => {
       !phoneNumber.match(/^\d{10}$/) ||
       !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) ||
       !pin.match(/^\d{4}$/) ||
-      pin!= confirmPin ||
+      pin != confirmPin ||
       !selectedCampusId
     ) {
       setError('Please fill out all fields correctly.');
@@ -67,26 +67,49 @@ const SignupScreen: React.FC = () => {
     // setError('');
     return isValid;
   };
-  
+
   const auth = useAuth();
   const signUp = async () => {
     if (validateFields()) {
       try {
         isLoading(true);
-        await auth.signUp(fullName, phoneNumber, selectedCampusId, email, pin);
+        const response = await auth.signUp(
+          fullName,
+          phoneNumber,
+          selectedCampusId,
+          email,
+          pin,
+        );
+        console.log('signup response', typeof response);
+        setModalVisible(true);
+        setTimeout(() => {
+          setModalVisible(false);
+          navigation.goBack();
+          console.log('registration SuccessFull');
+        }, 2000);
       } catch (error) {
-        setError('Signup failed. Please try again.');
+        handleSignUpError(error);
       } finally {
         isLoading(false);
       }
     }
   };
+  const getCamousList = async () => {
+    try {
+      isLoadingCampuses(true);
+      const camousList = await fetchOptions();
+      setcampusIds(camousList);
+    } catch (error) {
+      console.error('Error fetching options:', error);
+    } finally {
+      isLoadingCampuses(false);
+    }
+  };
   useEffect(() => {
-    fetchOptions();
+    getCamousList();
   }, []);
   const handleOptionSelected = (option: string) => {
     setSelectedCampusId(option);
-    console.log('opt', selectedCampusId);
   };
  
   if (loading) {
@@ -192,7 +215,7 @@ const SignupScreen: React.FC = () => {
         />
       </View>
       <View>
-        {!loadingCampuses ? (
+        {!loadingCampuses && campusIds ? (
           <Dropdown
             options={campusIds}
             onOptionSelected={handleOptionSelected}
@@ -216,6 +239,17 @@ const SignupScreen: React.FC = () => {
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Text style={styles.signUpText}>Already have an account? Sign Up</Text>
       </TouchableOpacity>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false);
+        }}>
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>Registration Successful!!</Text>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -279,8 +313,6 @@ const styles = StyleSheet.create({
     marginRight: -3,
     color : theme.colors.ternary,
     fontSize: 16,
-   
-
   }
 });
 export default SignupScreen;

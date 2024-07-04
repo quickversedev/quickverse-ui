@@ -16,7 +16,8 @@ import theme from '../../theme';
 import CustomButton from '../../utils/CustomButton';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dropdown from '../../utils/Dropdowm';
-import {fetchCampusIds} from '../../services/fetchCampusIds';
+import {setCampus} from '../../utils/Storage';
+import fetchOptions from './getCampusList';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -33,26 +34,15 @@ const LoginScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>(' ');
   const [pin, setPin] = useState<string>('');
   const [phoneError, setPhoneError] = useState<string>('');
+  const [responseError, setResponseError] = useState<string>('');
   const [pinError, setPinError] = useState<string>('');
   const [campusIdError, setCampusIdError] = useState<string>('');
   const [loading, isLoading] = useState(false);
   const [loadingCampuses, isLoadingCampuses] = useState(true);
-  const [campusIds, setCampusIds] = useState<string[]>([]);
+  const [campusIds, setCampusIds] = useState<string[]>();
   const [selectedCampusId, setSelectedCampusId] = useState<string>('');
 
   const navigation = useNavigation<LoginScreenNavigationProp>();
-  const fetchOptions = async () => {
-    try {
-      isLoadingCampuses(true);
-      const response = await fetchCampusIds();
-      setCampusIds(response);
-    } catch (error) {
-      console.error('Error fetching options:', error);
-    } finally {
-      isLoadingCampuses(false);
-    }
-  };
-
   const validatePhoneNumber = (phone: string) => {
     const phoneRegex = /^[0-9]{10}$/;
     return phoneRegex.test(phone);
@@ -83,7 +73,7 @@ const LoginScreen: React.FC = () => {
 
       isValid = false;
     }
-    if (!campusIds.includes(selectedCampusId)) {
+    if (!campusIds?.includes(selectedCampusId)) {
       setCampusIdError('Please select the campusId');
       isValid = false;
     }
@@ -93,18 +83,46 @@ const LoginScreen: React.FC = () => {
     if (validate()) {
       isLoading(true);
       await auth.signIn(phoneNumber, pin, selectedCampusId).catch(error => {
-        console.error('Error signing in:', error);
+        handleSignInError(error);
       });
     }
+    let result = selectedCampusId.split(' |')[0];
+    setCampus(result);
     isLoading(false);
   };
-
+  const handleSignInError = (error: any) => {
+    if (error.includes('1004')) {
+      setResponseError('Incorrect username or password. Please try again.');
+    } else if (error.includes('1001')) {
+      setResponseError('Error occurred while retrieving the JWT Token.');
+    } else if (error.includes('1002')) {
+      setResponseError('Error occurred while processing the Login Request.');
+    } else if (error.includes('1003')) {
+      setResponseError('Error occurred while processing the Login Request.');
+    } else if (error.includes('1006')) {
+      setResponseError('User not Found.');
+    } else if (error.includes('1111')) {
+      setResponseError('Unknown error.');
+    } else {
+      setResponseError('An unknown error occurred. Please try again.');
+    }
+  };
+  const getCamousList = async () => {
+    try {
+      isLoadingCampuses(true);
+      const camousList = await fetchOptions();
+      setCampusIds(camousList);
+    } catch (error) {
+      console.error('Error fetching options:', error);
+    } finally {
+      isLoadingCampuses(false);
+    }
+  };
   useEffect(() => {
-    fetchOptions();
+    getCamousList();
   }, []);
   const handleOptionSelected = (option: string) => {
     setSelectedCampusId(option);
-    console.log('opt', selectedCampusId);
   };
 
   return (
@@ -163,7 +181,7 @@ const LoginScreen: React.FC = () => {
             />
           </View>
           <View>
-            {!loadingCampuses ? (
+            {!loadingCampuses && campusIds ? (
               <Dropdown
                 options={campusIds}
                 onOptionSelected={handleOptionSelected}
@@ -175,6 +193,9 @@ const LoginScreen: React.FC = () => {
           </View>
           {phoneError ? <Text style={styles.error}>{phoneError}</Text> : null}
           {pinError ? <Text style={styles.error}>{pinError}</Text> : null}
+          {responseError ? (
+            <Text style={styles.error}>{responseError}</Text>
+          ) : null}
           {campusIdError ? (
             <Text style={styles.error}>{campusIdError}</Text>
           ) : null}

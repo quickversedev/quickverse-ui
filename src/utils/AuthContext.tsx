@@ -60,7 +60,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     pin: string,
     campusId: string,
   ) => {
-    console.log('insode signin', campusId);
     try {
       const _authData = await authService.signIn(_phoneNumber, pin, campusId);
       if (_authData) {
@@ -68,7 +67,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         storage.set('@AuthData', JSON.stringify(_authData));
       }
     } catch (error) {
-      console.error('Error signing in:', error);
       throw error; // Rethrow the error to propagate it to the caller
     }
   };
@@ -80,15 +78,13 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     email: string,
     pin: string,
   ) => {
-    const _authData = await authService.signUp(
+    return await authService.signUp(
       fullName,
       phoneNumber,
       campusId,
       email,
       pin,
     );
-    setAuthData(_authData);
-    storage.set('@AuthData', JSON.stringify(_authData));
   };
 
   const signOut = async () => {
@@ -117,37 +113,3 @@ function useAuth(): AuthContextData {
 }
 
 export {AuthContext, AuthProvider, useAuth};
-
-// const API_URL = 'https://yourapi.com'; // Replace with your actual API URL
-
-// const signIn = async (email: string, password: string): Promise<AuthData> => {
-//   try {
-//     const response = await axios.post(`${API_URL}/signin`, { email, password });
-//     return response.data;
-//   } catch (error) {
-//     throw new Error(error.response?.data?.message || 'Failed to sign in');
-//   }
-// };
-
-// const signUp = async (
-//   firstName: string,
-//   lastName: string,
-//   phoneNumber: string,
-//   campusId: string,
-//   email: string,
-//   password: string
-// ): Promise<AuthData> => {
-//   try {
-//     const response = await axios.post(`${API_URL}/signup`, {
-//       firstName,
-//       lastName,
-//       phoneNumber,
-//       campusId,
-//       email,
-//       password
-//     });
-//     return response.data;
-//   } catch (error) {
-//     throw new Error(error.response?.data?.message || 'Failed to sign up');
-//   }
-// };

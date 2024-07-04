@@ -16,7 +16,8 @@ import theme from '../../theme';
 import CustomButton from '../../utils/CustomButton';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dropdown from '../../utils/Dropdowm';
-import {fetchCampusIds} from '../../services/fetchCampusIds';
+import {setCampus} from '../../utils/Storage';
+import fetchOptions from './getCampusList';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -38,22 +39,10 @@ const LoginScreen: React.FC = () => {
   const [campusIdError, setCampusIdError] = useState<string>('');
   const [loading, isLoading] = useState(false);
   const [loadingCampuses, isLoadingCampuses] = useState(true);
-  const [campusIds, setCampusIds] = useState<string[]>([]);
+  const [campusIds, setCampusIds] = useState<string[]>();
   const [selectedCampusId, setSelectedCampusId] = useState<string>('');
 
   const navigation = useNavigation<LoginScreenNavigationProp>();
-  const fetchOptions = async () => {
-    try {
-      isLoadingCampuses(true);
-      const response = await fetchCampusIds();
-      setCampusIds(response);
-    } catch (error) {
-      console.error('Error fetching options:', error);
-    } finally {
-      isLoadingCampuses(false);
-    }
-  };
-
   const validatePhoneNumber = (phone: string) => {
     const phoneRegex = /^[0-9]{10}$/;
     return phoneRegex.test(phone);
@@ -80,7 +69,7 @@ const LoginScreen: React.FC = () => {
 
       isValid = false;
     }
-    if (!campusIds.includes(selectedCampusId)) {
+    if (!campusIds?.includes(selectedCampusId)) {
       setCampusIdError('Please select the campusId');
       isValid = false;
     }
@@ -93,6 +82,8 @@ const LoginScreen: React.FC = () => {
         handleSignInError(error);
       });
     }
+    let result = selectedCampusId.split(' |')[0];
+    setCampus(result);
     isLoading(false);
   };
   const handleSignInError = (error: any) => {
@@ -112,9 +103,19 @@ const LoginScreen: React.FC = () => {
       setResponseError('An unknown error occurred. Please try again.');
     }
   };
-
+  const getCamousList = async () => {
+    try {
+      isLoadingCampuses(true);
+      const camousList = await fetchOptions();
+      setCampusIds(camousList);
+    } catch (error) {
+      console.error('Error fetching options:', error);
+    } finally {
+      isLoadingCampuses(false);
+    }
+  };
   useEffect(() => {
-    fetchOptions();
+    getCamousList();
   }, []);
   const handleOptionSelected = (option: string) => {
     setSelectedCampusId(option);
@@ -172,7 +173,7 @@ const LoginScreen: React.FC = () => {
             />
           </View>
           <View>
-            {!loadingCampuses ? (
+            {!loadingCampuses && campusIds ? (
               <Dropdown
                 options={campusIds}
                 onOptionSelected={handleOptionSelected}

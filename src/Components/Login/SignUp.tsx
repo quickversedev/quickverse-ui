@@ -8,8 +8,6 @@ import {
   Image,
   TouchableOpacity,
   Modal,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import {Loading} from '../../utils/Loading';
 import {useAuth} from '../../utils/AuthContext';
@@ -19,7 +17,6 @@ import {useNavigation} from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dropdown from '../../utils/Dropdowm';
 import fetchOptions from './getCampusList';
-import {ScrollView} from 'react-native-gesture-handler';
 
 const SignupScreen: React.FC = () => {
   const [fullName, setFullName] = useState<string>('');

@@ -21,7 +21,7 @@ const SignupScreen: React.FC = () => {
   const [fullName, setFullName] = useState<string>('');
   const [pin, setPin] = useState<string>('');
   const [confirmPin,setconfirmPin] = useState<string>('');
-  const [phoneNumber, setPhoneNumber] = useState<string>('+91');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
   // const [valid, setValid] = useState<boolean>(true);
@@ -88,16 +88,7 @@ const SignupScreen: React.FC = () => {
     setSelectedCampusId(option);
     console.log('opt', selectedCampusId);
   };
-  const handlePhonenumber = (value: string) =>{
-    if(value.startsWith('+91'))
-      {
-        setPhoneNumber(value)
-      }
-    else
-    {
-      setPhoneNumber('+91' + value.replace(/^91/, ''));
-    }
-  }
+ 
   if (loading) {
     return <Loading />;
   }
@@ -124,6 +115,7 @@ const SignupScreen: React.FC = () => {
           placeholderTextColor={theme.colors.ternary}
         />
       </View>
+     
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons
           name="phone"
@@ -131,11 +123,16 @@ const SignupScreen: React.FC = () => {
           color={theme.colors.ternary}
           style={styles.icon}
         />
+        
+          
+        <Text style={styles.countryCode}>91</Text>
+        
+         
         <TextInput
           style={styles.input}
           placeholder="Phone Number"
           value={phoneNumber}
-          onChangeText={handlePhonenumber}
+          onChangeText={setPhoneNumber}
           placeholderTextColor={theme.colors.ternary}
           keyboardType="phone-pad"
         />
@@ -278,5 +275,12 @@ const styles = StyleSheet.create({
   icon: {
     marginRight: 8,
   },
+  countryCode :{
+    marginRight: -3,
+    color : theme.colors.ternary,
+    fontSize: 16,
+   
+
+  }
 });
 export default SignupScreen;

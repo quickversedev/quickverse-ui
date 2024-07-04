@@ -96,6 +96,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     storage.delete('@AuthData');
   };
 
+  
   return (
     <AuthContext.Provider value={{authData, loading, signIn, signOut, signUp}}>
       {children}

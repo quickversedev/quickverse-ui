@@ -30,7 +30,7 @@ type LoginScreenNavigationProp = StackNavigationProp<
 >;
 
 const LoginScreen: React.FC = () => {
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState<string>(' ');
   const [pin, setPin] = useState<string>('');
   const [phoneError, setPhoneError] = useState<string>('');
   const [pinError, setPinError] = useState<string>('');
@@ -57,6 +57,10 @@ const LoginScreen: React.FC = () => {
     const phoneRegex = /^[0-9]{10}$/;
     return phoneRegex.test(phone);
   };
+
+  
+
+
 
   const validatePin = (digitpin: string) => {
     const pinRegex = /^[0-9]{4}$/;
@@ -121,13 +125,17 @@ const LoginScreen: React.FC = () => {
               color={theme.colors.ternary}
               style={styles.icon}
             />
+            <Text style = {styles.countrycode}> 91 </Text>
             <TextInput
               style={styles.input}
               placeholder="Phone Number"
               value={phoneNumber}
               onChangeText={text => {
-                setPhoneError('');
+                
                 setPhoneNumber(text);
+                setPhoneError('');
+                
+                
               }}
               placeholderTextColor={theme.colors.ternary}
               keyboardType="phone-pad"
@@ -249,6 +257,11 @@ const styles = StyleSheet.create({
   icon: {
     marginRight: 8,
   },
+  countrycode : {
+    marginRight : -7,
+    color : theme.colors.ternary,
+    fontSize : 16,
+  }
 });
 
 export default LoginScreen;

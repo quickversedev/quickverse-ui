@@ -4,14 +4,13 @@ import {Text} from 'react-native-paper';
 import theme from '../../theme';
 import HorizontalScroll from './HorizontalScroll';
 import VendorsList from './HomeScreenVendors';
-import {useAuth} from '../../utils/AuthContext';
 import AppHeader from '../../utils/AppHeader';
+import {getCampus} from '../../utils/Storage';
 
 const HomeScreen: React.FC = () => {
   // const onChangeSearch = (query: string) => setSearchQuery(query);
   const [modalVisible, setModalVisible] = useState<boolean>(true);
-  const {authData} = useAuth();
-  const loggeedInAs = authData?.session?.name;
+
   useEffect(() => {
     setTimeout(() => {
       setModalVisible(false);
@@ -44,7 +43,7 @@ const HomeScreen: React.FC = () => {
           setModalVisible(false);
         }}>
         <View style={styles.modalView}>
-          <Text style={styles.modalText}>{loggeedInAs}</Text>
+          <Text style={styles.modalText}>{getCampus()}</Text>
         </View>
       </Modal>
     </View>

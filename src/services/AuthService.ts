@@ -14,6 +14,7 @@ const signIn = (
         token: JWTTokenMock,
         phoneNumber: phoneNumber,
         name: 'Lucas Garcez',
+        
       });
     }, 1000);
   });
@@ -31,6 +32,7 @@ const signUp = (
         token: JWTTokenMock,
         phoneNumber: phoneNumber,
         name: fullName,
+      
       });
     }, 1000);
   });

@@ -2,107 +2,41 @@ import React from 'react';
 import {Image,View, StyleSheet, Button} from 'react-native';
 import {Text} from 'react-native-paper';
 import {useAuth} from '../utils/AuthContext';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Feedback from './Feedback';
+import AboutUs from './Aboutus';
+import Help from './help';
+import SettingsPage from './settingpage';
+//import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import userprofile from './userprofile';
+
 //import { Image } from 'react-native-reanimated/lib/typescript/Animated';
 //import NewCard from './util/Newcard';
-
+const Stack = createStackNavigator();
 const UserProfileScreen: React.FC = () => {
   const auth = useAuth();
 //settings functionality needs to be added here 
-  const Settings =()=>{}
+  // const Settings =()=>{}
 
 
 
   const signOut = () => {
     auth.signOut();
   };
+  const stack = createNativeStackNavigator();
   return (
-    <View style={styles.container}>
-      <Text style={styles.headingText}>User Profile</Text>
-      
-      <View style={[styles.card,styles.cardElevated]}>
-      <Text style={styles.subsubtext}>      </Text>
-      <View style={styles.container1}>
-        <Image style={styles.tinylogo} source={{
-          uri:'https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG-Free-Image.png'
-        }}
-         />
-        
-      <Text style={styles.subtext}>Account details</Text>
-     
-      </View>
-      <View>
-      <Text style={styles.subsubtext}>      </Text>
-      <Text style={styles.subsubtext}>Username : Admin</Text>
-      <Text style={styles.subsubtext}>City : Pune</Text>
-      <Text style={styles.subsubtext}>College Area : Dhankavadi,Trimurti chowk</Text>
-      <Text style={styles.subsubtext}>Campus ID : Campus ID1</Text>
-    
-      </View>
-      <View>
-      <Text>       </Text>
-      </View>
+  
+<stack.Navigator
+initialRouteName='Profile'
+><stack.Screen name="Profile" component={userprofile} />
 
-      </View>
-
-     
-      <View style={styles.container2}>
-
-        <Image style={styles.tinylogo1} source={{
-          uri:'https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG-Free-Image.png'
-        }}
-         />
-        
-      <Text style={styles.subsubtext}>Settings</Text>
-     
-      </View>
-      <View style={styles.container2}>
-        <Image style={styles.tinylogo1} source={{
-          uri:'https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG-Free-Image.png'
-        }}
-         />
-        
-      <Text style={styles.subsubtext}>LogOut</Text>
-     
-      </View>
-      <View style={styles.container2}>
-        <Image style={styles.tinylogo1} source={{
-          uri:'https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG-Free-Image.png'
-        }}
-         />
-        
-      <Text style={styles.subsubtext}>Help</Text>
-     
-      </View>
-      <View style={styles.container2}>
-        <Image style={styles.tinylogo1} source={{
-          uri:'https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG-Free-Image.png'
-        }}
-         />
-        
-      <Text style={styles.subsubtext}>About us</Text>
-     
-      </View>
-      <View style={styles.container2}>
-        <Image style={styles.tinylogo1} source={{
-          uri:'https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG-Free-Image.png'
-        }}
-         />
-        
-      <Text style={styles.subsubtext}>Feedback</Text>
-     
-      </View>
-      {/* <Button title='Settings' onPress={Settings} color="#9F2409"/>
-     
-
-      <Button title="LogOut" onPress={signOut} color="#9F2409"/>
-
-      <Button title='Help' onPress={Settings} color="#9F2409"/>
-      <Button title='About Us' onPress={Settings} color="#9F2409"/>
-      <Button title='Feedback' onPress={Settings} color="#9F2409"/> */
-      }
-   
-   
-    </View>
+      <stack.Screen name="Settings" component={SettingsPage} />
+      <stack.Screen name="Aboutus" component={AboutUs} />
+      <stack.Screen name="Help" component={Help} />
+      <stack.Screen name="Feedback" component={Feedback} />
+</stack.Navigator>
+  
   );
 };
 

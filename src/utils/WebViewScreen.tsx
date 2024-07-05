@@ -4,7 +4,7 @@ import CookieManager from '@react-native-cookies/cookies';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {View, Text, StyleSheet} from 'react-native';
-import {Loading} from './Loading';
+import {Loading} from '../Components/util/Loading';
 import {useAuth} from './AuthContext';
 
 import ReloadButton from './RealoadButton';

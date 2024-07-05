@@ -3,18 +3,11 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 // import axios from 'axios';
 import {VenderList} from '../data/venderList';
 import venderList from '../data/venderList';
-import axios from 'axios';
-import {getCampus} from '../utils/Storage';
+// import axios from 'axios';
+// import {getCampus} from '../utils/Storage';
 // import {VenderList} from '../../data/venderList';
 // import venderList from '../data/venderList';
 
-// export const fetchVendorList = createAsyncThunk(
-//   'vendorList/fetchVendorList',
-//   async () => {
-//     const response = await axios.get('https://api.example.com/vendors');
-//     return response.data as VenderList[];
-//   },
-// );
 export const fetchVendorList = createAsyncThunk(
   'vendorList/fetchVendorList',
   async () => {

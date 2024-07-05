@@ -4,13 +4,13 @@ import {View, StyleSheet} from 'react-native';
 import {Text} from 'react-native-paper';
 import HorizontalCardList from './HorizontalCardList';
 
-const HomeScreenVendors = () => {
+const PromoDiscounts = () => {
   return (
     <View style={styles.headingContainer}>
       <View style={styles.lineContainer}>
         <View style={styles.line} />
         <Text variant="titleLarge" style={styles.heading}>
-          Stores Near You!
+          Promo & Discounts!
         </Text>
         <View style={styles.line} />
       </View>
@@ -47,4 +47,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreenVendors;
+export default PromoDiscounts;

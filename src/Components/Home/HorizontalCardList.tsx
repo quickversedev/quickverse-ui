@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {View, StyleSheet, StatusBar, FlatList, Dimensions} from 'react-native';
-import {Loading} from '../../utils/Loading';
+import {Loading} from '../util/Loading';
 import CardItem from '../util/CardItem';
 import {AppDispatch, RootState} from '../../store/store';
 import {useDispatch, useSelector} from 'react-redux';
@@ -12,7 +12,7 @@ import {useNavigation} from '@react-navigation/native';
 const {width} = Dimensions.get('window');
 const SPACING: any = 3;
 const ITEM_SIZE: any = width * 0.46;
-const EMPTY_ITEM_SIZE: any = width - ITEM_SIZE * 2.5;
+// const EMPTY_ITEM_SIZE: any = width - ITEM_SIZE * 2.5;
 
 type HomeNavigationProp = StackNavigationProp<
   RootStackParamListHome,

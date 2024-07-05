@@ -21,7 +21,7 @@ const LoggedIn: React.FC = () => {
           tabBarShowLabel: false,
           tabBarStyle: {
             backgroundColor: theme.colors.primary,
-            height: 70,
+            height: 60,
           },
 
           headerShown: false,

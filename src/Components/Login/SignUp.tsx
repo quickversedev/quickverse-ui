@@ -59,7 +59,6 @@ const SignupScreen: React.FC = () => {
     if (
       !fullName ||
       !phoneNumber.match(/^\d{10}$/) ||
-      //console.log('Size of phone number:', phoneNumber.length)||
       !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) ||
       !pin.match(/^\d{4}$/) ||
       pin !== confirmPin ||

@@ -39,7 +39,9 @@ const HorizontalScroll: React.FC = () => {
         ref={flatListRef}
         showsHorizontalScrollIndicator={false}
         data={food}
-        keyExtractor={item => item.id}
+        keyExtractor={(item, index) => {
+          return index.toString();
+        }}
         horizontal
         contentContainerStyle={{alignItems: 'center'}}
         snapToInterval={ITEM_SIZE}
@@ -66,7 +68,7 @@ const HorizontalScroll: React.FC = () => {
             extrapolate: 'clamp',
           });
           return (
-            <View style={{width: ITEM_SIZE}}>
+            <View key={index} style={{width: ITEM_SIZE}}>
               <Animated.View
                 style={{
                   marginHorizontal: SPACING,
@@ -76,7 +78,10 @@ const HorizontalScroll: React.FC = () => {
                   transform: [{translateY}],
                   borderRadius: 34,
                 }}>
-                <Card.Cover source={item.image} style={styles.posterImage} />
+                <Card.Cover
+                  source={{uri: item.image}}
+                  style={styles.posterImage}
+                />
                 <Card.Content style={{alignItems: 'center'}}>
                   <Text style={{fontSize: 24}} numberOfLines={1}>
                     {item.name}

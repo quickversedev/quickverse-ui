@@ -1,13 +1,19 @@
 // src/components/CardItem.tsx
 import React from 'react';
-import {StyleSheet, Text, Dimensions, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  Dimensions,
+  TouchableOpacity,
+  ImageSourcePropType,
+} from 'react-native';
 import {Card} from 'react-native-paper';
 const {width} = Dimensions.get('window');
 
 interface CardItemProps {
   name: string;
   distance: string;
-  image: string;
+  image: ImageSourcePropType;
   onPress: () => void;
 }
 const ITEM_SIZE: any = width * 0.76;

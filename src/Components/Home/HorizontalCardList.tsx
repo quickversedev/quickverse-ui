@@ -34,14 +34,16 @@ const HorizontalCardList: React.FC = () => {
   const handleCardPress = (url: string) => {
     navigation.navigate('WebView', {url});
   };
-  const enabledVendors = vendors.filter(vendor => vendor.enable);
+  const enabledVendors = vendors.filter(vendor => vendor.storeEnabled);
   return (
     <View style={styles.container}>
       <StatusBar hidden />
       <FlatList
         showsHorizontalScrollIndicator={false}
         data={enabledVendors}
-        keyExtractor={item => item.id}
+        keyExtractor={(item, index) => {
+          return index.toString();
+        }}
         horizontal
         contentContainerStyle={{alignItems: 'center'}}
         snapToInterval={ITEM_SIZE}
@@ -49,14 +51,14 @@ const HorizontalCardList: React.FC = () => {
         snapToAlignment="start"
         bounces={false}
         scrollEventThrottle={16}
-        renderItem={({item}) => {
+        renderItem={({item, index}) => {
           return (
-            <View style={{width: ITEM_SIZE, margin: SPACING * 3}}>
+            <View key={index} style={{width: ITEM_SIZE, margin: SPACING * 3}}>
               <CardItem
-                name={item.name}
+                name={item.vendorName}
                 distance={item.distance}
-                image={item.image}
-                onPress={() => handleCardPress(item.link)}
+                image={{uri: item.vendorBanner}}
+                onPress={() => handleCardPress(item.vendorEndPoint)}
               />
             </View>
           );

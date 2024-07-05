@@ -3,7 +3,7 @@ import {FoodItem} from '../data/foodItems';
 import foodItems from '../data/foodItems';
 
 export const fetchFoodItems = createAsyncThunk(
-  'vendorList/fetchVendorList',
+  'foodItems/fetchFoodItems',
   async () => {
     return new Promise<FoodItem[]>(resolve => {
       setTimeout(() => {

@@ -34,6 +34,10 @@ const getAuthorizationCookie = async (url: string): Promise<string | null> => {
     return null;
   }
 };
+const extractHostname = (url: string) => {
+  const matches = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
+  return matches && matches[1];
+};
 
 const WebViewScreen: React.FC<WebViewScreenProps> = ({
   route,
@@ -50,7 +54,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
         headerRight: () => <ReloadButton onPress={reloadWebView} />,
       });
     }
-    const effectiveurl = Url.replace(/.+\/\/|/g, '');
+    const effectiveurl = extractHostname(Url);
     const setMultipleCookies = async () => {
       if (authData && effectiveurl) {
         const cookies = [
@@ -72,7 +76,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
           },
         ];
         for (const cookie of cookies) {
-          await CookieManager.set(effectiveurl, cookie)
+          await CookieManager.set('https://' + effectiveurl, cookie)
             .then(done => {
               console.log('CookieManager.set =>', done);
             })

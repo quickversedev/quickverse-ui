@@ -6,7 +6,7 @@ import {
 import Vendors from './Vendors';
 import WebViewScreen from '../../utils/WebViewScreen';
 import theme from '../../theme';
-import {useAuth} from '../../utils/AuthContext';
+import {getCampus} from '../../utils/Storage';
 
 export type RootStackParamList = {
   VendorList: undefined;
@@ -17,7 +17,6 @@ export type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 const VendorsNavigator: React.FC = () => {
-  const {authData} = useAuth();
   return (
     <Stack.Navigator initialRouteName="VendorList">
       <Stack.Screen
@@ -32,7 +31,7 @@ const VendorsNavigator: React.FC = () => {
           headerStyle: {
             backgroundColor: theme.colors.primary,
           },
-          title: authData ? authData?.session?.campus : 'Place an Order',
+          title: getCampus() ? getCampus() : 'Place an Order',
         }}
       />
     </Stack.Navigator>

@@ -32,17 +32,18 @@ const VendorCards: React.FC = () => {
   const handleCardPress = (url: string) => {
     navigation.navigate('WebView', {url});
   };
+
   return (
     <ScrollView contentContainerStyle={styles.gridContainer}>
       {vendors
-        .filter(item => item.enable)
-        .map(item => (
-          <View key={item.id} style={styles.cardContainer}>
+        .filter(item => item.storeEnabled)
+        .map((item, index) => (
+          <View key={index} style={styles.cardContainer}>
             <CardItem
-              name={item.name}
+              name={item.vendorName}
               distance={item.distance}
-              image={item.image}
-              onPress={() => handleCardPress(item.link)}
+              image={{uri: item.vendorBanner}}
+              onPress={() => handleCardPress(item.vendorEndPoint)}
             />
           </View>
         ))}

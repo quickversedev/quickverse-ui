@@ -1,6 +1,10 @@
 import axios from 'axios';
 
+<<<<<<< HEAD
  import campusses from "../data/campus";
+=======
+import campusses from '../data/campus';
+>>>>>>> edffbafcdc914ae7c9a36ad44936cabee08eb4fe
 export interface Campus {
   campusId: string;
   campusName: string;

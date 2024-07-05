@@ -13,7 +13,8 @@ import {fetchFoodItems} from '../../services/FoodItemsSlice';
 import {FoodItem} from '../../data/foodItems';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../store/store';
-import {Loading} from '../../utils/Loading';
+import {Loading} from '../util/Loading';
+import theme from '../../theme';
 
 const SPACING: any = 4;
 const ITEM_SIZE: any = width * 0.76;
@@ -83,10 +84,10 @@ const HorizontalScroll: React.FC = () => {
                   style={styles.posterImage}
                 />
                 <Card.Content style={{alignItems: 'center'}}>
-                  <Text style={{fontSize: 24}} numberOfLines={1}>
+                  <Text style={styles.itemName} numberOfLines={1}>
                     {item.name}
                   </Text>
-                  <Text style={{fontSize: 14}} numberOfLines={3}>
+                  <Text style={styles.itemDesc} numberOfLines={3}>
                     {item.description}
                   </Text>
                 </Card.Content>
@@ -113,6 +114,8 @@ const styles = StyleSheet.create({
     margin: 0,
     marginBottom: 10,
   },
+  itemName: {fontSize: 24, color: theme.colors.ternary},
+  itemDesc: {fontSize: 14, color: theme.colors.ternary, textAlign: 'center'},
 });
 
 export default HorizontalScroll;

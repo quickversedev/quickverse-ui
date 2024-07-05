@@ -1,8 +1,9 @@
 // src/components/HorizontalCardList.tsx
 import React from 'react';
 import {View, StyleSheet, StatusBar, Dimensions} from 'react-native';
-import AppHeader from '../../utils/AppHeader';
+import AppHeader from '../util/AppHeader';
 import VendorCards from './vendorCards';
+import theme from '../../theme';
 
 const {width} = Dimensions.get('window');
 const SPACING: number = 4;
@@ -21,7 +22,7 @@ const Vendors: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // paddingTop: SPACING * 10,
+    backgroundColor: theme.colors.primary,
   },
   gridContainer: {
     flexDirection: 'row',

@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {fetchVendorList} from '../../services/VendorListSlice';
 import {AppDispatch, RootState} from '../../store/store';
 import CardItem from '../util/CardItem';
-import {Loading} from '../../utils/Loading';
+import {Loading} from '../util/Loading';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from './VendorsNavigator';
 import {useNavigation} from '@react-navigation/native';

@@ -9,13 +9,13 @@ import {
   Image,
 } from 'react-native';
 import {useAuth} from '../../utils/AuthContext';
-import {Loading} from '../../utils/Loading';
+import {Loading} from '../util/Loading';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import theme from '../../theme';
-import CustomButton from '../../utils/CustomButton';
+import CustomButton from '../util/CustomButton';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Dropdown from '../../utils/Dropdowm';
+import Dropdown from '../util/Dropdowm';
 import {setCampus} from '../../utils/Storage';
 import fetchOptions from './getCampusList';
 

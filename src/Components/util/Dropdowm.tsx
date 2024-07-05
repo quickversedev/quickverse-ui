@@ -10,7 +10,7 @@ import {
   UIManager,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import theme from '../theme';
+import theme from '../../theme';
 import {Loading} from './Loading';
 
 interface DropdownProps {

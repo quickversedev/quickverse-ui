@@ -22,6 +22,7 @@ const SignupScreen: React.FC = () => {
   const [fullName, setFullName] = useState<string>('');
   const [pin, setPin] = useState<string>('');
   const [confirmPin, setconfirmPin] = useState<string>('');
+  const [pinError, setPinError] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -32,15 +33,17 @@ const SignupScreen: React.FC = () => {
   const [campusIds, setcampusIds] = useState<string[]>();
   const [selectedCampusId, setSelectedCampusId] = useState<string>('');
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-
-  const handlingconfirmPin = (value: string) => {
-    setconfirmPin(value);
-
-    if (pin !== value) {
-      setError('Confirmation pin does not match the original pin');
+  useEffect(() => {
+    if (pin === '' && confirmPin === '') {
+      setPinError('');
+    } else if (pin !== confirmPin && confirmPin !== '') {
+      setPinError('Pin does not match');
     } else {
-      setError('');
+      setPinError('');
     }
+  }, [pin, confirmPin]);
+  const handleConfirmPinChange = (value: string) => {
+    setconfirmPin(value);
   };
   const handleSignUpError = (error: any) => {
     if (error.includes('1005')) {
@@ -56,10 +59,12 @@ const SignupScreen: React.FC = () => {
     if (
       !fullName ||
       !phoneNumber.match(/^\d{10}$/) ||
+      //console.log('Size of phone number:', phoneNumber.length)||
       !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) ||
       !pin.match(/^\d{4}$/) ||
-      pin != confirmPin ||
-      !selectedCampusId
+      pin !== confirmPin ||
+      !selectedCampusId ||
+      pin !== confirmPin
     ) {
       setError('Please fill out all fields correctly.');
       isValid = false;
@@ -138,6 +143,7 @@ const SignupScreen: React.FC = () => {
           color={theme.colors.ternary}
           style={styles.icon}
         />
+        <Text style={styles.countryCode}> +91</Text>
         <TextInput
           style={styles.input}
           placeholder="Phone Number"
@@ -194,7 +200,7 @@ const SignupScreen: React.FC = () => {
           style={styles.input}
           placeholder="confirm Pin"
           value={confirmPin}
-          onChangeText={handlingconfirmPin}
+          onChangeText={handleConfirmPinChange}
           placeholderTextColor={theme.colors.ternary}
           secureTextEntry
           keyboardType="numeric"
@@ -214,6 +220,7 @@ const SignupScreen: React.FC = () => {
         )}
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
+      {pinError ? <Text style={styles.error}>{pinError}</Text> : null}
       <View style={styles.buttonContainer}>
         <CustomButton
           title="SignUp"
@@ -309,6 +316,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     color: theme.colors.primary,
+  },
+  countryCode: {
+    color: theme.colors.ternary,
+    fontSize: 16,
   },
 });
 export default SignupScreen;

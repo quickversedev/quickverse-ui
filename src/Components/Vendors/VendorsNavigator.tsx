@@ -30,6 +30,7 @@ const VendorsNavigator: React.FC = () => {
         options={{
           headerStyle: {
             backgroundColor: theme.colors.primary,
+            height: 60,
           },
           title: getCampus() ? getCampus() : 'Place an Order',
         }}

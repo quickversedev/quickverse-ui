@@ -1,9 +1,9 @@
 import React from 'react';
-import {View, StyleSheet, ScrollView, Modal} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
 import theme from '../../theme';
 import HorizontalScroll from './HorizontalScroll';
-import VendorsList from './HomeScreenVendors';
-import AppHeader from '../../utils/AppHeader';
+import HomeScreenVendors from './HomeScreenVendors';
+import AppHeader from '../util/AppHeader';
 
 const HomeScreen: React.FC = () => {
   return (
@@ -11,7 +11,7 @@ const HomeScreen: React.FC = () => {
       <AppHeader headerText="Hi, Quick!" />
       <ScrollView>
         <HorizontalScroll />
-        <VendorsList />
+        <HomeScreenVendors />
       </ScrollView>
     </View>
   );
@@ -20,6 +20,7 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: theme.colors.primary,
   },
 });
 

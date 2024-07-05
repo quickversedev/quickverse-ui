@@ -9,13 +9,13 @@ import {
   TouchableOpacity,
   Modal,
 } from 'react-native';
-import {Loading} from '../../utils/Loading';
+import {Loading} from '../util/Loading';
 import {useAuth} from '../../utils/AuthContext';
 import theme from '../../theme';
-import CustomButton from '../../utils/CustomButton';
+import CustomButton from '../util/CustomButton';
 import {useNavigation} from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Dropdown from '../../utils/Dropdowm';
+import Dropdown from '../util/Dropdowm';
 import fetchOptions from './getCampusList';
 
 const SignupScreen: React.FC = () => {
@@ -25,7 +25,7 @@ const SignupScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
-  // const [valid, setValid] = useState<boolean>(true);
+
   const [loading, isLoading] = useState(false);
   const navigation = useNavigation();
   const [loadingCampuses, isLoadingCampuses] = useState(true);

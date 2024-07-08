@@ -10,8 +10,8 @@ export type AuthData = {
 };
 const signIn = (
   phoneNumber: string,
-  _pin: string,
-  _campusId: string,
+  pin: string,
+  campusId: string,
 ): Promise<AuthData> => {
   //*********************mock****************
   return new Promise(resolve => {
@@ -27,7 +27,7 @@ const signIn = (
     }, 1000);
   });
   // return axios
-  //   .post('http://192.168.31.144:8080/quickVerse/v1/login', {
+  //   .post('http://192.168.0.101:8080/quickVerse/v1/login', {
   //     mobile: '91' + phoneNumber,
   //     pin: pin,
   //     campusId: campusId,

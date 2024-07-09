@@ -21,12 +21,8 @@ const signIn = (
           token: JWTTokenMock,
           phoneNumber: phoneNumber,
           name: 'Lucas Garcez',
-<<<<<<< HEAD
           //campus: 'IIM Udaipur',
           email: 'mithiladongre@gmail.com',
-=======
-          email: 'abhi@gmail.com',
->>>>>>> edffbafcdc914ae7c9a36ad44936cabee08eb4fe
         },
       });
     }, 1000);
@@ -71,50 +67,50 @@ const signIn = (
   //   });
 };
 const signUp = (
-  _fullName: string,
-  _phoneNumber: string,
-  _campusId: string,
-  _email: string,
-  _pin: string,
+  fullName: string,
+  phoneNumber: string,
+  campusId: string,
+  email: string,
+  pin: string,
 ): Promise<any> => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve({
-        Response,
-      });
-    }, 1000);
-  });
-  // return axios
-  //   .post('http://192.168.31.144:8080/quickVerse/v1/registerUser', {
-  //     loginId: '91' + phoneNumber,
-  //     pin: pin,
-  //     campusId: campusId,
-  //     emailId: email,
-  //     userName: fullName,
-  //     createdDate: '2024-02-04',
-  //   })
-  //   .then(response => {
-  //     return response;
-  //   })
-  //   .catch(error => {
-  //     const {code} = error.response.data.error;
-  //     if (error.response) {
-  //       // The request was made and the server responded with a status code
-  //       console.error(
-  //         'Server responded with non-2xx status:',
-  //         error.response.status,
-  //       );
-  //       console.error('Response data:', error.response.data);
-  //     } else if (error.request) {
-  //       // The request was made but no response was received
-  //       console.error('No response received:', error.request);
-  //     } else {
-  //       // Something happened in setting up the request that triggered an Error
-  //       console.error('Error setting up the request:', error.message);
-  //     }
-  //     // Throw the error again to propagate it to the caller
-  //     throw code;
-  //   });
+  // return new Promise(resolve => {
+  //   setTimeout(() => {
+  //     resolve({
+  //       Response,
+  //     });
+  //   }, 1000);
+  // });
+  return axios
+    .post('http://192.168.0.101:8080/quickVerse/v1/registerUser', {
+      loginId: '91' + phoneNumber,
+      pin: pin,
+      campusId: campusId,
+      emailId: email,
+      userName: fullName,
+      createdDate: '2024-02-04',
+    })
+    .then(response => {
+      return response;
+    })
+    .catch(error => {
+      const {code} = error.response.data.error;
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        console.error(
+          'Server responded with non-2xx status:',
+          error.response.status,
+        );
+        console.error('Response data:', error.response.data);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error('No response received:', error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error('Error setting up the request:', error.message);
+      }
+      // Throw the error again to propagate it to the caller
+      throw code;
+    });
 };
 export const authService = {
   signIn,

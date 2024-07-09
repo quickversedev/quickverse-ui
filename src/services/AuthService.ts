@@ -21,7 +21,8 @@ const signIn = (
           token: JWTTokenMock,
           phoneNumber: phoneNumber,
           name: 'Lucas Garcez',
-          email: 'abhi@gmail.com',
+          //campus: 'IIM Udaipur',
+          email: 'mithiladongre@gmail.com',
         },
       });
     }, 1000);
@@ -66,11 +67,11 @@ const signIn = (
   //   });
 };
 const signUp = (
-  _fullName: string,
-  _phoneNumber: string,
-  _campusId: string,
-  _email: string,
-  _pin: string,
+  fullName: string,
+  phoneNumber: string,
+  campusId: string,
+  email: string,
+  pin: string,
 ): Promise<any> => {
   return new Promise(resolve => {
     setTimeout(() => {
@@ -80,7 +81,7 @@ const signUp = (
     }, 1000);
   });
   // return axios
-  //   .post('http://192.168.31.144:8080/quickVerse/v1/registerUser', {
+  //   .post('http://192.168.0.101:8080/quickVerse/v1/registerUser', {
   //     loginId: '91' + phoneNumber,
   //     pin: pin,
   //     campusId: campusId,

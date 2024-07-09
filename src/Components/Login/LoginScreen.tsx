@@ -102,18 +102,18 @@ const LoginScreen: React.FC = () => {
       setResponseError('An unknown error occurred. Please try again.');
     }
   };
-  const getCamousList = async () => {
-    try {
-      isLoadingCampuses(true);
-      const camousList = await fetchOptions();
-      setCampusIds(camousList);
-    } catch (error) {
-      console.error('Error fetching options:', error);
-    } finally {
-      isLoadingCampuses(false);
-    }
-  };
   useEffect(() => {
+    const getCamousList = async () => {
+      try {
+        isLoadingCampuses(true);
+        const camousList = await fetchOptions();
+        setCampusIds(camousList);
+      } catch (error) {
+        console.error('Error fetching options:', error);
+      } finally {
+        isLoadingCampuses(false);
+      }
+    };
     getCamousList();
   }, []);
   const handleOptionSelected = (option: string) => {
@@ -173,9 +173,9 @@ const LoginScreen: React.FC = () => {
             />
           </View>
           <View>
-            {!loadingCampuses && campusIds ? (
+            {!loadingCampuses ? (
               <Dropdown
-                options={campusIds}
+                options={campusIds ? campusIds : []}
                 onOptionSelected={handleOptionSelected}
                 isLoadingCampuses={loadingCampuses}
               />

@@ -10,7 +10,7 @@ import {
 import {Card, Text} from 'react-native-paper';
 const {width} = Dimensions.get('window');
 import {fetchFoodItems} from '../../../services/FoodItemsSlice';
-import {FoodItem} from '../../../data/foodItems';
+import {FoodItem} from '../../../utils/canonicalModel';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../../store/store';
 import {Loading} from '../../util/Loading';

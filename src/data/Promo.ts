@@ -1,11 +1,4 @@
-export interface Promo {
-  id: string;
-  name: string;
-  image: any; //base64
-  description: string;
-  link: string;
-}
-
+import {Promo} from '../utils/canonicalModel';
 const promo: Promo[] = [
   {
     id: '1',

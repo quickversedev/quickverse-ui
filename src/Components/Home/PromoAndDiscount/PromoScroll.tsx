@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {Promo} from '../../../data/Promo';
+import {Promo} from '../../../utils/canonicalModel';
 
 import theme from '../../../theme';
 

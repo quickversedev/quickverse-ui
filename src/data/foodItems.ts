@@ -1,11 +1,4 @@
-export interface FoodItem {
-  id: string;
-  name?: string;
-  image?: any; //base64
-  description?: string;
-  link?: string;
-}
-
+import {FoodItem} from '../utils/canonicalModel';
 const foodItems: FoodItem[] = [
   {
     id: '1',

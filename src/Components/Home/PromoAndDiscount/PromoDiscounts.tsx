@@ -1,21 +1,38 @@
 // src/components/Heading.tsx
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Text} from 'react-native-paper';
-import HorizontalCardList from './HorizontalCardList';
+// import HorizontalCardList from '../homeVendors/HorizontalCardList';
+import PromoScroll from './PromoScroll';
+import {Loading} from '../../util/Loading';
+import {AppDispatch, RootState} from '../../../store/store';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchPromoItems} from '../../../services/promoListSlice';
 
-const HomeScreenVendors = () => {
-  return (
+const PromoDiscounts = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const {promoItemsList, loading} = useSelector(
+    (state: RootState) => state.promoItems,
+  );
+  useEffect(() => {
+    dispatch(fetchPromoItems());
+  }, [dispatch]);
+  if (loading) {
+    return <Loading />;
+  }
+  return promoItemsList.length > 0 ? (
     <View style={styles.headingContainer}>
       <View style={styles.lineContainer}>
         <View style={styles.line} />
         <Text variant="titleLarge" style={styles.heading}>
-          Stores Near You!
+          Promo & Discounts!
         </Text>
         <View style={styles.line} />
       </View>
-      <HorizontalCardList />
+      <PromoScroll promoItemsList={promoItemsList} />
     </View>
+  ) : (
+    ''
   );
 };
 
@@ -47,4 +64,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreenVendors;
+export default PromoDiscounts;

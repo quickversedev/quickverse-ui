@@ -1,13 +1,10 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {View, StyleSheet, StatusBar, FlatList, Dimensions} from 'react-native';
-import {Loading} from '../util/Loading';
-import CardItem from '../util/CardItem';
-import {AppDispatch, RootState} from '../../store/store';
-import {useDispatch, useSelector} from 'react-redux';
-import {fetchVendorList} from '../../services/VendorListSlice';
+import CardItem from '../../util/CardItem';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamListHome} from './HomeNavigation';
+import {RootStackParamListHome} from '../HomeNavigation';
 import {useNavigation} from '@react-navigation/native';
+import {VenderList} from '../../../data/venderList';
 
 const {width} = Dimensions.get('window');
 const SPACING: any = 3;
@@ -18,19 +15,12 @@ type HomeNavigationProp = StackNavigationProp<
   RootStackParamListHome,
   'WebView'
 >;
-
-const HorizontalCardList: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
+interface Props {
+  vendors: VenderList[];
+}
+const HorizontalCardList: React.FC<Props> = ({vendors}) => {
   const navigation = useNavigation<HomeNavigationProp>();
-  const {vendors, loading} = useSelector(
-    (state: RootState) => state.vendorList,
-  );
-  useEffect(() => {
-    dispatch(fetchVendorList());
-  }, [dispatch]);
-  if (loading) {
-    return <Loading />;
-  }
+
   const handleCardPress = (url: string) => {
     navigation.navigate('WebView', {url});
   };
@@ -53,7 +43,7 @@ const HorizontalCardList: React.FC = () => {
         scrollEventThrottle={16}
         renderItem={({item, index}) => {
           return (
-            <View key={index} style={{width: ITEM_SIZE, margin: SPACING * 3}}>
+            <View key={index} style={{width: ITEM_SIZE, margin: SPACING * 2}}>
               <CardItem
                 name={item.vendorName}
                 distance={item.distance}

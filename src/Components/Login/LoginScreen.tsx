@@ -22,7 +22,6 @@ import fetchOptions from './getCampusList';
 export type RootStackParamList = {
   Login: undefined;
   Signup: undefined;
-  Home: undefined;
 };
 
 type LoginScreenNavigationProp = StackNavigationProp<

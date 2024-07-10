@@ -137,6 +137,7 @@ const LoginScreen: React.FC = () => {
               color={theme.colors.ternary}
               style={styles.icon}
             />
+            <Text style={styles.countryCode}>+91</Text>
             <TextInput
               style={styles.input}
               placeholder="Phone Number"
@@ -268,6 +269,10 @@ const styles = StyleSheet.create({
   icon: {
     marginRight: 8,
   },
+  countryCode: {
+    color: theme.colors.ternary,
+    fontSize: 16,
+  }
 });
 
 export default LoginScreen;

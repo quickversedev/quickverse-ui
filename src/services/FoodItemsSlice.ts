@@ -32,7 +32,7 @@ const FoodItemsSlice = createSlice({
       })
       .addCase(fetchFoodItems.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch vendors';
+        state.error = action.error.message || 'Failed to fetch featuredItems';
       });
   },
 });

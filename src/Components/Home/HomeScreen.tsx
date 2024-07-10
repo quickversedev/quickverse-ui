@@ -1,10 +1,11 @@
 import React from 'react';
 import {View, StyleSheet, ScrollView} from 'react-native';
 import theme from '../../theme';
-import HorizontalScroll from './HorizontalScroll';
-import HomeScreenVendors from './HomeScreenVendors';
+import HorizontalScroll from './featuredItems/HorizontalScroll';
+import HomeScreenVendors from './homeVendors/HomeScreenVendors';
 import AppHeader from '../util/AppHeader';
-
+import PromoDiscounts from './PromoAndDiscount/PromoDiscounts';
+import CampusBuzz from './campusBuzz/CampusBuzz';
 const HomeScreen: React.FC = () => {
   return (
     <View style={styles.container}>
@@ -12,6 +13,8 @@ const HomeScreen: React.FC = () => {
       <ScrollView>
         <HorizontalScroll />
         <HomeScreenVendors />
+        <PromoDiscounts />
+        <CampusBuzz />
       </ScrollView>
     </View>
   );

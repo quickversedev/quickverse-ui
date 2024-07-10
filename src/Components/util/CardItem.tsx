@@ -11,8 +11,8 @@ import {Card} from 'react-native-paper';
 const {width} = Dimensions.get('window');
 
 interface CardItemProps {
-  name: string;
-  distance: string;
+  name?: string;
+  distance?: string;
   image: ImageSourcePropType;
   onPress: () => void;
 }
@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
     height: ITEM_SIZE * 0.8,
     resizeMode: 'cover',
     borderRadius: 24,
-
     marginBottom: 10,
   },
   title: {

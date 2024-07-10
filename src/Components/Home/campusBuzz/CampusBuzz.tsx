@@ -1,21 +1,37 @@
-// src/components/Heading.tsx
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Text} from 'react-native-paper';
-import HorizontalCardList from './HorizontalCardList';
+import CampusBuzzList from './CampusBuzzList';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchBampusBuzzList} from '../../../services/CampusBuzzListSlice';
+import {AppDispatch, RootState} from '../../../store/store';
+import {Loading} from '../../util/Loading';
 
-const PromoDiscounts = () => {
-  return (
+const CampusBuzz = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+    dispatch(fetchBampusBuzzList());
+  }, [dispatch]);
+  const {campusBuzz, loading} = useSelector(
+    (state: RootState) => state.campusBuzz,
+  );
+
+  if (loading) {
+    return <Loading />;
+  }
+  return campusBuzz.buzzEnabled && campusBuzz?.buzzList?.length > 0 ? (
     <View style={styles.headingContainer}>
       <View style={styles.lineContainer}>
         <View style={styles.line} />
         <Text variant="titleLarge" style={styles.heading}>
-          Promo & Discounts!
+          Campus Buzzzz..!!
         </Text>
         <View style={styles.line} />
       </View>
-      <HorizontalCardList />
+      <CampusBuzzList buzzData={campusBuzz.buzzList} />
     </View>
+  ) : (
+    ''
   );
 };
 
@@ -47,4 +63,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PromoDiscounts;
+export default CampusBuzz;

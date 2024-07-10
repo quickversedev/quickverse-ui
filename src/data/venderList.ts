@@ -63,7 +63,7 @@ const venderList: VenderList[] = [
     description: 'This is a sample vendor description.',
     distance: '2.5 miles',
     vendorEndPoint: 'https://www.smartbiz.in/paajikirasoi',
-    storeEnabled: false,
+    storeEnabled: true,
     vendorOwner: 'John Doe',
     vendorPhone: '+1234567890',
     storeOpeningTime: '09:00 AM',

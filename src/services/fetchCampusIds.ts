@@ -1,12 +1,7 @@
 import axios from 'axios';
 
 import campusses from '../data/campus';
-export interface Campus {
-  campusId: string;
-  campusName: string;
-  location: string;
-  vendors?: {} | undefined;
-}
+import {Campus} from '../utils/canonicalModel';
 
 export const fetchCampusIds = (): Promise<Campus[]> => {
   return new Promise(resolve => {

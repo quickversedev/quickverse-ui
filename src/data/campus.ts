@@ -1,4 +1,4 @@
-import {Campus} from '../services/fetchCampusIds';
+import {Campus} from '../utils/canonicalModel';
 
 const campusses: Campus[] = [
   {

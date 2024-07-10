@@ -1,13 +1,4 @@
-export interface buzz {
-  id: string;
-  image?: any; //base64
-  link: string;
-}
-export interface CampusBuzz {
-  buzzEnabled: boolean;
-  buzzList: buzz[];
-}
-
+import {CampusBuzz} from '../utils/canonicalModel';
 const campusBuzzItems: CampusBuzz = {
   buzzEnabled: false,
   buzzList: [

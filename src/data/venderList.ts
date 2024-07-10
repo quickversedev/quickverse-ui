@@ -1,16 +1,4 @@
-export interface VenderList {
-  vendorId: string;
-  vendorName: string;
-  vendorBanner: string; //base64
-  description: string;
-  distance: string;
-  vendorEndPoint: string;
-  storeEnabled: boolean;
-  vendorOwner: string;
-  vendorPhone: string;
-  storeOpeningTime: string;
-  storeClosingTime: string;
-}
+import {VenderList} from '../utils/canonicalModel';
 
 const venderList: VenderList[] = [
   {

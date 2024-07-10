@@ -4,7 +4,7 @@ import CardItem from '../../util/CardItem';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamListHome} from '../HomeNavigation';
 import {useNavigation} from '@react-navigation/native';
-import {buzz} from '../../../data/campusBuss';
+import {Buzz} from '../../../utils/canonicalModel';
 
 const {width} = Dimensions.get('window');
 const SPACING: any = 3;
@@ -16,7 +16,7 @@ type HomeNavigationProp = StackNavigationProp<
   'WebView'
 >;
 interface Props {
-  buzzData?: buzz[];
+  buzzData?: Buzz[];
 }
 const CampusBuzzList: React.FC<Props> = ({buzzData}) => {
   const navigation = useNavigation<HomeNavigationProp>();

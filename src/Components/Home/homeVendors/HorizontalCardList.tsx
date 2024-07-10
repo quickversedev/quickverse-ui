@@ -4,7 +4,7 @@ import CardItem from '../../util/CardItem';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamListHome} from '../HomeNavigation';
 import {useNavigation} from '@react-navigation/native';
-import {VenderList} from '../../../data/venderList';
+import {VenderList} from '../../../utils/canonicalModel';
 
 const {width} = Dimensions.get('window');
 const SPACING: any = 3;

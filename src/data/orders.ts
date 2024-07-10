@@ -1,11 +1,4 @@
-interface Order {
-  id: string;
-  date: string;
-  items: string[];
-  total: number;
-  status: string;
-}
-
+import {Order} from '../utils/canonicalModel';
 const orders: Order[] = [
   {
     id: '1',

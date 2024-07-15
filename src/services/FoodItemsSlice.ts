@@ -3,12 +3,12 @@ import {FoodItem} from '../data/foodItems';
 import foodItems from '../data/foodItems';
 
 export const fetchFoodItems = createAsyncThunk(
-  'vendorList/fetchVendorList',
+  'foodItems/fetchFoodItems',
   async () => {
     return new Promise<FoodItem[]>(resolve => {
       setTimeout(() => {
         resolve(foodItems);
-      }, 5000); // Mock a delay for fetching data
+      }, 1000); // Mock a delay for fetching data
     });
   },
 );
@@ -32,7 +32,7 @@ const FoodItemsSlice = createSlice({
       })
       .addCase(fetchFoodItems.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch vendors';
+        state.error = action.error.message || 'Failed to fetch featuredItems';
       });
   },
 });

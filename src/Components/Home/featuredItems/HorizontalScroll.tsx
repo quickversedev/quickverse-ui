@@ -9,11 +9,12 @@ import {
 } from 'react-native';
 import {Card, Text} from 'react-native-paper';
 const {width} = Dimensions.get('window');
-import {fetchFoodItems} from '../../services/FoodItemsSlice';
-import {FoodItem} from '../../data/foodItems';
+import {fetchFoodItems} from '../../../services/FoodItemsSlice';
+import {FoodItem} from '../../../utils/canonicalModel';
 import {useDispatch, useSelector} from 'react-redux';
-import {AppDispatch, RootState} from '../../store/store';
-import {Loading} from '../../utils/Loading';
+import {AppDispatch, RootState} from '../../../store/store';
+import {Loading} from '../../util/Loading';
+import theme from '../../../theme';
 
 const SPACING: any = 4;
 const ITEM_SIZE: any = width * 0.76;
@@ -39,7 +40,9 @@ const HorizontalScroll: React.FC = () => {
         ref={flatListRef}
         showsHorizontalScrollIndicator={false}
         data={food}
-        keyExtractor={item => item.id}
+        keyExtractor={(item, index) => {
+          return index.toString();
+        }}
         horizontal
         contentContainerStyle={{alignItems: 'center'}}
         snapToInterval={ITEM_SIZE}
@@ -66,7 +69,7 @@ const HorizontalScroll: React.FC = () => {
             extrapolate: 'clamp',
           });
           return (
-            <View style={{width: ITEM_SIZE}}>
+            <View key={index} style={{width: ITEM_SIZE}}>
               <Animated.View
                 style={{
                   marginHorizontal: SPACING,
@@ -76,12 +79,15 @@ const HorizontalScroll: React.FC = () => {
                   transform: [{translateY}],
                   borderRadius: 34,
                 }}>
-                <Card.Cover source={item.image} style={styles.posterImage} />
+                <Card.Cover
+                  source={{uri: item.image}}
+                  style={styles.posterImage}
+                />
                 <Card.Content style={{alignItems: 'center'}}>
-                  <Text style={{fontSize: 24}} numberOfLines={1}>
+                  <Text style={styles.itemName} numberOfLines={1}>
                     {item.name}
                   </Text>
-                  <Text style={{fontSize: 14}} numberOfLines={3}>
+                  <Text style={styles.itemDesc} numberOfLines={3}>
                     {item.description}
                   </Text>
                 </Card.Content>
@@ -108,6 +114,8 @@ const styles = StyleSheet.create({
     margin: 0,
     marginBottom: 10,
   },
+  itemName: {fontSize: 24, color: theme.colors.ternary},
+  itemDesc: {fontSize: 14, color: theme.colors.ternary, textAlign: 'center'},
 });
 
 export default HorizontalScroll;

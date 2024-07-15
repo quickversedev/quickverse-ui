@@ -1,19 +1,31 @@
 // src/components/CardItem.tsx
 import React from 'react';
-import {View, StyleSheet, Text, Dimensions} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  Dimensions,
+  TouchableOpacity,
+  ImageSourcePropType,
+} from 'react-native';
 import {Card} from 'react-native-paper';
 const {width} = Dimensions.get('window');
 
 interface CardItemProps {
-  name: string;
-  distance: string;
-  image: string;
+  name?: string;
+  distance?: string;
+  image: ImageSourcePropType;
+  onPress: () => void;
 }
 const ITEM_SIZE: any = width * 0.76;
 const SPACING: any = 4;
-const CardItem: React.FC<CardItemProps> = ({name, distance, image}) => {
+const CardItem: React.FC<CardItemProps> = ({
+  name,
+  distance,
+  image,
+  onPress,
+}) => {
   return (
-    <View>
+    <TouchableOpacity onPress={onPress} style={styles.card}>
       <Card.Cover source={image} style={styles.posterImage} />
       <Card.Content style={{alignItems: 'center'}}>
         <Text style={styles.title} numberOfLines={1}>
@@ -23,7 +35,7 @@ const CardItem: React.FC<CardItemProps> = ({name, distance, image}) => {
           {distance}
         </Text>
       </Card.Content>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -39,7 +51,6 @@ const styles = StyleSheet.create({
     height: ITEM_SIZE * 0.8,
     resizeMode: 'cover',
     borderRadius: 24,
-
     marginBottom: 10,
   },
   title: {

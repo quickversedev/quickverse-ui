@@ -1,7 +1,7 @@
 // src/components/AppHeader.tsx
 import React from 'react';
 import {View, Text, StyleSheet, Dimensions} from 'react-native';
-import theme from '../theme';
+import theme from '../../theme';
 
 const {width} = Dimensions.get('window');
 
@@ -24,10 +24,17 @@ const AppHeader: React.FC<AppHeaderProps> = ({headerText, subHeaderText}) => {
 const styles = StyleSheet.create({
   headerContainer: {
     width: width,
-    padding: 20,
-    // backgroundColor: '#6200ea',
+    padding: 15,
     backgroundColor: theme.colors.primary,
-    marginBottom: 10,
+    // marginBottom: 10,
+    shadowColor: theme.colors.ternary,
+    shadowOffset: {
+      width: 0,
+      height: 20, // This will add a shadow at the bottom
+    },
+    shadowOpacity: 0.9,
+    shadowRadius: 9,
+    elevation: 2,
   },
   headerText: {
     fontSize: 24,

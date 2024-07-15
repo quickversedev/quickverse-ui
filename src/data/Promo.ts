@@ -1,5 +1,5 @@
-import {FoodItem} from '../utils/canonicalModel';
-const foodItems: FoodItem[] = [
+import {Promo} from '../utils/canonicalModel';
+const promo: Promo[] = [
   {
     id: '1',
     name: 'Pizza',
@@ -42,4 +42,4 @@ const foodItems: FoodItem[] = [
   },
 ];
 
-export default foodItems;
+export default promo;

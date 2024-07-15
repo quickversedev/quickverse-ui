@@ -1,28 +1,37 @@
 // src/redux/slices/vendorListSlice.ts
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 // import axios from 'axios';
-import {VenderList} from '../data/venderList';
+// import {VenderList} from '../data/venderList';
+import {VenderList} from '../utils/canonicalModel';
 import venderList from '../data/venderList';
+// import axios from 'axios';
+// import {getCampus} from '../utils/Storage';
 // import {VenderList} from '../../data/venderList';
 // import venderList from '../data/venderList';
 
-// export const fetchVendorList = createAsyncThunk(
-//   'vendorList/fetchVendorList',
-//   async () => {
-//     const response = await axios.get('https://api.example.com/vendors');
-//     return response.data as VenderList[];
-//   },
-// );
 export const fetchVendorList = createAsyncThunk(
   'vendorList/fetchVendorList',
   async () => {
     return new Promise<VenderList[]>(resolve => {
       setTimeout(() => {
         resolve(venderList);
-      }, 5000); // Mock a delay for fetching data
+      }, 1000);
     });
   },
 );
+// export const fetchVendorList = createAsyncThunk<VenderList[]>(
+//   'vendorList/fetchVendorList',
+//   async () => {
+//     try {
+//       const response = await axios.get(
+//         `http://192.168.31.144:8080/quickVerse/v1/campus/${getCampus()}/vendors`,
+//       );
+//       return response.data?.vendors;
+//     } catch (error) {
+//       throw new Error('Failed to fetch vendors');
+//     }
+//   },
+// );
 const vendorListSlice = createSlice({
   name: 'vendorList',
   initialState: {

@@ -1,25 +1,15 @@
 // src/components/HorizontalCardList.tsx
-import React, {useState, useEffect} from 'react';
-import {
-  View,
-  StyleSheet,
-  StatusBar,
-  Dimensions,
-  ScrollView,
-} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {fetchVendorList} from '../../services/VendorListSlice';
-import {AppDispatch, RootState} from '../../store/store';
-import CardItem from '../util/CardItem';
-import AppHeader from '../../utils/AppHeader';
-import {Loading} from '../../utils/Loading';
+import React from 'react';
+import {View, StyleSheet, StatusBar, Dimensions} from 'react-native';
+import AppHeader from '../util/AppHeader';
 import VendorCards from './vendorCards';
+import theme from '../../theme';
 
 const {width} = Dimensions.get('window');
 const SPACING: number = 4;
 const ITEM_SIZE: number = (width - SPACING * 6) / 2;
 
-const HorizontalCardList: React.FC = () => {
+const Vendors: React.FC = () => {
   return (
     <View style={styles.container}>
       <StatusBar hidden />
@@ -32,7 +22,7 @@ const HorizontalCardList: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // paddingTop: SPACING * 10,
+    backgroundColor: theme.colors.primary,
   },
   gridContainer: {
     flexDirection: 'row',
@@ -51,4 +41,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HorizontalCardList;
+export default Vendors;

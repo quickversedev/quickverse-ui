@@ -1,67 +1,58 @@
-// import React from 'react';
-// import {View, Text, StyleSheet} from 'react-native';
-
-// const Feedback = () => {
-//   return (
-//     <View style={styles.container}>
-//       <Text>Payment History Screen</Text>
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// });
-
-// export default Feedback;
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, TextInput, StyleSheet, Alert, Text} from 'react-native';
 import theme from '../../theme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomButton from '../util/CustomButton';
 import Dropdown from '../util/Dropdowm';
+import profileService from '../../services/profileService';
+import {getCampus} from '../../utils/Storage';
+import {useNavigation} from '@react-navigation/native';
 
 const Help = () => {
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [feedback, setFeedback] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [selectedQuery, setSelectedQuery] = useState<string>('');
-  const [dropdown, setDropdown] = useState<string[]>([
-    'Forgot Pin',
-    'Refund Status',
-  ]);
-
-  const handleSubmit = () => {
-    Alert.alert(
-      'Query Submitted',
-      `Name: ${name}\nEmail: ${email}\nQuery: ${feedback}`,
-    );
+  const [campusId, setCampusId] = useState<string>('');
+  const dropdown = ['Forgot Pin', 'Refund Status'];
+  const navigation = useNavigation();
+  // const handleSubmit = () => {
+  //   profileService(phoneNumber, campusId, email, selectedQuery, feedback);
+  //   Alert.alert('Query Submitted', `Email: ${email}\nQuery: ${feedback}`);
+  // };
+  const handleSubmit = async () => {
+    try {
+      await profileService(
+        phoneNumber,
+        campusId,
+        email,
+        selectedQuery,
+        feedback,
+      );
+      Alert.alert(
+        'Feedback Submitted',
+        ` Email: ${email}\nFeedback: ${feedback}`,
+      );
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        `Something went wrong..!
+        please try again later`,
+      );
+    }
+    setTimeout(() => {
+      navigation.goBack();
+    }, 2000);
   };
+  useEffect(() => {
+    const campus = getCampus();
+    campus && setCampusId(campus);
+  }, []);
   const handleOptionSelected = (option: string) => {
     setSelectedQuery(option);
   };
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <MaterialCommunityIcons
-          name="account-box"
-          size={24}
-          color={theme.colors.ternary}
-          style={styles.icon}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Full Name"
-          value={name}
-          onChangeText={setName}
-          placeholderTextColor={theme.colors.ternary}
-        />
-      </View>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons
           name="phone"

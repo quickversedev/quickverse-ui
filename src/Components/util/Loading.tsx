@@ -1,13 +1,14 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
-import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-import LinearGradient from 'react-native-linear-gradient';
-import theme from '../../theme';
+// import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+// import LinearGradient from 'react-native-linear-gradient';
+// import theme from '../../theme';
+import {ActivityIndicator} from 'react-native';
 
 export const Loading = () => {
   return (
     <View style={styles.container}>
-      <SkeletonPlaceholder
+      {/* <SkeletonPlaceholder
         backgroundColor={theme.colors.primary} // Set background color to #FFDC52
         highlightColor={theme.colors.ternary} // Set highlight color to #FFDC52
         borderRadius={10} // Increase border radius for a smoother look
@@ -26,8 +27,9 @@ export const Loading = () => {
         )}>
         <View style={styles.skeletonContainer}>
           <View style={styles.skeletonItem} />
-        </View>
-      </SkeletonPlaceholder>
+        </View> */}
+      {/* </SkeletonPlaceholder> */}
+      <ActivityIndicator size="large" color="#0000ff" />
     </View>
   );
 };

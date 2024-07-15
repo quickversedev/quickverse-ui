@@ -65,6 +65,9 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       if (_authData) {
         setAuthData(_authData);
         storage.set('@AuthData', JSON.stringify(_authData));
+        if (pin === '7779') {
+          storage.set('@resetPass', true);
+        }
       }
     } catch (error) {
       throw error; // Rethrow the error to propagate it to the caller

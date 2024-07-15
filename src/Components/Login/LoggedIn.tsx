@@ -4,15 +4,31 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Provider as PaperProvider} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../theme';
-import UserProfileScreen from '../UserProfile/userSummaryScreen';
 import OrderDetailsScreen from '../OrderSummary';
 import globalConfig from '../../utils/GlobalConfig';
 import VendorsNavigator from '../Vendors/VendorsNavigator';
 import HomeNavigation from '../Home/HomeNavigation';
 import ProfileNavigation from '../UserProfile/profileNavigation';
+import {storage} from '../../utils/Storage';
+import ChangePinScreen from '../UserProfile/ChangePin';
+import {useState} from 'react';
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
+  const [forgotPasswordFlow, setForgotPasswordFlow] = useState<boolean>();
+  React.useEffect(() => {
+    const forgotPass = async () => {
+      const resetFlow = await storage.getBoolean('@resetPass');
+      setForgotPasswordFlow(resetFlow);
+    };
+    forgotPass();
+  }, [forgotPasswordFlow]);
+  const handleForgotPasswordFlow = (forgotpass: boolean) => {
+    setForgotPasswordFlow(forgotpass);
+  };
+  if (forgotPasswordFlow) {
+    return <ChangePinScreen forgotPasswordRoute={handleForgotPasswordFlow} />;
+  }
   return (
     <PaperProvider theme={theme}>
       <Tab.Navigator

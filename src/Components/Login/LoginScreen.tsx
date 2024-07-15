@@ -177,6 +177,8 @@ const LoginScreen: React.FC = () => {
                 options={campusIds ? campusIds : []}
                 onOptionSelected={handleOptionSelected}
                 isLoadingCampuses={loadingCampuses}
+                placeHolder="CampusId"
+                iconName="school"
               />
             ) : (
               <Loading />
@@ -272,7 +274,7 @@ const styles = StyleSheet.create({
   countryCode: {
     color: theme.colors.ternary,
     fontSize: 16,
-  }
+  },
 });
 
 export default LoginScreen;

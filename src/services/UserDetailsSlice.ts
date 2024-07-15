@@ -11,7 +11,6 @@ import user from '../data/user';
 export const fetchUserDetails = createAsyncThunk(
   'userDetails/fetchUserDetails',
   async () => {
-    console.log('fetchiing user');
     return new Promise<User>(resolve => {
       setTimeout(() => {
         resolve(user);

@@ -1,36 +1,57 @@
-import React, {useState} from 'react';
-import {View, TextInput, StyleSheet, Alert} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, TextInput, StyleSheet, Alert, Text} from 'react-native';
 import theme from '../../theme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomButton from '../util/CustomButton';
+import {getCampus} from '../../utils/Storage';
+import profileService from '../../services/profileService';
+import {useNavigation} from '@react-navigation/native';
 
 const Feedback = () => {
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [feedback, setFeedback] = useState('');
-
-  const handleSubmit = () => {
-    Alert.alert(
-      'Feedback Submitted',
-      `Name: ${name}\nEmail: ${email}\nFeedback: ${feedback}`,
-    );
+  const [campusId, setCampusId] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const navigation = useNavigation();
+  const handleSubmit = async () => {
+    try {
+      await profileService(phoneNumber, campusId, email, 'Feedback', feedback);
+      Alert.alert(
+        'Feedback Submitted',
+        ` Email: ${email}\nFeedback: ${feedback}`,
+      );
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        `Something went wrong..!
+        please try again later`,
+      );
+    }
+    setTimeout(() => {
+      navigation.goBack();
+    }, 2000);
   };
-
+  useEffect(() => {
+    const campus = getCampus();
+    campus && setCampusId(campus);
+  }, []);
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons
-          name="account-box"
+          name="phone"
           size={24}
           color={theme.colors.ternary}
           style={styles.icon}
         />
+        <Text style={styles.countryCode}> +91</Text>
         <TextInput
           style={styles.input}
-          placeholder="Full Name"
-          value={name}
-          onChangeText={setName}
+          placeholder="Phone Number"
+          value={phoneNumber}
+          onChangeText={setPhoneNumber}
           placeholderTextColor={theme.colors.ternary}
+          keyboardType="phone-pad"
         />
       </View>
       <View style={styles.inputContainer}>
@@ -116,6 +137,10 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 8,
+  },
+  countryCode: {
+    color: theme.colors.ternary,
+    fontSize: 16,
   },
 });
 

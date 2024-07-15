@@ -212,7 +212,8 @@ const SignupScreen: React.FC = () => {
             options={campusIds}
             onOptionSelected={handleOptionSelected}
             isLoadingCampuses={loadingCampuses}
-            // placeholder={'Search..'}
+            placeHolder="CampusId"
+            iconName="school"
           />
         ) : (
           <Loading />

@@ -1,6 +1,6 @@
 import {CampusBuzz} from '../utils/canonicalModel';
 const campusBuzzItems: CampusBuzz = {
-  buzzEnabled: false,
+  buzzEnabled: true,
   buzzList: [
     {
       id: '1',

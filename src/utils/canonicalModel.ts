@@ -47,3 +47,21 @@ export interface Campus {
   location: string;
   vendors?: {} | undefined;
 }
+export interface User {
+  mobile: string;
+  campusId: string;
+  userName: string;
+  pin: string;
+  emailId: string;
+  verifyEmail: false;
+  createdDate: string;
+  addresses: Address[];
+}
+export interface Address {
+  id: number;
+  streetAddress: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}

@@ -4,11 +4,12 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Provider as PaperProvider} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../theme';
-import UserProfileScreen from '../userSummaryScreen';
+import UserProfileScreen from '../UserProfile/userSummaryScreen';
 import OrderDetailsScreen from '../OrderSummary';
 import globalConfig from '../../utils/GlobalConfig';
 import VendorsNavigator from '../Vendors/VendorsNavigator';
 import HomeNavigation from '../Home/HomeNavigation';
+import ProfileNavigation from '../UserProfile/profileNavigation';
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
@@ -73,7 +74,7 @@ const LoggedIn: React.FC = () => {
         />
         <Tab.Screen
           name="User Profile"
-          component={UserProfileScreen}
+          component={ProfileNavigation}
           options={{
             tabBarIcon: ({focused, color}) => (
               <MaterialCommunityIcons

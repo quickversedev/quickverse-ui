@@ -1,7 +1,8 @@
 // src/redux/slices/vendorListSlice.ts
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 // import axios from 'axios';
-import {VenderList} from '../data/venderList';
+// import {VenderList} from '../data/venderList';
+import {VenderList} from '../utils/canonicalModel';
 import venderList from '../data/venderList';
 // import axios from 'axios';
 // import {getCampus} from '../utils/Storage';

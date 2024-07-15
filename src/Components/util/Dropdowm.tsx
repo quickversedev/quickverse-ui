@@ -16,13 +16,17 @@ import {Loading} from './Loading';
 interface DropdownProps {
   options: string[];
   onOptionSelected: (option: string) => void;
-  isLoadingCampuses: boolean;
+  isLoadingCampuses?: boolean;
+  placeHolder: string;
+  iconName: string;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
   options,
   onOptionSelected,
   isLoadingCampuses,
+  placeHolder,
+  iconName,
 }) => {
   const [searchText, setSearchText] = useState<string>('');
   const [filteredOptions, setFilteredOptions] = useState<string[]>(options);
@@ -59,7 +63,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     <View>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons
-          name="school"
+          name={iconName}
           size={24}
           color={theme.colors.ternary}
           style={styles.icon}
@@ -68,7 +72,7 @@ const Dropdown: React.FC<DropdownProps> = ({
           value={searchText}
           onFocus={() => toggleDropdown(true)}
           onChangeText={filterOptions}
-          placeholder="CampusId"
+          placeholder={placeHolder}
           placeholderTextColor={theme.colors.ternary}
           style={styles.input}
         />

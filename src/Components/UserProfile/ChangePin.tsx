@@ -5,13 +5,22 @@ import {View, TextInput, StyleSheet, Alert} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../theme';
 import CustomButton from '../util/CustomButton';
-
-const ChangePinScreen: React.FC = () => {
+import changePinService from '../../services/ChangePinService';
+import {useAuth} from '../../utils/AuthContext';
+import {getCampus, storage} from '../../utils/Storage';
+import {useNavigation} from '@react-navigation/native';
+import {Loading} from '../util/Loading';
+type changePinProps = {
+  forgotPasswordRoute?: (forgotPasswordFlow: boolean) => void;
+};
+const ChangePinScreen: React.FC<changePinProps> = ({forgotPasswordRoute}) => {
   const [currentPin, setCurrentPin] = useState('');
   const [newPin, setNewPin] = useState('');
   const [confirmNewPin, setConfirmNewPin] = useState('');
-
-  const handleChangePin = () => {
+  const [loading, isLoading] = useState(false);
+  const {authData} = useAuth();
+  const navigation = useNavigation();
+  const handleChangePin = async () => {
     if (
       currentPin.length !== 4 ||
       newPin.length !== 4 ||
@@ -26,10 +35,34 @@ const ChangePinScreen: React.FC = () => {
       return;
     }
 
-    // Implement your logic to handle pin change here
-    console.log('Changing PIN...');
-    // Example: validate pins, update state or call an API
+    try {
+      isLoading(true);
+      const campus = getCampus();
+      authData &&
+        campus &&
+        (await changePinService(
+          authData?.session.phoneNumber,
+          campus,
+          currentPin,
+          newPin,
+        ));
+
+      if (forgotPasswordRoute && currentPin === '7779') {
+        forgotPasswordRoute(false);
+        storage.set('@resetPass', false);
+      } else {
+        navigation.goBack();
+      }
+      console.log('Chnage Pin SuccessFUll');
+    } catch (error) {
+      console.log('Error while changing the Pin!');
+    } finally {
+      isLoading(false);
+    }
   };
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <View style={styles.container}>
@@ -78,7 +111,7 @@ const ChangePinScreen: React.FC = () => {
         />
         <TextInput
           style={styles.input}
-          placeholder="confirm New Pin"
+          placeholder="Confirm New Pin"
           value={confirmNewPin}
           onChangeText={setConfirmNewPin}
           placeholderTextColor={theme.colors.ternary}
@@ -89,7 +122,7 @@ const ChangePinScreen: React.FC = () => {
       </View>
       <View style={styles.buttonContainer}>
         <CustomButton
-          title="SignUp"
+          title="Submit"
           onPress={handleChangePin}
           buttonColor={theme.colors.ternary}
           textColor={theme.colors.primary}

@@ -28,7 +28,6 @@ const ProfileScreen = () => {
   const {userDetails, loading} = useSelector(
     (state: RootState) => state.userDetails,
   );
-  console.log('userDetails', userDetails);
   useEffect(() => {
     dispatch(fetchUserDetails());
   }, [dispatch]);

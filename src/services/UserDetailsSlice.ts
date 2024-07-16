@@ -1,24 +1,24 @@
-// src/redux/slices/vendorListSlice.ts
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-// import axios from 'axios';
 import {User} from '../utils/canonicalModel';
-import user from '../data/user';
-// import axios from 'axios';
-// import {getCampus} from '../utils/Storage';
-// import {VenderList} from '../../data/venderList';
-// import venderList from '../data/venderList';
+import axios from 'axios';
+import {getCampus} from '../utils/Storage';
+import globalConfig from '../utils/GlobalConfig';
 
-export const fetchUserDetails = createAsyncThunk(
+export const fetchUserDetails = createAsyncThunk<User, string>(
   'userDetails/fetchUserDetails',
-  async () => {
-    return new Promise<User>(resolve => {
-      setTimeout(() => {
-        resolve(user);
-      }, 1000);
-    });
+  async (token, {rejectWithValue}) => {
+    try {
+      const response = await axios.post(
+        `${globalConfig.apiBaseUrl}/v1/campus/${getCampus()}/user`,
+        {token},
+      );
+      console.log('userDetails:', response.data.vendors);
+      return response.data?.vendors.vendor;
+    } catch (error) {
+      return rejectWithValue('Failed to fetch vendors');
+    }
   },
 );
-
 const UserDetailsSlice = createSlice({
   name: 'userDetails',
   initialState: {

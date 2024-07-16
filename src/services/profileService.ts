@@ -1,4 +1,5 @@
 import axios from 'axios';
+import globalConfig from '../utils/GlobalConfig';
 
 const profileService = (
   phoneNumber: string,
@@ -8,7 +9,7 @@ const profileService = (
   body: string,
 ): Promise<any> => {
   return axios
-    .post('http://192.168.0.102:8080/quickVerse/v1/email', {
+    .post(`${globalConfig.apiBaseUrl}/v1/email`, {
       mobile: '91' + phoneNumber,
       body: body,
       campusId: campusId,

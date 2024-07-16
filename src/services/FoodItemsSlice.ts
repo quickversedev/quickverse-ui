@@ -1,15 +1,21 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {FoodItem} from '../data/foodItems';
-import foodItems from '../data/foodItems';
+import {FoodItem} from '../utils/canonicalModel';
+import axios from 'axios';
+import {getCampus} from '../utils/Storage';
+import globalConfig from '../utils/GlobalConfig';
 
-export const fetchFoodItems = createAsyncThunk(
+export const fetchFoodItems = createAsyncThunk<FoodItem[]>(
   'foodItems/fetchFoodItems',
   async () => {
-    return new Promise<FoodItem[]>(resolve => {
-      setTimeout(() => {
-        resolve(foodItems);
-      }, 1000); // Mock a delay for fetching data
-    });
+    try {
+      const response = await axios.get(
+        `${globalConfig.apiBaseUrl}/v1/featuredItem/${getCampus()}`,
+      );
+      console.log('Featured Items:', response.data.featuredItems.featuredItems);
+      return response.data.featuredItems.featuredItems;
+    } catch (error) {
+      throw new Error('Failed to fetch vendors');
+    }
   },
 );
 const FoodItemsSlice = createSlice({

@@ -67,7 +67,7 @@ const LoginScreen: React.FC = () => {
 
       isValid = false;
     }
-    if (!campusIds?.includes(selectedCampusId)) {
+    if (selectedCampusId === '') {
       setCampusIdError('Please select the campusId');
       isValid = false;
     }
@@ -105,8 +105,8 @@ const LoginScreen: React.FC = () => {
     const getCamousList = async () => {
       try {
         isLoadingCampuses(true);
-        const camousList = await fetchOptions();
-        setCampusIds(camousList);
+        const campusList = await fetchOptions();
+        setCampusIds(campusList);
       } catch (error) {
         console.error('Error fetching options:', error);
       } finally {
@@ -116,7 +116,9 @@ const LoginScreen: React.FC = () => {
     getCamousList();
   }, []);
   const handleOptionSelected = (option: string) => {
-    setSelectedCampusId(option);
+    const extractedString = option.split(' |')[0].trim();
+    console.log('campus:', extractedString);
+    setSelectedCampusId(extractedString);
   };
 
   return (

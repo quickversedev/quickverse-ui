@@ -24,13 +24,13 @@ const ProfileScreen = () => {
     auth.signOut();
   };
   const dispatch = useDispatch<AppDispatch>();
-
+  const {authData} = useAuth();
   const {userDetails, loading} = useSelector(
     (state: RootState) => state.userDetails,
   );
   useEffect(() => {
-    dispatch(fetchUserDetails());
-  }, [dispatch]);
+    authData && dispatch(fetchUserDetails(authData?.session.token));
+  }, [authData, dispatch]);
   if (loading) {
     return <Loading />;
   }

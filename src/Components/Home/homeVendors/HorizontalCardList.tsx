@@ -24,13 +24,13 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
   const handleCardPress = (url: string) => {
     navigation.navigate('WebView', {url});
   };
-  const enabledVendors = vendors.filter(vendor => vendor.storeEnabled);
+
   return (
     <View style={styles.container}>
       <StatusBar hidden />
       <FlatList
         showsHorizontalScrollIndicator={false}
-        data={enabledVendors}
+        data={vendors}
         keyExtractor={(item, index) => {
           return index.toString();
         }}

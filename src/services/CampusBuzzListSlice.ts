@@ -1,23 +1,40 @@
 // src/redux/slices/vendorListSlice.ts
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-// import axios from 'axios';
+import axios from 'axios';
 
-import campusBuzzItems from '../data/campusBuss';
-import {CampusBuzz} from '../data/campusBuss';
-export const fetchBampusBuzzList = createAsyncThunk(
-  'campusBuzz/fetchBampusBuzzList',
+// import campusBuzzItems from '../data/campusBuss';
+// import {CampusBuzz} from '../data/campusBuss';
+import {CampusBuzz} from '../utils/canonicalModel';
+import {getCampus} from '../utils/Storage';
+import globalConfig from '../utils/GlobalConfig';
+// export const fetchBampusBuzzList = createAsyncThunk(
+//   'campusBuzz/fetchBampusBuzzList',
+//   async () => {
+//     return new Promise<CampusBuzz>(resolve => {
+//       setTimeout(() => {
+//         resolve(campusBuzzItems);
+//       }, 1000);
+//     });
+//   },
+// );
+export const fetchBampusBuzzList = createAsyncThunk<CampusBuzz[]>(
+  'campusBuzz/fetchVendorList',
   async () => {
-    return new Promise<CampusBuzz>(resolve => {
-      setTimeout(() => {
-        resolve(campusBuzzItems);
-      }, 1000);
-    });
+    try {
+      const response = await axios.get(
+        `${globalConfig.apiBaseUrl}/v1/campusBuzz/${getCampus()}`,
+      );
+      console.log('CampusBuzz:', response.data.campusBuzzes);
+      return response.data.campusBuzzes;
+    } catch (error) {
+      throw new Error('Failed to fetch vendors');
+    }
   },
 );
 const campusBuzzListSlice = createSlice({
   name: 'campusBuzz',
   initialState: {
-    campusBuzz: {} as CampusBuzz,
+    campusBuzz: [] as CampusBuzz[],
     loading: false,
     error: null as string | null,
   },

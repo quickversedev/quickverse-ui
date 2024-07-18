@@ -32,14 +32,14 @@ export interface FoodItem {
   description?: string;
   link?: string;
 }
-export interface Buzz {
-  id: string;
-  image?: any; //base64
-  link: string;
-}
 export interface CampusBuzz {
-  buzzEnabled: boolean;
-  buzzList: Buzz[];
+  buzzId: string;
+  campusId: string;
+  buzzName: string;
+  buzzDescription: string;
+  buzzUrl?: string;
+  buzzImage: string;
+  endDate: string;
 }
 export interface Campus {
   campusId: string;

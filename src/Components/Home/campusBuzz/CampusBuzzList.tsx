@@ -4,7 +4,7 @@ import CardItem from '../../util/CardItem';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamListHome} from '../HomeNavigation';
 import {useNavigation} from '@react-navigation/native';
-import {Buzz} from '../../../utils/canonicalModel';
+import {CampusBuzz} from '../../../utils/canonicalModel';
 
 const {width} = Dimensions.get('window');
 const SPACING: any = 3;
@@ -16,13 +16,13 @@ type HomeNavigationProp = StackNavigationProp<
   'WebView'
 >;
 interface Props {
-  buzzData?: Buzz[];
+  buzzData?: CampusBuzz[];
 }
 const CampusBuzzList: React.FC<Props> = ({buzzData}) => {
   const navigation = useNavigation<HomeNavigationProp>();
 
-  const handleCardPress = (url: string) => {
-    navigation.navigate('WebView', {url});
+  const handleCardPress = (url: string | undefined) => {
+    url && navigation.navigate('WebView', {url});
   };
 
   return (
@@ -47,8 +47,8 @@ const CampusBuzzList: React.FC<Props> = ({buzzData}) => {
               <CardItem
                 // name={item.vendorName}
                 // distance={item.distance}
-                image={{uri: item.image}}
-                onPress={() => handleCardPress(item.link)}
+                image={{uri: `${item.buzzImage}.jpg`}}
+                onPress={() => handleCardPress(item.buzzUrl)}
               />
             </View>
           );

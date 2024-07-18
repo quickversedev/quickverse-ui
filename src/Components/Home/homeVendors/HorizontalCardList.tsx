@@ -47,7 +47,7 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
               <CardItem
                 name={item.vendorName}
                 distance={item.distance}
-                image={{uri: item.vendorBanner}}
+                image={{uri: `${item.vendorBanner}.jpg`}}
                 onPress={() => handleCardPress(item.vendorEndPoint)}
               />
             </View>

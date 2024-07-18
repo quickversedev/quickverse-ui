@@ -19,7 +19,7 @@ const CampusBuzz = () => {
   if (loading) {
     return <Loading />;
   }
-  return campusBuzz.buzzEnabled && campusBuzz?.buzzList?.length > 0 ? (
+  return campusBuzz?.length > 0 ? (
     <View style={styles.headingContainer}>
       <View style={styles.lineContainer}>
         <View style={styles.line} />
@@ -28,7 +28,7 @@ const CampusBuzz = () => {
         </Text>
         <View style={styles.line} />
       </View>
-      <CampusBuzzList buzzData={campusBuzz.buzzList} />
+      <CampusBuzzList buzzData={campusBuzz} />
     </View>
   ) : (
     ''

@@ -48,7 +48,7 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
     return (
       <View style={styles.imageContainer}>
         <Image
-          source={{uri: item.image}}
+          source={{uri: `${item.image}.jpg`}}
           style={[styles.image, {width: screenWidth, borderRadius: 5}]}
         />
       </View>

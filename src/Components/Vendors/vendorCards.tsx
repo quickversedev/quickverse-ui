@@ -42,7 +42,7 @@ const VendorCards: React.FC = () => {
             <CardItem
               name={item.vendorName}
               distance={item.distance}
-              image={{uri: item.vendorBanner}}
+              image={{uri: `${item.vendorBanner}.jpg`}}
               onPress={() => handleCardPress(item.vendorEndPoint)}
             />
           </View>

@@ -11,7 +11,7 @@ export const fetchPromoItems = createAsyncThunk<Promo[]>(
       const response = await axios.get(
         `${globalConfig.apiBaseUrl}/v1/promotionItem/${getCampus()}`,
       );
-      console.log('Promo:', response.data);
+
       return response.data.promotions.promotions;
     } catch (error) {
       throw new Error('Failed to fetch vendors');

@@ -12,10 +12,9 @@ export const fetchUserDetails = createAsyncThunk<User, string>(
         `${globalConfig.apiBaseUrl}/v1/campus/${getCampus()}/user`,
         {token},
       );
-      console.log('userDetails:', response.data.vendors);
-      return response.data?.vendors.vendor;
+      return response.data;
     } catch (error) {
-      return rejectWithValue('Failed to fetch vendors');
+      return rejectWithValue('Failed to fetch userdetails');
     }
   },
 );

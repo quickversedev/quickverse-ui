@@ -12,11 +12,10 @@ export interface VenderList {
   storeClosingTime: string;
 }
 export interface Promo {
-  id: string;
-  name: string;
-  image: any; //base64
-  description: string;
-  link: string;
+  promoId: string;
+  promoName: string;
+  promoImage: any; //base64
+  promoLink: string;
 }
 export interface Order {
   id: string;

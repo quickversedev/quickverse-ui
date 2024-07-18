@@ -35,18 +35,19 @@ const VendorCards: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.gridContainer}>
-      {vendors
-        .filter(item => item.storeEnabled)
-        .map((item, index) => (
-          <View key={index} style={styles.cardContainer}>
-            <CardItem
-              name={item.vendorName}
-              distance={item.distance}
-              image={{uri: `${item.vendorBanner}.jpg`}}
-              onPress={() => handleCardPress(item.vendorEndPoint)}
-            />
-          </View>
-        ))}
+      {vendors &&
+        vendors
+          .filter(item => item.storeEnabled)
+          .map((item, index) => (
+            <View key={index} style={styles.cardContainer}>
+              <CardItem
+                name={item.vendorName}
+                distance={item.distance}
+                image={{uri: `${item.vendorBanner}.jpg`}}
+                onPress={() => handleCardPress(item.vendorEndPoint)}
+              />
+            </View>
+          ))}
     </ScrollView>
   );
 };

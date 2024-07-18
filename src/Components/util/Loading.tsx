@@ -4,6 +4,7 @@ import {View, StyleSheet} from 'react-native';
 // import LinearGradient from 'react-native-linear-gradient';
 // import theme from '../../theme';
 import {ActivityIndicator} from 'react-native';
+import theme from '../../theme';
 
 export const Loading = () => {
   return (
@@ -29,7 +30,7 @@ export const Loading = () => {
           <View style={styles.skeletonItem} />
         </View> */}
       {/* </SkeletonPlaceholder> */}
-      <ActivityIndicator size="large" color="#0000ff" />
+      <ActivityIndicator size="large" color={theme.colors.ternary} />
     </View>
   );
 };

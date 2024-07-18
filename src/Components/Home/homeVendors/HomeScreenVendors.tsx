@@ -16,14 +16,16 @@ const HomeScreenVendors = () => {
   );
   useEffect(() => {
     console.log('callsing fetchVendorsList');
-    dispatch(fetchVendorList());
+    setTimeout(() => {
+      dispatch(fetchVendorList());
+    }, 1000);
   }, [dispatch]);
   if (loading) {
     return <Loading />;
   }
   const enabledVendors =
     vendors && vendors.filter(vendor => vendor.storeEnabled);
-  return enabledVendors.length > 0 ? (
+  return enabledVendors?.length > 0 ? (
     <View style={styles.headingContainer}>
       <View style={styles.lineContainer}>
         <View style={styles.line} />

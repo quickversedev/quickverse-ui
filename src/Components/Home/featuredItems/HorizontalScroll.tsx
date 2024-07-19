@@ -80,7 +80,7 @@ const HorizontalScroll: React.FC = () => {
                   borderRadius: 34,
                 }}>
                 <Card.Cover
-                  source={{uri: item.image}}
+                  source={{uri: `${item.image}.jpg`}}
                   style={styles.posterImage}
                 />
                 <Card.Content style={{alignItems: 'center'}}>

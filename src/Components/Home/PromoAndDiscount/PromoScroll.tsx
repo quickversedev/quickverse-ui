@@ -48,7 +48,7 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
     return (
       <View style={styles.imageContainer}>
         <Image
-          source={{uri: item.image}}
+          source={{uri: `${item.promoImage}.jpg`}}
           style={[styles.image, {width: screenWidth, borderRadius: 5}]}
         />
       </View>
@@ -79,7 +79,6 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
       );
     });
   };
-
   return (
     <View style={styles.container}>
       <FlatList
@@ -87,7 +86,9 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
         ref={flatlistRef}
         getItemLayout={getItemLayout}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={(item, index) => {
+          return index.toString();
+        }}
         horizontal={true}
         pagingEnabled={true}
         onScroll={handleScroll}

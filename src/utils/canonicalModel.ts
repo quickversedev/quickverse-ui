@@ -12,11 +12,10 @@ export interface VenderList {
   storeClosingTime: string;
 }
 export interface Promo {
-  id: string;
-  name: string;
-  image: any; //base64
-  description: string;
-  link: string;
+  promoId: string;
+  promoName: string;
+  promoImage: any; //base64
+  promoLink: string;
 }
 export interface Order {
   id: string;
@@ -32,14 +31,14 @@ export interface FoodItem {
   description?: string;
   link?: string;
 }
-export interface Buzz {
-  id: string;
-  image?: any; //base64
-  link: string;
-}
 export interface CampusBuzz {
-  buzzEnabled: boolean;
-  buzzList: Buzz[];
+  buzzId: string;
+  campusId: string;
+  buzzName: string;
+  buzzDescription: string;
+  buzzUrl?: string;
+  buzzImage: string;
+  endDate: string;
 }
 export interface Campus {
   campusId: string;

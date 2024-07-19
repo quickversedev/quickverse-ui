@@ -15,7 +15,9 @@ const PromoDiscounts = () => {
     (state: RootState) => state.promoItems,
   );
   useEffect(() => {
-    dispatch(fetchPromoItems());
+    setTimeout(() => {
+      dispatch(fetchPromoItems());
+    }, 1000);
   }, [dispatch]);
   if (loading) {
     return <Loading />;

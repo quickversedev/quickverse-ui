@@ -15,17 +15,16 @@ const changePinService = (
   //     }, 1000);
   //   });
   return axios
-    .post(`${globalConfig.apiBaseUrl}/v1/changepin`, {
-      mobile: '91' + phoneNumber,
+    .put(`${globalConfig.apiBaseUrl}/v1/changePin`, {
+      mobile: phoneNumber,
       campusId: campusId,
-      oldPin: oldPin,
-      NewPin: newPin,
+      oldpin: oldPin,
+      newpin: newPin,
     })
     .then(response => {
       return response;
     })
     .catch(error => {
-      const {code} = error.response.data.error;
       if (error.response) {
         // The request was made and the server responded with a status code
         console.error(
@@ -41,7 +40,8 @@ const changePinService = (
         console.error('Error setting up the request:', error.message);
       }
       // Throw the error again to propagate it to the caller
-      throw code;
+
+      throw error;
     });
 };
 export default changePinService;

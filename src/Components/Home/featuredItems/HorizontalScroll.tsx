@@ -27,7 +27,9 @@ const HorizontalScroll: React.FC = () => {
     (state: RootState) => state.foodItems,
   );
   useEffect(() => {
-    dispatch(fetchFoodItems());
+    setTimeout(() => {
+      dispatch(fetchFoodItems());
+    }, 1000);
   }, [dispatch]);
   if (loading) {
     return <Loading />;

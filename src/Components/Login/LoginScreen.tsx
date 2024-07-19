@@ -21,6 +21,7 @@ import fetchOptions from './getCampusList';
 
 export type RootStackParamList = {
   Login: undefined;
+  Help: undefined;
   Signup: undefined;
 };
 
@@ -117,7 +118,6 @@ const LoginScreen: React.FC = () => {
   }, []);
   const handleOptionSelected = (option: string) => {
     const extractedString = option.split(' |')[0].trim();
-    console.log('campus:', extractedString);
     setSelectedCampusId(extractedString);
   };
 
@@ -203,6 +203,9 @@ const LoginScreen: React.FC = () => {
               enabled={!loading && !loadingCampuses}
             />
           </View>
+          <TouchableOpacity onPress={() => navigation.navigate('Help')}>
+            <Text style={styles.signUpText}>Forgot Passowrd?</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
             <Text style={styles.signUpText}>
               Don't have an account? Sign Up

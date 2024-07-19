@@ -7,6 +7,9 @@ import Dropdown from '../util/Dropdowm';
 import profileService from '../../services/profileService';
 import {getCampus} from '../../utils/Storage';
 import {useNavigation} from '@react-navigation/native';
+import {useAuth} from '../../utils/AuthContext';
+import {Loading} from '../util/Loading';
+import fetchOptions from '../Login/getCampusList';
 
 const Help = () => {
   const [email, setEmail] = useState('');
@@ -14,8 +17,12 @@ const Help = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [selectedQuery, setSelectedQuery] = useState<string>('');
   const [campusId, setCampusId] = useState<string>('');
+  const [loadingCampuses, isLoadingCampuses] = useState(true);
+  const [campusIds, setcampusIds] = useState<string[]>();
+  const [selectedCampusId, setSelectedCampusId] = useState<string>('');
   const dropdown = ['Forgot Pin', 'Refund Status'];
   const navigation = useNavigation();
+  const {authData} = useAuth();
   // const handleSubmit = () => {
   //   profileService(phoneNumber, campusId, email, selectedQuery, feedback);
   //   Alert.alert('Query Submitted', `Email: ${email}\nQuery: ${feedback}`);
@@ -33,6 +40,9 @@ const Help = () => {
         'Feedback Submitted',
         ` Email: ${email}\nFeedback: ${feedback}`,
       );
+      setTimeout(() => {
+        navigation.goBack();
+      }, 2000);
     } catch (error) {
       Alert.alert(
         'Error',
@@ -40,19 +50,39 @@ const Help = () => {
         please try again later`,
       );
     }
-    setTimeout(() => {
-      navigation.goBack();
-    }, 2000);
+  };
+  const getCamousList = async () => {
+    try {
+      isLoadingCampuses(true);
+      const camousList = await fetchOptions();
+      setcampusIds(camousList);
+    } catch (error) {
+      console.error('Error fetching options:', error);
+    } finally {
+      isLoadingCampuses(false);
+    }
   };
   useEffect(() => {
-    const campus = getCampus();
-    campus && setCampusId(campus);
+    getCamousList();
   }, []);
-  const handleOptionSelected = (option: string) => {
+  useEffect(() => {
+    if (authData) {
+      const campus = getCampus();
+      campus && setCampusId(campus);
+    } else {
+      setCampusId(selectedCampusId);
+    }
+  }, [authData, selectedCampusId]);
+  const handleQueryOptionSelected = (option: string) => {
     setSelectedQuery(option);
+  };
+  const handleOptionSelected = (option: string) => {
+    let result = option.split(' |')[0];
+    setSelectedCampusId(result);
   };
   return (
     <View style={styles.container}>
+      <Text style={styles.header}>Help</Text>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons
           name="phone"
@@ -89,10 +119,25 @@ const Help = () => {
       </View>
       <Dropdown
         options={dropdown}
-        onOptionSelected={handleOptionSelected}
+        onOptionSelected={handleQueryOptionSelected}
         placeHolder="Query"
         iconName="pencil"
       />
+      {!authData && (
+        <View>
+          {!loadingCampuses ? (
+            <Dropdown
+              options={campusIds ? campusIds : []}
+              onOptionSelected={handleOptionSelected}
+              isLoadingCampuses={loadingCampuses}
+              placeHolder="CampusId"
+              iconName="school"
+            />
+          ) : (
+            <Loading />
+          )}
+        </View>
+      )}
       <View style={styles.inputContainer1}>
         <TextInput
           style={styles.input}
@@ -122,6 +167,13 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: theme.colors.primary,
   },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 24,
+    textAlign: 'center',
+    color: theme.colors.ternary,
+  },
   label: {
     fontSize: 18,
     marginBottom: 8,
@@ -131,6 +183,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: theme.colors.ternary,
   },
+
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',

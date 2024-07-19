@@ -1,7 +1,7 @@
 // ChangePinScreen.tsx
 
 import React, {useState} from 'react';
-import {View, TextInput, StyleSheet, Alert} from 'react-native';
+import {View, TextInput, StyleSheet, Alert, ScrollView} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../theme';
 import CustomButton from '../util/CustomButton';
@@ -10,6 +10,7 @@ import {useAuth} from '../../utils/AuthContext';
 import {getCampus, storage} from '../../utils/Storage';
 import {useNavigation} from '@react-navigation/native';
 import {Loading} from '../util/Loading';
+import HeaderComponent from './LogoAndHeading';
 type changePinProps = {
   forgotPasswordRoute?: (forgotPasswordFlow: boolean) => void;
 };
@@ -65,7 +66,8 @@ const ChangePinScreen: React.FC<changePinProps> = ({forgotPasswordRoute}) => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
+      <HeaderComponent heading="ChnagePin" />
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons
           name="lock"
@@ -128,7 +130,7 @@ const ChangePinScreen: React.FC<changePinProps> = ({forgotPasswordRoute}) => {
           textColor={theme.colors.primary}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

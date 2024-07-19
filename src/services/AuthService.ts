@@ -28,7 +28,6 @@ const signIn = (
   //     });
   //   }, 1000);
   // });
-  console.log('login:', phoneNumber);
   return axios
     .post(`${globalConfig.apiBaseUrl}/v1/login`, {
       mobile: '91' + phoneNumber,

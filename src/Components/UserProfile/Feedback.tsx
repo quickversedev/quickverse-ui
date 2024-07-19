@@ -6,6 +6,8 @@ import CustomButton from '../util/CustomButton';
 import {getCampus} from '../../utils/Storage';
 import profileService from '../../services/profileService';
 import {useNavigation} from '@react-navigation/native';
+import HeaderComponent from './LogoAndHeading';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const Feedback = () => {
   const [email, setEmail] = useState('');
@@ -36,7 +38,8 @@ const Feedback = () => {
     campus && setCampusId(campus);
   }, []);
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
+      <HeaderComponent heading="FeedBack" />
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons
           name="phone"
@@ -89,7 +92,7 @@ const Feedback = () => {
           textColor={theme.colors.primary}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

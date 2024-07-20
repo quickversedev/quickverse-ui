@@ -6,6 +6,7 @@ import {
   StatusBar,
   FlatList,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
 import {Card, Text} from 'react-native-paper';
 const {width} = Dimensions.get('window');
@@ -15,11 +16,25 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../../store/store';
 import {Loading} from '../../util/Loading';
 import theme from '../../../theme';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamListHome} from '../HomeNavigation';
 
 const SPACING: any = 4;
 const ITEM_SIZE: any = width * 0.76;
 const EMPTY_ITEM_SIZE: any = (width - ITEM_SIZE) / 2;
+
+type HomeNavigationProp = StackNavigationProp<
+  RootStackParamListHome,
+  'WebView'
+>;
+
 const HorizontalScroll: React.FC = () => {
+  const navigation = useNavigation<HomeNavigationProp>();
+
+  const handleCardPress = (url: string | undefined) => {
+    url && navigation.navigate('WebView', {url});
+  };
   const scrollx = React.useRef(new Animated.Value(0)).current;
   const flatListRef = React.useRef<FlatList<FoodItem>>(null);
   const dispatch = useDispatch<AppDispatch>();
@@ -34,7 +49,11 @@ const HorizontalScroll: React.FC = () => {
   if (loading) {
     return <Loading />;
   }
-  const food = [{id: 'empty-left'}, ...foodItemsList, {id: 'empty-right'}];
+  const food = [
+    {itemId: 'empty-left'},
+    ...foodItemsList,
+    {itemId: 'empty-right'},
+  ];
   return (
     <View style={styles.container}>
       <StatusBar hidden />
@@ -57,7 +76,7 @@ const HorizontalScroll: React.FC = () => {
         )}
         scrollEventThrottle={16}
         renderItem={({item, index}) => {
-          if (!item.image) {
+          if (!item.itemImage) {
             return <View style={{width: EMPTY_ITEM_SIZE}} />;
           }
           const inputRange = [
@@ -81,18 +100,22 @@ const HorizontalScroll: React.FC = () => {
                   transform: [{translateY}],
                   borderRadius: 34,
                 }}>
-                <Card.Cover
-                  source={{uri: `${item.image}.jpg`}}
-                  style={styles.posterImage}
-                />
-                <Card.Content style={{alignItems: 'center'}}>
-                  <Text style={styles.itemName} numberOfLines={1}>
-                    {item.name}
-                  </Text>
-                  <Text style={styles.itemDesc} numberOfLines={3}>
-                    {item.description}
-                  </Text>
-                </Card.Content>
+                <TouchableOpacity
+                  onPress={() => handleCardPress(item.itemLink)}
+                  style={styles.posterImage}>
+                  <Card.Cover
+                    source={{uri: `${item.itemImage}.jpg`}}
+                    style={styles.posterImage}
+                  />
+                  <Card.Content style={{alignItems: 'center'}}>
+                    <Text style={styles.itemName} numberOfLines={1}>
+                      {item.itemName}
+                    </Text>
+                    <Text style={styles.itemDesc} numberOfLines={3}>
+                      {item.itemDesc}
+                    </Text>
+                  </Card.Content>
+                </TouchableOpacity>
               </Animated.View>
             </View>
           );

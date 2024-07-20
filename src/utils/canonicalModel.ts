@@ -25,11 +25,11 @@ export interface Order {
   status: string;
 }
 export interface FoodItem {
-  id: string;
-  name?: string;
-  image?: any; //base64
-  description?: string;
-  link?: string;
+  itemId: string;
+  itemName?: string;
+  itemImage?: any; //base64
+  itemDesc?: string;
+  itemLink?: string;
 }
 export interface CampusBuzz {
   buzzId: string;

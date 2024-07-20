@@ -30,6 +30,7 @@ const ProfileNavigation: React.FC = () => {
         name="Feedback"
         component={Feedback}
         options={{
+          headerShown: false,
           headerStyle: {
             backgroundColor: theme.colors.primary,
             height: 60,
@@ -41,6 +42,7 @@ const ProfileNavigation: React.FC = () => {
         name="AboutUs"
         component={AboutUs}
         options={{
+          headerShown: false,
           headerStyle: {
             backgroundColor: theme.colors.primary,
             height: 60,
@@ -52,6 +54,7 @@ const ProfileNavigation: React.FC = () => {
         name="Help"
         component={Help}
         options={{
+          headerShown: false,
           headerStyle: {
             backgroundColor: theme.colors.primary,
             height: 60,
@@ -63,6 +66,7 @@ const ProfileNavigation: React.FC = () => {
         name="ChangePinScreen"
         component={ChangePinScreen}
         options={{
+          headerShown: false,
           headerStyle: {
             backgroundColor: theme.colors.primary,
             height: 60,

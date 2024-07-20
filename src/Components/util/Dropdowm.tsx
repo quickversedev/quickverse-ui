@@ -143,14 +143,15 @@ const styles = StyleSheet.create({
   },
   optionsContainer: {
     position: 'absolute',
-    top: 45,
+    top: 60,
     left: 0,
     right: 0,
     maxHeight: 150,
     borderWidth: 2,
     borderColor: theme.colors.ternary,
     backgroundColor: theme.colors.primary,
-    zIndex: 1,
+    zIndex: 10,
+    borderRadius: 8,
     overflow: 'scroll',
   },
   optionItem: {

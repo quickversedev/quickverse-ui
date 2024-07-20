@@ -24,7 +24,6 @@ export const fetchBampusBuzzList = createAsyncThunk<CampusBuzz[]>(
       const response = await axios.get(
         `${globalConfig.apiBaseUrl}/v1/campusBuzz/${getCampus()}`,
       );
-      console.log('CampusBuzz:', response.data.campusBuzzes);
       return response.data.campusBuzzes;
     } catch (error) {
       throw new Error('Failed to fetch vendors');

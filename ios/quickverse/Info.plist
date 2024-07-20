@@ -31,6 +31,17 @@
 		<false/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>65.0.18.159</key>
+			<dict>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+      			<true/>
+      			<!--Include to specify minimum TLS version-->
+      			<key>NSTemporaryExceptionMinimumTLSVersion</key>
+      			<string>TLSv1.3</string>	
+		</dict>
+		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>

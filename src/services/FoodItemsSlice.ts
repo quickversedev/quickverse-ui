@@ -11,7 +11,10 @@ export const fetchFoodItems = createAsyncThunk<FoodItem[]>(
       const response = await axios.get(
         `${globalConfig.apiBaseUrl}/v1/featuredItem/${getCampus()}`,
       );
-
+      // console.log(
+      //   'featured Items: ',
+      //   response.data.featuredItems.featuredItems,
+      // );
       return response.data.featuredItems.featuredItems;
     } catch (error) {
       throw new Error('Failed to fetch vendors');

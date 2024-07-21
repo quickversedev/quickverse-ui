@@ -8,6 +8,7 @@ import {
   Image,
   TouchableOpacity,
   Modal,
+  Linking,
 } from 'react-native';
 import {Loading} from '../util/Loading';
 import {useAuth} from '../../utils/AuthContext';
@@ -17,6 +18,7 @@ import {useNavigation} from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dropdown from '../util/Dropdowm';
 import fetchOptions from './getCampusList';
+import CheckBox from '@react-native-community/checkbox';
 
 const SignupScreen: React.FC = () => {
   const [fullName, setFullName] = useState<string>('');
@@ -33,6 +35,8 @@ const SignupScreen: React.FC = () => {
   const [campusIds, setcampusIds] = useState<string[]>();
   const [selectedCampusId, setSelectedCampusId] = useState<string>('');
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [isTermsAccepted, setIsTermsAccepted] = useState<boolean>(false);
+
   useEffect(() => {
     if (pin === '' && confirmPin === '') {
       setPinError('');
@@ -63,7 +67,8 @@ const SignupScreen: React.FC = () => {
       !pin.match(/^\d{4}$/) ||
       pin !== confirmPin ||
       !selectedCampusId ||
-      pin !== confirmPin
+      pin !== confirmPin ||
+      !isTermsAccepted
     ) {
       setError('Please fill out all fields correctly.');
       isValid = false;
@@ -108,6 +113,21 @@ const SignupScreen: React.FC = () => {
   const handleOptionSelected = (option: string) => {
     setSelectedCampusId(option);
   };
+  const handleTermsLinkPress = () => {
+    // Open the terms and conditions link
+    Linking.openURL(
+      'https://drive.google.com/file/d/1RuqiipOyHGKPBxs3QTa5dky3VKL9TYO7/view?usp=sharing',
+    );
+  };
+  const handlePrivacyPolicy = () => {
+    // Open the terms and conditions link
+    Linking.openURL(
+      'https://drive.google.com/file/d/1XSIFl5teCUnWsl3DMfl0pDrmHRGoIm76/view?usp=sharing',
+    );
+  };
+  const handleTermsCheckbox = () => {
+    setIsTermsAccepted(!isTermsAccepted);
+  };
 
   if (loading) {
     return <Loading />;
@@ -120,6 +140,19 @@ const SignupScreen: React.FC = () => {
         style={styles.logo}
       />
       <Text style={styles.header}>Sign Up</Text>
+      <View style={{zIndex: 1, marginBottom: 10}}>
+        {!loadingCampuses && campusIds ? (
+          <Dropdown
+            options={campusIds}
+            onOptionSelected={handleOptionSelected}
+            isLoadingCampuses={loadingCampuses}
+            placeHolder="CampusId"
+            iconName="school"
+          />
+        ) : (
+          <Loading />
+        )}
+      </View>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons
           name="account-box"
@@ -206,19 +239,21 @@ const SignupScreen: React.FC = () => {
           maxLength={4}
         />
       </View>
-      <View style={{zIndex: 1}}>
-        {!loadingCampuses && campusIds ? (
-          <Dropdown
-            options={campusIds}
-            onOptionSelected={handleOptionSelected}
-            isLoadingCampuses={loadingCampuses}
-            placeHolder="CampusId"
-            iconName="school"
-          />
-        ) : (
-          <Loading />
-        )}
+      <View style={styles.termsContainer}>
+        <CheckBox
+          value={isTermsAccepted}
+          onValueChange={handleTermsCheckbox}
+          style={styles.checkbox}
+        />
+        <Text onPress={handleTermsLinkPress} style={styles.termsText}>
+          I agree to the{' '}
+          <Text style={styles.termsLink}>Terms and Conditions </Text>
+        </Text>
+        <Text onPress={handlePrivacyPolicy} style={styles.termsText}>
+          & <Text style={styles.termsLink}>privacy Policy</Text>
+        </Text>
       </View>
+
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {pinError ? <Text style={styles.error}>{pinError}</Text> : null}
       <View style={styles.buttonContainer}>
@@ -320,6 +355,21 @@ const styles = StyleSheet.create({
   countryCode: {
     color: theme.colors.ternary,
     fontSize: 16,
+  },
+  termsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  checkbox: {
+    marginRight: 10,
+  },
+  termsText: {
+    color: theme.colors.ternary,
+  },
+  termsLink: {
+    color: theme.colors.ternary,
+    textDecorationLine: 'underline',
   },
 });
 export default SignupScreen;

@@ -9,6 +9,7 @@ import {storage} from './Storage';
 import {AuthData, authService} from '../services/AuthService';
 
 type AuthContextData = {
+  loggedInDate: string;
   authData?: AuthData;
   loading: boolean;
   signIn(phoneNumber: string, pin: string, campusId: string): Promise<void>;
@@ -33,6 +34,7 @@ type AuthProviderProps = {
 const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const [authData, setAuthData] = useState<AuthData | undefined>();
   const [loading, setLoading] = useState(true);
+  const [loggedInDate, setLoggedInDate] = useState<string>('');
 
   useEffect(() => {
     // Every time the App is opened, this provider is rendered
@@ -44,9 +46,11 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     try {
       // Try to get the data from MMKV storage
       const authDataSerialized = storage.getString('@AuthData');
-      if (authDataSerialized) {
+      const logindate = storage.getString('@loginDate');
+      if (authDataSerialized && logindate) {
         const _authData: AuthData = JSON.parse(authDataSerialized);
         setAuthData(_authData);
+        setLoggedInDate(logindate);
       }
     } catch (error) {
       console.error('Failed to load auth data from storage', error);
@@ -68,6 +72,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         if (pin === '7779') {
           storage.set('@resetPass', true);
         }
+        const date = new Date();
+        storage.set('@loginDate', date.toISOString());
       }
     } catch (error) {
       throw error; // Rethrow the error to propagate it to the caller
@@ -94,10 +100,12 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     setAuthData(undefined);
     storage.delete('@AuthData');
     storage.delete('@CampusID');
+    storage.delete('@loginDate');
   };
 
   return (
-    <AuthContext.Provider value={{authData, loading, signIn, signOut, signUp}}>
+    <AuthContext.Provider
+      value={{loggedInDate, authData, loading, signIn, signOut, signUp}}>
       {children}
     </AuthContext.Provider>
   );

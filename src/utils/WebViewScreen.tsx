@@ -39,13 +39,19 @@ const extractHostname = (url: string) => {
   return matches && matches[1];
 };
 
+const calculateExpiryDate = (date: string) => {
+  const dateObject = new Date(date);
+  dateObject.setFullYear(dateObject.getFullYear() + 1);
+  console.log('expiredate:', dateObject.toISOString());
+  return dateObject.toISOString();
+};
 const WebViewScreen: React.FC<WebViewScreenProps> = ({
   route,
   url,
   navigation,
 }) => {
   const [loading, setLoading] = useState(true);
-  const {authData} = useAuth();
+  const {authData, loggedInDate} = useAuth();
   const webViewRef = useRef<WebView>(null);
   const Url = url || route?.params?.url;
   useEffect(() => {
@@ -57,6 +63,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
     const effectiveurl = extractHostname(Url);
     const setMultipleCookies = async () => {
       if (authData && effectiveurl) {
+        const expiryDate = calculateExpiryDate(loggedInDate);
         const cookies = [
           {
             name: 'X_AMZ_JWT',
@@ -64,7 +71,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
             domain: effectiveurl,
             path: '/',
             version: '1',
-            expiration: '2025-06-23T12:00:00.00-00:00',
+            expiration: expiryDate,
           },
           {
             name: 'REQUEST_ORIGIN',
@@ -72,7 +79,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
             domain: effectiveurl,
             path: '/',
             version: '1',
-            expiration: '2025-06-23T12:00:00.00-00:00',
+            expiration: expiryDate,
           },
         ];
         for (const cookie of cookies) {
@@ -91,7 +98,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
       }
     };
     setMultipleCookies();
-  }, [authData, Url, navigation]);
+  }, [authData, Url, navigation, loggedInDate]);
 
   if (loading) {
     return <Loading />;

@@ -10,7 +10,9 @@ import {Loading} from '../../util/Loading';
 const CampusBuzz = () => {
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
-    dispatch(fetchBampusBuzzList());
+    setTimeout(() => {
+      dispatch(fetchBampusBuzzList());
+    }, 1000);
   }, [dispatch]);
   const {campusBuzz, loading} = useSelector(
     (state: RootState) => state.campusBuzz,

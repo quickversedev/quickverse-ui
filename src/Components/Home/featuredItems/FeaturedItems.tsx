@@ -2,39 +2,37 @@
 import React, {useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Text} from 'react-native-paper';
-import HorizontalCardList from './HorizontalCardList';
+import HorizontalScroll from './HorizontalScroll';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {fetchVendorList} from '../../../services/VendorListSlice';
 import {Loading} from '../../util/Loading';
 import {AppDispatch, RootState} from '../../../store/store';
+import {fetchFoodItems} from '../../../services/FoodItemsSlice';
 
-const HomeScreenVendors = () => {
+const FeaturedItems = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const {vendors, loading} = useSelector(
-    (state: RootState) => state.vendorList,
+  const {foodItemsList, loading} = useSelector(
+    (state: RootState) => state.foodItems,
   );
   useEffect(() => {
-    console.log('callsing fetchVendorsList');
     setTimeout(() => {
-      dispatch(fetchVendorList());
+      dispatch(fetchFoodItems());
     }, 1000);
   }, [dispatch]);
   if (loading) {
     return <Loading />;
   }
-  const enabledVendors =
-    vendors && vendors.filter(vendor => vendor.storeEnabled);
-  return enabledVendors?.length > 0 ? (
+
+  return foodItemsList?.length > 0 ? (
     <View style={styles.headingContainer}>
       <View style={styles.lineContainer}>
         <View style={styles.line} />
         <Text variant="titleLarge" style={styles.heading}>
-          Stores Near You!
+          Best Sellers..!
         </Text>
         <View style={styles.line} />
       </View>
-      <HorizontalCardList vendors={enabledVendors} />
+      <HorizontalScroll featuredItems={foodItemsList} />
     </View>
   ) : (
     ''
@@ -43,6 +41,7 @@ const HomeScreenVendors = () => {
 
 const styles = StyleSheet.create({
   headingContainer: {
+    flex: 1,
     alignItems: 'center',
     display: 'flex',
     justifyContent: 'flex-start',
@@ -70,4 +69,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreenVendors;
+export default FeaturedItems;

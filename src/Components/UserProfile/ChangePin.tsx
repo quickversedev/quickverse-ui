@@ -67,7 +67,7 @@ const ChangePinScreen: React.FC<changePinProps> = ({forgotPasswordRoute}) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <HeaderComponent heading="ChnagePin" />
+      <HeaderComponent heading="Change Pin" />
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons
           name="lock"

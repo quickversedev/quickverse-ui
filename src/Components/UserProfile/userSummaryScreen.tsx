@@ -1,5 +1,12 @@
 import React, {useEffect} from 'react';
-import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -35,104 +42,111 @@ const ProfileScreen = () => {
     return <Loading />;
   }
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          // eslint-disable-next-line prettier/prettier, no-useless-escape
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Image
+            // eslint-disable-next-line prettier/prettier
           source={require('../../data/images/qv-blue.png')}
-          style={styles.profileImage}
-        />
-        <View style={styles.headerText}>
-          <Text style={styles.name}>{userDetails.userName}</Text>
-          <Text style={styles.phone}>+{userDetails.mobile}</Text>
-          <Text style={styles.email}>{userDetails.emailId}</Text>
-        </View>
-        {/* <TouchableOpacity style={styles.editIcon}>
+            style={styles.profileImage}
+          />
+          <View style={styles.headerText}>
+            <Text style={styles.name}>{userDetails.userName}</Text>
+            <Text style={styles.phone}>+{userDetails.mobile}</Text>
+            <Text style={styles.email}>{userDetails.emailId}</Text>
+          </View>
+          {/* <TouchableOpacity style={styles.editIcon}>
           <MaterialCommunityIcons
             name="pencil-outline"
             size={24}
             color={theme.colors.ternary}
           />
         </TouchableOpacity> */}
-      </View>
-      <TouchableOpacity
-        style={styles.option}
-        onPress={() => navigation.navigate('ChangePinScreen')}>
-        <MaterialCommunityIcons
-          name="lock"
-          size={24}
-          color={theme.colors.ternary}
-        />
-        <Text style={styles.optionText}>Change Pin</Text>
-        <MaterialCommunityIcons
-          name="chevron-right"
-          size={24}
-          color={theme.colors.ternary}
-        />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.option}
-        onPress={() => navigation.navigate('Help')}>
-        <MaterialCommunityIcons
-          name="account-tie"
-          size={24}
-          color={theme.colors.ternary}
-        />
-        <Text style={styles.optionText}>Help</Text>
-        <MaterialCommunityIcons
-          name="chevron-right"
-          size={24}
-          color={theme.colors.ternary}
-        />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.option}
-        onPress={() => navigation.navigate('Feedback')}>
-        <MaterialCommunityIcons
-          name="book-edit"
-          size={24}
-          color={theme.colors.ternary}
-        />
+        </View>
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => navigation.navigate('ChangePinScreen')}>
+          <MaterialCommunityIcons
+            name="lock"
+            size={24}
+            color={theme.colors.ternary}
+          />
+          <Text style={styles.optionText}>Change Pin</Text>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={24}
+            color={theme.colors.ternary}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => navigation.navigate('Help')}>
+          <MaterialCommunityIcons
+            name="account-tie"
+            size={24}
+            color={theme.colors.ternary}
+          />
+          <Text style={styles.optionText}>Help</Text>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={24}
+            color={theme.colors.ternary}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => navigation.navigate('Feedback')}>
+          <MaterialCommunityIcons
+            name="book-edit"
+            size={24}
+            color={theme.colors.ternary}
+          />
 
-        <Text style={styles.optionText}>Feedback</Text>
-        <MaterialCommunityIcons
-          name="chevron-right"
-          size={24}
-          color={theme.colors.ternary}
-        />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.option}
-        onPress={() => navigation.navigate('AboutUs')}>
-        <MaterialCommunityIcons
-          name="account-network"
-          size={24}
-          color={theme.colors.ternary}
-        />
-        <Text style={styles.optionText}>AboutUs..</Text>
-        <MaterialCommunityIcons
-          name="chevron-right"
-          size={24}
-          color={theme.colors.ternary}
-        />
-      </TouchableOpacity>
-      <View style={styles.buttonContainer}>
-        <CustomButton
-          title="LogOut"
-          onPress={signOut}
-          buttonColor={theme.colors.ternary}
-          textColor={theme.colors.primary}
-        />
+          <Text style={styles.optionText}>Feedback</Text>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={24}
+            color={theme.colors.ternary}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => navigation.navigate('AboutUs')}>
+          <MaterialCommunityIcons
+            name="account-network"
+            size={24}
+            color={theme.colors.ternary}
+          />
+          <Text style={styles.optionText}>AboutUs..</Text>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={24}
+            color={theme.colors.ternary}
+          />
+        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <CustomButton
+            title="LogOut"
+            onPress={signOut}
+            buttonColor={theme.colors.ternary}
+            textColor={theme.colors.primary}
+          />
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  safeArea: {
     backgroundColor: theme.colors.primary,
-    padding: 16,
+    flex: 1,
+  },
+  container: {
+    backgroundColor: theme.colors.primary,
+    paddingBottom: 16,
+    paddingLeft: 16,
+    paddingRight: 16,
   },
   header: {
     flexDirection: 'row',

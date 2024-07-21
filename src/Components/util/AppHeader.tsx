@@ -24,21 +24,20 @@ const AppHeader: React.FC<AppHeaderProps> = ({headerText, subHeaderText}) => {
 const styles = StyleSheet.create({
   headerContainer: {
     width: width,
-    padding: 15,
+    paddingBottom: 15,
     backgroundColor: theme.colors.primary,
-    // marginBottom: 10,
     shadowColor: theme.colors.ternary,
     shadowOffset: {
       width: 0,
-      height: 20, // This will add a shadow at the bottom
+      height: 2, // This will add a shadow at the bottom
     },
-    shadowOpacity: 0.9,
-    shadowRadius: 9,
-    elevation: 2,
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    elevation: 4,
   },
   headerText: {
     fontSize: 24,
-    color: theme.colors.secondary,
+    color: theme.colors.ternary,
     fontWeight: 'bold',
     textAlign: 'center',
   },

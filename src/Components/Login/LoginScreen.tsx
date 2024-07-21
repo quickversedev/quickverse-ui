@@ -139,7 +139,7 @@ const LoginScreen: React.FC = () => {
               color={theme.colors.ternary}
               style={styles.icon}
             />
-            <Text style={styles.countryCode}>+91</Text>
+            <Text style={styles.countryCode}>+91 </Text>
             <TextInput
               style={styles.input}
               placeholder="Phone Number"
@@ -173,7 +173,7 @@ const LoginScreen: React.FC = () => {
               maxLength={4}
             />
           </View>
-          <View>
+          <View style={{zIndex:10}}>
             {!loadingCampuses ? (
               <Dropdown
                 options={campusIds ? campusIds : []}

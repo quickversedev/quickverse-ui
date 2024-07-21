@@ -8,6 +8,7 @@ import profileService from '../../services/profileService';
 import {useNavigation} from '@react-navigation/native';
 import HeaderComponent from './LogoAndHeading';
 import {ScrollView} from 'react-native-gesture-handler';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 const Feedback = () => {
   const [email, setEmail] = useState('');
@@ -38,65 +39,71 @@ const Feedback = () => {
     campus && setCampusId(campus);
   }, []);
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <HeaderComponent heading="FeedBack" />
-      <View style={styles.inputContainer}>
-        <MaterialCommunityIcons
-          name="phone"
-          size={24}
-          color={theme.colors.ternary}
-          style={styles.icon}
-        />
-        <Text style={styles.countryCode}> +91</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Phone Number"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-          placeholderTextColor={theme.colors.ternary}
-          keyboardType="phone-pad"
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <MaterialCommunityIcons
-          name="email"
-          size={24}
-          color={theme.colors.ternary}
-          style={styles.icon}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          placeholderTextColor={theme.colors.ternary}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-      </View>
-      <View style={styles.inputContainer1}>
-        <TextInput
-          style={styles.input}
-          value={feedback}
-          onChangeText={setFeedback}
-          placeholder="Enter your feedback"
-          multiline
-          numberOfLines={4}
-        />
-      </View>
-      <View style={styles.buttonContainer}>
-        <CustomButton
-          title="Submit"
-          onPress={handleSubmit}
-          buttonColor={theme.colors.ternary}
-          textColor={theme.colors.primary}
-        />
-      </View>
-    </ScrollView>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <HeaderComponent heading="FeedBack" />
+        <View style={styles.inputContainer}>
+          <MaterialCommunityIcons
+            name="phone"
+            size={24}
+            color={theme.colors.ternary}
+            style={styles.icon}
+          />
+          <Text style={styles.countryCode}> +91</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Phone Number"
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+            placeholderTextColor={theme.colors.ternary}
+            keyboardType="phone-pad"
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <MaterialCommunityIcons
+            name="email"
+            size={24}
+            color={theme.colors.ternary}
+            style={styles.icon}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            placeholderTextColor={theme.colors.ternary}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+        </View>
+        <View style={styles.inputContainer1}>
+          <TextInput
+            style={styles.input}
+            value={feedback}
+            onChangeText={setFeedback}
+            placeholder="Enter your feedback"
+            multiline
+            numberOfLines={4}
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <CustomButton
+            title="Submit"
+            onPress={handleSubmit}
+            buttonColor={theme.colors.ternary}
+            textColor={theme.colors.primary}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    backgroundColor: theme.colors.primary,
+    flex: 1,
+  },
   container: {
     flex: 1,
     padding: 16,

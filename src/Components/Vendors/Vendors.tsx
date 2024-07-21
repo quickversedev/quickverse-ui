@@ -1,6 +1,12 @@
 // src/components/HorizontalCardList.tsx
 import React from 'react';
-import {View, StyleSheet, StatusBar, Dimensions} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  StatusBar,
+  Dimensions,
+  SafeAreaView,
+} from 'react-native';
 import AppHeader from '../util/AppHeader';
 import VendorCards from './vendorCards';
 import theme from '../../theme';
@@ -11,17 +17,22 @@ const ITEM_SIZE: number = (width - SPACING * 6) / 2;
 
 const Vendors: React.FC = () => {
   return (
-    <View style={styles.container}>
-      <StatusBar hidden />
-      <AppHeader headerText="Vendors" />
-      <VendorCards />
-    </View>
+    <SafeAreaView style={styles.safeView}>
+      <View style={styles.container}>
+        <StatusBar hidden />
+        <AppHeader headerText="Vendors" />
+        <VendorCards />
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeView: {
     flex: 1,
+    backgroundColor: theme.colors.primary,
+  },
+  container: {
     backgroundColor: theme.colors.primary,
   },
   gridContainer: {

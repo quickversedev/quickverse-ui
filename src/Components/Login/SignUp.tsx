@@ -142,7 +142,7 @@ const SignupScreen: React.FC = () => {
           color={theme.colors.ternary}
           style={styles.icon}
         />
-        <Text style={styles.countryCode}> +91</Text>
+        <Text style={styles.countryCode}>+91 </Text>
         <TextInput
           style={styles.input}
           placeholder="Phone Number"
@@ -197,7 +197,7 @@ const SignupScreen: React.FC = () => {
         />
         <TextInput
           style={styles.input}
-          placeholder="confirm Pin"
+          placeholder="Confirm Pin"
           value={confirmPin}
           onChangeText={handleConfirmPinChange}
           placeholderTextColor={theme.colors.ternary}
@@ -206,7 +206,7 @@ const SignupScreen: React.FC = () => {
           maxLength={4}
         />
       </View>
-      <View>
+      <View style={{zIndex: 1}}>
         {!loadingCampuses && campusIds ? (
           <Dropdown
             options={campusIds}

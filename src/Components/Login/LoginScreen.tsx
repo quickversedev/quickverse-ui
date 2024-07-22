@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Text,
   Image,
+  Platform,
 } from 'react-native';
 import {useAuth} from '../../utils/AuthContext';
 import {Loading} from '../util/Loading';
@@ -77,6 +78,7 @@ const LoginScreen: React.FC = () => {
   const signIn = async () => {
     if (validate()) {
       isLoading(true);
+      console.log('campusID:', selectedCampusId);
       await auth.signIn(phoneNumber, pin, selectedCampusId).catch(error => {
         handleSignInError(error);
       });
@@ -132,6 +134,24 @@ const LoginScreen: React.FC = () => {
             style={styles.logo}
           />
           <Text style={styles.header}>Login</Text>
+          <View
+            style={
+              Platform.OS === 'ios'
+                ? styles.iosContainer
+                : styles.androidContainer
+            }>
+            {!loadingCampuses ? (
+              <Dropdown
+                options={campusIds ? campusIds : []}
+                onOptionSelected={handleOptionSelected}
+                isLoadingCampuses={loadingCampuses}
+                placeHolder="CampusId"
+                iconName="school"
+              />
+            ) : (
+              <Loading />
+            )}
+          </View>
           <View style={styles.inputContainer}>
             <MaterialCommunityIcons
               name="phone"
@@ -173,19 +193,7 @@ const LoginScreen: React.FC = () => {
               maxLength={4}
             />
           </View>
-          <View style={{zIndex:10}}>
-            {!loadingCampuses ? (
-              <Dropdown
-                options={campusIds ? campusIds : []}
-                onOptionSelected={handleOptionSelected}
-                isLoadingCampuses={loadingCampuses}
-                placeHolder="CampusId"
-                iconName="school"
-              />
-            ) : (
-              <Loading />
-            )}
-          </View>
+
           {phoneError ? <Text style={styles.error}>{phoneError}</Text> : null}
           {pinError ? <Text style={styles.error}>{pinError}</Text> : null}
           {responseError ? (
@@ -279,6 +287,13 @@ const styles = StyleSheet.create({
   countryCode: {
     color: theme.colors.ternary,
     fontSize: 16,
+  },
+  iosContainer: {
+    zIndex: 1,
+    marginBottom: 10,
+  },
+  androidContainer: {
+    marginBottom: 10,
   },
 });
 

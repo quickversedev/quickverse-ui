@@ -97,7 +97,6 @@ const Dropdown: React.FC<DropdownProps> = ({
           (!isLoadingCampuses ? (
             <FlatList
               data={filteredOptions}
-              contentContainerStyle={{flexGrow: 1}}
               renderItem={({item}) => (
                 <TouchableOpacity
                   onPress={() => onOptionPress(item)}
@@ -151,9 +150,8 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.ternary,
     backgroundColor: theme.colors.primary,
     zIndex: 1000,
-    elevation: 1000,
+    // elevation: 1000,
     borderRadius: 8,
-    overflow: 'scroll',
   },
   optionItem: {
     padding: 10,

@@ -14,6 +14,14 @@ interface WebViewScreenProps {
   route?: RouteProp<any, any>;
   navigation?: StackNavigationProp<any, any>;
 }
+interface Cookie {
+  name: string;
+  value: string;
+  domain: string;
+  path: string;
+  version: string;
+}
+
 interface Cookies {
   [key: string]: {
     value: string;
@@ -39,19 +47,19 @@ const extractHostname = (url: string) => {
   return matches && matches[1];
 };
 
-const calculateExpiryDate = (date: string) => {
-  const dateObject = new Date(date);
-  dateObject.setFullYear(dateObject.getFullYear() + 1);
-  console.log('expiredate:', dateObject.toISOString());
-  return dateObject.toISOString();
-};
+// const calculateExpiryDate = (date: string) => {
+//   const dateObject = new Date(date);
+//   dateObject.setFullYear(dateObject.getFullYear() + 1);
+//   console.log('expiredate:', dateObject.toISOString());
+//   return dateObject.toISOString();
+// };
 const WebViewScreen: React.FC<WebViewScreenProps> = ({
   route,
   url,
   navigation,
 }) => {
   const [loading, setLoading] = useState(true);
-  const {authData, loggedInDate} = useAuth();
+  const {authData} = useAuth();
   const webViewRef = useRef<WebView>(null);
   const Url = url || route?.params?.url;
   useEffect(() => {
@@ -63,15 +71,14 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
     const effectiveurl = extractHostname(Url);
     const setMultipleCookies = async () => {
       if (authData && effectiveurl) {
-        const expiryDate = calculateExpiryDate(loggedInDate);
-        const cookies = [
+        // const expiryDate = calculateExpiryDate(loggedInDate);
+        const cookies: Cookie[] = [
           {
             name: 'X_AMZ_JWT',
             value: authData?.session?.token,
             domain: effectiveurl,
             path: '/',
             version: '1',
-            expiration: expiryDate,
           },
           {
             name: 'REQUEST_ORIGIN',
@@ -79,17 +86,34 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
             domain: effectiveurl,
             path: '/',
             version: '1',
-            expiration: expiryDate,
           },
         ];
+        const existingCookies: Cookies = await CookieManager.get(
+          'https://' + effectiveurl,
+        );
+
         for (const cookie of cookies) {
-          await CookieManager.set('https://' + effectiveurl, cookie)
-            .then(done => {
-              console.log('CookieManager.set =>', done);
+          const existingCookieValue = existingCookies[cookie.name]?.value;
+
+          if (existingCookieValue !== cookie.value) {
+            await CookieManager.set('https://' + effectiveurl, {
+              name: cookie.name,
+              value: cookie.value,
+              domain: cookie.domain,
+              path: cookie.path,
+              version: cookie.version,
             })
-            .catch(error => {
-              console.log('error setting up thje cookie', error);
-            });
+              .then(done => {
+                console.log('CookieManager.set =>', done);
+              })
+              .catch(error => {
+                console.log('error setting up thje cookie', error);
+              });
+          } else {
+            console.log(
+              `Cookie ${cookie.name} is already set with the same value`,
+            );
+          }
         }
         setLoading(false);
       } else {
@@ -98,7 +122,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
       }
     };
     setMultipleCookies();
-  }, [authData, Url, navigation, loggedInDate]);
+  }, [authData, Url, navigation]);
 
   if (loading) {
     return <Loading />;

@@ -34,17 +34,19 @@ const CardItem: React.FC<CardItemProps> = ({
         <Text style={styles.title} numberOfLines={2}>
           {name}
         </Text>
-        <View style={styles.distanceContainer}>
-          <MaterialCommunityIcons
-            name="timer-outline"
-            size={20}
-            color={theme.colors.secondary}
-            style={styles.icon}
-          />
-          <Text style={styles.distance} numberOfLines={1}>
-            {distance}
-          </Text>
-        </View>
+        {distance && (
+          <View style={styles.distanceContainer}>
+            <MaterialCommunityIcons
+              name="timer-outline"
+              size={20}
+              color={theme.colors.secondary}
+              style={styles.icon}
+            />
+            <Text style={styles.distance} numberOfLines={1}>
+              {distance}
+            </Text>
+          </View>
+        )}
       </Card.Content>
     </TouchableOpacity>
   );

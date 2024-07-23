@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: theme.colors.primary,
+    paddingBottom: 50,
   },
   gridContainer: {
     flexDirection: 'row',

@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {fetchVendorList} from '../../../services/VendorListSlice';
 import {Loading} from '../../util/Loading';
 import {AppDispatch, RootState} from '../../../store/store';
+import theme from '../../../theme';
 
 const HomeScreenVendors = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     display: 'flex',
     justifyContent: 'flex-start',
-    paddingTop: 15,
+    paddingTop: 40,
   },
   lineContainer: {
     flexDirection: 'row',
@@ -64,9 +65,10 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 30,
+    padding: 5,
     fontWeight: 'bold',
-    color: '#333',
+    color: theme.colors.ternary,
   },
 });
 

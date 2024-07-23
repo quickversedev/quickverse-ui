@@ -6,8 +6,11 @@ import {
   Dimensions,
   TouchableOpacity,
   ImageSourcePropType,
+  View,
 } from 'react-native';
 import {Card} from 'react-native-paper';
+import theme from '../../theme';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 const {width} = Dimensions.get('window');
 
 interface CardItemProps {
@@ -28,12 +31,20 @@ const CardItem: React.FC<CardItemProps> = ({
     <TouchableOpacity onPress={onPress} style={styles.card}>
       <Card.Cover source={image} style={styles.posterImage} />
       <Card.Content style={{alignItems: 'center'}}>
-        <Text style={styles.title} numberOfLines={1}>
+        <Text style={styles.title} numberOfLines={2}>
           {name}
         </Text>
-        <Text style={styles.distance} numberOfLines={1}>
-          {distance}
-        </Text>
+        <View style={styles.distanceContainer}>
+          <MaterialCommunityIcons
+            name="timer-outline"
+            size={20}
+            color={theme.colors.secondary}
+            style={styles.icon}
+          />
+          <Text style={styles.distance} numberOfLines={1}>
+            {distance}
+          </Text>
+        </View>
       </Card.Content>
     </TouchableOpacity>
   );
@@ -41,6 +52,7 @@ const CardItem: React.FC<CardItemProps> = ({
 
 const styles = StyleSheet.create({
   card: {
+    flex: 1,
     marginHorizontal: SPACING,
     padding: SPACING * 2,
     alignItems: 'center',
@@ -55,9 +67,20 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
+    textAlign: 'center',
+    color: theme.colors.ternary,
+    fontWeight: 'bold',
   },
   distance: {
     fontSize: 14,
+    color: theme.colors.secondary,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  distanceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 

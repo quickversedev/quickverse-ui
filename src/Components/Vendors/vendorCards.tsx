@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
     // paddingTop: SPACING * 10,
   },
   gridContainer: {
+    // flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',

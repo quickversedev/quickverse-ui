@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Loading} from '../../util/Loading';
 import {AppDispatch, RootState} from '../../../store/store';
 import {fetchFoodItems} from '../../../services/FoodItemsSlice';
+import theme from '../../../theme';
 
 const FeaturedItems = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     display: 'flex',
     justifyContent: 'flex-start',
-    paddingTop: 15,
+    paddingTop: 25,
   },
   lineContainer: {
     flexDirection: 'row',
@@ -53,8 +54,8 @@ const styles = StyleSheet.create({
   },
   line: {
     flex: 1,
-    height: 2, // Thicker line
-    backgroundColor: '#333',
+    height: 3, // Thicker line
+    backgroundColor: theme.colors.ternary,
     marginHorizontal: 8,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
@@ -63,9 +64,10 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 30,
+    paddingTop: 5,
     fontWeight: 'bold',
-    color: '#333',
+    color: theme.colors.ternary,
   },
 });
 

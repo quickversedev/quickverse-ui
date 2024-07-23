@@ -60,7 +60,7 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: SPACING * 10,
+    paddingTop: SPACING * 8,
   },
 });
 

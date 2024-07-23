@@ -159,7 +159,9 @@ const SignupScreen: React.FC = () => {
           <Loading />
         )}
       </View>
-      <ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}>
         <View style={styles.inputContainer}>
           <MaterialCommunityIcons
             name="account-box"

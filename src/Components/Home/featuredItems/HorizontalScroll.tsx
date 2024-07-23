@@ -43,7 +43,6 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
   ];
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
       <Animated.FlatList
         ref={flatListRef}
         showsHorizontalScrollIndicator={false}

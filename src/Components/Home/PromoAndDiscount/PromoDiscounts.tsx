@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     display: 'flex',
     justifyContent: 'flex-start',
+    paddingTop: 15,
   },
   lineContainer: {
     flexDirection: 'row',

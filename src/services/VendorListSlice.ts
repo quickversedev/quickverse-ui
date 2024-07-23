@@ -1,10 +1,10 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axios from 'axios';
-import {VenderList} from '../utils/canonicalModel';
+import {Vendor} from '../utils/canonicalModel';
 import {getCampus} from '../utils/Storage';
 import globalConfig from '../utils/GlobalConfig';
 
-export const fetchVendorList = createAsyncThunk<VenderList[]>(
+export const fetchVendorList = createAsyncThunk<Vendor[]>(
   'vendorList/fetchVendorList',
   async () => {
     try {
@@ -20,7 +20,7 @@ export const fetchVendorList = createAsyncThunk<VenderList[]>(
 const vendorListSlice = createSlice({
   name: 'vendorList',
   initialState: {
-    vendors: [] as VenderList[],
+    vendors: [] as Vendor[],
     loading: false,
     error: null as string | null,
   },

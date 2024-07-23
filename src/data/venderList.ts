@@ -1,6 +1,6 @@
-import {VenderList} from '../utils/canonicalModel';
+import {Vendor} from '../utils/canonicalModel';
 
-const venderList: VenderList[] = [
+const venderList: Vendor[] = [
   {
     vendorId: '001',
     vendorName: 'Sample Vendor1',

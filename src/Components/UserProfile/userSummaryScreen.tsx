@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
@@ -47,7 +48,7 @@ const ProfileScreen = () => {
         <View style={styles.header}>
           <Image
             // eslint-disable-next-line prettier/prettier
-          source={require('../../data/images/qv-blue.png')}
+            source={require('../../data/images/qv-blue.png')}
             style={styles.profileImage}
           />
           <View style={styles.headerText}>
@@ -141,6 +142,7 @@ const styles = StyleSheet.create({
   safeArea: {
     backgroundColor: theme.colors.primary,
     flex: 1,
+    paddingTop: Platform.OS === 'android' ? 10 : 0,
   },
   container: {
     backgroundColor: theme.colors.primary,

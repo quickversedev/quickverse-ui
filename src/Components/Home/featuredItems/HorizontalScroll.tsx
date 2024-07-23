@@ -43,7 +43,6 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
   ];
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
       <Animated.FlatList
         ref={flatListRef}
         showsHorizontalScrollIndicator={false}
@@ -115,7 +114,6 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
 const styles = StyleSheet.create({
   container: {
     display: 'flex',
-    paddingTop: SPACING,
     justifyContent: 'flex-start',
   },
   posterImage: {
@@ -126,8 +124,8 @@ const styles = StyleSheet.create({
     margin: 0,
     marginBottom: 10,
   },
-  itemName: {fontSize: 24, color: theme.colors.ternary},
-  itemDesc: {fontSize: 14, color: theme.colors.ternary, textAlign: 'center'},
+  itemName: {fontSize: 24, color: theme.colors.ternary, fontWeight: 'bold'},
+  itemDesc: {fontSize: 14, color: theme.colors.secondary, textAlign: 'center'},
 });
 
 export default HorizontalScroll;

@@ -4,7 +4,7 @@ import CardItem from '../../util/CardItem';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamListHome} from '../HomeNavigation';
 import {useNavigation} from '@react-navigation/native';
-import {VenderList} from '../../../utils/canonicalModel';
+import {Vendor} from '../../../utils/canonicalModel';
 
 const {width} = Dimensions.get('window');
 const SPACING: any = 3;
@@ -16,7 +16,7 @@ type HomeNavigationProp = StackNavigationProp<
   'WebView'
 >;
 interface Props {
-  vendors: VenderList[];
+  vendors: Vendor[];
 }
 const HorizontalCardList: React.FC<Props> = ({vendors}) => {
   const navigation = useNavigation<HomeNavigationProp>();
@@ -27,7 +27,6 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
       <FlatList
         showsHorizontalScrollIndicator={false}
         data={vendors}
@@ -61,7 +60,7 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: SPACING * 10,
+    paddingTop: SPACING * 8,
   },
 });
 

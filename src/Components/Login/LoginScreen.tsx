@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Text,
   Image,
+  Platform,
 } from 'react-native';
 import {useAuth} from '../../utils/AuthContext';
 import {Loading} from '../util/Loading';
@@ -18,6 +19,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Dropdown from '../util/Dropdowm';
 import {setCampus} from '../../utils/Storage';
 import fetchOptions from './getCampusList';
+import {ScrollView} from 'react-native-gesture-handler';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -77,6 +79,7 @@ const LoginScreen: React.FC = () => {
   const signIn = async () => {
     if (validate()) {
       isLoading(true);
+      console.log('campusID:', selectedCampusId);
       await auth.signIn(phoneNumber, pin, selectedCampusId).catch(error => {
         handleSignInError(error);
       });
@@ -132,48 +135,12 @@ const LoginScreen: React.FC = () => {
             style={styles.logo}
           />
           <Text style={styles.header}>Login</Text>
-          <View style={styles.inputContainer}>
-            <MaterialCommunityIcons
-              name="phone"
-              size={24}
-              color={theme.colors.ternary}
-              style={styles.icon}
-            />
-            <Text style={styles.countryCode}>+91 </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Phone Number"
-              value={phoneNumber}
-              onChangeText={text => {
-                setPhoneError('');
-                setPhoneNumber(text);
-              }}
-              placeholderTextColor={theme.colors.ternary}
-              keyboardType="phone-pad"
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <MaterialCommunityIcons
-              name="lock"
-              size={24}
-              color={theme.colors.ternary}
-              style={styles.icon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="4-digit PIN"
-              value={pin}
-              onChangeText={text => {
-                setPinError('');
-                setPin(text);
-              }}
-              placeholderTextColor={theme.colors.ternary}
-              secureTextEntry
-              keyboardType="numeric"
-              maxLength={4}
-            />
-          </View>
-          <View style={{zIndex:10}}>
+          <View
+            style={
+              Platform.OS === 'ios'
+                ? styles.iosContainer
+                : styles.androidContainer
+            }>
             {!loadingCampuses ? (
               <Dropdown
                 options={campusIds ? campusIds : []}
@@ -186,31 +153,77 @@ const LoginScreen: React.FC = () => {
               <Loading />
             )}
           </View>
-          {phoneError ? <Text style={styles.error}>{phoneError}</Text> : null}
-          {pinError ? <Text style={styles.error}>{pinError}</Text> : null}
-          {responseError ? (
-            <Text style={styles.error}>{responseError}</Text>
-          ) : null}
-          {campusIdError ? (
-            <Text style={styles.error}>{campusIdError}</Text>
-          ) : null}
-          <View style={styles.buttonContainer}>
-            <CustomButton
-              title="Login"
-              onPress={signIn}
-              buttonColor={theme.colors.ternary}
-              textColor={theme.colors.primary}
-              enabled={!loading && !loadingCampuses}
-            />
-          </View>
-          <TouchableOpacity onPress={() => navigation.navigate('Help')}>
-            <Text style={styles.signUpText}>Forgot Passowrd?</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-            <Text style={styles.signUpText}>
-              Don't have an account? Sign Up
-            </Text>
-          </TouchableOpacity>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}>
+            <View style={styles.inputContainer}>
+              <MaterialCommunityIcons
+                name="phone"
+                size={24}
+                color={theme.colors.ternary}
+                style={styles.icon}
+              />
+              <Text style={styles.countryCode}>+91 </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Phone Number"
+                value={phoneNumber}
+                onChangeText={text => {
+                  setPhoneError('');
+                  setPhoneNumber(text);
+                }}
+                placeholderTextColor={theme.colors.ternary}
+                keyboardType="phone-pad"
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <MaterialCommunityIcons
+                name="lock"
+                size={24}
+                color={theme.colors.ternary}
+                style={styles.icon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="4-digit PIN"
+                value={pin}
+                onChangeText={text => {
+                  setPinError('');
+                  setPin(text);
+                }}
+                placeholderTextColor={theme.colors.ternary}
+                secureTextEntry
+                keyboardType="numeric"
+                maxLength={4}
+              />
+            </View>
+
+            {phoneError ? <Text style={styles.error}>{phoneError}</Text> : null}
+            {pinError ? <Text style={styles.error}>{pinError}</Text> : null}
+            {responseError ? (
+              <Text style={styles.error}>{responseError}</Text>
+            ) : null}
+            {campusIdError ? (
+              <Text style={styles.error}>{campusIdError}</Text>
+            ) : null}
+            <View style={styles.buttonContainer}>
+              <CustomButton
+                title="Login"
+                onPress={signIn}
+                buttonColor={theme.colors.ternary}
+                textColor={theme.colors.primary}
+                enabled={!loading && !loadingCampuses}
+              />
+            </View>
+            <TouchableOpacity onPress={() => navigation.navigate('Help')}>
+              <Text style={styles.signUpText}>Forgot Passowrd?</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+              <Text style={styles.signUpText}>
+                Don't have an account? Sign Up
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
         </View>
       )}
     </View>
@@ -279,6 +292,13 @@ const styles = StyleSheet.create({
   countryCode: {
     color: theme.colors.ternary,
     fontSize: 16,
+  },
+  iosContainer: {
+    zIndex: 1,
+    marginBottom: 10,
+  },
+  androidContainer: {
+    marginBottom: 10,
   },
 });
 

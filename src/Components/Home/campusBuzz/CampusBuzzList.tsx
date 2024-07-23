@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, StatusBar, FlatList, Dimensions} from 'react-native';
+import {View, StyleSheet, FlatList, Dimensions} from 'react-native';
 import CardItem from '../../util/CardItem';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamListHome} from '../HomeNavigation';
@@ -27,7 +27,6 @@ const CampusBuzzList: React.FC<Props> = ({buzzData}) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
       <FlatList
         showsHorizontalScrollIndicator={false}
         data={buzzData}

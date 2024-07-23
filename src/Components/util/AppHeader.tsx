@@ -1,6 +1,6 @@
 // src/components/AppHeader.tsx
 import React from 'react';
-import {View, Text, StyleSheet, Dimensions} from 'react-native';
+import {View, Text, StyleSheet, Dimensions, Platform} from 'react-native';
 import theme from '../../theme';
 
 const {width} = Dimensions.get('window');
@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 2,
     elevation: 4,
+    paddingTop: Platform.OS === 'android' ? 10 : 0,
   },
   headerText: {
     fontSize: 24,

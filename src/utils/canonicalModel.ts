@@ -1,4 +1,4 @@
-export interface VenderList {
+export interface Vendor {
   vendorId: string;
   vendorName: string;
   vendorBanner: string; //base64

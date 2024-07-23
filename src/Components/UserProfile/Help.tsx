@@ -6,6 +6,8 @@ import {
   Alert,
   Text,
   SafeAreaView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import theme from '../../theme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -88,87 +90,89 @@ const Help = () => {
     setSelectedCampusId(result);
   };
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Text style={styles.header}>Help</Text>
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="phone"
-            size={24}
-            color={theme.colors.ternary}
-            style={styles.icon}
-          />
-          <Text style={styles.countryCode}>+91 </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Phone Number"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-            placeholderTextColor={theme.colors.ternary}
-            keyboardType="phone-pad"
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="email"
-            size={24}
-            color={theme.colors.ternary}
-            style={styles.icon}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            placeholderTextColor={theme.colors.ternary}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-        <View style={{zIndex: 2}}>
-          <Dropdown
-            options={dropdown}
-            onOptionSelected={handleQueryOptionSelected}
-            placeHolder="Query"
-            iconName="pencil"
-          />
-        </View>
-        {!authData && (
-          <View style={{zIndex: 1}}>
-            {!loadingCampuses ? (
-              <Dropdown
-                options={campusIds ? campusIds : []}
-                onOptionSelected={handleOptionSelected}
-                isLoadingCampuses={loadingCampuses}
-                placeHolder="CampusId"
-                iconName="school"
-              />
-            ) : (
-              <Loading />
-            )}
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <Text style={styles.header}>Help</Text>
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="phone"
+              size={24}
+              color={theme.colors.ternary}
+              style={styles.icon}
+            />
+            <Text style={styles.countryCode}>+91 </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Phone Number"
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              placeholderTextColor={theme.colors.ternary}
+              keyboardType="phone-pad"
+            />
           </View>
-        )}
-        <View style={styles.inputContainer1}>
-          <TextInput
-            style={styles.input}
-            value={feedback}
-            onChangeText={setFeedback}
-            placeholder="Enter your Query"
-            multiline
-            numberOfLines={4}
-          />
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="email"
+              size={24}
+              color={theme.colors.ternary}
+              style={styles.icon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              placeholderTextColor={theme.colors.ternary}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+          <View style={{zIndex: 2}}>
+            <Dropdown
+              options={dropdown}
+              onOptionSelected={handleQueryOptionSelected}
+              placeHolder="Query"
+              iconName="pencil"
+            />
+          </View>
+          {!authData && (
+            <View style={{zIndex: 1}}>
+              {!loadingCampuses ? (
+                <Dropdown
+                  options={campusIds ? campusIds : []}
+                  onOptionSelected={handleOptionSelected}
+                  isLoadingCampuses={loadingCampuses}
+                  placeHolder="CampusId"
+                  iconName="school"
+                />
+              ) : (
+                <Loading />
+              )}
+            </View>
+          )}
+          <View style={styles.inputContainer1}>
+            <TextInput
+              style={styles.input}
+              value={feedback}
+              onChangeText={setFeedback}
+              placeholder="Enter your Query"
+              multiline
+              numberOfLines={4}
+            />
+          </View>
+          <Text>Please provide order Id in case for refund query..!</Text>
+          <View style={styles.buttonContainer}>
+            <CustomButton
+              title="Submit"
+              onPress={handleSubmit}
+              buttonColor={theme.colors.ternary}
+              textColor={theme.colors.primary}
+            />
+          </View>
         </View>
-        <Text>Please provide order Id in case for refund query..!</Text>
-        <View style={styles.buttonContainer}>
-          <CustomButton
-            title="Submit"
-            onPress={handleSubmit}
-            buttonColor={theme.colors.ternary}
-            textColor={theme.colors.primary}
-          />
-        </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 

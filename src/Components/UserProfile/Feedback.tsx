@@ -1,5 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {View, TextInput, StyleSheet, Alert, Text} from 'react-native';
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  Alert,
+  Text,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 import theme from '../../theme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomButton from '../util/CustomButton';
@@ -39,63 +47,67 @@ const Feedback = () => {
     campus && setCampusId(campus);
   }, []);
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <HeaderComponent heading="FeedBack" />
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="phone"
-            size={24}
-            color={theme.colors.ternary}
-            style={styles.icon}
-          />
-          <Text style={styles.countryCode}> +91</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Phone Number"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-            placeholderTextColor={theme.colors.ternary}
-            keyboardType="phone-pad"
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="email"
-            size={24}
-            color={theme.colors.ternary}
-            style={styles.icon}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            placeholderTextColor={theme.colors.ternary}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-        <View style={styles.inputContainer1}>
-          <TextInput
-            style={styles.input}
-            value={feedback}
-            onChangeText={setFeedback}
-            placeholder="Enter your feedback"
-            multiline
-            numberOfLines={4}
-          />
-        </View>
-        <View style={styles.buttonContainer}>
-          <CustomButton
-            title="Submit"
-            onPress={handleSubmit}
-            buttonColor={theme.colors.ternary}
-            textColor={theme.colors.primary}
-          />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="always">
+          <HeaderComponent heading="FeedBack" />
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="phone"
+              size={24}
+              color={theme.colors.ternary}
+              style={styles.icon}
+            />
+            <Text style={styles.countryCode}> +91</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Phone Number"
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              placeholderTextColor={theme.colors.ternary}
+              keyboardType="phone-pad"
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="email"
+              size={24}
+              color={theme.colors.ternary}
+              style={styles.icon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              placeholderTextColor={theme.colors.ternary}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+          <View style={styles.inputContainer1}>
+            <TextInput
+              style={styles.input}
+              value={feedback}
+              onChangeText={setFeedback}
+              placeholder="Enter your feedback"
+              multiline
+              numberOfLines={4}
+            />
+          </View>
+          <View style={styles.buttonContainer}>
+            <CustomButton
+              title="Submit"
+              onPress={handleSubmit}
+              buttonColor={theme.colors.ternary}
+              textColor={theme.colors.primary}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 

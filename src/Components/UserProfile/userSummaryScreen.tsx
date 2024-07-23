@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Platform,
+  Linking,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
@@ -39,9 +40,14 @@ const ProfileScreen = () => {
   useEffect(() => {
     authData && dispatch(fetchUserDetails(authData?.session.token));
   }, [authData, dispatch]);
+  const handleDeleteAccount = () => {
+    // Open the terms and conditions link
+    Linking.openURL('https://forms.gle/GDWr1mj2LBbZ5m7L6');
+  };
   if (loading) {
     return <Loading />;
   }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -125,6 +131,9 @@ const ProfileScreen = () => {
             color={theme.colors.ternary}
           />
         </TouchableOpacity>
+        <TouchableOpacity onPress={handleDeleteAccount}>
+          <Text style={styles.deleteAccount}>Delete Account?</Text>
+        </TouchableOpacity>
         <View style={styles.buttonContainer}>
           <CustomButton
             title="LogOut"
@@ -197,6 +206,14 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     fontSize: 18,
     color: theme.colors.ternary,
+  },
+  deleteAccount: {
+    marginTop: 36,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 15,
+    color: theme.colors.ternary,
+    textDecorationLine: 'underline',
   },
 });
 

@@ -114,7 +114,7 @@ const LoginScreen: React.FC = () => {
         const campusList = await fetchOptions();
         setCampusIds(campusList);
       } catch (error) {
-        console.error('Error fetching options:', error);
+        setResponseError('Error fetching campus details');
       } finally {
         isLoadingCampuses(false);
       }
@@ -223,10 +223,18 @@ const LoginScreen: React.FC = () => {
                   enabled={!loading && !loadingCampuses}
                 />
               </View>
-              <TouchableOpacity onPress={() => navigation.navigate('Help')}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.removeListener;
+                  navigation.navigate('Help');
+                }}>
                 <Text style={styles.signUpText}>Forgot Passowrd?</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.removeListener;
+                  navigation.navigate('Signup');
+                }}>
                 <Text style={styles.signUpText}>
                   Don't have an account? Sign Up
                 </Text>

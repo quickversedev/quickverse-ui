@@ -21,7 +21,6 @@ interface Cookie {
   path: string;
   version: string;
 }
-
 interface Cookies {
   [key: string]: {
     value: string;
@@ -38,7 +37,7 @@ const getAuthorizationCookie = async (url: string): Promise<string | null> => {
       return null;
     }
   } catch (error) {
-    console.error('Error getting cookies:', error);
+    console.log('Error getting cookies:', error);
     return null;
   }
 };

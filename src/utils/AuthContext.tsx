@@ -53,7 +53,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         setLoggedInDate(logindate);
       }
     } catch (error) {
-      console.error('Failed to load auth data from storage', error);
+      console.log('Failed to load auth data from storage', error);
     } finally {
       setLoading(false);
     }

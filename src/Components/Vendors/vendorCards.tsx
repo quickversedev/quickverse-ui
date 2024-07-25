@@ -30,6 +30,7 @@ const VendorCards: React.FC = () => {
     return <Loading />;
   }
   const handleCardPress = (url: string) => {
+    navigation.removeListener;
     navigation.navigate('WebView', {url});
   };
 

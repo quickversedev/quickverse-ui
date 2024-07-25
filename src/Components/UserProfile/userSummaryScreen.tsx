@@ -72,7 +72,10 @@ const ProfileScreen = () => {
         </View>
         <TouchableOpacity
           style={styles.option}
-          onPress={() => navigation.navigate('ChangePinScreen')}>
+          onPress={() => {
+            navigation.removeListener;
+            navigation.navigate('ChangePinScreen');
+          }}>
           <MaterialCommunityIcons
             name="lock"
             size={24}
@@ -87,7 +90,10 @@ const ProfileScreen = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.option}
-          onPress={() => navigation.navigate('Help')}>
+          onPress={() => {
+            navigation.removeListener;
+            navigation.navigate('Help');
+          }}>
           <MaterialCommunityIcons
             name="account-tie"
             size={24}
@@ -102,7 +108,10 @@ const ProfileScreen = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.option}
-          onPress={() => navigation.navigate('Feedback')}>
+          onPress={() => {
+            navigation.removeListener;
+            navigation.navigate('Feedback');
+          }}>
           <MaterialCommunityIcons
             name="book-edit"
             size={24}
@@ -118,7 +127,10 @@ const ProfileScreen = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.option}
-          onPress={() => navigation.navigate('AboutUs')}>
+          onPress={() => {
+            navigation.removeListener;
+            navigation.navigate('AboutUs');
+          }}>
           <MaterialCommunityIcons
             name="account-network"
             size={24}

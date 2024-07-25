@@ -55,7 +55,7 @@ const SignupScreen: React.FC = () => {
   };
   const handleSignUpError = (error: any) => {
     if (error.includes('1005')) {
-      setError('Error occurred while creating the User.');
+      setError('User Already Exist.!');
     } else if (error.includes('1111')) {
       setError('Unknown error.');
     } else {
@@ -106,7 +106,7 @@ const SignupScreen: React.FC = () => {
       const camousList = await fetchOptions();
       setcampusIds(camousList);
     } catch (error) {
-      console.error('Error fetching options:', error);
+      console.log('Error fetching options:', error);
     } finally {
       isLoadingCampuses(false);
     }

@@ -22,6 +22,7 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
   const navigation = useNavigation<HomeNavigationProp>();
 
   const handleCardPress = (url: string) => {
+    navigation.removeListener;
     navigation.navigate('WebView', {url});
   };
 

@@ -23,17 +23,17 @@ const profileService = (
       const {code} = error.response.data.error;
       if (error.response) {
         // The request was made and the server responded with a status code
-        console.error(
+        console.log(
           'Server responded with non-2xx status:',
           error.response.status,
         );
-        console.error('Response data:', error.response.data);
+        console.log('Response data:', error.response.data);
       } else if (error.request) {
         // The request was made but no response was received
-        console.error('No response received:', error.request);
+        console.log('No response received:', error.request);
       } else {
         // Something happened in setting up the request that triggered an Error
-        console.error('Error setting up the request:', error.message);
+        console.log('Error setting up the request:', error.message);
       }
       // Throw the error again to propagate it to the caller
       throw code;

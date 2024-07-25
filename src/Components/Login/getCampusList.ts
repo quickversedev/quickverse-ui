@@ -12,7 +12,7 @@ const fetchOptions = async () => {
         : [];
     return cam;
   } catch (error) {
-    console.error('Error fetching ', error);
+    console.log('Error fetching ', error);
     throw error;
   }
 };

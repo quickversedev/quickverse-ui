@@ -66,7 +66,7 @@ const Help = () => {
       const camousList = await fetchOptions();
       setcampusIds(camousList);
     } catch (error) {
-      console.error('Error fetching options:', error);
+      console.log('Error fetching options:', error);
     } finally {
       isLoadingCampuses(false);
     }

@@ -22,6 +22,7 @@ const CampusBuzzList: React.FC<Props> = ({buzzData}) => {
   const navigation = useNavigation<HomeNavigationProp>();
 
   const handleCardPress = (url: string | undefined) => {
+    navigation.removeListener;
     url && navigation.navigate('WebView', {url});
   };
 

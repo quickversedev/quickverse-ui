@@ -31,6 +31,7 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
   const navigation = useNavigation<HomeNavigationProp>();
 
   const handleCardPress = (url: string | undefined) => {
+    navigation.removeListener;
     url && navigation.navigate('WebView', {url});
   };
   const scrollx = React.useRef(new Animated.Value(0)).current;

@@ -11,6 +11,7 @@ import {
   Linking,
   TouchableWithoutFeedback,
   Keyboard,
+  SafeAreaView,
 } from 'react-native';
 import {Loading} from '../util/Loading';
 import {useAuth} from '../../utils/AuthContext';
@@ -140,174 +141,180 @@ const SignupScreen: React.FC = () => {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={styles.container}>
-        <Image
-          source={require('../../data/images/qv-blue.png')}
-          style={styles.logo}
-        />
-        <Text style={styles.header}>Sign Up</Text>
-        <View
-          style={
-            Platform.OS === 'ios'
-              ? styles.iosContainer
-              : styles.androidContainer
-          }>
-          {!loadingCampuses && campusIds ? (
-            <Dropdown
-              options={campusIds}
-              onOptionSelected={handleOptionSelected}
-              isLoadingCampuses={loadingCampuses}
-              placeHolder="CampusId"
-              iconName="school"
-            />
-          ) : (
-            <Loading />
-          )}
-        </View>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-          keyboardShouldPersistTaps="always">
-          <View style={styles.inputContainer}>
-            <MaterialCommunityIcons
-              name="account-box"
-              size={24}
-              color={theme.colors.ternary}
-              style={styles.icon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Full Name"
-              value={fullName}
-              onChangeText={setFullName}
-              placeholderTextColor={theme.colors.ternary}
-            />
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <Image
+            source={require('../../data/images/qv-blue.png')}
+            style={styles.logo}
+          />
+          <Text style={styles.header}>Sign Up</Text>
+          <View
+            style={
+              Platform.OS === 'ios'
+                ? styles.iosContainer
+                : styles.androidContainer
+            }>
+            {!loadingCampuses && campusIds ? (
+              <Dropdown
+                options={campusIds}
+                onOptionSelected={handleOptionSelected}
+                isLoadingCampuses={loadingCampuses}
+                placeHolder="CampusId"
+                iconName="school"
+              />
+            ) : (
+              <Loading />
+            )}
           </View>
-          <View style={styles.inputContainer}>
-            <MaterialCommunityIcons
-              name="phone"
-              size={24}
-              color={theme.colors.ternary}
-              style={styles.icon}
-            />
-            <Text style={styles.countryCode}>+91 </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Phone Number"
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              placeholderTextColor={theme.colors.ternary}
-              keyboardType="phone-pad"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <MaterialCommunityIcons
-              name="email"
-              size={24}
-              color={theme.colors.ternary}
-              style={styles.icon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              placeholderTextColor={theme.colors.ternary}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <MaterialCommunityIcons
-              name="lock"
-              size={24}
-              color={theme.colors.ternary}
-              style={styles.icon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="4-digit Pin"
-              value={pin}
-              onChangeText={setPin}
-              placeholderTextColor={theme.colors.ternary}
-              secureTextEntry
-              keyboardType="numeric"
-              maxLength={4}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <MaterialCommunityIcons
-              name="lock-check"
-              size={24}
-              color={theme.colors.ternary}
-              style={styles.icon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Confirm Pin"
-              value={confirmPin}
-              onChangeText={handleConfirmPinChange}
-              placeholderTextColor={theme.colors.ternary}
-              secureTextEntry
-              keyboardType="numeric"
-              maxLength={4}
-            />
-          </View>
-          <View style={styles.termsContainer}>
-            <CheckBox
-              value={isTermsAccepted}
-              onValueChange={handleTermsCheckbox}
-              style={styles.checkbox}
-            />
-            <Text style={styles.termsText}>
-              I agree to the{' '}
-              <Text onPress={handleTermsLinkPress} style={styles.termsLink}>
-                Terms and Conditions
-              </Text>
-            </Text>
-            <Text style={styles.termsText}>
-              &{' '}
-              <Text onPress={handlePrivacyPolicy} style={styles.termsLink}>
-                Privacy Policy
-              </Text>
-            </Text>
-          </View>
-
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-          {pinError ? <Text style={styles.error}>{pinError}</Text> : null}
-          <View style={styles.buttonContainer}>
-            <CustomButton
-              title="SignUp"
-              onPress={signUp}
-              buttonColor={theme.colors.ternary}
-              textColor={theme.colors.primary}
-              enabled={!loading && !loadingCampuses}
-            />
-          </View>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.signUpText}>
-              Already have an account? Sign Up
-            </Text>
-          </TouchableOpacity>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => {
-              setModalVisible(false);
-            }}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>Registration Successful!!</Text>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps="always">
+            <View style={styles.inputContainer}>
+              <MaterialCommunityIcons
+                name="account-box"
+                size={24}
+                color={theme.colors.ternary}
+                style={styles.icon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Full Name"
+                value={fullName}
+                onChangeText={setFullName}
+                placeholderTextColor={theme.colors.ternary}
+              />
             </View>
-          </Modal>
-        </ScrollView>
-      </View>
+            <View style={styles.inputContainer}>
+              <MaterialCommunityIcons
+                name="phone"
+                size={24}
+                color={theme.colors.ternary}
+                style={styles.icon}
+              />
+              <Text style={styles.countryCode}>+91 </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Phone Number"
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                placeholderTextColor={theme.colors.ternary}
+                keyboardType="phone-pad"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <MaterialCommunityIcons
+                name="email"
+                size={24}
+                color={theme.colors.ternary}
+                style={styles.icon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                placeholderTextColor={theme.colors.ternary}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <MaterialCommunityIcons
+                name="lock"
+                size={24}
+                color={theme.colors.ternary}
+                style={styles.icon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="4-digit Pin"
+                value={pin}
+                onChangeText={setPin}
+                placeholderTextColor={theme.colors.ternary}
+                secureTextEntry
+                keyboardType="numeric"
+                maxLength={4}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <MaterialCommunityIcons
+                name="lock-check"
+                size={24}
+                color={theme.colors.ternary}
+                style={styles.icon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Confirm Pin"
+                value={confirmPin}
+                onChangeText={handleConfirmPinChange}
+                placeholderTextColor={theme.colors.ternary}
+                secureTextEntry
+                keyboardType="numeric"
+                maxLength={4}
+              />
+            </View>
+            <View style={styles.termsContainer}>
+              <CheckBox
+                value={isTermsAccepted}
+                onValueChange={handleTermsCheckbox}
+                style={styles.checkbox}
+              />
+              <Text style={styles.termsText}>
+                I agree to the{' '}
+                <Text onPress={handleTermsLinkPress} style={styles.termsLink}>
+                  Terms and Conditions
+                </Text>
+              </Text>
+              <Text style={styles.termsText}>
+                &{' '}
+                <Text onPress={handlePrivacyPolicy} style={styles.termsLink}>
+                  Privacy Policy
+                </Text>
+              </Text>
+            </View>
+
+            {error ? <Text style={styles.error}>{error}</Text> : null}
+            {pinError ? <Text style={styles.error}>{pinError}</Text> : null}
+            <View style={styles.buttonContainer}>
+              <CustomButton
+                title="SignUp"
+                onPress={signUp}
+                buttonColor={theme.colors.ternary}
+                textColor={theme.colors.primary}
+                enabled={!loading && !loadingCampuses}
+              />
+            </View>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Text style={styles.signUpText}>
+                Already have an account? Sign Up
+              </Text>
+            </TouchableOpacity>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={() => {
+                setModalVisible(false);
+              }}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalText}>Registration Successful!!</Text>
+              </View>
+            </Modal>
+          </ScrollView>
+        </View>
+      </SafeAreaView>
     </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    backgroundColor: theme.colors.primary,
+    flex: 1,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',

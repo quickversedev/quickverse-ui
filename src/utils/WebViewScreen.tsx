@@ -58,7 +58,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
   navigation,
 }) => {
   const [loading, setLoading] = useState(true);
-  const {authData} = useAuth();
+  const {authData, configs} = useAuth();
   const webViewRef = useRef<WebView>(null);
   const Url = url || route?.params?.url;
   useEffect(() => {
@@ -70,7 +70,6 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
     const effectiveurl = extractHostname(Url);
     const setMultipleCookies = async () => {
       if (authData && effectiveurl) {
-        // const expiryDate = calculateExpiryDate(loggedInDate);
         const cookies: Cookie[] = [
           {
             name: 'X_AMZ_JWT',
@@ -87,32 +86,21 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
             version: '1',
           },
         ];
-        const existingCookies: Cookies = await CookieManager.get(
-          'https://' + effectiveurl,
-        );
 
         for (const cookie of cookies) {
-          const existingCookieValue = existingCookies[cookie.name]?.value;
-
-          if (existingCookieValue !== cookie.value) {
-            await CookieManager.set('https://' + effectiveurl, {
-              name: cookie.name,
-              value: cookie.value,
-              domain: cookie.domain,
-              path: cookie.path,
-              version: cookie.version,
+          await CookieManager.set('https://' + effectiveurl, {
+            name: cookie.name,
+            value: cookie.value,
+            domain: cookie.domain,
+            path: cookie.path,
+            version: cookie.version,
+          })
+            .then(done => {
+              console.log('CookieManager.set =>', done);
             })
-              .then(done => {
-                console.log('CookieManager.set =>', done);
-              })
-              .catch(error => {
-                console.log('error setting up thje cookie', error);
-              });
-          } else {
-            console.log(
-              `Cookie ${cookie.name} is already set with the same value`,
-            );
-          }
+            .catch(error => {
+              console.log('error setting up thje cookie', error);
+            });
         }
         setLoading(false);
       } else {
@@ -120,8 +108,31 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
         setLoading(false);
       }
     };
-    setMultipleCookies();
-  }, [authData, Url, navigation]);
+    const deleteCookies = async () => {
+      const cookiesToDelete = ['X_AMZ_JWT', 'REQUEST_ORIGIN'];
+      const existingCookies: Cookies = await CookieManager.get(
+        'https://' + effectiveurl,
+      );
+      for (const cookieName of cookiesToDelete) {
+        const existingCookieValue = existingCookies[cookieName]?.value;
+        if (existingCookieValue) {
+          await CookieManager.clearAll()
+            .then(() => {
+              console.log('All cookies cleared');
+            })
+            .catch(error => {
+              console.log('Error clearing cookies:', error);
+            });
+        }
+        setLoading(false);
+      }
+    };
+    if (configs?.configuration.cookieEnabled) {
+      setMultipleCookies();
+    } else {
+      deleteCookies();
+    }
+  }, [authData, Url, navigation, configs?.configuration]);
 
   if (loading) {
     return <Loading />;

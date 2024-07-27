@@ -13,11 +13,11 @@ const AboutUs = () => {
         />
         <View style={styles.container2}>
           <Text style={styles.font}>
-            QuickVerse is a hyper-local delivery startup for India's premium
-            campuses, utilizing advanced drone technology for swift and reliable
+            QuickVerse is a hyper-local delivery startup serving India's premium
+            campuses with advanced drone technology. We offer fast and reliable
             delivery of groceries, meals, books, and more. Our mission is to
-            enhance campus life by providing fast, efficient, and eco-friendly
-            delivery solutions tailored to the unique needs of each community.
+            enhance campus life through swift, efficient, and eco-friendly
+            delivery solutions tailored to each community's unique needs.
           </Text>
         </View>
       </View>

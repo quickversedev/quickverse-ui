@@ -7,11 +7,14 @@ import React, {
 } from 'react';
 import {storage} from './Storage';
 import {AuthData, authService} from '../services/AuthService';
+import {fetchConfigs} from '../services/configService';
+import {config} from './canonicalModel';
 
 type AuthContextData = {
   loggedInDate: string;
   authData?: AuthData;
   loading: boolean;
+  configs: config | undefined;
   signIn(phoneNumber: string, pin: string, campusId: string): Promise<void>;
   signOut(): void;
   signUp(
@@ -35,6 +38,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const [authData, setAuthData] = useState<AuthData | undefined>();
   const [loading, setLoading] = useState(true);
   const [loggedInDate, setLoggedInDate] = useState<string>('');
+  const [configs, setConfigs] = useState<config | undefined>();
 
   useEffect(() => {
     // Every time the App is opened, this provider is rendered
@@ -51,6 +55,10 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         const _authData: AuthData = JSON.parse(authDataSerialized);
         setAuthData(_authData);
         setLoggedInDate(logindate);
+        const configData = await fetchConfigs();
+        if (configData) {
+          setConfigs(configData);
+        }
       }
     } catch (error) {
       console.log('Failed to load auth data from storage', error);
@@ -105,7 +113,15 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
   return (
     <AuthContext.Provider
-      value={{loggedInDate, authData, loading, signIn, signOut, signUp}}>
+      value={{
+        loggedInDate,
+        configs,
+        authData,
+        loading,
+        signIn,
+        signOut,
+        signUp,
+      }}>
       {children}
     </AuthContext.Provider>
   );

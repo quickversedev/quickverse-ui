@@ -488,7 +488,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = in.quickverse.QuickVerse;
+				PRODUCT_BUNDLE_IDENTIFIER = in.quickverse.qvapp;
 				PRODUCT_NAME = quickverse;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -523,7 +523,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = in.quickverse.QuickVerse;
+				PRODUCT_BUNDLE_IDENTIFIER = in.quickverse.qvapp;
 				PRODUCT_NAME = quickverse;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

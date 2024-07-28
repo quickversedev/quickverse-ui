@@ -9,6 +9,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
+  SafeAreaView,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../theme';
@@ -75,80 +76,86 @@ const ChangePinScreen: React.FC<changePinProps> = ({forgotPasswordRoute}) => {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        keyboardShouldPersistTaps="always">
-        <HeaderComponent heading="Change Pin" />
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="lock"
-            size={24}
-            color={theme.colors.ternary}
-            style={styles.icon}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Current Pin"
-            value={currentPin}
-            onChangeText={setCurrentPin}
-            placeholderTextColor={theme.colors.ternary}
-            secureTextEntry
-            keyboardType="numeric"
-            maxLength={4}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="lock"
-            size={24}
-            color={theme.colors.ternary}
-            style={styles.icon}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="New 4 Digit Pin"
-            value={newPin}
-            onChangeText={setNewPin}
-            placeholderTextColor={theme.colors.ternary}
-            secureTextEntry
-            keyboardType="numeric"
-            maxLength={4}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="lock-check"
-            size={24}
-            color={theme.colors.ternary}
-            style={styles.icon}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm New Pin"
-            value={confirmNewPin}
-            onChangeText={setConfirmNewPin}
-            placeholderTextColor={theme.colors.ternary}
-            secureTextEntry
-            keyboardType="numeric"
-            maxLength={4}
-          />
-        </View>
-        <View style={styles.buttonContainer}>
-          <CustomButton
-            title="Submit"
-            onPress={handleChangePin}
-            buttonColor={theme.colors.ternary}
-            textColor={theme.colors.primary}
-          />
-        </View>
-      </ScrollView>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          keyboardShouldPersistTaps="always">
+          <HeaderComponent heading="Change Pin" />
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="lock"
+              size={24}
+              color={theme.colors.ternary}
+              style={styles.icon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Current Pin"
+              value={currentPin}
+              onChangeText={setCurrentPin}
+              placeholderTextColor={theme.colors.ternary}
+              secureTextEntry
+              keyboardType="numeric"
+              maxLength={4}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="lock"
+              size={24}
+              color={theme.colors.ternary}
+              style={styles.icon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="New 4 Digit Pin"
+              value={newPin}
+              onChangeText={setNewPin}
+              placeholderTextColor={theme.colors.ternary}
+              secureTextEntry
+              keyboardType="numeric"
+              maxLength={4}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="lock-check"
+              size={24}
+              color={theme.colors.ternary}
+              style={styles.icon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm New Pin"
+              value={confirmNewPin}
+              onChangeText={setConfirmNewPin}
+              placeholderTextColor={theme.colors.ternary}
+              secureTextEntry
+              keyboardType="numeric"
+              maxLength={4}
+            />
+          </View>
+          <View style={styles.buttonContainer}>
+            <CustomButton
+              title="Submit"
+              onPress={handleChangePin}
+              buttonColor={theme.colors.ternary}
+              textColor={theme.colors.primary}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    backgroundColor: theme.colors.primary,
+    flex: 1,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',

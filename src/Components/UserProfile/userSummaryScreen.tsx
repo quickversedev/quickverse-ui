@@ -51,26 +51,26 @@ const ProfileScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Image
-            // eslint-disable-next-line prettier/prettier
-            source={require('../../data/images/qv-blue.png')}
-            style={styles.profileImage}
-          />
-          <View style={styles.headerText}>
+        {/* <View style={styles.header}> */}
+        <Image
+          // eslint-disable-next-line prettier/prettier
+          source={require('../../data/images/qv-blue.png')}
+          style={styles.profileImage}
+        />
+        {/* <View style={styles.headerText}>
             <Text style={styles.name}>{userDetails.userName}</Text>
             <Text style={styles.phone}>+{userDetails.mobile}</Text>
             <Text style={styles.email}>{userDetails.emailId}</Text>
-          </View>
-          {/* <TouchableOpacity style={styles.editIcon}>
+          </View> */}
+        {/* <TouchableOpacity style={styles.editIcon}>
           <MaterialCommunityIcons
             name="pencil-outline"
             size={24}
             color={theme.colors.ternary}
           />
         </TouchableOpacity> */}
-        </View>
-        <TouchableOpacity
+        {/* </View> */}
+        {/* <TouchableOpacity
           style={styles.option}
           onPress={() => {
             navigation.removeListener;
@@ -87,7 +87,7 @@ const ProfileScreen = () => {
             size={24}
             color={theme.colors.ternary}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           style={styles.option}
           onPress={() => {
@@ -143,17 +143,17 @@ const ProfileScreen = () => {
             color={theme.colors.ternary}
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleDeleteAccount}>
+        {/* <TouchableOpacity onPress={handleDeleteAccount}>
           <Text style={styles.deleteAccount}>Delete Account?</Text>
-        </TouchableOpacity>
-        <View style={styles.buttonContainer}>
+        </TouchableOpacity> */}
+        {/* <View style={styles.buttonContainer}>
           <CustomButton
             title="LogOut"
             onPress={signOut}
             buttonColor={theme.colors.ternary}
             textColor={theme.colors.primary}
           />
-        </View>
+        </View> */}
       </View>
     </SafeAreaView>
   );
@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     paddingLeft: 16,
     paddingRight: 16,
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -177,8 +178,9 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   profileImage: {
-    width: 80,
-    height: 80,
+    width: 150,
+    height: 150,
+    alignItems: 'center',
   },
   headerText: {
     marginLeft: 16,

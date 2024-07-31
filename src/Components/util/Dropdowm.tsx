@@ -152,9 +152,12 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     // elevation: 1000,
     borderRadius: 8,
+    // paddingTop: 15,
+    // paddingBottom: 15,
   },
   optionItem: {
     padding: 10,
+    paddingVertical: 15,
   },
   separator: {
     height: 2,

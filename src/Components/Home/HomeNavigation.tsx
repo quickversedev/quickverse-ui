@@ -13,7 +13,6 @@ export type RootStackParamListHome = {
 const Stack = createStackNavigator<RootStackParamListHome>();
 
 const HomeNavigation: React.FC = () => {
-  console.log('authdata.campus:', getCampus());
   return (
     <Stack.Navigator initialRouteName="HomeScreen">
       <Stack.Screen

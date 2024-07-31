@@ -1,14 +1,12 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {FoodItem} from '../utils/canonicalModel';
 import axios from 'axios';
-import {getCampus} from '../utils/Storage';
 import globalConfig from '../utils/GlobalConfig';
 
 export const fetchFoodItems = createAsyncThunk<FoodItem[], string>(
   'foodItems/fetchFoodItems',
   async (campus: string) => {
     try {
-      console.log('fetching food items:', campus);
       const response = await axios.get(
         `${globalConfig.apiBaseUrl}/v1/featuredItem/${campus}`,
       );

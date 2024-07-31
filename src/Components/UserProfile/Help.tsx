@@ -128,12 +128,29 @@ const Help = () => {
               autoCapitalize="none"
             />
           </View>
-          <View style={{zIndex: 2}}>
+          {/* <View style={{zIndex: 2}}>
             <Dropdown
               options={dropdown}
               onOptionSelected={handleQueryOptionSelected}
               placeHolder="Query"
               iconName="pencil"
+            />
+          </View> */}
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="pencil"
+              size={24}
+              color={theme.colors.ternary}
+              style={styles.icon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Query"
+              value={selectedQuery}
+              onChangeText={setSelectedQuery}
+              placeholderTextColor={theme.colors.ternary}
+              keyboardType="default"
+              autoCapitalize="sentences"
             />
           </View>
           {!authData && (
@@ -157,8 +174,9 @@ const Help = () => {
               value={feedback}
               onChangeText={setFeedback}
               placeholder="Enter your Query"
+              placeholderTextColor={theme.colors.ternary}
               multiline
-              numberOfLines={4}
+              numberOfLines={10}
             />
           </View>
           <Text>Please provide order Id in case for refund query..!</Text>
@@ -219,7 +237,7 @@ const styles = StyleSheet.create({
   inputContainer1: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 100,
+    height: 150,
     borderColor: theme.colors.ternary,
     borderWidth: 1,
     borderRadius: 8,

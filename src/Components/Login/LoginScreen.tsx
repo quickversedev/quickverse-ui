@@ -82,7 +82,6 @@ const LoginScreen: React.FC = () => {
   const signIn = async () => {
     if (validate()) {
       isLoading(true);
-      console.log('campusID:', selectedCampusId);
       await auth.signIn(phoneNumber, pin, selectedCampusId).catch(error => {
         handleSignInError(error);
       });

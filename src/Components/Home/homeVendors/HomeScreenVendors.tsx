@@ -10,7 +10,10 @@ import {Loading} from '../../util/Loading';
 import {AppDispatch, RootState} from '../../../store/store';
 import theme from '../../../theme';
 
-const HomeScreenVendors = () => {
+interface HomeScreenVendorsProps {
+  campus: string | undefined; // Define the type for the campus prop
+}
+const HomeScreenVendors: React.FC<HomeScreenVendorsProps> = ({campus}) => {
   const dispatch = useDispatch<AppDispatch>();
   const {vendors, loading} = useSelector(
     (state: RootState) => state.vendorList,
@@ -18,9 +21,9 @@ const HomeScreenVendors = () => {
   useEffect(() => {
     console.log('callsing fetchVendorsList');
     setTimeout(() => {
-      dispatch(fetchVendorList());
+     campus &&  dispatch(fetchVendorList(campus));
     }, 1000);
-  }, [dispatch]);
+  }, [campus, dispatch]);
   if (loading) {
     return <Loading />;
   }

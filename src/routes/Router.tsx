@@ -12,7 +12,9 @@ export const Router = () => {
   }
   return (
     <NavigationContainer>
-      {authData ? <AppStack /> : <AuthStack />}
+      {/* {authData ? <AppStack /> : <AuthStack />}
+       */}
+      <AppStack />
     </NavigationContainer>
   );
 };

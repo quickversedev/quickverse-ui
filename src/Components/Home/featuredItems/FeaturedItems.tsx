@@ -9,17 +9,20 @@ import {Loading} from '../../util/Loading';
 import {AppDispatch, RootState} from '../../../store/store';
 import {fetchFoodItems} from '../../../services/FoodItemsSlice';
 import theme from '../../../theme';
+interface FeaturedItemsProps {
+  campus: string | undefined; // Define the type for the campus prop
+}
 
-const FeaturedItems = () => {
+const FeaturedItems: React.FC<FeaturedItemsProps> = ({campus}) => {
   const dispatch = useDispatch<AppDispatch>();
   const {foodItemsList, loading} = useSelector(
     (state: RootState) => state.foodItems,
   );
   useEffect(() => {
     setTimeout(() => {
-      dispatch(fetchFoodItems());
+      campus && dispatch(fetchFoodItems(campus));
     }, 1000);
-  }, [dispatch]);
+  }, [campus, dispatch]);
   if (loading) {
     return <Loading />;
   }

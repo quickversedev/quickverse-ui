@@ -1,6 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, ScrollView, SafeAreaView, View} from 'react-native';
-import RNPickerSelect from 'react-native-picker-select';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  View,
+  FlatList,
+  TouchableOpacity,
+  Text,
+  // TextInput,
+} from 'react-native';
+// import RNPickerSelect from 'react-native-picker-select';
 import theme from '../../theme';
 import HomeScreenVendors from './homeVendors/HomeScreenVendors';
 // import AppHeader from '../util/AppHeader';
@@ -10,16 +19,11 @@ import FeaturedItems from './featuredItems/FeaturedItems';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {getCampus, setCampus} from '../../utils/Storage';
 import {fetchCampusIds} from '../../services/fetchCampusIds';
-import {Campus} from '../../utils/canonicalModel';
 const HomeScreen: React.FC = () => {
   const [selectedCampus, setSelectedCampus] = useState<string | undefined>();
   const [campusOptions, setCampusOptions] = useState<any>();
-  // const campusOptions = [
-  //   {label: 'iimu', value: 'IIMU-313001'},
-  //   {label: 'GITS', value: 'GITS-313022'},
-  //   {label: 'Campus 3', value: '3'},
-  //   // Add more campuses as needed
-  // ];
+  const [clicked, setClicked] = useState(false);
+
   const fetchCampus = async () => {
     const response = await fetchCampusIds();
     const campusOption = response.map(campus => ({
@@ -35,6 +39,7 @@ const HomeScreen: React.FC = () => {
     console.log('selected camous:', selectedCampus);
     setTimeout(() => {
       const camp = getCampus();
+      console.log('campussssssssssssss:', camp);
       setSelectedCampus(camp);
     }, 1000);
 
@@ -44,26 +49,46 @@ const HomeScreen: React.FC = () => {
     selectedCampus && (
       <SafeAreaView style={styles.container}>
         <View style={styles.headerContainer}>
-          <RNPickerSelect
-            onValueChange={value => setSelectedCampus(value)}
-            items={campusOptions}
-            placeholder={
-              selectedCampus
-                ? {label: `${selectedCampus}`, value: selectedCampus}
-                : {label: 'Select Campus', value: null}
-            }
-            style={pickerSelectStyles}
-            Icon={() => {
-              return (
-                <MaterialCommunityIcons
-                  name="chevron-down"
-                  size={20}
-                  color={theme.colors.ternary}
-                />
-              );
-            }}
-          />
-          {/* <AppHeader headerText={authData ? 'Hi, ' + name : 'Hi, Welcome...!'} /> */}
+          <TouchableOpacity
+            style={styles.touchableOpacity}
+            onPress={() => {
+              setClicked(!clicked);
+            }}>
+            <Text style={styles.touchableText}>
+              {selectedCampus === '' ? 'Select Campus' : selectedCampus}
+            </Text>
+            {clicked ? (
+              <MaterialCommunityIcons
+                name="chevron-up"
+                size={20}
+                color={theme.colors.ternary}
+              />
+            ) : (
+              <MaterialCommunityIcons
+                name="chevron-down"
+                size={20}
+                color={theme.colors.ternary}
+              />
+            )}
+          </TouchableOpacity>
+          {clicked ? (
+            <View style={styles.dropdownContainer}>
+              <FlatList
+                data={campusOptions}
+                keyExtractor={item => item.value}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    style={styles.listItem}
+                    onPress={() => {
+                      setSelectedCampus(item.value);
+                      setClicked(!clicked);
+                    }}>
+                    <Text style={styles.listItemText}>{item.value}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          ) : null}
         </View>
         <ScrollView>
           <FeaturedItems campus={selectedCampus} />
@@ -82,38 +107,61 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   headerContainer: {
+    zIndex: 1000, // Ensure the dropdown is above other elements
+  },
+  touchableOpacity: {
+    width: '90%',
+    height: 50,
+    borderRadius: 10,
+    borderWidth: 0.9,
+    alignSelf: 'center',
+    marginTop: 10,
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingLeft: 15,
+    paddingRight: 15,
+    backgroundColor: theme.colors.primary, // Ensure background is set for visibility
+  },
+  touchableText: {
+    fontWeight: '600',
+    color: theme.colors.ternary,
+  },
+  dropdownContainer: {
+    elevation: 5,
+    marginTop: 10,
+    maxHeight: 500, // Limit the height of the dropdown
+    alignSelf: 'center',
+    width: '90%',
+    backgroundColor: theme.colors.primary,
+    borderRadius: 10,
+    position: 'absolute',
+    top: 60, // Adjust as needed to position below the button
+    zIndex: 1000,
+    overflow: 'scroll',
+  },
+  searchInput: {
+    width: '90%',
+    height: 50,
+    alignSelf: 'center',
+    borderWidth: 0.2,
+    borderColor: theme.colors.ternary,
+    borderRadius: 7,
+    marginTop: 20,
+    paddingLeft: 20,
+  },
+  listItem: {
+    width: '85%',
+    alignSelf: 'center',
+    height: 50,
+    justifyContent: 'center',
+    borderBottomWidth: 0.5,
+    borderColor: theme.colors.ternary,
+  },
+  listItemText: {
+    fontWeight: '600',
+    color: theme.colors.ternary,
   },
 });
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: theme.colors.ternary,
-    borderRadius: 4,
-    color: theme.colors.ternary,
-    paddingRight: 30, // to ensure the text is never behind the icon
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 0.5,
-    borderColor: theme.colors.ternary,
-    borderRadius: 8,
-    color: theme.colors.ternary,
-    paddingRight: 30, // to ensure the text is never behind the icon
-  },
-  placeholder: {
-    color: theme.colors.ternary, // Customize the placeholder color here
-    fontSize: 16,
-  },
-});
+
 export default HomeScreen;
-function async() {
-  throw new Error('Function not implemented.');
-}

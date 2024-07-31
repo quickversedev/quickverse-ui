@@ -9,7 +9,6 @@ import {Loading} from '../util/Loading';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from './VendorsNavigator';
 import {useNavigation} from '@react-navigation/native';
-import {getCampus} from '../../utils/Storage';
 
 const {width} = Dimensions.get('window');
 const SPACING: number = 4;
@@ -25,8 +24,7 @@ const VendorCards: React.FC = () => {
     (state: RootState) => state.vendorList,
   );
   useEffect(() => {
-    const campus = getCampus();
-    campus && dispatch(fetchVendorList(campus));
+    dispatch(fetchVendorList());
   }, [dispatch]);
   if (loading) {
     return <Loading />;

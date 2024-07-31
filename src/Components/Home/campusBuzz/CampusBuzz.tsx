@@ -7,17 +7,14 @@ import {fetchBampusBuzzList} from '../../../services/CampusBuzzListSlice';
 import {AppDispatch, RootState} from '../../../store/store';
 import {Loading} from '../../util/Loading';
 import theme from '../../../theme';
-interface PCampusBuzzProps {
-  campus: string | undefined; // Define the type for the campus prop
-}
-const CampusBuzz: React.FC<PCampusBuzzProps> = ({campus}) => {
-  // const CampusBuzz = () => {
+
+const CampusBuzz = () => {
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     setTimeout(() => {
-      campus && dispatch(fetchBampusBuzzList(campus));
+      dispatch(fetchBampusBuzzList());
     }, 1000);
-  }, [campus, dispatch]);
+  }, [dispatch]);
   const {campusBuzz, loading} = useSelector(
     (state: RootState) => state.campusBuzz,
   );

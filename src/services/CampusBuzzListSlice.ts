@@ -17,12 +17,12 @@ import globalConfig from '../utils/GlobalConfig';
 //     });
 //   },
 // );
-export const fetchBampusBuzzList = createAsyncThunk<CampusBuzz[], string>(
+export const fetchBampusBuzzList = createAsyncThunk<CampusBuzz[]>(
   'campusBuzz/fetchVendorList',
-  async (campus: string) => {
+  async () => {
     try {
       const response = await axios.get(
-        `${globalConfig.apiBaseUrl}/v1/campusBuzz/${campus}`,
+        `${globalConfig.apiBaseUrl}/v1/campusBuzz/${getCampus()}`,
       );
       return response.data.campusBuzzes;
     } catch (error) {

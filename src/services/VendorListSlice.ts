@@ -4,12 +4,12 @@ import {Vendor} from '../utils/canonicalModel';
 import {getCampus} from '../utils/Storage';
 import globalConfig from '../utils/GlobalConfig';
 
-export const fetchVendorList = createAsyncThunk<Vendor[], string>(
+export const fetchVendorList = createAsyncThunk<Vendor[]>(
   'vendorList/fetchVendorList',
-  async (campus: string) => {
+  async () => {
     try {
       const response = await axios.get(
-        `${globalConfig.apiBaseUrl}/v1/campus/${campus}/vendors`,
+        `${globalConfig.apiBaseUrl}/v1/campus/${getCampus()}/vendors`,
       );
       return response.data?.vendors.vendor;
     } catch (error) {

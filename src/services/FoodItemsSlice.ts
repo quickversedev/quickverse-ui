@@ -4,12 +4,13 @@ import axios from 'axios';
 import {getCampus} from '../utils/Storage';
 import globalConfig from '../utils/GlobalConfig';
 
-export const fetchFoodItems = createAsyncThunk<FoodItem[]>(
+export const fetchFoodItems = createAsyncThunk<FoodItem[], string>(
   'foodItems/fetchFoodItems',
-  async () => {
+  async (campus: string) => {
     try {
+      console.log('fetching food items:', campus);
       const response = await axios.get(
-        `${globalConfig.apiBaseUrl}/v1/featuredItem/${getCampus()}`,
+        `${globalConfig.apiBaseUrl}/v1/featuredItem/${campus}`,
       );
       // console.log(
       //   'featured Items: ',

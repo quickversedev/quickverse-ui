@@ -4,12 +4,12 @@ import axios from 'axios';
 import {getCampus} from '../utils/Storage';
 import globalConfig from '../utils/GlobalConfig';
 
-export const fetchPromoItems = createAsyncThunk<Promo[]>(
+export const fetchPromoItems = createAsyncThunk<Promo[], string>(
   'promoItems/fetchPromoItems',
-  async () => {
+  async (campus: string) => {
     try {
       const response = await axios.get(
-        `${globalConfig.apiBaseUrl}/v1/promotionItem/${getCampus()}`,
+        `${globalConfig.apiBaseUrl}/v1/promotionItem/${campus}`,
       );
 
       return response.data.promotions.promotions;

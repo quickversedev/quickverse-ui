@@ -9,17 +9,19 @@ import {AppDispatch, RootState} from '../../../store/store';
 import {useDispatch, useSelector} from 'react-redux';
 import {fetchPromoItems} from '../../../services/promoListSlice';
 import theme from '../../../theme';
-
-const PromoDiscounts = () => {
+interface PromoDiscountsProps {
+  campus: string | undefined; // Define the type for the campus prop
+}
+const PromoDiscounts: React.FC<PromoDiscountsProps> = ({campus}) => {
   const dispatch = useDispatch<AppDispatch>();
   const {promoItemsList, loading} = useSelector(
     (state: RootState) => state.promoItems,
   );
   useEffect(() => {
     setTimeout(() => {
-      dispatch(fetchPromoItems());
+      campus && dispatch(fetchPromoItems(campus));
     }, 1000);
-  }, [dispatch]);
+  }, [campus, dispatch]);
   if (loading) {
     return <Loading />;
   }

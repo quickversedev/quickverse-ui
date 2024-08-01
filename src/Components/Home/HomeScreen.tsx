@@ -133,6 +133,7 @@ const styles = StyleSheet.create({
     maxHeight: 500, // Limit the height of the dropdown
     alignSelf: 'center',
     width: '90%',
+    borderWidth: 0.9,
     backgroundColor: theme.colors.primary,
     borderRadius: 10,
     position: 'absolute',

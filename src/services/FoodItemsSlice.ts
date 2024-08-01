@@ -1,7 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {FoodItem} from '../utils/canonicalModel';
 import axios from 'axios';
-import {getCampus} from '../utils/Storage';
 import globalConfig from '../utils/GlobalConfig';
 
 export const fetchFoodItems = createAsyncThunk<FoodItem[], string>(

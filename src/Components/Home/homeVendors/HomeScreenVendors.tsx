@@ -19,9 +19,8 @@ const HomeScreenVendors: React.FC<HomeScreenVendorsProps> = ({campus}) => {
     (state: RootState) => state.vendorList,
   );
   useEffect(() => {
-    console.log('callsing fetchVendorsList');
     setTimeout(() => {
-     campus &&  dispatch(fetchVendorList(campus));
+      campus && dispatch(fetchVendorList(campus));
     }, 1000);
   }, [campus, dispatch]);
   if (loading) {

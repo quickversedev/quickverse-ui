@@ -12,6 +12,7 @@ import ProfileNavigation from '../UserProfile/profileNavigation';
 import {storage} from '../../utils/Storage';
 import ChangePinScreen from '../UserProfile/ChangePin';
 import {useState} from 'react';
+import {Platform} from 'react-native';
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
@@ -38,7 +39,8 @@ const LoggedIn: React.FC = () => {
           tabBarShowLabel: false,
           tabBarStyle: {
             backgroundColor: theme.colors.primary,
-            height: 60,
+            height: Platform.OS === 'ios' ? 80 : 60,
+            paddingBottom: Platform.OS === 'ios' ? 20 : 10,
           },
 
           headerShown: false,

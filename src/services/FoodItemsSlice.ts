@@ -7,6 +7,7 @@ export const fetchFoodItems = createAsyncThunk<FoodItem[], string>(
   'foodItems/fetchFoodItems',
   async (campus: string) => {
     try {
+      console.log('fetching food items:', campus);
       const response = await axios.get(
         `${globalConfig.apiBaseUrl}/v1/featuredItem/${campus}`,
       );

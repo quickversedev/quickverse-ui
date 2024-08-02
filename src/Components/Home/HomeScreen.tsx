@@ -20,17 +20,18 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {getCampus, setCampus} from '../../utils/Storage';
 import {fetchCampusIds} from '../../services/fetchCampusIds';
 const HomeScreen: React.FC = () => {
-  const [selectedCampus, setSelectedCampus] = useState<string | undefined>();
+  const [selectedCampus, setSelectedCampus] = useState<string | undefined>('');
   const [campusOptions, setCampusOptions] = useState<any>();
   const [clicked, setClicked] = useState(false);
 
   const fetchCampus = async () => {
     const response = await fetchCampusIds();
-    const campusOption = response.map(campus => ({
+    const campusOption = response?.map(campus => ({
       label: campus.campusName,
       value: campus.campusId,
     }));
     setCampusOptions(campusOption);
+    setSelectedCampus(campusOption[0]?.value ? campusOption[0].value : '');
   };
   useEffect(() => {
     // getCampusDetails();
@@ -40,64 +41,62 @@ const HomeScreen: React.FC = () => {
     setTimeout(() => {
       const camp = getCampus();
       console.log('campussssssssssssss:', camp);
-      setSelectedCampus(camp);
+      camp && setSelectedCampus(camp);
     }, 1000);
-
+    console.log('selecteddddd camous:', selectedCampus);
     selectedCampus && setCampus(selectedCampus);
   }, [selectedCampus]);
   return (
-    selectedCampus && (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.headerContainer}>
-          <TouchableOpacity
-            style={styles.touchableOpacity}
-            onPress={() => {
-              setClicked(!clicked);
-            }}>
-            <Text style={styles.touchableText}>
-              {selectedCampus === '' ? 'Select Campus' : selectedCampus}
-            </Text>
-            {clicked ? (
-              <MaterialCommunityIcons
-                name="chevron-up"
-                size={20}
-                color={theme.colors.ternary}
-              />
-            ) : (
-              <MaterialCommunityIcons
-                name="chevron-down"
-                size={20}
-                color={theme.colors.ternary}
-              />
-            )}
-          </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.headerContainer}>
+        <TouchableOpacity
+          style={styles.touchableOpacity}
+          onPress={() => {
+            setClicked(!clicked);
+          }}>
+          <Text style={styles.touchableText}>
+            {selectedCampus === '' ? 'Select Campus' : selectedCampus}
+          </Text>
           {clicked ? (
-            <View style={styles.dropdownContainer}>
-              <FlatList
-                data={campusOptions}
-                keyExtractor={item => item.value}
-                renderItem={({item}) => (
-                  <TouchableOpacity
-                    style={styles.listItem}
-                    onPress={() => {
-                      setSelectedCampus(item.value);
-                      setClicked(!clicked);
-                    }}>
-                    <Text style={styles.listItemText}>{item.value}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          ) : null}
-        </View>
-        <ScrollView>
-          <FeaturedItems campus={selectedCampus} />
-          <HomeScreenVendors campus={selectedCampus} />
-          <PromoDiscounts campus={selectedCampus} />
-          <CampusBuzz campus={selectedCampus} />
-        </ScrollView>
-      </SafeAreaView>
-    )
+            <MaterialCommunityIcons
+              name="chevron-up"
+              size={20}
+              color={theme.colors.ternary}
+            />
+          ) : (
+            <MaterialCommunityIcons
+              name="chevron-down"
+              size={20}
+              color={theme.colors.ternary}
+            />
+          )}
+        </TouchableOpacity>
+        {clicked ? (
+          <View style={styles.dropdownContainer}>
+            <FlatList
+              data={campusOptions}
+              keyExtractor={item => item.value}
+              renderItem={({item}) => (
+                <TouchableOpacity
+                  style={styles.listItem}
+                  onPress={() => {
+                    setSelectedCampus(item.value);
+                    setClicked(!clicked);
+                  }}>
+                  <Text style={styles.listItemText}>{item.value}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        ) : null}
+      </View>
+      <ScrollView>
+        <FeaturedItems campus={selectedCampus} />
+        <HomeScreenVendors campus={selectedCampus} />
+        <PromoDiscounts campus={selectedCampus} />
+        <CampusBuzz campus={selectedCampus} />
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

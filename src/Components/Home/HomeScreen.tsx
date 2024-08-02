@@ -20,7 +20,9 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {getCampus, setCampus} from '../../utils/Storage';
 import {fetchCampusIds} from '../../services/fetchCampusIds';
 const HomeScreen: React.FC = () => {
-  const [selectedCampus, setSelectedCampus] = useState<string | undefined>('');
+  const [selectedCampus, setSelectedCampus] = useState<string | undefined>(
+    'IIMU-313001',
+  );
   const [campusOptions, setCampusOptions] = useState<any>();
   const [clicked, setClicked] = useState(false);
 
@@ -31,7 +33,7 @@ const HomeScreen: React.FC = () => {
       value: campus.campusId,
     }));
     setCampusOptions(campusOption);
-    setSelectedCampus(campusOption[0]?.value ? campusOption[0].value : '');
+    // setSelectedCampus(campusOption[0]?.value ? campusOption[0].value : '');
   };
   useEffect(() => {
     // getCampusDetails();

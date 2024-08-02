@@ -35,13 +35,10 @@ const HomeScreen: React.FC = () => {
     setCampusOptions(campusOption);
   };
   useEffect(() => {
-    // getCampusDetails();
     fetchCampus();
-
-    console.log('selected camous:', selectedCampus);
     setTimeout(() => {
       const camp = getCampus();
-      console.log('campussssssssssssss:', camp);
+
       camp && setSelectedCampus(camp);
     }, 1000);
     console.log('selecteddddd camous:', selectedCampus);

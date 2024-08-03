@@ -1,14 +1,12 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
-// import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-// import LinearGradient from 'react-native-linear-gradient';
-// import theme from '../../theme';
 import {ActivityIndicator} from 'react-native';
 import theme from '../../theme';
 
 export const Loading = () => {
   return (
     <View style={styles.container}>
+
       {/* <SkeletonPlaceholder
         backgroundColor={theme.colors.primary} // Set background color to #FFDC52
         highlightColor={theme.colors.ternary} // Set highlight color to #FFDC52

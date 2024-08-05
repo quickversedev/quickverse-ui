@@ -1,9 +1,10 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import HomeScreen from './HomeScreen.1';
+//import HomeScreen from './HomeScreen';
 import WebViewScreen from '../../utils/WebViewScreen';
 import theme from '../../theme';
 import {getCampus} from '../../utils/Storage';
+import HomeScreen from './HomeScreen';
 
 export type RootStackParamListHome = {
   HomeScreen: undefined;
@@ -20,6 +21,7 @@ const HomeNavigation: React.FC = () => {
         component={HomeScreen}
         options={{headerShown: false}}
       />
+      
       <Stack.Screen
         name="WebView"
         component={WebViewScreen}

@@ -83,7 +83,7 @@ const HomeScreen: React.FC = () => {
         </TouchableOpacity>
         <View style= {styles.buttonadd}>
                   <TouchableOpacity>
-    <IonIcons name = 'profile' size={20}/>
+    <IonIcons name = 'profile' size={20} color={'black'}/>
 </TouchableOpacity>
                   </View>
 

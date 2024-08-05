@@ -1,6 +1,6 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import HomeScreen from './HomeScreen';
+import HomeScreen from './HomeScreen.1';
 import WebViewScreen from '../../utils/WebViewScreen';
 import theme from '../../theme';
 import {getCampus} from '../../utils/Storage';

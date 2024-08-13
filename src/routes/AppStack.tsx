@@ -7,5 +7,6 @@ import LoggedIn from '../Components/Login/LoggedIn';
 // const Stack = createStackNavigator();
 
 export const AppStack = () => {
-  return <LoggedIn />;
+  return <LoggedIn />
+  ;
 };

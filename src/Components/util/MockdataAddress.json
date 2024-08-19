@@ -1,0 +1,21 @@
+{
+    "addresses": [
+      {
+        "flatNo": "101",
+        "street": "Main Street",
+        "area": "Downtown",
+        "city": "New York",
+        "state": "NY",
+        "pincode": "10001"
+      },
+      {
+        "flatNo": "202",
+        "street": "Broadway",
+        "area": "Manhattan",
+        "city": "New York",
+        "state": "NY",
+        "pincode": "10002"
+      }
+    ]
+  }
+  

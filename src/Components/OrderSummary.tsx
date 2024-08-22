@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFDC52',
-    paddingHorizontal: 16,
+    //paddingHorizontal: 16,
   },
   headerContainer: {
     backgroundColor: '#FFE474',
@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFE474',
     borderRadius: 15,
     padding: 16,
+    margin:16,
     marginVertical: 8,
     alignItems: 'center',
     borderColor: '#FFDC52',

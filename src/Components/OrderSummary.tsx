@@ -1,13 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Dimensions } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const orders = [
-  { id: '#999012', date: '20-AUG-2024, 3:25 PM', status: 'Estimated Delivery on 21 AUG', image: 'https://example.com/product1.png' },
-  { id: '#329012', date: '16-AUG-2024, 3:25 PM', status: 'Delivered on 17 AUG', image: 'https://example.com/product2.png' },
-  { id: '#499012', date: '12-AUG-2024, 3:25 PM', status: 'Delivered on 13 AUG', image: 'https://example.com/product3.png' },
-  { id: '#439012', date: '10-AUG-2024, 3:25 PM', status: 'Delivered on 11 AUG', image: 'https://example.com/product4.png' },
-  { id: '#459012', date: '08-AUG-2024, 3:25 PM', status: 'Delivered on 09 AUG', image: 'https://example.com/product5.png' },
-  { id: '#769012', date: '06-AUG-2024, 3:25 PM', status: 'Delivered on 07 AUG', image: 'https://example.com/product6.png' }
+  { id: '#999012', date: '20-AUG-2024, 3:25 PM', status: 'Estimated Delivery on 21 AUG', image: 'https://e7.pngegg.com/pngimages/692/99/png-clipart-delicious-food-food-salad-thumbnail.png' },
+  { id: '#329012', date: '16-AUG-2024, 3:25 PM', status: 'Delivered on 17 AUG', image: 'https://images.rawpixel.com/image_png_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbGlmZW9mcGl4MDAwMDEtaW1hZ2VfMS1renhsdXd3ci5wbmc.png' },
+  { id: '#499012', date: '12-AUG-2024, 3:25 PM', status: 'Delivered on 13 AUG', image: 'https://e7.pngegg.com/pngimages/287/494/png-clipart-san-francisco-eatsa-fast-food-restaurant-fast-food-restaurant-healthy-food-leaf-vegetable-food.png' },
+  { id: '#439012', date: '10-AUG-2024, 3:25 PM', status: 'Delivered on 11 AUG', image: 'https://w7.pngwing.com/pngs/458/929/png-transparent-hamburger-and-french-fries-fast-food-junk-food-hamburger-french-fries-fried-chicken-fast-food-banner-miscellaneous-food-recipe-thumbnail.png' },
+  { id: '#459012', date: '08-AUG-2024, 3:25 PM', status: 'Delivered on 09 AUG', image: 'https://e7.pngegg.com/pngimages/692/99/png-clipart-hamburger-street-food-seafood-fast-food-delicious-food-salmon-with-vegetables-salad-in-plate-leaf-vegetable-food-thumbnail.png' },
+  { id: '#769012', date: '06-AUG-2024, 3:25 PM', status: 'Delivered on 07 AUG', image: 'https://e7.pngegg.com/pngimages/535/859/png-clipart-italian-cuisine-pasta-organic-food-restaurant-foods-food-recipe-thumbnail.png' }
 ];
 
 const MyOrdersScreen = () => {
@@ -20,7 +21,11 @@ const MyOrdersScreen = () => {
         <Text style={styles.orderStatus}>{item.status}</Text>
       </View>
       <TouchableOpacity>
-        <Text style={styles.arrow}>{'>'}</Text>
+        <MaterialCommunityIcons 
+        name="chevron-right" 
+        size={24} 
+        color="#A52A2A" 
+        />
       </TouchableOpacity>
     </View>
   );
@@ -97,10 +102,6 @@ const styles = StyleSheet.create({
   },
   orderStatus: {
     color: '#0C7C59',
-  },
-  arrow: {
-    fontSize: 18,
-    color: '#A52A2A',
   },
 });
 

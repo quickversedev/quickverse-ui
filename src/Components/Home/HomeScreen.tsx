@@ -14,6 +14,8 @@ import theme from '../../theme';
 import HomeScreenVendors from './homeVendors/HomeScreenVendors';
 // import AppHeader from '../util/AppHeader';
 import PromoDiscounts from './PromoAndDiscount/PromoDiscounts';
+import Categories from '../v2 Categories and promotions/Categories';
+import Promotions from '../v2 Categories and promotions/Promotions';
 import CampusBuzz from './campusBuzz/CampusBuzz';
 import FeaturedItems from './featuredItems/FeaturedItems';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';

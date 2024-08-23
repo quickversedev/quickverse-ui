@@ -34,7 +34,15 @@ export default function Promotions() {
       try {
         const response = await fetch('http://65.0.18.159:8080/quickVerse/v1/promotionItem/IIMU-313001');
         const result = await response.json();
-        setPromotions(result.promotions.promotions);
+        
+        const promotionsWithCorrectedImageUrls = result.promotions.promotions.map((item: any) => ({
+          ...item,
+          promoImage: item.promoImage.replace('imgur.com/', 'i.imgur.com/') + '.jpg',
+        }));
+        console.log("result",result.promotions.promotions);
+        console.log("image",promotionsWithCorrectedImageUrls);
+        setPromotions(promotionsWithCorrectedImageUrls);
+
       } catch (err) {
         setError('Failed to fetch promotions');
       } finally {

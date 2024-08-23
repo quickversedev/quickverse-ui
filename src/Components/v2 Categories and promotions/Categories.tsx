@@ -1,10 +1,13 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 
-//images
-import food from './assets/Food.png';
-import Pharmacy from './assets/Pharmacy.png';
-import services from './assets/Services.png';
+// //images
+// import food from './assets/Food.png';
+// import Pharmacy from './assets/Pharmacy.png';
+// import services from './assets/Services.png';
+import food from '../assets/Food.png';
+import Pharmacy from '../assets/Pharmacy.png';
+import services from '../assets/Services.png';
 
 type CardProps = {
   imageUri: any;

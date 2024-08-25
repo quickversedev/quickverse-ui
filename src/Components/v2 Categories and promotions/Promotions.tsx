@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 
 //images 
 
-import line from './assets/Line.png';
-import promotionImage from './assets/Promotions.png';
+import line from '../assets/Line.png';
+import promotionImage from '../assets/Promotions.png';
 
 type CardProps = {
   imageUri: string;

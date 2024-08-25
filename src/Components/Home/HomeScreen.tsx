@@ -16,6 +16,7 @@ import HomeScreenVendors from './homeVendors/HomeScreenVendors';
 import PromoDiscounts from './PromoAndDiscount/PromoDiscounts';
 import Categories from '../v2 Categories and promotions/Categories';
 import Promotions from '../v2 Categories and promotions/Promotions';
+import CategoriesPage from '../v2 Categories and promotions/CategoriesPage';
 import CampusBuzz from './campusBuzz/CampusBuzz';
 import FeaturedItems from './featuredItems/FeaturedItems';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -94,6 +95,7 @@ const HomeScreen: React.FC = () => {
         ) : null}
       </View>
       <ScrollView>
+        <CategoriesPage />
         <FeaturedItems campus={selectedCampus} />
         <HomeScreenVendors campus={selectedCampus} />
         <PromoDiscounts campus={selectedCampus} />

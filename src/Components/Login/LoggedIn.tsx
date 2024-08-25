@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Provider as PaperProvider } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../theme';
-import OrderDetailsScreen from '../OrderSummary';
+import OrderDetailsScreen from '../Orders/OrderSummary';
 import VendorsNavigator from '../Vendors/VendorsNavigator';
 import HomeNavigation from '../Home/HomeNavigation';
 import ProfileNavigation from '../UserProfile/profileNavigation';

@@ -21,7 +21,7 @@ const mockCategoriesData: CategoriesResponse = {
   categories: [
       {
           id: "92c198b6-e13d-4410-8064-01903524b1b2",
-          name: "Other Food and Grocery",
+          name: "Grocery",
           description: "|",
           imageURLs: [
               "https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/Icons-09.png"
@@ -104,10 +104,10 @@ const CategoriesScreen: React.FC<any> = ({navigation}) => {
           <TouchableOpacity
             style={styles.categoryButton}
             onPress={() => handleCategoryPress(item.name)}>
-            <Image
+            {/* <Image
               source={{uri: item.imageURLs[0]}}
-              style={styles.categoryImage}
-            />
+              // style={styles.categoryImage}
+            /> */}
             <Text style={styles.categoryText}>{item.name}</Text>
           </TouchableOpacity>
         )}
@@ -119,34 +119,38 @@ const CategoriesScreen: React.FC<any> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: '100%',
+    width: '35%',
     padding: 20,
     backgroundColor: theme.colors.primary,
   },
   title: {
-    fontSize: 24,
+    height: '7%',
+    width: '100%',
+    fontSize: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
     fontWeight: 'bold',
     marginBottom: 20,
     color: theme.colors.primary,
     backgroundColor: theme.colors.secondary,
     borderRadius: 100,
     padding: 15,
-    alignSelf: 'flex-start', 
     textAlign: 'center',
   },
   categoryButton: {
-    padding: 15,
-    backgroundColor: theme.colors.primary,
+    height: 90,
+    width: '100%',
+    padding: 5,
+    backgroundColor: '#fdda4f',
     marginBottom: 10,
-    borderRadius: 15,
-    flexDirection: 'row',
+    borderRadius: 35,
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2, // Add a border
-    borderColor: '#333', // Set the border color to a blackish tone
-    alignSelf: 'flex-start', // Align the component to the left
-    marginRight: 'auto',
-     width: '100%',
-     
-   
+    borderWidth: 2,
+    borderColor: '#F3C200', 
+
   },
   categoryImage: {
     width: 50,
@@ -154,7 +158,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   categoryText: {
-    fontSize: 18,
+    fontSize: 17,
     color:  theme.colors.secondary, 
     fontWeight: 'bold',
     

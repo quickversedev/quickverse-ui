@@ -21,6 +21,7 @@ import {getCampus, setCampus} from '../../utils/Storage';
 import CategoriesPage from './Categories/CategoriesPage'
 import {fetchCampusIds} from '../../services/fetchCampusIds';
 import Categories from './Categories/Categories';
+import Promotions from './Promotions V2/Promotions';
 const HomeScreen: React.FC = () => {
   const [selectedCampus, setSelectedCampus] = useState<string | undefined>(
     'IIMU-313001',
@@ -94,8 +95,6 @@ const HomeScreen: React.FC = () => {
         ) : null}
       </View>
       <ScrollView>
-        <Categories />
-        <CategoriesPage />
         <FeaturedItems campus={selectedCampus} />
         <HomeScreenVendors campus={selectedCampus} />
         <PromoDiscounts campus={selectedCampus} />

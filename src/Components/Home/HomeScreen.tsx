@@ -19,6 +19,7 @@ import FeaturedItems from './featuredItems/FeaturedItems';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {getCampus, setCampus} from '../../utils/Storage';
 import {fetchCampusIds} from '../../services/fetchCampusIds';
+import Categories from './Categories/Categories';
 const HomeScreen: React.FC = () => {
   const [selectedCampus, setSelectedCampus] = useState<string | undefined>(
     'IIMU-313001',
@@ -92,6 +93,7 @@ const HomeScreen: React.FC = () => {
         ) : null}
       </View>
       <ScrollView>
+        <Categories />
         <FeaturedItems campus={selectedCampus} />
         <HomeScreenVendors campus={selectedCampus} />
         <PromoDiscounts campus={selectedCampus} />

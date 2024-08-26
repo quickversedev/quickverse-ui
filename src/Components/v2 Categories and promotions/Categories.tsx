@@ -1,14 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 
-// //images
-// import food from './assets/Food.png';
-// import Pharmacy from './assets/Pharmacy.png';
-// import services from './assets/Services.png';
-import food from '../assets/Food.png';
-import Pharmacy from '../assets/Pharmacy.png';
-import services from '../assets/Services.png';
-
 type CardProps = {
   imageUri: any;
   text: string;
@@ -18,7 +10,7 @@ const Card: React.FC<CardProps> = ({ imageUri, text }) => (
   <View style={styles.cardContainer}>
     <TouchableOpacity style={[styles.cards, styles.cardElevated]}>
       <View style={styles.imageContainer}>
-        <Image source={imageUri} style={styles.image} />
+      <Image source={{ uri: imageUri }} style={styles.image} />
     <Text style={styles.cardText}>{text}</Text>
       </View>
     </TouchableOpacity>
@@ -27,15 +19,15 @@ const Card: React.FC<CardProps> = ({ imageUri, text }) => (
 
 const cardData = [
   {
-    imageUri: food, 
+    imageUri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRreDW9RdU2GTU-Ki1tcVXnE_9QABA-As3AIw&s", 
     text: 'Food',
   },
   {
-    imageUri: Pharmacy,
+    imageUri: "https://plus.unsplash.com/premium_photo-1668487826871-2f2cac23ad56?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bWVkaWNpbmV8ZW58MHx8MHx8fDA%3D",
     text: 'Pharmacy',
   },
   {
-    imageUri: services, 
+    imageUri: "https://images.pexels.com/photos/534229/pexels-photo-534229.jpeg?cs=srgb&dl=pexels-pixabay-534229.jpg&fm=jpg", 
     text: 'Services',
   },
 ];

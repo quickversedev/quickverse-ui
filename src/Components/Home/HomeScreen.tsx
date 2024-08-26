@@ -95,6 +95,8 @@ const HomeScreen: React.FC = () => {
         ) : null}
       </View>
       <ScrollView>
+        <Categories />
+        <Promotions />
         <CategoriesPage />
         <FeaturedItems campus={selectedCampus} />
         <HomeScreenVendors campus={selectedCampus} />

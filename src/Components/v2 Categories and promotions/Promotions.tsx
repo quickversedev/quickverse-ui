@@ -1,11 +1,6 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, Linking } from 'react-native';
 import React, { useState, useEffect } from 'react';
 
-//images 
-
-import line from '../assets/Line.png';
-import promotionImage from '../assets/Promotions.png';
-
 type CardProps = {
   imageUri: string;
   text: string;
@@ -64,9 +59,7 @@ export default function Promotions() {
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-        <Image style={{marginTop: 20,marginHorizontal: 2,}} source={line}></Image>
         <Text style={styles.headingText}>Promotions</Text>
-        <Image style={{marginHorizontal: 2}}  source={promotionImage}></Image>
       </View>
       <View style={styles.categories}>
         <ScrollView horizontal showsHorizontalScrollIndicator={true}>

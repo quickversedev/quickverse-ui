@@ -1,24 +1,37 @@
-import React, { useState } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Provider as PaperProvider } from 'react-native-paper';
+import React, {useState} from 'react';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {Provider as PaperProvider} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../theme';
-import OrderDetailsScreen from '../Orders/OrderSummary';
-import VendorsNavigator from '../Vendors/VendorsNavigator';
+// import OrderDetailsScreen from '../Orders/OrderSummary';
+// import VendorsNavigator from '../Vendors/VendorsNavigator';
 import HomeNavigation from '../Home/HomeNavigation';
 import ProfileNavigation from '../UserProfile/profileNavigation';
 import CategoriesScreen from '../Categories/CategoriesScreen';
-import { storage } from '../../utils/Storage';
+import {storage} from '../../utils/Storage';
 import ChangePinScreen from '../UserProfile/ChangePin';
-import { Platform, View, Modal, Animated, Dimensions, TouchableWithoutFeedback, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  Platform,
+  View,
+  Modal,
+  Animated,
+  Dimensions,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import CartScreen from '../Cart/CartScreen';
+import MyOrdersScreen from '../Orders/OrderSummary';
+import OrdersNavigation from '../Orders/OrderSNavigator';
 
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
   const [forgotPasswordFlow, setForgotPasswordFlow] = useState<boolean>();
   const [modalVisible, setModalVisible] = useState(false);
-  const animationValue = useState(new Animated.Value(Dimensions.get('window').height))[0];
+  const animationValue = useState(
+    new Animated.Value(Dimensions.get('window').height),
+  )[0];
 
   React.useEffect(() => {
     const forgotPass = async () => {
@@ -57,7 +70,7 @@ const LoggedIn: React.FC = () => {
 
   return (
     <PaperProvider theme={theme}>
-      <View style={{ flex: 1 }}>
+      <View style={{flex: 1}}>
         <Tab.Navigator
           screenOptions={{
             tabBarActiveTintColor: theme.colors.secondary,
@@ -72,55 +85,56 @@ const LoggedIn: React.FC = () => {
               paddingBottom: Platform.OS === 'ios' ? 20 : 10,
             },
             headerShown: false,
-          }}
-        >
+          }}>
           <Tab.Screen
             name="Home"
             component={HomeNavigation}
             options={{
-              tabBarIcon: ({ focused, color }) => (
+              tabBarIcon: ({focused, color}) => (
                 <MaterialCommunityIcons
                   name={focused ? 'home' : 'home-outline'}
                   color={color}
                   size={focused ? 36 : 26}
                 />
               ),
-              tabBarLabel: "Shop",
+              tabBarLabel: 'Shop',
             }}
           />
           <Tab.Screen
             name="Categories"
             component={CategoriesScreen}
             options={{
-              tabBarIcon: ({ focused, color }) => (
+              tabBarIcon: ({focused, color}) => (
                 <MaterialCommunityIcons
                   name={focused ? 'view-grid' : 'view-grid-outline'}
                   color={color}
                   size={focused ? 36 : 26}
                 />
               ),
-              tabBarLabel: "Categories",
+              tabBarLabel: 'Categories',
             }}
           />
           <Tab.Screen
             name="Cart"
             component={CartScreen}
             options={{
-              tabBarIcon: ({ focused, color }) => (
+              tabBarIcon: ({focused, color}) => (
                 <View style={styles.floatingButtonContainer}>
-                  <TouchableOpacity style={styles.floatingButton} onPress={openCartModal}>
+                  <TouchableOpacity
+                    style={styles.floatingButton}
+                    onPress={openCartModal}>
                     <MaterialCommunityIcons
                       name="cart"
-                      color="#8A0707"  // Blood red cart icon
-                      size={50}  // Increased icon size
+                      color="#8A0707" // Blood red cart icon
+                      size={50} // Increased icon size
                     />
                   </TouchableOpacity>
                 </View>
               ),
-              tabBarLabel: "",
+              tabBarLabel: '',
             }}
-            listeners={({ navigation }) => ({
-              tabPress: (e) => {
+            listeners={({navigation}) => ({
+              tabPress: e => {
                 e.preventDefault();
                 openCartModal();
               },
@@ -128,30 +142,30 @@ const LoggedIn: React.FC = () => {
           />
           <Tab.Screen
             name="Orders"
-            component={OrderDetailsScreen}
+            component={OrdersNavigation}
             options={{
-              tabBarIcon: ({ focused, color }) => (
+              tabBarIcon: ({focused, color}) => (
                 <MaterialCommunityIcons
                   name={focused ? 'clipboard-list' : 'clipboard-list-outline'}
                   color={color}
                   size={focused ? 36 : 26}
                 />
               ),
-              tabBarLabel: "Orders",
+              tabBarLabel: 'Orders',
             }}
           />
           <Tab.Screen
             name="Profile"
             component={ProfileNavigation}
             options={{
-              tabBarIcon: ({ focused, color }) => (
+              tabBarIcon: ({focused, color}) => (
                 <MaterialCommunityIcons
                   name={focused ? 'account-circle' : 'account-circle-outline'}
                   color={color}
                   size={focused ? 36 : 26}
                 />
               ),
-              tabBarLabel: "Account",
+              tabBarLabel: 'Account',
             }}
           />
         </Tab.Navigator>
@@ -159,15 +173,14 @@ const LoggedIn: React.FC = () => {
           transparent={true}
           visible={modalVisible}
           animationType="none"
-          onRequestClose={closeCartModal}
-        >
+          onRequestClose={closeCartModal}>
           <TouchableWithoutFeedback onPress={closeCartModal}>
-            <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' }} />
+            <View style={{flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)'}} />
           </TouchableWithoutFeedback>
           <Animated.View
             style={{
               position: 'absolute',
-              transform: [{ translateY: animationValue }],
+              transform: [{translateY: animationValue}],
               left: 0,
               right: 0,
               height: '90%',
@@ -175,20 +188,27 @@ const LoggedIn: React.FC = () => {
               borderTopLeftRadius: 20,
               borderTopRightRadius: 20,
               shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
+              shadowOffset: {width: 0, height: 2},
               shadowOpacity: 0.25,
               shadowRadius: 4,
               elevation: 5,
-            }}
-          >
+            }}>
             {/* Transparent Back Button */}
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', padding: 16, position: 'absolute', top: 10, right: 10 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                padding: 16,
+                position: 'absolute',
+                top: 10,
+                right: 10,
+              }}>
               <TouchableOpacity onPress={closeCartModal}>
                 <MaterialCommunityIcons
                   name="arrow-left"
                   size={24}
                   color={theme.colors.primary}
-                  style={{ backgroundColor: 'transparent' }}
+                  style={{backgroundColor: 'transparent'}}
                 />
               </TouchableOpacity>
             </View>
@@ -208,14 +228,14 @@ const styles = StyleSheet.create({
     marginTop: -25, // Adjust this to position the bubble correctly (75% visible)
   },
   floatingButton: {
-    width: 100,  // Bubble size
+    width: 100, // Bubble size
     height: 100, // Bubble size
     borderRadius: 50, // Make it perfectly round
     backgroundColor: 'white', // Set the bubble color to white
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 6,

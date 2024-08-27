@@ -1,35 +1,33 @@
 import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
+import {
+  createStackNavigator,
+  StackNavigationProp,
+} from '@react-navigation/stack';
+// import MyOrdersScreen from './MyOrdersScreen';
 import MyOrdersScreen from './OrderSummary';
 import OrderDetailsScreen from './OrderDetailsScreen';
-import theme from '../../theme';
+import {OrderMetadata} from '../../data/orders';
 
 export type OrderStackParamList = {
-  MyOrdersScreen: undefined;
-  OrderDetailsScreen: { order: any };
+  AllOrders: undefined;
+  OrderDetails: {order: OrderMetadata};
+  navigation?: StackNavigationProp<any, any>;
 };
 
 const Stack = createStackNavigator<OrderStackParamList>();
 
 const OrdersNavigation: React.FC = () => {
   return (
-    <Stack.Navigator initialRouteName="MyOrdersScreen">
+    <Stack.Navigator initialRouteName="AllOrders">
       <Stack.Screen
-        name="MyOrdersScreen"
+        name="AllOrders"
         component={MyOrdersScreen}
-        options={{ headerShown: false }}
+        options={{title: 'My Orders'}}
       />
       <Stack.Screen
-        name="OrderDetailsScreen"
+        name="OrderDetails"
         component={OrderDetailsScreen}
-        options={{
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: theme.colors.primary,
-            height: 60,
-          },
-          title: 'Order Details',
-        }}
+        options={{title: 'Order Details'}}
       />
     </Stack.Navigator>
   );

@@ -1,45 +1,66 @@
+import {RouteProp, useNavigation} from '@react-navigation/native';
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, Button } from 'react-native';
+import {View, Text, StyleSheet, Image, ScrollView, Button} from 'react-native';
+// import {OrderStackParamList} from './OrdersNavigation';
 
-const OrderDetailsScreen = ({ route, navigation }) => {
-  const { order } = route.params; // Get the order details passed from MyOrdersScreen
+import {StackNavigationProp} from '@react-navigation/stack';
+import {OrderMetadata} from '../../data/orders';
+import {OrderStackParamList} from './OrderSNavigator';
 
+interface OrderDetailsProps {
+  order?: OrderMetadata;
+  route?: RouteProp<any, any>;
+  navigation?: StackNavigationProp<any, any>;
+}
+
+const OrderDetailsScreen: React.FC<OrderDetailsProps> = ({route, order}) => {
+  const {item: orderr} = route?.params?.order; // Get the order details passed from MyOrdersScreen
+  console.log('osderrr:', orderr);
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Order Details</Text>
       <View style={styles.infoContainer}>
         <Text style={styles.status}>Order delivered!!!</Text>
         <View style={styles.customerInfo}>
-          <Text style={styles.customerName}>{order.customerName}</Text>
-          <Text style={styles.address}>{order.customerDeliveryAddress || 'Address not provided'}</Text>
-          <Text style={styles.deliveryTime}>Delivered on {new Date(order.creationTime).toLocaleString()}</Text>
+          <Text style={styles.customerName}>{orderr.customerName}</Text>
+          <Text style={styles.address}>
+            {orderr.customerDeliveryAddress || 'Address not provided'}
+          </Text>
+          <Text style={styles.deliveryTime}>
+            Delivered on{' '}
+            {/* {new Date(parseInt(order.creationTime)).toLocaleString()} */}
+          </Text>
         </View>
       </View>
 
       <View style={styles.itemsContainer}>
         <Text style={styles.sectionHeader}>Items in order</Text>
         <View style={styles.item}>
-          <Image source={{ uri: order.productImageUrls[0] }} style={styles.productImage} />
+          <Image
+            source={{uri: orderr.productImageUrls[0]}}
+            style={styles.productImage}
+          />
           <View style={styles.itemDetails}>
-            <Text style={styles.itemName}>{order.orderDescription}</Text>
-            <Text style={styles.itemPrice}>{order.totalOrderAmount}</Text>
+            <Text style={styles.itemName}>{orderr.orderDescription}</Text>
+            <Text style={styles.itemPrice}>${orderr.totalOrderAmount}</Text>
           </View>
         </View>
       </View>
 
       <View style={styles.orderSummary}>
         <Text style={styles.summaryHeader}>Order Total</Text>
-        <Text style={styles.summaryAmount}>${order.totalOrderAmount}</Text>
+        <Text style={styles.summaryAmount}>${orderr.totalOrderAmount}</Text>
       </View>
 
-      {/* Updated Order Details Section */}
       <View style={styles.orderDetailsContainer}>
-        <Text style={styles.detailsHeader}>Order ID: #{order.orderId}</Text>
-        <Text style={styles.detailsText}>Order Time: {new Date(order.creationTime).toLocaleString()}</Text>
-        <Text style={styles.detailsText}>Store Name: {order.storeName}</Text>
-        <Text style={styles.detailsText}>State Label: {order.stateLabel}</Text>
-        <Text style={styles.detailsText}>State: {order.state}</Text>
-        <Text style={styles.detailsText}>Product ID: {order.productId}</Text>
+        <Text style={styles.detailsHeader}>Order ID: #{orderr.orderId}</Text>
+        <Text style={styles.detailsText}>
+          Order Time: {new Date(parseInt(orderr.creationTime)).toLocaleString()}
+        </Text>
+        <Text style={styles.detailsText}>Store Name: {orderr.storeName}</Text>
+        <Text style={styles.detailsText}>State Label: {orderr.stateLabel}</Text>
+        <Text style={styles.detailsText}>State: {orderr.state}</Text>
+        <Text style={styles.detailsText}>Product ID: {orderr.productId}</Text>
       </View>
 
       <Button

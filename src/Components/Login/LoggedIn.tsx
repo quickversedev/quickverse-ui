@@ -13,6 +13,8 @@ import {storage} from '../../utils/Storage';
 import ChangePinScreen from '../UserProfile/ChangePin';
 import {useState} from 'react';
 import {Platform} from 'react-native';
+// import LaundryScreen from '../Laundry/laundry';
+import LaundryScreen from '../Laundry/Laundry';
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
@@ -80,6 +82,19 @@ const LoggedIn: React.FC = () => {
         <Tab.Screen
           name="Vendors"
           component={VendorsNavigator}
+          options={{
+            tabBarIcon: ({focused, color}) => (
+              <MaterialCommunityIcons
+                name={focused ? 'store' : 'store-outline'}
+                color={color}
+                size={focused ? 36 : 26}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Laundry"
+          component={LaundryScreen}
           options={{
             tabBarIcon: ({focused, color}) => (
               <MaterialCommunityIcons

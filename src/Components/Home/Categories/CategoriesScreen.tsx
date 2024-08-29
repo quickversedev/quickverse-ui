@@ -6,6 +6,21 @@ import cardData from '../../../data/mockData';
 import PlusminusButton from './Plusminusbutton';
 import { ScrollView } from 'react-native-gesture-handler';
 
+
+const Card: React.FC<{ imageUri: string; text: string; price: string }> = ({ imageUri, text, price }) => (
+  <View style={styles.cardContainer}>
+    <TouchableOpacity style={[styles.cards, styles.cardElevated]}>
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: imageUri }} style={styles.image} />
+        <Text style={styles.cardText}>{text}</Text>
+        <Text style={styles.priceText}>{price}</Text>
+        <View style={styles.buttonContainer}>
+          <PlusminusButton />
+        </View>
+      </View>
+    </TouchableOpacity>
+  </View>
+);
 const CategoriesScreen: React.FC<any> = ({ navigation }) => {
   const [categories, setCategories] = useState<any[]>([]);
 
@@ -25,27 +40,12 @@ const CategoriesScreen: React.FC<any> = ({ navigation }) => {
     <TouchableOpacity
       style={styles.categoryButton}
       onPress={() => handleCategoryPress(item.name)}>
-      {/* <Image
+      <Image
         source={{ uri: item.imageURLs[0] }}
         style={styles.categoryImage}
-      /> */}
+      />
       <Text style={styles.categoryText}>{item.name}</Text>
     </TouchableOpacity>
-  );
-
-  const Card: React.FC<{ imageUri: string; text: string; price: string }> = ({ imageUri, text, price }) => (
-    <View style={styles.cardContainer}>
-      <TouchableOpacity style={[styles.cards, styles.cardElevated]}>
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: imageUri }} style={styles.image} />
-          <Text style={styles.cardText}>{text}</Text>
-          <Text style={styles.priceText}>{price}</Text>
-          <View style={styles.buttonContainer}>
-            <PlusminusButton />
-          </View>
-        </View>
-      </TouchableOpacity>
-    </View>
   );
 
   return (
@@ -111,8 +111,8 @@ const styles = StyleSheet.create({
     borderColor: '#F3C200',
   },
   categoryImage: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     marginRight: 10,
   },
   categoryText: {
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   },
   cards: {
     width: 230,
-    height: 120,
+    height: 100,
     borderRadius: 30,
     overflow: 'hidden',
     borderWidth: 1,

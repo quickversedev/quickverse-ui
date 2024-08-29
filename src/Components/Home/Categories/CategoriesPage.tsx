@@ -1,7 +1,7 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
-
 import PlusminusButton from './Plusminusbutton';
+import cardData from '../../../data/mockData'; 
 
 type CardProps = {
   imageUri: string;
@@ -24,39 +24,6 @@ const Card: React.FC<CardProps> = ({ imageUri, text, price }) => (
   </View>
 );
 
-const cardData = [
-  {
-    imageUri: 'https://img.freepik.com/free-photo/top-view-pepperoni-pizza-with-mushroom-sausages-bell-pepper-olive-corn-black-wooden_141793-2158.jpg', 
-    text: 'Pizza Margherita',
-    price: '120',
-  },
-  {
-    imageUri: 'https://img.freepik.com/free-photo/top-view-pepperoni-pizza-with-mushroom-sausages-bell-pepper-olive-corn-black-wooden_141793-2158.jpg', 
-    text: 'Pepperoni Pizza',
-    price: '150',
-  },
-  {
-    imageUri: 'https://img.freepik.com/free-photo/top-view-pepperoni-pizza-with-mushroom-sausages-bell-pepper-olive-corn-black-wooden_141793-2158.jpg', 
-    text: 'BBQ Chicken Pizza',
-    price: '180',
-  },
-  {
-    imageUri: 'https://img.freepik.com/free-photo/top-view-pepperoni-pizza-with-mushroom-sausages-bell-pepper-olive-corn-black-wooden_141793-2158.jpg', 
-    text: 'Veggie Pizza',
-    price: '130',
-  },
-  {
-    imageUri: 'https://img.freepik.com/free-photo/top-view-pepperoni-pizza-with-mushroom-sausages-bell-pepper-olive-corn-black-wooden_141793-2158.jpg', 
-    text: 'Hawaiian Pizza',
-    price: '160',
-  },
-  {
-    imageUri: 'https://img.freepik.com/free-photo/top-view-pepperoni-pizza-with-mushroom-sausages-bell-pepper-olive-corn-black-wooden_141793-2158.jpg', 
-    text: 'Four Cheese Pizza',
-    price: '200',
-  },
-];
-
 export default function Cards() {
   return (
     <View style={styles.container}>
@@ -73,7 +40,7 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 50,
     flex: 1,
-    paddingHorizontal: 20, 
+    paddingHorizontal: 20,
   },
   headingText: {
     fontSize: 24,
@@ -87,23 +54,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   cardContainer: {
-    width: '48%', 
+    width: '48%',
     marginBottom: 20,
   },
   cards: {
     width: '100%',
     height: 200,
-    borderRadius: 32, 
-    overflow: 'hidden', 
-    borderWidth: 1.5, 
+    borderRadius: 32,
+    overflow: 'hidden',
+    borderWidth: 1.5,
     borderColor: '#8F1413',
-    backgroundColor: '#FFDC52', 
-    justifyContent: 'center',    
+    backgroundColor: '#FFDC52',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   imageContainer: {
-    width: 80,   
-    height: 80,  
+    width: 80,
+    height: 80,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 30,

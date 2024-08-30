@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Dimensions }
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import mockOrdersResponse from 'F:/Qickverse/Orders/quickverse-ui/src/data/orders';
-
+import OrderDetailsScreen from './OrderDetailsScreen';
 const MyOrdersScreen = () => {
-  const [orders, setOrders] = useState([]);
+//return (<OrderDetailsScreen></OrderDetailsScreen>);
+    const [orders, setOrders] = useState([]);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -84,7 +85,9 @@ const MyOrdersScreen = () => {
       />
     </View>
   );
-};
+ };
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -3,7 +3,26 @@ import { View, Text, StyleSheet, Image, ScrollView, Button } from 'react-native'
 
 const OrderDetailsScreen = ({ route, navigation }) => {
   const { order } = route.params; // Get the order details passed from MyOrdersScreen
-
+  // const order={
+  //   orderId: 6931496981463564,
+  //   customerId: 1576482547300535,
+  //   customerName: "Abhilash Bhaiya",
+  //   customerMobileNumber: 8801454674,
+  //   customerDeliveryAddress: null,
+  //   state: "PENDING",
+  //   totalOrderAmount: 499,
+  //   totalItemCount: 1,
+  //   totalProductCount: 1,
+  //   totalInvoiceAmount: 499,
+  //   fulfillmentOption: "PICK_UP",
+  //   creationTime: "1688716025703",
+  //   productImageUrls: [
+  //     "https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/Icons-09.png",
+  //   ],
+  //   stateLabel: "Waiting for seller confirmation",
+  //   orderDescription: "Power Yoga T-shirt(Size-XL)",
+  //   orderLink: "https://www.smartbiz.in/teststore-devops/orders/6931496981463564/order-details",
+  // };
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Order Details</Text>

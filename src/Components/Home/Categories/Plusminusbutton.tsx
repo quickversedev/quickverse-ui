@@ -36,10 +36,9 @@ const CartButton = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
+    marginLeft: 40,
   },
   title: {
     fontSize: 24,
@@ -57,9 +56,9 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#fff',
-    borderRadius: 20, 
-    width: 40, 
-    height: 40,
+    borderRadius: 15, 
+    width: 30, 
+    height: 30,
     justifyContent: 'center',
     alignItems: 'center',
   },

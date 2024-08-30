@@ -6,21 +6,22 @@ import cardData from '../../../data/mockData';
 import PlusminusButton from './Plusminusbutton';
 import { ScrollView } from 'react-native-gesture-handler';
 
-
-const Card: React.FC<{ imageUri: string; text: string; price: string }> = ({ imageUri, text, price }) => (
+const Card: React.FC<{ imageUri: string; text: string; price: string; rating: number }> = ({ imageUri, text, price, rating }) => (
   <View style={styles.cardContainer}>
-    <TouchableOpacity style={[styles.cards, styles.cardElevated]}>
+    <View style={[styles.cards, styles.cardElevated]}>
       <View style={styles.imageContainer}>
         <Image source={{ uri: imageUri }} style={styles.image} />
+      </View>
+      <View style={styles.descriptionText}>
         <Text style={styles.cardText}>{text}</Text>
         <Text style={styles.priceText}>{price}</Text>
-        <View style={styles.buttonContainer}>
-          <PlusminusButton />
-        </View>
+        <Text style={styles.ratingText}>{rating}</Text>
+        <PlusminusButton />
       </View>
-    </TouchableOpacity>
+    </View>
   </View>
 );
+
 const CategoriesScreen: React.FC<any> = ({ navigation }) => {
   const [categories, setCategories] = useState<any[]>([]);
 
@@ -50,24 +51,24 @@ const CategoriesScreen: React.FC<any> = ({ navigation }) => {
 
   return (
     <ScrollView>
-    <View style={styles.wrapper}>
-      <View style={styles.container1}>
-        <Text style={styles.title}>Categories</Text>
-        <FlatList
-          data={categories}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderCategoryItem}
-          initialNumToRender={10} 
-        />
-      </View>
-      <View style={styles.container2}>
-        <View style={styles.cardsContainer}>
-          {cardData.map((card, index) => (
-            <Card key={index} imageUri={card.imageUri} text={card.text} price={card.price} />
-          ))}
+      <View style={styles.wrapper}>
+        <View style={styles.container1}>
+          <Text style={styles.title}>Categories</Text>
+          <FlatList
+            data={categories}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderCategoryItem}
+            initialNumToRender={10} 
+          />
+        </View>
+        <View style={styles.container2}>
+          <View style={styles.cardsContainer}>
+            {cardData.map((card, index) => (
+              <Card key={index} imageUri={card.imageUri} text={card.text} price={card.price} rating={card.rating} />
+            ))}
+          </View>
         </View>
       </View>
-    </View>
     </ScrollView>
   );
 };
@@ -75,6 +76,8 @@ const CategoriesScreen: React.FC<any> = ({ navigation }) => {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
+    height: '100%',
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -82,11 +85,13 @@ const styles = StyleSheet.create({
   },
   container1: {
     padding: 20,
+    height: '100%',
     width: '35%',
   },
   container2: {
     width: '65%',
-    paddingHorizontal: 20,
+    height: '100%',
+    paddingHorizontal: 10,
   },
   title: {
     fontSize: 14,
@@ -120,52 +125,63 @@ const styles = StyleSheet.create({
     color: theme.colors.secondary,
     fontWeight: 'bold',
   },
-  cardsContainer: {
-
-  },
+  cardsContainer: {},
   cardContainer: {
     width: '48%',
     marginBottom: 20,
+    flex: 1,
   },
   cards: {
-    width: 230,
-    height: 100,
+    width: 250,
+    height: 138,
+    paddingHorizontal: 5,
     borderRadius: 30,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#8F1413',
+    borderWidth: 2.5,
+    borderColor: '#F3C200',
     backgroundColor: '#FFDC52',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  descriptionText: {
+    flex: 1,
+    justifyContent: 'center',
+    flexDirection: 'column',
+    paddingHorizontal: 10,
   },
   imageContainer: {
     width: 80,
-    height: 80,
-    justifyContent: 'center',
+    height: '100%',
     alignItems: 'center',
-    marginTop: 30,
+    justifyContent: 'center',
+    paddingLeft: 5,
+    overflow: 'hidden',
+    borderRadius: 40, 
   },
   image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'contain',
+    width: 80,
+    height: 80,
+    borderRadius: 40, 
+    resizeMode: 'cover', 
+  },
+  ratingText: {
+    fontSize: 14,
+    color: '#8F1413', 
+    fontWeight: '900',
   },
   cardText: {
     fontSize: 15,
-    textAlign: 'center',
     color: '#103E60',
     fontWeight: '900',
-    paddingTop: 4,
+    marginTop: 10,
   },
   priceText: {
     fontSize: 20,
-    textAlign: 'center',
     color: '#8F1413',
     fontWeight: '900',
-    paddingTop: 4,
   },
   cardElevated: {
-    elevation: 4,
     shadowOffset: {
       width: 1,
       height: 1,

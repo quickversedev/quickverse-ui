@@ -3,14 +3,13 @@ import {
   createStackNavigator,
   StackNavigationProp,
 } from '@react-navigation/stack';
-// import MyOrdersScreen from './MyOrdersScreen';
 import MyOrdersScreen from './OrderSummary';
 import OrderDetailsScreen from './OrderDetailsScreen';
-import {OrderMetadata} from '../../data/orders';
+import { OrderMetadata } from '../../data/orders';
 
 export type OrderStackParamList = {
   AllOrders: undefined;
-  OrderDetails: {order: OrderMetadata};
+  OrderDetails: { order: OrderMetadata };
   navigation?: StackNavigationProp<any, any>;
 };
 
@@ -22,12 +21,12 @@ const OrdersNavigation: React.FC = () => {
       <Stack.Screen
         name="AllOrders"
         component={MyOrdersScreen}
-        options={{title: 'My Orders'}}
+        options={{ headerShown: false }}  // This will remove the title "My Ordwerfeders"
       />
       <Stack.Screen
         name="OrderDetails"
         component={OrderDetailsScreen}
-        options={{title: 'Order Details'}}
+        options={{headerShown: false}}
       />
     </Stack.Navigator>
   );

@@ -58,7 +58,7 @@ const mockOrdersResponse: OrdersResponse = {
       fulfillmentOption: 'PICK_UP',
       creationTime: '1688722062229',
       productImageUrls: [
-        'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.amazon.in%2FCotton-Graphic-Printed-Pattern-Shirt%2Fdp%2FB0C6B77F8D&psig=AOvVaw0dBGVYCk5O_iJsRAWaWH_a&ust=1724654322990000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCLD5qpTEj4gDFQAAAAAdAAAAABAE',
+        'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/Icons-09.png',
       ],
       stateLabel: 'Waiting for seller confirmation',
       orderDescription: 'Power Yoga T-shirt',
@@ -79,7 +79,7 @@ const mockOrdersResponse: OrdersResponse = {
       fulfillmentOption: 'DELIVERY',
       creationTime: '1688739123456',
       productImageUrls: [
-        'https://alpha.eu.smartpos-api.seller-fulfillment-tech.amazon.dev/images/3858/abcd1234-2a2d-43be-9e18-3d0d014ff323_1688533094322.jpg',
+        'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/Icons-09.png',
       ],
       stateLabel: 'Shipped',
       orderDescription: 'Yoga Mat and T-shirt',
@@ -100,12 +100,12 @@ const mockOrdersResponse: OrdersResponse = {
       fulfillmentOption: 'DELIVERY',
       creationTime: '1688745678901',
       productImageUrls: [
-        'https://alpha.eu.smartpos-api.seller-fulfillment-tech.amazon.dev/images/3858/efgh5678-2a2d-43be-9e18-3d0d014ff323_1688533094322.jpg',
+        'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/Icons-09.png',
       ],
       stateLabel: 'Delivered',
       orderDescription: 'Yoga Mat, T-shirt, and Water Bottle',
       orderLink:
-        'https://www.smartbiz.in/teststore-devops/orders/8673948572639485/order-details',
+        'https://www.smartbiz.in/teststoring-devops/orders/8673948572639485/order-details',
     },
     {
       orderId: 9023847503847502,
@@ -121,7 +121,7 @@ const mockOrdersResponse: OrdersResponse = {
       fulfillmentOption: 'PICK_UP',
       creationTime: '1688756789012',
       productImageUrls: [
-        'https://alpha.eu.smartpos-api.seller-fulfillment-tech.amazon.dev/images/3858/ijkl9012-2a2d-43be-9e18-3d0d014ff323_1688533094322.jpg',
+        'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/Icons-09.png',
       ],
       stateLabel: 'Cancelled by customer',
       orderDescription: 'Fitness Gloves',

@@ -7,6 +7,7 @@ import FoodItemsSlice from '../services/FoodItemsSlice';
 import PromoListSlice from '../services/promoListSlice';
 import CampusBuzzListSlice from '../services/CampusBuzzListSlice';
 import UserDetailsSlice from '../services/UserDetailsSlice';
+import cartSlice from '../services/cartSlice';
 
 const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ const store = configureStore({
     promoItems: PromoListSlice,
     campusBuzz: CampusBuzzListSlice,
     userDetails: UserDetailsSlice,
+    cart: cartSlice,
   },
 });
 

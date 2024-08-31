@@ -8,6 +8,7 @@ import theme from '../theme';
 const OrderDetailsScreen: React.FC = () => {
   return (
     <View
+    
       style={{
         flex: 1,
         backgroundColor: theme.colors.primary,

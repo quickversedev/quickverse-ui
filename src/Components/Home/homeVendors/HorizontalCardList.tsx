@@ -35,7 +35,7 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
           return index.toString();
         }}
         horizontal
-        contentContainerStyle={{alignItems: 'center'}}
+        // contentContainerStyle={{alignItems: 'center'}}
         snapToInterval={ITEM_SIZE}
         decelerationRate={0.98}
         snapToAlignment="start"

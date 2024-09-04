@@ -14,7 +14,9 @@ import ChangePinScreen from '../UserProfile/ChangePin';
 import {useState} from 'react';
 import {Platform} from 'react-native';
 // import LaundryScreen from '../Laundry/laundry';
-import LaundryScreen from '../Laundry/Laundry';
+// import Laundry from '../Laundry/Laundrybackk';
+import Laundry from '../Laundry/Laundry';
+import CartAddressNav from '../Laundry/cartAddressNav';
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
@@ -94,7 +96,7 @@ const LoggedIn: React.FC = () => {
         />
         <Tab.Screen
           name="Laundry"
-          component={LaundryScreen}
+          component={Laundry}
           options={{
             tabBarIcon: ({focused, color}) => (
               <MaterialCommunityIcons

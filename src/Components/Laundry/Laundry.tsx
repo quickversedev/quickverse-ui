@@ -1,112 +1,148 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {
-  View,
-  Text,
-  FlatList,
   StyleSheet,
-  Image,
-  TouchableOpacity,
-  Alert,
+  Text,
+  View,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  Animated,
 } from 'react-native';
-import {mockLaundryItems, LaundryItems} from '../../data/laundry';
-// Define types for the shoe item
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../../store/store';
+import {
+  addToCart,
+  decrementQuantity,
+  incrementQuantity,
+  removeFromCart,
+  CartItem,
+  updateCartItemServices,
+} from '../../services/cartSlice';
+import {LaundryProduct} from '../../utils/canonicalModel';
+import {fetchLaundryProductsList} from '../../services/laundryProductsSlice';
+import {Loading} from '../util/Loading';
+// import theme from '../../theme';
+// import LaundryItem from './LaundryItem';
+// import CartModal from './CartModal';
+import LaundryItem from './LaundryItems';
+// import CartModal from './CartModebackk';
+import CartModal from './CartModel/CartModel';
+import styles from './styles';
+import CartSummary from './CartSummary';
 
-const LaundryScreen: React.FC = () => {
-  const [shoesItems, setShoesItems] = useState<LaundryItems[]>([]);
-  const [cart, setCart] = useState<LaundryItems[]>([]);
+const Laundry: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const {LaundryProducts, loading} = useSelector(
+    (state: RootState) => state.laundryProducts,
+  );
+  const cart = useSelector((state: RootState) => state.cart.cart);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const animationValue = useRef(new Animated.Value(1000)).current;
 
   useEffect(() => {
-    const fetchShoesItems = async () => {
-      try {
-        const response: LaundryItems[] = await new Promise(resolve => {
-          setTimeout(() => {
-            resolve(mockLaundryItems);
-          }, 1000); // Simulate a network request
-        });
-        setShoesItems(response);
-      } catch (err) {
-        Alert.alert('Error', 'Failed to load shoes items.');
-      }
+    dispatch(fetchLaundryProductsList());
+  }, [dispatch]);
+
+  const addItemToCart = (item: LaundryProduct) => {
+    const cartItem: CartItem = {
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      ironRate: item.ironRate,
+      quantity: 1,
+      isIroningSelected: false,
+      isWashingSelected: true,
     };
-
-    fetchShoesItems();
-  }, []);
-
-  const addToCart = (item: LaundryItems) => {
-    setCart(prevCart => [...prevCart, item]);
-    // Alert.alert('Added to Cart', `${item.name} has been added to your cart.`);
-    console.log('cart:', cart);
+    dispatch(addToCart(cartItem));
   };
 
+  const removeItemFromCart = (item: CartItem) => {
+    dispatch(removeFromCart({id: item.id}));
+  };
+
+  const increaseQuantity = (item: CartItem) => {
+    dispatch(incrementQuantity({id: item.id}));
+  };
+
+  const decreaseQuantity = (item: CartItem) => {
+    if (item.quantity === 1) {
+      dispatch(removeFromCart({id: item.id}));
+    } else {
+      dispatch(decrementQuantity({id: item.id}));
+    }
+  };
+
+  const handleCheckboxChange = (
+    cartItem: CartItem,
+    service: 'ironing' | 'washing',
+  ) => {
+    const updatedItem = {
+      ...cartItem,
+      isIroningSelected:
+        service === 'ironing'
+          ? !cartItem.isIroningSelected
+          : cartItem.isIroningSelected,
+      isWashingSelected:
+        service === 'washing'
+          ? !cartItem.isWashingSelected
+          : cartItem.isWashingSelected,
+    };
+    dispatch(updateCartItemServices(updatedItem));
+  };
+
+  const openCartModal = () => {
+    setModalVisible(true);
+    Animated.timing(animationValue, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeCartModal = () => {
+    Animated.timing(animationValue, {
+      toValue: 1000,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => setModalVisible(false));
+  };
+
+  if (loading) return <Loading />;
+
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={shoesItems}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({item}) => (
-          <View style={styles.itemContainer}>
-            <Image source={{uri: item.image}} style={styles.itemImage} />
-            <View style={styles.itemDetails}>
-              <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemPrice}>INR {item.price}</Text>
-              <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => addToCart(item)}>
-                <Text style={styles.addButtonText}>Add to Cart</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+        {LaundryProducts.map(product => (
+          <LaundryItem
+            key={product.id}
+            item={product}
+            cartItem={cart.find(cartItem => cartItem.id === product.id)}
+            addItemToCart={addItemToCart}
+            removeItemFromCart={removeItemFromCart}
+            increaseQuantity={increaseQuantity}
+            decreaseQuantity={decreaseQuantity}
+            handleCheckboxChange={handleCheckboxChange}
+          />
+        ))}
+        <Pressable onPress={openCartModal} style={styles.cartButton}>
+          <Text style={styles.cartButtonText}>View Cart</Text>
+        </Pressable>
+      </ScrollView>
+      <CartModal
+        cart={cart}
+        LaundryProducts={LaundryProducts}
+        modalVisible={modalVisible}
+        animationValue={animationValue}
+        closeCartModal={closeCartModal}
+        increaseQuantity={increaseQuantity}
+        decreaseQuantity={decreaseQuantity}
+        removeItemFromCart={removeItemFromCart}
+        handleCheckboxChange={handleCheckboxChange}
       />
-    </View>
+      <CartSummary cart={cart} onPress={openCartModal} />
+    </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#f5f5f5',
-  },
-  itemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    marginBottom: 16,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  itemImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginRight: 16,
-  },
-  itemDetails: {
-    flex: 1,
-  },
-  itemName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  itemPrice: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 8,
-  },
-  addButton: {
-    backgroundColor: '#28a745',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-});
-
-export default LaundryScreen;
+export default Laundry;

@@ -56,14 +56,35 @@ export interface User {
   createdDate: string;
   addresses: Address[];
 }
-export interface Address {
-  id: number;
-  streetAddress: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-}
+// export interface Address {
+//   id: number;
+//   streetAddress: string;
+//   city: string;
+//   state: string;
+//   postalCode: string;
+//   country: string;
+// }
 export interface config {
   configuration: any;
+}
+
+export interface LaundryProduct {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  mrp: number;
+  discount: number;
+  category: string;
+  available: boolean;
+  imageUrl: string;
+  ironRate: number;
+}
+export interface Address {
+  keyId: string;
+  address: {
+    name: string;
+    phone: string;
+    concatenatedAddress: string;
+  };
 }

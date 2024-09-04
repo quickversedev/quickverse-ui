@@ -1,17 +1,121 @@
-// mockShoesItems.ts
+import {LaundryProduct} from '../utils/canonicalModel';
 
-export type LaundryItems = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-};
-
-export const mockLaundryItems: LaundryItems[] = [
-  {id: 1, name: 'shoes 1', price: 1073, image: 'url-to-shoes1-image'},
-  {id: 2, name: 'shoes 2', price: 3050, image: 'url-to-shoes2-image'},
-  {id: 3, name: 'shoes 3', price: 2500, image: 'url-to-shoes3-image'},
-  {id: 4, name: 'shoes 4', price: 2100, image: 'url-to-shoes4-image'},
-  {id: 5, name: 'shoes 5', price: 1400, image: 'url-to-shoes5-image'},
-  {id: 6, name: 'shoes 6', price: 700, image: 'url-to-shoes6-image'},
+export const mockProducts: LaundryProduct[] = [
+  {
+    id: '1',
+    name: 'Cotton T-Shirt',
+    description: 'Comfortable and breathable cotton T-shirt.',
+    price: 500,
+    mrp: 600,
+    discount: 15,
+    category: 'Laundry Cloths',
+    available: true,
+    ironRate: 50,
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsbyPfA6xAl2ck76O3aX2tNd4dD7yYZc0fqw&usqp=CAU',
+  },
+  {
+    id: '2',
+    name: 'Denim Jeans',
+    description: 'Stylish and durable denim jeans.',
+    price: 1200,
+    mrp: 1500,
+    discount: 20,
+    category: 'Laundry Cloths',
+    available: true,
+    ironRate: 70,
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYfbQik2w0gThDtYzZfI3TixQAEc7oZ8uodA&usqp=CAU',
+  },
+  {
+    id: '3',
+    name: 'Woolen Sweater',
+    description: 'Warm and cozy woolen sweater for winter.',
+    price: 1500,
+    mrp: 1800,
+    discount: 17,
+    category: 'Laundry Cloths',
+    available: true,
+    ironRate: 60,
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5_F6uhJYPEN8lI1oz_f0LNN0tbRY7IarJQg&usqp=CAU',
+  },
+  {
+    id: '4',
+    name: 'Formal Shirt',
+    description: 'Elegant formal shirt suitable for office wear.',
+    price: 700,
+    mrp: 900,
+    discount: 22,
+    category: 'Laundry Cloths',
+    available: true,
+    ironRate: 55,
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJ_7S45bA2aPtksLJkn2do3usD0XX9i2gNzg&usqp=CAU',
+  },
+  {
+    id: '5',
+    name: 'Track Pants',
+    description: 'Comfortable track pants for workouts and casual wear.',
+    price: 800,
+    mrp: 1000,
+    discount: 20,
+    category: 'Laundry Cloths',
+    available: false,
+    ironRate: 40,
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQMmJW_G7-x9xUGcvxnZhz8K5a2lw6X4evcg&usqp=CAU',
+  },
+  {
+    id: '7',
+    name: 'Track Pants',
+    description: 'Comfortable track pants for workouts and casual wear.',
+    price: 800,
+    mrp: 1000,
+    discount: 20,
+    category: 'Laundry Cloths',
+    available: false,
+    ironRate: 40,
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQMmJW_G7-x9xUGcvxnZhz8K5a2lw6X4evcg&usqp=CAU',
+  },
+  {
+    id: '8',
+    name: 'Track Pants',
+    description: 'Comfortable track pants for workouts and casual wear.',
+    price: 800,
+    mrp: 1000,
+    discount: 20,
+    category: 'Laundry Cloths',
+    available: false,
+    ironRate: 40,
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQMmJW_G7-x9xUGcvxnZhz8K5a2lw6X4evcg&usqp=CAU',
+  },
+  {
+    id: '9',
+    name: 'Track Pants',
+    description: 'Comfortable track pants for workouts and casual wear.',
+    price: 800,
+    mrp: 1000,
+    discount: 20,
+    category: 'Laundry Cloths',
+    available: false,
+    ironRate: 40,
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQMmJW_G7-x9xUGcvxnZhz8K5a2lw6X4evcg&usqp=CAU',
+  },
+  {
+    id: '10',
+    name: 'Track Pants',
+    description: 'Comfortable track pants for workouts and casual wear.',
+    price: 800,
+    mrp: 1000,
+    discount: 20,
+    category: 'Laundry Cloths',
+    available: false,
+    ironRate: 40,
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQMmJW_G7-x9xUGcvxnZhz8K5a2lw6X4evcg&usqp=CAU',
+  },
 ];

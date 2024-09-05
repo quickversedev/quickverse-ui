@@ -21,11 +21,7 @@ import {
 import {LaundryProduct} from '../../utils/canonicalModel';
 import {fetchLaundryProductsList} from '../../services/laundryProductsSlice';
 import {Loading} from '../util/Loading';
-// import theme from '../../theme';
-// import LaundryItem from './LaundryItem';
-// import CartModal from './CartModal';
 import LaundryItem from './LaundryItems';
-// import CartModal from './CartModebackk';
 import CartModal from './CartModel/CartModel';
 import styles from './styles';
 import CartSummary from './CartSummary';

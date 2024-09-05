@@ -6,11 +6,12 @@ import {
   StyleSheet,
   Dimensions,
   Platform,
-  Button,
+  // Button,
 } from 'react-native';
 import theme from '../../theme';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../store/store';
+import {Button} from 'react-native-paper';
+// import {useSelector} from 'react-redux';
+// import {RootState} from '../../store/store';
 
 const {width} = Dimensions.get('window');
 

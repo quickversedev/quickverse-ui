@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../../theme';
 import {Address} from '../../../utils/canonicalModel';
 // import styles from '../styles';
@@ -18,23 +18,41 @@ const AddressCard: React.FC<AddressCardProps> = ({
   onDelete,
   onSelect,
 }) => {
+  const handleDeleteClick = () => {
+    console.log('delete clicked');
+    onDelete();
+  };
+
   return (
     <View style={styles.addressCard}>
-      <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
-        <Icon name="delete" size={24} color={theme.colors.secondary} />
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => handleDeleteClick()}>
+        <MaterialCommunityIcons
+          name="delete"
+          size={24}
+          color={theme.colors.secondary}
+        />
       </TouchableOpacity>
       <TouchableOpacity style={styles.radioButton} onPress={onSelect}>
-        <Icon
-          name={isSelected ? 'radio-button-checked' : 'radio-button-unchecked'}
+        <MaterialCommunityIcons
+          name={isSelected ? 'radiobox-marked' : 'radiobox-blank'}
           size={24}
           color={theme.colors.ternary}
         />
       </TouchableOpacity>
       <View style={styles.textContainer}>
-        <Text style={styles.text}>Name: {address.address.name}</Text>
-        <Text style={styles.text}>Phone: {address.address.phone}</Text>
         <Text style={styles.text}>
-          Address: {address.address.concatenatedAddress}
+          <Text style={styles.label}>Name: </Text>
+          {address.address.name}
+        </Text>
+        <Text style={styles.text}>
+          <Text style={styles.label}>Phone: </Text>
+          {address.address.phone}
+        </Text>
+        <Text style={styles.text}>
+          <Text style={styles.label}>Address: </Text>
+          {address.address.concatenatedAddress}
         </Text>
       </View>
     </View>
@@ -43,7 +61,6 @@ const AddressCard: React.FC<AddressCardProps> = ({
 
 const styles = StyleSheet.create({
   addressCard: {
-    // Existing styles for the card
     backgroundColor: theme.colors.primary,
     padding: 16,
     marginBottom: 10,
@@ -56,28 +73,35 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 8,
-    borderRadius: 20,
-    padding: 6,
+    borderRadius: 12,
+    padding: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: theme.colors.primary,
   },
   radioButton: {
     position: 'absolute',
     top: 8,
     left: 8,
-    borderRadius: 20,
-    padding: 6,
+    borderRadius: 12,
+    padding: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
   textContainer: {
-    marginLeft: 40, // Adjust margin to accommodate for icons
-    flexShrink: 1, // Allow text to shrink if needed
+    marginLeft: 40,
+    marginRight: 50,
+    flexShrink: 1,
+    // backgroundColor: 'white',
   },
   text: {
-    fontSize: 14,
+    fontSize: 16,
     color: theme.colors.ternary,
-    flexWrap: 'wrap', // Ensure text wraps
+    flexWrap: 'wrap',
+  },
+  label: {
+    fontWeight: 'bold', // Makes the label bold
+    fontSize: 18,
   },
 });
 

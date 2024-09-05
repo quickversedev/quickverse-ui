@@ -17,11 +17,10 @@ import {useDispatch} from 'react-redux';
 import {AppDispatch} from '../../../store/store';
 
 interface AddressFormProps {
-  onSubmit: (formData: Address) => void;
   onBack: () => void;
 }
 
-const AddressForm: React.FC<AddressFormProps> = ({onSubmit, onBack}) => {
+const AddressForm: React.FC<AddressFormProps> = ({onBack}) => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [roomNumber, setRoomNumber] = useState('');
@@ -51,12 +50,24 @@ const AddressForm: React.FC<AddressFormProps> = ({onSubmit, onBack}) => {
       address: '',
     };
 
-    if (!name) newErrors.name = 'Name is required';
-    if (!phone) newErrors.phone = 'Phone number is required';
-    if (!roomNumber) newErrors.roomNumber = 'Room number is required';
-    if (!floor) newErrors.floor = 'Floor is required';
-    if (!hostelName) newErrors.hostelName = 'Hostel name is required';
-    if (!address) newErrors.address = 'Address is required';
+    if (!name) {
+      newErrors.name = 'Name is required';
+    }
+    if (!phone) {
+      newErrors.phone = 'Phone number is required';
+    }
+    if (!roomNumber) {
+      newErrors.roomNumber = 'Room number is required';
+    }
+    if (!floor) {
+      newErrors.floor = 'Floor is required';
+    }
+    if (!hostelName) {
+      newErrors.hostelName = 'Hostel name is required';
+    }
+    if (!address) {
+      newErrors.address = 'Address is required';
+    }
 
     setErrors(newErrors);
 
@@ -64,7 +75,9 @@ const AddressForm: React.FC<AddressFormProps> = ({onSubmit, onBack}) => {
   };
 
   const handleSubmit = () => {
-    if (!validateFields()) return;
+    if (!validateFields()) {
+      return;
+    }
 
     const keyId = uuid.v4().toString();
     const concatenatedAddress = `Room Number:${roomNumber}, Floor:${floor}, Address: ${address}, Hostel: ${hostelName}, How to Reach: ${howToReach}`;
@@ -79,7 +92,6 @@ const AddressForm: React.FC<AddressFormProps> = ({onSubmit, onBack}) => {
     };
 
     dispatch(addAddress(newAddress));
-    onSubmit(newAddress);
     onBack();
   };
 

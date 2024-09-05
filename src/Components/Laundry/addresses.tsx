@@ -14,12 +14,12 @@ import {
 } from 'react-native';
 import {Address} from '../../utils/canonicalModel';
 import AddressForm from './Address/AddressPage';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon library
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import theme from '../../theme';
 
 interface AddressListProps {
   onBack: () => void;
-  onAddressSelect: (address: Address) => void; // Callback to pass the selected address
+  onAddressSelect: (address: Address) => void;
 }
 
 const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
@@ -36,7 +36,11 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
 
   if (loading) {
     return (
-      <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />
+      <ActivityIndicator
+        size="large"
+        color={theme.colors.secondary}
+        style={styles.loader}
+      />
     );
   }
 
@@ -48,10 +52,9 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
     setShowAddress(false);
   };
 
-  const handleAddressSubmit = (formData: Address) => {
-    console.log('Address Submitted:', formData);
-    // Handle address submission logic
-  };
+  // const handleAddressSubmit = (formData: Address) => {
+  //   console.log('Address Submitted:', formData);
+  // };
 
   const handleSelectAddress = (address: Address) => {
     setSelectedAddressId(address.keyId);
@@ -107,13 +110,12 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
           />
         </>
       ) : (
-        <AddressForm onSubmit={handleAddressSubmit} onBack={handleBackToCart} />
+        <AddressForm onBack={handleBackToCart} />
       )}
     </View>
   );
 };
 
-// const styles = StyleSheet.create({
 //   container: {
 //     flex: 1,
 //     padding: 16,

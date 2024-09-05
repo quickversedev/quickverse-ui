@@ -1,7 +1,17 @@
 // src/components/AppHeader.tsx
 import React from 'react';
-import {View, Text, StyleSheet, Dimensions, Platform} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Platform,
+  // Button,
+} from 'react-native';
 import theme from '../../theme';
+import {Button} from 'react-native-paper';
+// import {useSelector} from 'react-redux';
+// import {RootState} from '../../store/store';
 
 const {width} = Dimensions.get('window');
 
@@ -11,6 +21,10 @@ interface AppHeaderProps {
 }
 
 const AppHeader: React.FC<AppHeaderProps> = ({headerText, subHeaderText}) => {
+  // const cart = useSelector((state: RootState) => state.cart.cart);
+  // const handlePress = () => {
+  //   console.log('pressing Button', cart);
+  // };
   return (
     <View style={styles.headerContainer}>
       <Text style={styles.headerText}>{headerText}</Text>

@@ -8241,6 +8241,7 @@ __metadata:
     react-native-safe-area-context: ^4.10.4
     react-native-screens: ^3.31.1
     react-native-shadow: ^1.2.2
+    react-native-uuid: ^2.0.2
     react-native-vector-icons: ^10.1.0
     react-native-webview: ^13.10.3
     react-navigation: ^5.0.0
@@ -8409,6 +8410,13 @@ __metadata:
   version: 1.2.2
   resolution: "react-native-shadow@npm:1.2.2"
   checksum: 5916af514b116f102170d60533fa108379eb727e834e133550215202428bf6b56e34d3b35ec6dde4999f4eb6449aa3d4fbcc30e803152a36f2da9495eb16e094
+  languageName: node
+  linkType: hard
+
+"react-native-uuid@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "react-native-uuid@npm:2.0.2"
+  checksum: 149f65549132a240ac237f4db34063fd08473e4b3a9b5958e3d0d6722cf10754efb222b1c6085a3dc42e0718ca9575b38cd5535ae83a96534dde0f54d343e915
   languageName: node
   linkType: hard
 

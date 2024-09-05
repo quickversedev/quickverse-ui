@@ -25,6 +25,7 @@ import LaundryItem from './LaundryItems';
 import CartModal from './CartModel/CartModel';
 import styles from './styles';
 import CartSummary from './CartSummary';
+import AppHeader from '../util/AppHeader';
 
 const Laundry: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -107,7 +108,10 @@ const Laundry: React.FC = () => {
   if (loading) return <Loading />;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.safeView}>
+      <View style={styles.header}>
+        <AppHeader headerText="Laundry" />
+      </View>
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {LaundryProducts.map(product => (
           <LaundryItem

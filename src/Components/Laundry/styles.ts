@@ -2,10 +2,18 @@ import {StyleSheet} from 'react-native';
 import theme from '../../theme';
 
 export default StyleSheet.create({
+  safeView: {
+    flex: 1,
+    backgroundColor: theme.colors.primary,
+  },
   container: {
     flex: 1,
     padding: 16,
     backgroundColor: theme.colors.primary,
+  },
+  header: {
+    backgroundColor: theme.colors.primary,
+    paddingBottom: 50,
   },
   title: {
     textAlign: 'center',

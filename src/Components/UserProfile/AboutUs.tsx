@@ -17,7 +17,7 @@ const AboutUs = () => {
             campuses with advanced drone technology. We offer fast and reliable
             delivery of groceries, meals, books, and more. Our mission is to
             enhance campus life through swift, efficient, and eco-friendly
-            delivery solutions tailored to each community's unique needs.
+            delivery solutions tailored to each community's unique needs.
           </Text>
         </View>
       </View>

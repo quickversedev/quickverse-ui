@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,22 +10,58 @@ import {
   Linking,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from './profileNavigation';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from './profileNavigation';
 import theme from '../../theme';
-import CustomButton from '../util/CustomButton';
-import {useAuth} from '../../utils/AuthContext';
-import {useDispatch, useSelector} from 'react-redux';
-import {AppDispatch, RootState} from '../../store/store';
-import {Loading} from '../util/Loading';
-import {fetchUserDetails} from '../../services/UserDetailsSlice';
+import { useAuth } from '../../utils/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
+import { Loading } from '../util/Loading';
+import { fetchUserDetails } from '../../services/UserDetailsSlice';
 
+// Type for navigation prop
 type ProfileScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'ProfileScreen'
 >;
 
+// Reusable ProfileSection Component
+const ProfileSection = ({ profile }) => {
+  return (
+    <View style={styles.profileSection}>
+      <Image source={{ uri: profile.image }} style={styles.profileImage} />
+      <View style={styles.profileTextContainer}>
+        <Text style={styles.profileName}>{profile.name}</Text>
+        <Text style={styles.profileEmail}>{profile.email}</Text>
+        <Text style={styles.profilecollege}>{profile.college}</Text>
+      </View>
+    </View>
+  );
+};
+
+// Reusable OrderItem Component
+const OrderItem = ({ icon, text, onPress }) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.orderContainer}>
+      <MaterialCommunityIcons
+        name={icon}
+        size={20}
+        color="#A52A2A"
+        style={styles.orderIcon}
+      />
+      <Text style={styles.orderText}>{text}</Text>
+      <MaterialCommunityIcons
+        name="chevron-right"
+        size={20}
+        color="#A52A2A"
+        style={styles.chevronIcon}
+      />
+    </TouchableOpacity>
+  );
+};
+
+// Main ProfileScreen Component
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const auth = useAuth();
@@ -33,17 +69,24 @@ const ProfileScreen = () => {
     auth.signOut();
   };
   const dispatch = useDispatch<AppDispatch>();
-  const {authData} = useAuth();
-  const {userDetails, loading} = useSelector(
+  const { authData } = useAuth();
+  const { userDetails, loading } = useSelector(
     (state: RootState) => state.userDetails,
   );
+
   useEffect(() => {
-    authData && dispatch(fetchUserDetails(authData?.session.token));
+    if (authData) {
+      dispatch(fetchUserDetails(authData?.session.token));
+    }
   }, [authData, dispatch]);
-  const handleDeleteAccount = () => {
-    // Open the terms and conditions link
-    Linking.openURL('https://forms.gle/GDWr1mj2LBbZ5m7L6');
+
+  const profile = {
+    image: 'https://via.placeholder.com/100',
+    name: 'SHUVO JAIN',
+    email: '+91 7489343894',
+    college: 'IIM UDAIPUR',
   };
+
   if (loading) {
     return <Loading />;
   }
@@ -51,109 +94,64 @@ const ProfileScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* <View style={styles.header}> */}
-        <Image
-          // eslint-disable-next-line prettier/prettier
-          source={require('../../data/images/qv-blue.png')}
-          style={styles.profileImage}
-        />
-        {/* <View style={styles.headerText}>
-            <Text style={styles.name}>{userDetails.userName}</Text>
-            <Text style={styles.phone}>+{userDetails.mobile}</Text>
-            <Text style={styles.email}>{userDetails.emailId}</Text>
-          </View> */}
-        {/* <TouchableOpacity style={styles.editIcon}>
-          <MaterialCommunityIcons
-            name="pencil-outline"
-            size={24}
-            color={theme.colors.ternary}
-          />
-        </TouchableOpacity> */}
-        {/* </View> */}
-        {/* <TouchableOpacity
-          style={styles.option}
-          onPress={() => {
-            navigation.removeListener;
-            navigation.navigate('ChangePinScreen');
-          }}>
-          <MaterialCommunityIcons
-            name="lock"
-            size={24}
-            color={theme.colors.ternary}
-          />
-          <Text style={styles.optionText}>Change Pin</Text>
-          <MaterialCommunityIcons
-            name="chevron-right"
-            size={24}
-            color={theme.colors.ternary}
-          />
-        </TouchableOpacity> */}
-        <TouchableOpacity
-          style={styles.option}
-          onPress={() => {
-            navigation.removeListener;
-            navigation.navigate('Help');
-          }}>
-          <MaterialCommunityIcons
-            name="account-tie"
-            size={24}
-            color={theme.colors.ternary}
-          />
-          <Text style={styles.optionText}>Help</Text>
-          <MaterialCommunityIcons
-            name="chevron-right"
-            size={24}
-            color={theme.colors.ternary}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.option}
-          onPress={() => {
-            navigation.removeListener;
-            navigation.navigate('Feedback');
-          }}>
-          <MaterialCommunityIcons
-            name="book-edit"
-            size={24}
-            color={theme.colors.ternary}
-          />
+        <View style={styles.headerContainer}>
+          <Text style={styles.heading}>Account</Text>
+        </View>
 
-          <Text style={styles.optionText}>Feedback</Text>
-          <MaterialCommunityIcons
-            name="chevron-right"
-            size={24}
-            color={theme.colors.ternary}
+        {/* Profile Section */}
+        <View style={styles.nameSection}>
+          <ProfileSection profile={profile} />
+        </View>
+
+        {/* Order Items */}
+        <View style={styles.ordersContainer}>
+          <OrderItem
+            icon="account-box"
+            text="My Details"
+            onPress={() => navigation.navigate('MyDetails')}
           />
+          <OrderItem
+            icon="map-marker"
+            text="Delivery Address"
+            onPress={() => navigation.navigate('AddressScreen')}
+          />
+          <OrderItem
+            icon="credit-card"
+            text="Payment Methods"
+            onPress={() => navigation.navigate('PaymentMethods')}
+          />
+          <OrderItem
+            icon="card-bulleted-outline"
+            text="Promo Cards"
+            onPress={() => navigation.navigate('PromoCards')}
+          />
+          <OrderItem
+            icon="bell-outline"
+            text="Notifications"
+            onPress={() => navigation.navigate('Notifications')}
+          />
+          <OrderItem
+            icon="help-circle"
+            text="Help & Support"
+            onPress={() => navigation.navigate('Help_support')}
+          />
+          <OrderItem
+            icon="information-outline"
+            text="About"
+            onPress={() => navigation.navigate('AboutUs')}
+          />
+        </View>
+
+        {/* Logout Button */}
+        <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+          <MaterialCommunityIcons
+            name="logout"
+            size={20}
+            color="#fff"
+            style={styles.logoutIcon}
+          />
+          <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.option}
-          onPress={() => {
-            navigation.removeListener;
-            navigation.navigate('AboutUs');
-          }}>
-          <MaterialCommunityIcons
-            name="account-network"
-            size={24}
-            color={theme.colors.ternary}
-          />
-          <Text style={styles.optionText}>AboutUs..</Text>
-          <MaterialCommunityIcons
-            name="chevron-right"
-            size={24}
-            color={theme.colors.ternary}
-          />
-        </TouchableOpacity>
-        {/* <TouchableOpacity onPress={handleDeleteAccount}>
-          <Text style={styles.deleteAccount}>Delete Account?</Text>
-        </TouchableOpacity> */}
-        {/* <View style={styles.buttonContainer}>
-          <CustomButton
-            title="LogOut"
-            onPress={signOut}
-            buttonColor={theme.colors.ternary}
-            textColor={theme.colors.primary}
-          />
-        </View> */}
       </View>
     </SafeAreaView>
   );
@@ -163,71 +161,119 @@ const styles = StyleSheet.create({
   safeArea: {
     backgroundColor: theme.colors.primary,
     flex: 1,
-    paddingTop: Platform.OS === 'android' ? 10 : 0,
+    paddingTop: Platform.OS === 'android' ? 0 : 0,
   },
   container: {
     backgroundColor: theme.colors.primary,
     paddingBottom: 16,
-    paddingLeft: 16,
-    paddingRight: 16,
     alignItems: 'center',
   },
-  header: {
-    flexDirection: 'row',
+  headerContainer: {
+    backgroundColor: '#FFE474',
+    paddingVertical: 16,
+    width: '100%',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.50,
+    shadowRadius: 4,
+    elevation: 8,
     alignItems: 'center',
-    marginBottom: 32,
   },
-  profileImage: {
-    width: 150,
-    height: 150,
-    alignItems: 'center',
-  },
-  headerText: {
-    marginLeft: 16,
-    flex: 1,
-    color: theme.colors.ternary,
-  },
-  name: {
+
+  heading: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: theme.colors.ternary,
+    color: '#A52A2A',
   },
-  phone: {
-    fontSize: 16,
-    color: theme.colors.ternary,
+  nameSection: {
+    width: '100%',
+    paddingHorizontal: 46,
+    paddingVertical: 10,
+    backgroundColor: '#FFE474',
+    borderRadius: 10,
+    margin: 15,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.50,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  email: {
-    fontSize: 16,
-    color: theme.colors.ternary,
-  },
-  editIcon: {
-    padding: 8,
-  },
-  option: {
+  profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.ternary,
   },
-  buttonContainer: {
-    marginTop: 50,
-    borderRadius: 8,
-    overflow: 'hidden',
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
   },
-  optionText: {
+  profileTextContainer: {
     flex: 1,
-    marginLeft: 16,
-    fontSize: 18,
-    color: theme.colors.ternary,
   },
-  deleteAccount: {
-    marginTop: 36,
-    textAlign: 'center',
+  profileName: {
+    fontSize: 18,
     fontWeight: 'bold',
-    fontSize: 15,
-    color: theme.colors.ternary,
-    textDecorationLine: 'underline',
+    color: '#8B1A1A',
+  },
+  profileEmail: {
+    fontSize: 14,
+    color: '#0D3B66',
+  },
+  profilecollege: {
+    fontSize: 14,
+    color: '#0D3B66',
+  },
+
+  ordersContainer: {
+    paddingHorizontal: 16,
+  },
+  orderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFE474',
+    width: '100%',
+    borderRadius: 10,
+    padding: 16,
+    marginVertical: 8,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.50,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  orderIcon: {
+    marginRight: 16,
+  },
+  orderText: {
+    fontSize: 16,
+    color: '#0D3B66',
+    fontWeight: 'bold',
+    flex: 1,
+  },
+  chevronIcon: {
+    marginLeft: 'auto',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 350,
+    backgroundColor: '#8F1413',
+    padding: 12,
+    borderRadius: 25,
+    marginTop: 20,
+  },
+
+
+  logoutIcon: {
+    position: 'absolute',
+    left: 15,
+  },
+  logoutText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

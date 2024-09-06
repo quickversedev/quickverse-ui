@@ -13,10 +13,13 @@ import {storage} from '../../utils/Storage';
 import ChangePinScreen from '../UserProfile/ChangePin';
 import {useState} from 'react';
 import {Platform} from 'react-native';
+import LoginScreen from 'F:/Qickverse/NEw_login/quickverse-ui/src/Components/Login_2/login_2';
+
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
   const [forgotPasswordFlow, setForgotPasswordFlow] = useState<boolean>();
+  
   React.useEffect(() => {
     const forgotPass = async () => {
       const resetFlow = await storage.getBoolean('@resetPass');
@@ -24,12 +27,15 @@ const LoggedIn: React.FC = () => {
     };
     forgotPass();
   }, [forgotPasswordFlow]);
+  
   const handleForgotPasswordFlow = (forgotpass: boolean) => {
     setForgotPasswordFlow(forgotpass);
   };
+
   if (forgotPasswordFlow) {
     return <ChangePinScreen forgotPasswordRoute={handleForgotPasswordFlow} />;
   }
+
   return (
     <PaperProvider theme={theme}>
       <Tab.Navigator
@@ -42,9 +48,9 @@ const LoggedIn: React.FC = () => {
             height: Platform.OS === 'ios' ? 80 : 60,
             paddingBottom: Platform.OS === 'ios' ? 20 : 10,
           },
-
           headerShown: false,
         }}>
+        
         <Tab.Screen
           name="HomeNavigator"
           component={HomeNavigation}
@@ -58,6 +64,7 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
+
         {globalConfig.OrderSummeryEnabled ? (
           <Tab.Screen
             name="Order Summary"
@@ -74,9 +81,8 @@ const LoggedIn: React.FC = () => {
               ),
             }}
           />
-        ) : (
-          <></>
-        )}
+        ) : null}
+
         <Tab.Screen
           name="Vendors"
           component={VendorsNavigator}
@@ -90,6 +96,21 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
+        
+        <Tab.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{
+            tabBarIcon: ({focused, color}) => (
+              <MaterialCommunityIcons
+                name={focused ? 'login' : 'login-variant'}
+                color={color}
+                size={focused ? 36 : 26}
+              />
+            ),
+          }}
+        />
+
         <Tab.Screen
           name="User Profile"
           component={ProfileNavigation}
@@ -103,6 +124,7 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
+        
       </Tab.Navigator>
     </PaperProvider>
   );

@@ -6,16 +6,25 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {Promo} from '../../../utils/canonicalModel';
 
 import theme from '../../../theme';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamListHome} from '../HomeNavigation';
 
+type HomeNavigationProp = StackNavigationProp<
+  RootStackParamListHome,
+  'WebView'
+>;
 interface Props {
   promoItemsList: Promo[];
 }
 const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
+  const navigation = useNavigation<HomeNavigationProp>();
   const flatlistRef = useRef<FlatList<Promo>>(null);
   const screenWidth = Dimensions.get('window').width;
   const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -33,7 +42,7 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
           animated: true,
         });
       }
-    }, 2000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [activeIndex, promoItemsList.length]);
@@ -43,15 +52,22 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
     offset: screenWidth * index,
     index: index,
   });
+  const handleCardPress = (url: string | undefined) => {
+    navigation.removeListener;
+    url && navigation.navigate('WebView', {url});
+  };
 
   const renderItem = ({item}: {item: Promo}) => {
     return (
-      <View style={styles.imageContainer}>
-        <Image
-          source={{uri: `${item.promoImage}.jpg`}}
-          style={[styles.image, {width: screenWidth, borderRadius: 5}]}
-        />
-      </View>
+      <TouchableOpacity onPress={() => handleCardPress(item.promoLink)}>
+        <View style={styles.imageContainer}>
+          <Image
+            source={{uri: `${item.promoImage}.jpg`}}
+            style={[styles.image, {width: screenWidth, borderRadius: 5}]}
+            // resizeMode="contain"
+          />
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -92,7 +108,7 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
         horizontal={true}
         pagingEnabled={true}
         onScroll={handleScroll}
-        scrollEventThrottle={16} // Throttle the event to improve performance
+        scrollEventThrottle={16}
       />
 
       <View style={styles.dotContainer}>{renderDotIndicators()}</View>
@@ -110,9 +126,11 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     height: 250,
+    backgroundColor: 'red',
   },
   image: {
-    height: 250,
+    height: '100%',
+    width: '100%',
   },
   dotContainer: {
     flexDirection: 'row',

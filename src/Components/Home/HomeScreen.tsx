@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -9,10 +9,8 @@ import {
   Text,
   // TextInput,
 } from 'react-native';
-// import RNPickerSelect from 'react-native-picker-select';
 import theme from '../../theme';
 import HomeScreenVendors from './homeVendors/HomeScreenVendors';
-// import AppHeader from '../util/AppHeader';
 import PromoDiscounts from './PromoAndDiscount/PromoDiscounts';
 import CampusBuzz from './campusBuzz/CampusBuzz';
 import FeaturedItems from './featuredItems/FeaturedItems';
@@ -96,9 +94,9 @@ const HomeScreen: React.FC = () => {
       <ScrollView>
         <Categories />
         <CategoriesPage />
+        <PromoDiscounts campus={selectedCampus} />
         <FeaturedItems campus={selectedCampus} />
         <HomeScreenVendors campus={selectedCampus} />
-        <PromoDiscounts campus={selectedCampus} />
         <CampusBuzz campus={selectedCampus} />
       </ScrollView>
     </SafeAreaView>

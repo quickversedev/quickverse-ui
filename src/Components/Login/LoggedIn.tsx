@@ -14,9 +14,14 @@ import ChangePinScreen from '../UserProfile/ChangePin';
 import {useState} from 'react';
 import {Platform} from 'react-native';
 import CategoriesNavigation from '../Home/Categories/categoriesNavigator';
+import Laundry from '../Laundry/Laundry';
+import {useAuth} from '../../utils/AuthContext';
+cb47779d73b8c58aef3d3ad470f99fc0748
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
+  const {configs} = useAuth();
+  const isLaundryAvailable = configs?.configuration?.isLaundryEnabled;
   const [forgotPasswordFlow, setForgotPasswordFlow] = useState<boolean>();
   React.useEffect(() => {
     const forgotPass = async () => {
@@ -91,6 +96,21 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
+        {isLaundryAvailable && (
+          <Tab.Screen
+            name="Laundry"
+            component={Laundry}
+            options={{
+              tabBarIcon: ({focused, color}) => (
+                <MaterialCommunityIcons
+                  name={focused ? 'washing-machine' : 'washing-machine'}
+                  color={color}
+                  size={focused ? 36 : 26}
+                />
+              ),
+            }}
+          />
+        )}
         <Tab.Screen
           name="User Profile"
           component={ProfileNavigation}

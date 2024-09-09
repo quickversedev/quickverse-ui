@@ -7,23 +7,11 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import theme from '../../theme';
 import CustomButton from '../util/CustomButton';
 
-export type RootStackParamList = {
-  Home: undefined;
-  OtpVerification: undefined;
-};
-
-type OtpVerificationScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'OtpVerification'
->;
 
 const OtpVerificationScreen: React.FC = () => {
-  const navigation = useNavigation<OtpVerificationScreenNavigationProp>();
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
@@ -59,15 +47,11 @@ const OtpVerificationScreen: React.FC = () => {
     // Handle OTP verification logic here
     console.log('OTP entered:', otp.join(''));
     // Redirect to Home screen
-    navigation.navigate('Home');
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>{'<'} Back</Text>
-        </TouchableOpacity>
         <Text style={styles.header}>OTP Verification</Text>
         <Text style={styles.subHeader}>
           We have sent a verification code to {'\n'} +91-9265614292
@@ -151,3 +135,4 @@ const styles = StyleSheet.create({
 });
 
 export default OtpVerificationScreen;
+

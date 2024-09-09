@@ -14,6 +14,7 @@ import ChangePinScreen from '../UserProfile/ChangePin';
 import {useState} from 'react';
 import {Platform} from 'react-native';
 import LoginScreen from 'F:/Qickverse/NEw_login/quickverse-ui/src/Components/Login_2/login_2';
+import LoginNavigator from '../Login_2/login_navigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -99,7 +100,7 @@ const LoggedIn: React.FC = () => {
         
         <Tab.Screen
           name="Login"
-          component={LoginScreen}
+          component={LoginNavigator}
           options={{
             tabBarIcon: ({focused, color}) => (
               <MaterialCommunityIcons

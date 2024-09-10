@@ -9,8 +9,8 @@ import {getCampus} from '../../utils/Storage';
 import OtpVerificationScreen from './otpVerificationScreen';
 
 export type loginRootStackParamList = {
-  LoginScreen1 : undefined;
-  otpverify : undefined;
+  LoginScreen1: undefined;
+  otpverify: undefined;
 };
 
 const Stack = createStackNavigator<loginRootStackParamList>();

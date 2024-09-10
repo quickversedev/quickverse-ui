@@ -1,15 +1,7 @@
-import React, { useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-} from 'react-native';
+import React, {useState, useRef} from 'react';
+import {View, Text, StyleSheet, TextInput, SafeAreaView} from 'react-native';
 import theme from '../../theme';
 import CustomButton from '../util/CustomButton';
-
 
 const OtpVerificationScreen: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
@@ -29,7 +21,7 @@ const OtpVerificationScreen: React.FC = () => {
   const handleKeyPress = (index: number, key: string) => {
     if (key === 'Backspace') {
       const newOtp = [...otp];
-      
+
       if (otp[index]) {
         // Clear the current field if it is not empty
         newOtp[index] = '';
@@ -60,13 +52,15 @@ const OtpVerificationScreen: React.FC = () => {
           {otp.map((digit, index) => (
             <TextInput
               key={index}
-              ref={(el) => (inputRefs.current[index] = el)}
+              ref={el => (inputRefs.current[index] = el)}
               style={styles.otpInput}
               maxLength={1}
               keyboardType="numeric"
               value={digit}
-              onChangeText={(value) => handleOtpChange(index, value)}
-              onKeyPress={({ nativeEvent }) => handleKeyPress(index, nativeEvent.key)}
+              onChangeText={value => handleOtpChange(index, value)}
+              onKeyPress={({nativeEvent}) =>
+                handleKeyPress(index, nativeEvent.key)
+              }
             />
           ))}
         </View>
@@ -135,4 +129,3 @@ const styles = StyleSheet.create({
 });
 
 export default OtpVerificationScreen;
-

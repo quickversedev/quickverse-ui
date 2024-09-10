@@ -23,6 +23,7 @@ const OrderDetailsScreen: React.FC<OrderDetailsProps> = ({ route, navigation }) 
 
   return (
     <ScrollView style={styles.container}>
+      {/* Header */}
       <View style={styles.headerContainer}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Icon name="chevron-back" size={24} color="#A52A2A" />
@@ -30,44 +31,50 @@ const OrderDetailsScreen: React.FC<OrderDetailsProps> = ({ route, navigation }) 
         <Text style={styles.header}>Order Details</Text>
       </View>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.status}>Order Status: {order.stateLabel}</Text>
-        <View style={styles.customerInfo}>
-          <Text style={styles.customerName}>{order.customerName}</Text>
-          <Text style={styles.address}>
-            {order.customerDeliveryAddress || 'Address not provided'}
-          </Text>
-          <Text style={styles.deliveryTime}>
-            Delivered on {new Date(parseInt(order.creationTime)).toLocaleString()}
-          </Text>
-        </View>
+      {/* Order Status */}
+      <View style={styles.statusContainer}>
+        <Text style={styles.status}>Order delivered!!!</Text>
+        <Icon name="checkmark-circle" size={28} color="#A52A2A" />
       </View>
 
+      {/* Customer Info */}
+      <View style={styles.infoContainer}>
+        <Text style={styles.customerName}>{order.customerName}</Text>
+        <Text style={styles.address}>
+          {order.customerDeliveryAddress || 'Address not provided'}
+        </Text>
+        <Text style={styles.deliveryTime}>
+          Delivered on{' '}
+          {new Date(parseInt(order.creationTime, 10)).toLocaleString()}
+        </Text>
+      </View>
+
+      {/* Items */}
       <View style={styles.itemsContainer}>
         <Text style={styles.sectionHeader}>Items in order</Text>
         {order.productImageUrls.map((imageUrl, index) => (
           <View key={index} style={styles.item}>
-            <Image
-              source={{ uri: imageUrl }}
-              style={styles.productImage}
-            />
+            <Image source={{uri: imageUrl}} style={styles.productImage} />
             <View style={styles.itemDetails}>
               <Text style={styles.itemName}>{order.orderDescription}</Text>
-              <Text style={styles.itemPrice}>${order.totalOrderAmount}</Text>
+              <Text style={styles.itemPrice}>€{order.totalOrderAmount}</Text>
             </View>
           </View>
         ))}
       </View>
 
+      {/* Order Summary */}
       <View style={styles.orderSummary}>
         <Text style={styles.summaryHeader}>Order Total</Text>
-        <Text style={styles.summaryAmount}>${order.totalOrderAmount}</Text>
+        <Text style={styles.summaryAmount}>€{order.totalOrderAmount}</Text>
       </View>
 
+      {/* Order Details */}
       <View style={styles.orderDetailsContainer}>
         <Text style={styles.detailsHeader}>Order ID: #{order.orderId}</Text>
         <Text style={styles.detailsText}>
-          Order Time: {new Date(parseInt(order.creationTime)).toLocaleString()}
+          Order Time:{' '}
+          {new Date(parseInt(order.creationTime, 10)).toLocaleString()}
         </Text>
         <Text style={styles.detailsText}>Store Name: {storeName}</Text>
         <Text style={styles.detailsText}>State Label: {order.stateLabel}</Text>
@@ -75,13 +82,13 @@ const OrderDetailsScreen: React.FC<OrderDetailsProps> = ({ route, navigation }) 
         <Text style={styles.detailsText}>Product ID: {order.productId}</Text>
       </View>
 
-      <Button
-        title="Buy Again"
-        color="#A52A2A"
+      <TouchableOpacity
+        style={styles.buyAgainButton}
         onPress={() => {
-          // Add logic for the "Buy Again" functionality
-        }}
-      />
+          /* Buy Again Logic */
+        }}>
+        <Text style={styles.buyAgainButtonText}>BUY AGAIN</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -95,10 +102,14 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFDC52',
     paddingVertical: 20,
-    paddingHorizontal: 5,
-    elevation: 3,
+    paddingHorizontal: 10,
+    backgroundColor: '#FFDC52',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 5,
   },
   backButton: {
     marginRight: 85,
@@ -108,19 +119,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#A52A2A',
   },
-  infoContainer: {
-    backgroundColor: '#FFE474',
+  statusContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#fcefb6',
     padding: 16,
     borderRadius: 8,
     marginBottom: 16,
   },
   status: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#A52A2A',
-    marginBottom: 16,
   },
-  customerInfo: {
+  infoContainer: {
+    backgroundColor: '#fcefb6',
+    padding: 16,
+    borderRadius: 8,
     marginBottom: 16,
   },
   customerName: {
@@ -168,7 +184,7 @@ const styles = StyleSheet.create({
     color: '#A52A2A',
   },
   orderSummary: {
-    backgroundColor: '#FFE474',
+    backgroundColor: '#fcefb6',
     padding: 16,
     borderRadius: 8,
     marginBottom: 16,
@@ -196,6 +212,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#A52A2A',
     marginBottom: 8,
+  },
+  buyAgainButton: {
+    backgroundColor: '#A52A2A',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buyAgainButtonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

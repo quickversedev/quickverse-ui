@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import mockOrdersResponse from '../../data/orders';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { OrderStackParamList } from './OrderSNavigator';
-import { OrderMetadata } from '../../data/orders';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {OrderStackParamList} from './OrderSNavigator';
+import {OrderMetadata} from '../../data/orders';
 
 type OrderStackNavigationProp = StackNavigationProp<
   OrderStackParamList,
@@ -28,23 +28,26 @@ const MyOrdersScreen: React.FC = () => {
   }, []);
 
   const handleCardPress = (order: OrderMetadata) => {
-    navigation.navigate('OrderDetails', { order });
+    navigation.navigate('OrderDetails', {order});
   };
 
   const renderOrderItem = (item: OrderMetadata) => (
     <TouchableOpacity
       style={styles.orderContainer}
-      onPress={() => handleCardPress(item)}
-    >
+      onPress={() => handleCardPress(item)}>
       <Image
-        source={{ uri: item.productImageUrls[0] }} // assuming the first image is to be displayed
+        source={{uri: item.productImageUrls[0]}} // assuming the first image is to be displayed
         style={styles.productImage}
       />
       <View style={styles.orderDetails}>
         <Text style={styles.orderId}>ORDER : #{item.orderId}</Text>
         <Text style={styles.time}>
-          {new Date(parseInt(item.creationTime)).toLocaleDateString('en-GB')}{' '}
-          {new Date(parseInt(item.creationTime)).toLocaleTimeString('en-GB')}
+          {new Date(parseInt(item.creationTime, 10)).toLocaleDateString(
+            'en-GB',
+          )}{' '}
+          {new Date(parseInt(item.creationTime, 10)).toLocaleTimeString(
+            'en-GB',
+          )}
         </Text>
         <Text style={styles.deliveryStatus}>
           {item.stateLabel.charAt(0).toUpperCase() + item.stateLabel.slice(1)}
@@ -61,8 +64,8 @@ const MyOrdersScreen: React.FC = () => {
       </View>
       <FlatList
         data={orders}
-        renderItem={({ item }) => renderOrderItem(item)}
-        keyExtractor={(item) => item.orderId.toString()}
+        renderItem={({item}) => renderOrderItem(item)}
+        keyExtractor={item => item.orderId.toString()}
       />
     </View>
   );
@@ -88,7 +91,7 @@ const styles = StyleSheet.create({
   orderContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFEB9A', // Lighter card background color
+    backgroundColor: '#fcefb6', // Lighter card background color
     padding: 16,
     borderRadius: 20, // Rounded corners
     margin: 16,

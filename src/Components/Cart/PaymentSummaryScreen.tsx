@@ -36,7 +36,7 @@ const PaymentSummaryScreen = ({ getTotalPrice, navigation }) => {
 const styles = StyleSheet.create({
   // Add the styles used in the payment summary section here
   paymentSummary: {
-    backgroundColor: 'white',
+    backgroundColor: '#fcefb6',
     padding: 20,
     borderRadius: 10,
     marginTop: 20,

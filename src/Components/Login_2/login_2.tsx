@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   TextInput,
@@ -10,21 +10,17 @@ import {
   Keyboard,
   SafeAreaView,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
 import theme from '../../theme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
+import {GestureHandlerRootView, ScrollView} from 'react-native-gesture-handler';
+import {loginRootStackParamList} from './login_navigator';
 
-export type RootStackParamList = {
-  Login: undefined;
-  Help: undefined;
-  Signup: undefined;
-  OTPVerification: undefined;
-  Home: undefined;
-};
-
-type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
+type LoginScreenNavigationProp = StackNavigationProp<
+  loginRootStackParamList,
+  'LoginScreen1'
+>;
 
 const LoginScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
@@ -48,12 +44,13 @@ const LoginScreen: React.FC = () => {
 
   const handleContinue = () => {
     if (validate()) {
-      navigation.navigate('otpVerificationScreen');
+      navigation.navigate('otpverify');
     }
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    // eslint-disable-next-line react-native/no-inline-styles
+    <GestureHandlerRootView style={{flex: 1}}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.container}>
@@ -87,7 +84,9 @@ const LoginScreen: React.FC = () => {
                 />
               </View>
 
-              {phoneError ? <Text style={styles.error}>{phoneError}</Text> : null}
+              {phoneError ? (
+                <Text style={styles.error}>{phoneError}</Text>
+              ) : null}
 
               <TouchableOpacity onPress={handleContinue} style={styles.button}>
                 <Text style={styles.buttonText}>Continue</Text>
@@ -100,7 +99,9 @@ const LoginScreen: React.FC = () => {
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')} style={styles.skipButton}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('HomeScreen')}
+                style={styles.skipButton}>
                 <Text style={styles.skipButtonText}>Skip</Text>
               </TouchableOpacity>
             </ScrollView>
@@ -119,16 +120,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center', // Added this to center horizontally
     padding: 16,
-    backgroundColor: '#FFD700',
+    backgroundColor: '#FFDC52',
   },
   scrollContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'center', // Centers vertically
+    alignItems: 'center', // Centers horizontally
+    flexGrow: 1, // Allows proper centering inside ScrollView
   },
   logo: {
-    width: 150,
-    height: 160,
+    width: 200, // Increased width
+    height: 220, // Increased height
     alignSelf: 'center',
     marginBottom: 30,
   },
@@ -148,7 +151,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16,
     paddingHorizontal: 8,
-    backgroundColor: '#FFD700',
+    backgroundColor: '#FFDC52',
   },
   input: {
     flex: 1,

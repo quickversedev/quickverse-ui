@@ -30,7 +30,7 @@ const Vendors: React.FC = () => {
 const styles = StyleSheet.create({
   safeView: {
     flex: 1,
-    backgroundColor: theme.colors.primary,
+    backgroundColor: 'theme.colors.primary',
   },
   container: {
     backgroundColor: theme.colors.primary,

@@ -94,7 +94,7 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
-        {isLaundryAvailable && (
+        {true && (
           <Tab.Screen
             name="Laundry"
             component={Laundry}

@@ -14,6 +14,7 @@ import ChangePinScreen from '../UserProfile/ChangePin';
 import {useState} from 'react';
 import {Platform} from 'react-native';
 import Laundry from '../Laundry/Laundry';
+import Pharmacy from '../Pharmacy/Pharmacy'; // Import the Pharmacy component
 import {useAuth} from '../../utils/AuthContext';
 const Tab = createBottomTabNavigator();
 
@@ -46,7 +47,6 @@ const LoggedIn: React.FC = () => {
             height: Platform.OS === 'ios' ? 80 : 60,
             paddingBottom: Platform.OS === 'ios' ? 20 : 10,
           },
-
           headerShown: false,
         }}>
         <Tab.Screen
@@ -109,6 +109,19 @@ const LoggedIn: React.FC = () => {
             }}
           />
         )}
+        <Tab.Screen
+          name="Pharmacy"
+          component={Pharmacy} // Use the Pharmacy component
+          options={{
+            tabBarIcon: ({focused, color}) => (
+              <MaterialCommunityIcons
+                name={focused ? 'pill' : 'pill'}
+                color={color}
+                size={focused ? 36 : 26}
+              />
+            ),
+          }}
+        />
         <Tab.Screen
           name="User Profile"
           component={ProfileNavigation}

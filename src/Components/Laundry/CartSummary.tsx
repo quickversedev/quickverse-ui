@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, Pressable} from 'react-native';
+import {Text, Pressable} from 'react-native';
 // import styles from './styles';
 import styles from './styles';
 import {CartItem} from '../../services/cartSlice';

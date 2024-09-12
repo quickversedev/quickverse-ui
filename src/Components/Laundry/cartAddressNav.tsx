@@ -4,13 +4,12 @@ import {
 } from '@react-navigation/stack';
 /// Adjust path as needed
 import React from 'react';
-import CartModal from './CartModebackk';
 import Laundry from './Laundry';
 import AddressPage from './Address/AddressPage';
 
 export type RootStackParamList = {
   LaundryStack: undefined;
-  CartModal: undefined;
+  CartModal: undefined;u
   AddressPage: undefined;
 };
 

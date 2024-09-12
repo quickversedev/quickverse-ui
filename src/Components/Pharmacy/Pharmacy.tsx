@@ -57,8 +57,8 @@ const Pharmacy: React.FC = () => {
         response => {
           if (response.didCancel) {
             console.log('User cancelled image picker');
-          } else if (response.error) {
-            console.log('ImagePicker Error: ', response.error);
+          } else if (response.errorCode) {
+            console.log('ImagePicker Error: ', response.errorCode);
           } else {
             const uri =
               response.assets && response.assets.length > 0

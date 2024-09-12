@@ -140,7 +140,7 @@ const Laundry: React.FC = () => {
         removeItemFromCart={removeItemFromCart}
         handleCheckboxChange={handleCheckboxChange}
       />
-      <CartSummary cart={cart} onPress={openCartModal} />
+      {cart.length > 0 && <CartSummary cart={cart} onPress={openCartModal} />}
     </SafeAreaView>
   );
 };

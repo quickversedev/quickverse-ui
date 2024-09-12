@@ -31,18 +31,15 @@ const HomeScreen: React.FC = () => {
     setCampusOptions(campusOption);
   };
   useEffect(() => {
-    // getCampusDetails();
     fetchCampus();
-
-    console.log('selected camous:', selectedCampus);
     setTimeout(() => {
       const camp = getCampus();
       camp ? setSelectedCampus(camp) : setSelectedCampus('IIMU-313001');
     }, 1000);
-    console.log('selecteddddd camous:', selectedCampus);
+
     selectedCampus && setCampus(selectedCampus);
   }, [selectedCampus]);
-  console.log('getcamopusss:', getCampus());
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>

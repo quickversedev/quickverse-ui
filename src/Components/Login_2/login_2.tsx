@@ -49,7 +49,6 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    // eslint-disable-next-line react-native/no-inline-styles
     <GestureHandlerRootView style={{flex: 1}}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <SafeAreaView style={styles.safeArea}>
@@ -91,20 +90,13 @@ const LoginScreen: React.FC = () => {
               <TouchableOpacity onPress={handleContinue} style={styles.button}>
                 <Text style={styles.buttonText}>Continue</Text>
               </TouchableOpacity>
-
-              <View style={styles.footer}>
-                <Text style={styles.footerText}>Don’t have an account?</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-                  <Text style={styles.signUpButton}>Sign Up</Text>
-                </TouchableOpacity>
-              </View>
-
-              <TouchableOpacity
-                onPress={() => navigation.navigate('HomeScreen')}
-                style={styles.skipButton}>
-                <Text style={styles.skipButtonText}>Skip</Text>
-              </TouchableOpacity>
             </ScrollView>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('HomeScreen')}
+              style={styles.skipButton}>
+              <Text style={styles.skipButtonText}>Skip</Text>
+            </TouchableOpacity>
           </View>
         </SafeAreaView>
       </TouchableWithoutFeedback>
@@ -120,20 +112,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center', // Added this to center horizontally
+    alignItems: 'center',
     padding: 16,
     backgroundColor: '#FFDC52',
   },
   scrollContainer: {
-    justifyContent: 'center', // Centers vertically
-    alignItems: 'center', // Centers horizontally
-    flexGrow: 1, // Allows proper centering inside ScrollView
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexGrow: 1,
   },
   logo: {
-    width: 200, // Increased width
-    height: 220, // Increased height
+    width: 250,
+    height: 250,
     alignSelf: 'center',
-    marginBottom: 30,
+    marginBottom: 50,
   },
   header: {
     fontSize: 24,
@@ -145,17 +137,18 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 50,
+    height: 60,
     borderColor: '#8B0000',
-    borderWidth: 1,
-    borderRadius: 8,
+    borderWidth: 3,
+    width: 300,
+    borderRadius: 15,
     marginBottom: 16,
-    paddingHorizontal: 8,
+    paddingHorizontal: 15,
     backgroundColor: '#FFDC52',
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 20,
     color: '#8B0000',
   },
   icon: {
@@ -172,32 +165,21 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
     marginTop: 16,
-    width: '100%',
+    width: '60%',
   },
   buttonText: {
     color: '#FFD700',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  footer: {
-    flexDirection: 'row',
-    marginTop: 16,
-    alignItems: 'center',
-  },
-  footerText: {
-    color: '#000',
-    marginRight: 4,
-  },
-  signUpButton: {
-    color: '#8B0000',
-    fontWeight: 'bold',
-  },
   skipButton: {
-    marginTop: 16,
+    position: 'absolute',
+    top: 30,
+    right: 30,
   },
   skipButtonText: {
     color: '#8B0000',
-    textAlign: 'center',
+    fontSize: 20,
   },
   error: {
     color: 'red',

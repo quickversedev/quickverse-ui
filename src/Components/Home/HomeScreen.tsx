@@ -17,6 +17,8 @@ import FeaturedItems from './featuredItems/FeaturedItems';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {getCampus, setCampus} from '../../utils/Storage';
 import {fetchCampusIds} from '../../services/fetchCampusIds';
+import Laundry from '../Laundry/Laundry';
+import LaundryItem from '../Laundry/LaundryItems';
 const HomeScreen: React.FC = () => {
   const [selectedCampus, setSelectedCampus] = useState<string | undefined>();
   const [campusOptions, setCampusOptions] = useState<any>();
@@ -85,6 +87,7 @@ const HomeScreen: React.FC = () => {
         ) : null}
       </View>
       <ScrollView>
+        <Laundry></Laundry>
         <PromoDiscounts campus={selectedCampus} />
         <FeaturedItems campus={selectedCampus} />
         <HomeScreenVendors campus={selectedCampus} />

@@ -16,7 +16,9 @@ import CampusBuzz from './campusBuzz/CampusBuzz';
 import FeaturedItems from './featuredItems/FeaturedItems';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {getCampus, setCampus} from '../../utils/Storage';
+import CategoriesPage from './Categories/CategoriesPage'
 import {fetchCampusIds} from '../../services/fetchCampusIds';
+import Categories from './Categories/Categories';
 const HomeScreen: React.FC = () => {
   const [selectedCampus, setSelectedCampus] = useState<string | undefined>();
   const [campusOptions, setCampusOptions] = useState<any>();
@@ -85,6 +87,8 @@ const HomeScreen: React.FC = () => {
         ) : null}
       </View>
       <ScrollView>
+        <Categories />
+        <CategoriesPage />
         <PromoDiscounts campus={selectedCampus} />
         <FeaturedItems campus={selectedCampus} />
         <HomeScreenVendors campus={selectedCampus} />

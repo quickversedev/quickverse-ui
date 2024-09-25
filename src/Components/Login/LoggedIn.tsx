@@ -13,8 +13,10 @@ import {storage} from '../../utils/Storage';
 import ChangePinScreen from '../UserProfile/ChangePin';
 import {useState} from 'react';
 import {Platform} from 'react-native';
+import CategoriesNavigation from '../Home/Categories/categoriesNavigator';
 import Laundry from '../Laundry/Laundry';
 import {useAuth} from '../../utils/AuthContext';
+cb47779d73b8c58aef3d3ad470f99fc0748
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
@@ -116,6 +118,19 @@ const LoggedIn: React.FC = () => {
             tabBarIcon: ({focused, color}) => (
               <MaterialCommunityIcons
                 name={focused ? 'account-circle' : 'account-circle-outline'}
+                color={color}
+                size={focused ? 36 : 26}
+              />
+            ),
+          }}
+        />
+         <Tab.Screen
+          name="Categories"
+          component={CategoriesNavigation}
+          options={{
+            tabBarIcon: ({focused, color}) => (
+              <MaterialCommunityIcons
+                name={focused ? 'view-list' : 'view-list-outline'}
                 color={color}
                 size={focused ? 36 : 26}
               />

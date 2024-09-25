@@ -21,20 +21,21 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
     <View style={styles.container}>
       <View style={styles.orderSummary}>
         <View style={styles.priceSection}>
-          <Text style={styles.itemName}>{`Total Items : `}</Text>
+          <Text style={styles.itemName}>{'Total Items : '}</Text>
           <Text style={styles.itemName}>{`${totalItems}`}</Text>
         </View>
         <View style={styles.priceSection}>
-          <Text>{`    Total Washing Amount : `}</Text>
+          <Text>{'    Total Washing Amount : '}</Text>
           <Text>{`${washingTotal} Rs`}</Text>
         </View>
         <View style={styles.priceSection}>
-          <Text>{`    Total Ironing Amount : `}</Text>
+          <Text>{'    Total Ironing Amount : '}</Text>
           <Text>{`+${ironingTotal} Rs`}</Text>
         </View>
         <View style={styles.priceSection}>
-          <Text style={styles.itemName}>{`Total Amount : `}</Text>
+          <Text style={styles.itemName}>{'Total Amount : '}</Text>
           <Text
+            // eslint-disable-next-line react-native/no-inline-styles
             style={{
               color: theme.colors.secondary,
               fontSize: 22,

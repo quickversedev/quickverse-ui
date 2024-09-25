@@ -1,339 +1,407 @@
-import React, {useState, useRef} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
-  FlatList,
+  Image,
   TextInput,
   StyleSheet,
   Alert,
-  Image,
-  TouchableOpacity,
-  Animated,
+  Modal,
+  Pressable,
+  ActivityIndicator,
+  ScrollView,
 } from 'react-native';
-import {Card, Title, Paragraph} from 'react-native-paper';
-import {launchImageLibrary} from 'react-native-image-picker';
-import {PermissionsAndroid, Platform} from 'react-native';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {RNS3} from 'react-native-aws3';
+import SelectedAddress from '../Laundry/CartModel/SelectedAddress';
+import AddressList from '../Laundry/Address/AddressList';
+import {Address} from '../../utils/canonicalModel';
 
-const Pharmacy: React.FC = () => {
-  const [pharmacyData, setPharmacyData] = useState([
-    {
-      id: '1',
-      name: 'Paracetamol',
-      description: 'Pain relief and fever reducer',
-      phone: '123-456-7890',
-      imageUri:
-        'F:\\Qickverse\\NEw_login\\quickverse-ui\\src\\data\\images\\a1.jpg',
-    },
-    {
-      id: '2',
-      name: 'Aspirin',
-      description: 'Used to reduce pain, fever, or inflammation',
-      phone: '987-654-3210',
-      imageUri:
-        'F:\\Qickverse\\NEw_login\\quickverse-ui\\src\\data\\images\\a1.jpg',
-    },
-  ]);
+const s3Options = {
+  keyPrefix: 'uploads/',
+  bucket: 'p1images',
+  region: 'eu-north-1',
+  accessKey: 'your-access-key', // Replace with your accessKey
+  secretKey: 'your-secret-key', // Replace with your secretKey
+  successActionStatus: 201,
+};
 
-  const [newItem, setNewItem] = useState({
-    id: '',
-    name: '',
-    description: '',
-    phone: '',
-    imageUri: '',
-  });
+const PharmacyScreen = () => {
+  const [images, setImages] = useState<string[]>([]);
+  const [description, setDescription] = useState('');
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
 
-  const [isAddItemVisible, setIsAddItemVisible] = useState(false); // Hidden by default
-  const animation = useRef(new Animated.Value(0)).current; // Initially set to hidden
-  const rotateAnimation = useRef(new Animated.Value(0)).current; // Animation for floating button
-
-  // Function to pick an image
-  const pickImage = async () => {
-    const granted = await requestStoragePermission();
-    if (granted) {
-      launchImageLibrary(
-        {
-          mediaType: 'video',
-        },
-        response => {
-          if (response.didCancel) {
-            console.log('User cancelled image picker');
-          } else if (response.errorCode) {
-            console.log('ImagePicker Error: ', response.errorCode);
-          } else {
-            const uri =
-              response.assets && response.assets.length > 0
-                ? response.assets[0].uri
-                : null;
-            setNewItem(prevItem => ({...prevItem, imageUri: uri}));
-          }
-        },
-      );
-    } else {
-      Alert.alert(
-        'Permission denied',
-        'Storage permission is required to upload an image.',
-      );
-    }
-  };
-
-  // Request storage permission on Android
-  const requestStoragePermission = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-          {
-            title: 'Storage Permission',
-            message: 'App needs access to your storage to upload photos',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      } catch (err) {
-        console.warn(err);
-        return false;
+  const selectImageFromGallery = () => {
+    launchImageLibrary({mediaType: 'photo'}, response => {
+      if (response.assets && response.assets.length > 0) {
+        setImages([...images, response.assets[0].uri ?? '']);
       }
-    } else {
-      return true;
+      setShowNotification(false);
+    });
+  };
+
+  const takePhoto = () => {
+    launchCamera({mediaType: 'photo'}, response => {
+      if (response.assets && response.assets.length > 0) {
+        setImages([...images, response.assets[0].uri ?? '']);
+      }
+      setShowNotification(false);
+    });
+  };
+
+  const removeImage = (uri: string) => {
+    setImages(images.filter(imageUri => imageUri !== uri));
+  };
+
+  const uploadFileToS3 = async (fileUri: string) => {
+    const fileName = fileUri.split('/').pop() || 'default_filename';
+    const fileType = fileName.split('.').pop();
+
+    const file = {
+      uri: fileUri,
+      name: fileName,
+      type: `image/${fileType}`,
+    };
+
+    try {
+      setIsLoading(true);
+      const response = await RNS3.put(file as any, s3Options);
+
+      if (response.status === 201) {
+        console.log('File uploaded successfully', response);
+        const responseBody = (response as any).body;
+        return responseBody;
+      } else {
+        console.log('Failed to upload file', response);
+        throw new Error('File upload failed');
+      }
+    } catch (error) {
+      console.error('Error uploading file to S3', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Function to add a new pharmacy item
-  const addNewItem = () => {
-    if (newItem.name && newItem.description && newItem.phone) {
-      setPharmacyData(prevData => [
-        ...prevData,
-        {...newItem, id: (pharmacyData.length + 1).toString()},
-      ]);
-      setNewItem({id: '', name: '', description: '', phone: '', imageUri: ''});
-    } else {
-      Alert.alert('Error', 'Please fill in all the details');
+  const handleSubmit = async () => {
+    if (images.length === 0 || !description.trim() || !selectedAddress) {
+      Alert.alert(
+        'Error',
+        'Please upload at least one image, add a description, and select an address.',
+      );
+      return;
+    }
+
+    try {
+      for (const image of images) {
+        await uploadFileToS3(image);
+      }
+
+      Alert.alert(
+        'Success',
+        'Images, description, and address submitted successfully!',
+      );
+      setImages([]);
+      setDescription('');
+      setSelectedAddress(null);
+    } catch (error) {
+      Alert.alert('Error', 'File upload failed.');
     }
   };
 
-  // Function to toggle visibility of Add Item container with animation
-  const toggleAddItem = () => {
-    if (isAddItemVisible) {
-      Animated.parallel([
-        Animated.timing(animation, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(rotateAnimation, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ]).start(() => setIsAddItemVisible(false));
-    } else {
-      setIsAddItemVisible(true);
-      Animated.parallel([
-        Animated.timing(animation, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(rotateAnimation, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }
+  const handleAddressSelect = (address: Address) => {
+    setSelectedAddress(address);
+    setShowAddressModal(false);
   };
 
-  const rotateInterpolate = rotateAnimation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '45deg'],
-  });
+  const removeSelectedAddress = () => {
+    setSelectedAddress(null);
+  };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
+      {/* Header with Drop Shadow */}
       <View style={styles.headerContainer}>
-        <Text style={styles.heading}>Pharmacy</Text>
+        <Text style={styles.pharmacyHeader}>Pharmacy</Text>
       </View>
 
-      <FlatList
-        data={pharmacyData}
-        keyExtractor={item => item.id}
-        renderItem={({item}) => (
-          <Card style={styles.card}>
-            <Card.Content>
-              <View style={styles.row}>
-                {item.imageUri ? (
-                  <Image source={{uri: item.imageUri}} style={styles.image} />
-                ) : null}
-                <View style={styles.descriptionContainer}>
-                  <Title>{item.name}</Title>
-                  <Paragraph>{item.description}</Paragraph>
-                  <Text style={styles.phoneText}>Phone: {item.phone}</Text>
-                </View>
-              </View>
-            </Card.Content>
-          </Card>
-        )}
+      <Text style={styles.title}>Upload Prescription</Text>
+
+      <View style={styles.uploadSection}>
+        {/* Images are arranged horizontally */}
+        <ScrollView horizontal>
+          {images.map((imageUri, index) => (
+            <View key={index} style={styles.imageContainer}>
+              <Image source={{uri: imageUri}} style={styles.image} />
+              <Pressable
+                style={styles.removeButton}
+                onPress={() => removeImage(imageUri)}>
+                <Text style={styles.removeButtonText}>x</Text>
+              </Pressable>
+            </View>
+          ))}
+        </ScrollView>
+
+        <Pressable
+          style={styles.uploadBox}
+          onPress={() => setShowNotification(true)}>
+          <Image
+            source={{
+              uri: 'https://img.icons8.com/material-rounded/24/000000/image.png',
+            }}
+            style={styles.uploadIcon}
+          />
+          <Text style={styles.uploadText}>Select or Add More Images</Text>
+        </Pressable>
+      </View>
+
+      {/* Description Box with Reduced Height */}
+      <TextInput
+        style={styles.textInput}
+        placeholder="Add a description..."
+        value={description}
+        onChangeText={setDescription}
+        multiline
       />
 
-      {/* Animated Add Item container */}
-      {isAddItemVisible && (
-        <Animated.View style={[styles.inputContainer, {opacity: animation}]}>
-          <TextInput
-            placeholder="Medicine Name"
-            style={styles.input}
-            value={newItem.name}
-            onChangeText={text =>
-              setNewItem(prevItem => ({...prevItem, name: text}))
-            }
+      {selectedAddress ? (
+        <View style={styles.selectedAddressContainer}>
+          <SelectedAddress
+            selectedAddress={selectedAddress}
+            onChangeAddress={function (): void {
+              throw new Error('Function not implemented.');
+            }}
           />
-          <TextInput
-            placeholder="Description"
-            style={styles.input}
-            value={newItem.description}
-            onChangeText={text =>
-              setNewItem(prevItem => ({...prevItem, description: text}))
-            }
-          />
-          <TextInput
-            placeholder="Phone Number"
-            style={styles.input}
-            value={newItem.phone}
-            onChangeText={text =>
-              setNewItem(prevItem => ({...prevItem, phone: text}))
-            }
-          />
-
-          {/* Buttons in the same row with spacing */}
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.button} onPress={pickImage}>
-              <Text style={styles.buttonText}>Pick an Image</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={addNewItem}>
-              <Text style={styles.buttonText}>Add Item</Text>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
+          <Pressable
+            style={styles.removeAddressButton}
+            onPress={removeSelectedAddress}>
+            <Text style={styles.removeAddressButtonText}>Remove Address</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <Pressable
+          style={styles.addressButton}
+          onPress={() => setShowAddressModal(true)}>
+          <Text style={styles.buttonText}>Select Address</Text>
+        </Pressable>
       )}
 
-      {/* Floating button to toggle Add Item container */}
-      <Animated.View
-        style={[
-          styles.floatingButton,
-          {transform: [{rotate: rotateInterpolate}]},
-        ]}>
-        <TouchableOpacity onPress={toggleAddItem}>
-          <Text style={styles.floatingButtonText}>+</Text>
-        </TouchableOpacity>
-      </Animated.View>
-    </View>
+      <Pressable
+        style={styles.submitButton}
+        onPress={handleSubmit}
+        disabled={isLoading}>
+        <Text style={styles.buttonText}>
+          {isLoading ? 'Submitting...' : 'Submit'}
+        </Text>
+        {isLoading && <ActivityIndicator size="small" color="#fff" />}
+      </Pressable>
+
+      {/* Notification for Image Selection */}
+      {showNotification && (
+        <View style={styles.notificationContainer}>
+          <Pressable style={styles.notificationButton} onPress={takePhoto}>
+            <Text style={styles.notificationButtonText}>Take a Photo</Text>
+          </Pressable>
+          <Pressable
+            style={styles.notificationButton}
+            onPress={selectImageFromGallery}>
+            <Text style={styles.notificationButtonText}>
+              Select from Gallery
+            </Text>
+          </Pressable>
+          <Pressable
+            style={styles.notificationButton}
+            onPress={() => setShowNotification(false)}>
+            <Text style={styles.notificationButtonText}>Cancel</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {/* Address List Modal */}
+      <Modal
+        visible={showAddressModal}
+        animationType="slide"
+        onRequestClose={() => setShowAddressModal(false)}>
+        <View style={styles.fullScreenModal}>
+          <AddressList
+            onAddressSelect={handleAddressSelect}
+            onBack={() => setShowAddressModal(false)}
+          />
+          <Pressable
+            style={styles.closeButton}
+            onPress={() => setShowAddressModal(false)}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </Pressable>
+        </View>
+      </Modal>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 16,
     backgroundColor: '#FFDC52',
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
   },
   headerContainer: {
-    padding: 16,
     backgroundColor: '#FFDC52',
-    marginBottom: 16,
-    marginHorizontal: -20,
-    marginVertical: -15,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.8,
-    shadowRadius: 3,
-    elevation: 5,
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#8B0000',
-  },
-  card: {
-    backgroundColor: '#fcefb6',
-    marginBottom: 15,
-    padding: 10,
-    borderRadius: 20,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.8,
-    shadowRadius: 3,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    marginTop: -30,
+    marginHorizontal: -20,
     elevation: 5,
+    marginBottom: 20, // Added space to separate the header
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  pharmacyHeader: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#000080',
   },
-  descriptionContainer: {
-    flex: 1,
-    paddingLeft: 10,
-  },
-  inputContainer: {
-    marginTop: 20,
-    backgroundColor: '#fcefb6',
-    padding: 16,
-    borderRadius: 10,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
     marginBottom: 10,
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: '#FFF',
+    textAlign: 'center',
+    color: '#000080',
   },
-  phoneText: {
-    fontSize: 14,
-    marginTop: 8,
-    color: '#555',
+  uploadSection: {
+    marginBottom: 0,
+  },
+  imageContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 10,
   },
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
+    width: 100,
+    height: 100,
+    marginRight: 10,
   },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-  button: {
-    backgroundColor: '#4a0101',
-    padding: 10,
+  removeButton: {
+    backgroundColor: '#800000',
+    padding: 5,
     borderRadius: 5,
-    flex: 0.48, // Adjust the width of each button
   },
-  buttonText: {
-    color: 'white',
-    textAlign: 'center',
+  removeButtonText: {
+    color: '#fff',
     fontWeight: 'bold',
   },
-  floatingButton: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: '#4a0101',
-    borderRadius: 50,
-    width: 60,
-    height: 60,
+  uploadBox: {
+    borderColor: '#00BFA6',
+    borderWidth: 2,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    height: 100,
+    marginBottom: 20,
+  },
+  uploadIcon: {
+    width: 40,
+    height: 40,
+    marginBottom: 10,
+  },
+  uploadText: {
+    fontSize: 16,
+    color: '#999',
+  },
+  textInput: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 20,
+    borderRadius: 10,
+    backgroundColor: '#fcf4d4',
+    height: 60, // Reduced height
+  },
+  selectedAddressContainer: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: '#fcf4d4',
+    marginBottom: 20,
+  },
+  removeAddressButton: {
+    backgroundColor: '#800000',
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  removeAddressButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  addressButton: {
+    backgroundColor: '#007BFF',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  submitButton: {
+    backgroundColor: '#800000',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  notificationContainer: {
+    position: 'absolute',
+    top: '40%',
+    left: '10%',
+    right: '10%',
+    backgroundColor: '#fcf4d4',
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
     elevation: 5,
   },
-  floatingButtonText: {
-    color: 'white',
-    fontSize: 24,
+  notificationButton: {
+    backgroundColor: '#800000',
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  notificationButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  fullScreenModal: {
+    flex: 1,
+    backgroundColor: '#f8f8f8',
+  },
+  closeButton: {
+    padding: 10,
+    backgroundColor: '#007BFF',
+    borderRadius: 10,
+    alignItems: 'center',
+    margin: 20,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });
 
-export default Pharmacy;
+export default PharmacyScreen;

@@ -16,8 +16,13 @@
     "@react-navigation/bottom-tabs": "^6.5.20",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/stack": "^6.3.29",
+    "@react-three/drei": "^9.114.0",
+    "@react-three/fiber": "^8.17.8",
     "@reduxjs/toolkit": "^2.2.5",
     "axios": "^0.21.4",
+    "expo": "^51.0.34",
+    "expo-modules-core": "^1.12.24",
+    "expo-three": "^8.0.0",
     "react": "18.2.0",
     "react-native": "0.74.1",
     "react-native-gesture-handler": "^2.16.2",
@@ -34,6 +39,7 @@
     "react-native-webview": "^13.10.3",
     "react-navigation": "^5.0.0",
     "react-redux": "^9.1.2",
+    "three": "^0.166.0",
     "yarn": "^1.22.22"
   },
   "devDependencies": {

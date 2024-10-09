@@ -1,71 +1,78 @@
+import { RouteProp, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, Button } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { OrderMetadata } from '../../data/orders';
+import { OrderStackParamList } from './OrderSNavigator';
 
-const OrderDetailsScreen = ({ route, navigation }) => {
-  const { order } = route.params; // Get the order details passed from MyOrdersScreen
-  // const order={
-  //   orderId: 6931496981463564,
-  //   customerId: 1576482547300535,
-  //   customerName: "Abhilash Bhaiya",
-  //   customerMobileNumber: 8801454674,
-  //   customerDeliveryAddress: null,
-  //   state: "PENDING",
-  //   totalOrderAmount: 499,
-  //   totalItemCount: 1,
-  //   totalProductCount: 1,
-  //   totalInvoiceAmount: 499,
-  //   fulfillmentOption: "PICK_UP",
-  //   creationTime: "1688716025703",
-  //   productImageUrls: [
-  //     "https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/Icons-09.png",
-  //   ],
-  //   stateLabel: "Waiting for seller confirmation",
-  //   orderDescription: "Power Yoga T-shirt(Size-XL)",
-  //   orderLink: "https://www.smartbiz.in/teststore-devops/orders/6931496981463564/order-details",
-  // };
+interface OrderDetailsProps {
+  // Type definition for the route prop, ensuring it contains the expected parameters
+  route: RouteProp<OrderStackParamList, 'OrderDetails'>;
+  // Type definition for the navigation prop, allowing for navigation between screens
+  navigation: StackNavigationProp<OrderStackParamList, 'OrderDetails'>;
+}
+
+const OrderDetailsScreen: React.FC<OrderDetailsProps> = ({ route, navigation }) => {
+  // Extract the order object passed from MyOrdersScreen via route params
+  const order = route.params.order;
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Order Details</Text>
+
+      {/* Container for displaying order status and customer information */}
       <View style={styles.infoContainer}>
         <Text style={styles.status}>Order delivered!!!</Text>
         <View style={styles.customerInfo}>
           <Text style={styles.customerName}>{order.customerName}</Text>
-          <Text style={styles.address}>{order.customerDeliveryAddress || 'Address not provided'}</Text>
-          <Text style={styles.deliveryTime}>Delivered on {new Date(order.creationTime).toLocaleString()}</Text>
+          <Text style={styles.address}>
+            {order.customerDeliveryAddress || 'Address not provided'}
+          </Text>
+          <Text style={styles.deliveryTime}>
+            Delivered on {new Date(parseInt(order.creationTime)).toLocaleString()}
+          </Text>
         </View>
       </View>
 
+      {/* Container for displaying the items in the order */}
       <View style={styles.itemsContainer}>
         <Text style={styles.sectionHeader}>Items in order</Text>
         <View style={styles.item}>
-          <Image source={{ uri: order.productImageUrls[0] }} style={styles.productImage} />
+          <Image
+            source={{ uri: order.productImageUrls[0] }}
+            style={styles.productImage}
+          />
           <View style={styles.itemDetails}>
             <Text style={styles.itemName}>{order.orderDescription}</Text>
-            <Text style={styles.itemPrice}>{order.totalOrderAmount}</Text>
+            <Text style={styles.itemPrice}>${order.totalOrderAmount}</Text>
           </View>
         </View>
       </View>
 
+      {/* Summary of the order's total amount */}
       <View style={styles.orderSummary}>
         <Text style={styles.summaryHeader}>Order Total</Text>
         <Text style={styles.summaryAmount}>${order.totalOrderAmount}</Text>
       </View>
 
-      {/* Updated Order Details Section */}
+      {/* Additional details about the order, including order ID, time, and state */}
       <View style={styles.orderDetailsContainer}>
         <Text style={styles.detailsHeader}>Order ID: #{order.orderId}</Text>
-        <Text style={styles.detailsText}>Order Time: {new Date(order.creationTime).toLocaleString()}</Text>
+        <Text style={styles.detailsText}>
+          Order Time: {new Date(parseInt(order.creationTime)).toLocaleString()}
+        </Text>
         <Text style={styles.detailsText}>Store Name: {order.storeName}</Text>
         <Text style={styles.detailsText}>State Label: {order.stateLabel}</Text>
         <Text style={styles.detailsText}>State: {order.state}</Text>
         <Text style={styles.detailsText}>Product ID: {order.productId}</Text>
       </View>
 
+      {/* Button to allow the user to "Buy Again" */}
       <Button
         title="Buy Again"
         color="#A52A2A"
         onPress={() => {
-          // Add logic for the "Buy Again" functionality
+          // Add logic for the "Buy Again" functionality here
         }}
       />
     </ScrollView>

@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   // Add the shared styles here
   container: {
     flex: 1,
-    backgroundColor: '#FFF8DC',
+    backgroundColor: '#FFDC52',
     padding: 20,
   },
   header: {

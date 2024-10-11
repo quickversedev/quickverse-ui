@@ -1,4 +1,13 @@
+import {ReactNode} from 'react';
+
 export interface OrderMetadata {
+  storeName: ReactNode;
+  productId: ReactNode;
+  estimatedDeliveryDate(
+    estimatedDeliveryDate: any,
+    arg1: number,
+  ): string | number | Date;
+  deliverydate(deliverydate: any, arg1: number): string | number | Date;
   orderId: number;
   customerId: number;
   customerName: string;
@@ -43,6 +52,19 @@ const mockOrdersResponse: OrdersResponse = {
       orderDescription: 'Power Yoga T-shirt(Size-XL)',
       orderLink:
         'https://www.smartbiz.in/teststore-devops/orders/6931496981463564/order-details',
+      storeName: undefined,
+      productId: undefined,
+      estimatedDeliveryDate: function (
+        _estimatedDeliveryDate: any,
+      ): string | number | Date {
+        throw new Error('Function not implemented.');
+      },
+      deliverydate: function (
+        _deliverydate: any,
+        _arg1: number,
+      ): string | number | Date {
+        throw new Error('Function not implemented.');
+      },
     },
     {
       orderId: 6396141178054622,
@@ -58,12 +80,26 @@ const mockOrdersResponse: OrdersResponse = {
       fulfillmentOption: 'PICK_UP',
       creationTime: '1688722062229',
       productImageUrls: [
-        'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.amazon.in%2FCotton-Graphic-Printed-Pattern-Shirt%2Fdp%2FB0C6B77F8D&psig=AOvVaw0dBGVYCk5O_iJsRAWaWH_a&ust=1724654322990000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCLD5qpTEj4gDFQAAAAAdAAAAABAE',
+        'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/Icons-09.png',
       ],
       stateLabel: 'Waiting for seller confirmation',
       orderDescription: 'Power Yoga T-shirt',
       orderLink:
         'https://www.smartbiz.in/teststore-devops/orders/6396141178054622/order-details',
+      storeName: undefined,
+      productId: undefined,
+      estimatedDeliveryDate: function (
+        _estimatedDeliveryDate: any,
+        _arg1: number,
+      ): string | number | Date {
+        throw new Error('Function not implemented.');
+      },
+      deliverydate: function (
+        _deliverydate: any,
+        _arg1: number,
+      ): string | number | Date {
+        throw new Error('Function not implemented.');
+      },
     },
     {
       orderId: 7584938274657382,
@@ -79,12 +115,26 @@ const mockOrdersResponse: OrdersResponse = {
       fulfillmentOption: 'DELIVERY',
       creationTime: '1688739123456',
       productImageUrls: [
-        'https://alpha.eu.smartpos-api.seller-fulfillment-tech.amazon.dev/images/3858/abcd1234-2a2d-43be-9e18-3d0d014ff323_1688533094322.jpg',
+        'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/Icons-09.png',
       ],
       stateLabel: 'Shipped',
       orderDescription: 'Yoga Mat and T-shirt',
       orderLink:
         'https://www.smartbiz.in/teststore-devops/orders/7584938274657382/order-details',
+      storeName: undefined,
+      productId: undefined,
+      estimatedDeliveryDate: function (
+        _estimatedDeliveryDate: any,
+        _arg1: number,
+      ): string | number | Date {
+        throw new Error('Function not implemented.');
+      },
+      deliverydate: function (
+        _deliverydate: any,
+        _arg1: number,
+      ): string | number | Date {
+        throw new Error('Function not implemented.');
+      },
     },
     {
       orderId: 8673948572639485,
@@ -100,12 +150,26 @@ const mockOrdersResponse: OrdersResponse = {
       fulfillmentOption: 'DELIVERY',
       creationTime: '1688745678901',
       productImageUrls: [
-        'https://alpha.eu.smartpos-api.seller-fulfillment-tech.amazon.dev/images/3858/efgh5678-2a2d-43be-9e18-3d0d014ff323_1688533094322.jpg',
+        'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/Icons-09.png',
       ],
       stateLabel: 'Delivered',
       orderDescription: 'Yoga Mat, T-shirt, and Water Bottle',
       orderLink:
-        'https://www.smartbiz.in/teststore-devops/orders/8673948572639485/order-details',
+        'https://www.smartbiz.in/teststoring-devops/orders/8673948572639485/order-details',
+      storeName: undefined,
+      productId: undefined,
+      estimatedDeliveryDate: function (
+        _estimatedDeliveryDate: any,
+        _arg1: number,
+      ): string | number | Date {
+        throw new Error('Function not implemented.');
+      },
+      deliverydate: function (
+        _deliverydate: any,
+        _arg1: number,
+      ): string | number | Date {
+        throw new Error('Function not implemented.');
+      },
     },
     {
       orderId: 9023847503847502,
@@ -121,12 +185,26 @@ const mockOrdersResponse: OrdersResponse = {
       fulfillmentOption: 'PICK_UP',
       creationTime: '1688756789012',
       productImageUrls: [
-        'https://alpha.eu.smartpos-api.seller-fulfillment-tech.amazon.dev/images/3858/ijkl9012-2a2d-43be-9e18-3d0d014ff323_1688533094322.jpg',
+        'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/Icons-09.png',
       ],
       stateLabel: 'Cancelled by customer',
       orderDescription: 'Fitness Gloves',
       orderLink:
         'https://www.smartbiz.in/teststore-devops/orders/9023847503847502/order-details',
+      storeName: undefined,
+      productId: undefined,
+      estimatedDeliveryDate: function (
+        _estimatedDeliveryDate: any,
+        _arg1: number,
+      ): string | number | Date {
+        throw new Error('Function not implemented.');
+      },
+      deliverydate: function (
+        _deliverydate: any,
+        _arg1: number,
+      ): string | number | Date {
+        throw new Error('Function not implemented.');
+      },
     },
   ],
 };

@@ -1,10 +1,10 @@
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Provider as PaperProvider} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../theme';
-// import OrderDetailsScreen from '../Orders/OrderSummary';
-// import VendorsNavigator from '../Vendors/VendorsNavigator';
 import HomeNavigation from '../Home/HomeNavigation';
 import ProfileNavigation from '../UserProfile/profileNavigation';
 import CategoriesScreen from '../Categories/CategoriesScreen';
@@ -22,7 +22,6 @@ import {
 } from 'react-native';
 import CartScreen from '../Cart/CartScreen';
 import MyOrdersScreen from '../Orders/OrderSummary';
-import OrdersNavigation from '../Orders/OrderSNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -118,7 +117,7 @@ const LoggedIn: React.FC = () => {
             name="Cart"
             component={CartScreen}
             options={{
-              tabBarIcon: ({focused, color}) => (
+              tabBarIcon: () => (
                 <View style={styles.floatingButtonContainer}>
                   <TouchableOpacity
                     style={styles.floatingButton}
@@ -142,7 +141,7 @@ const LoggedIn: React.FC = () => {
           />
           <Tab.Screen
             name="Orders"
-            component={OrdersNavigation}
+            component={MyOrdersScreen}
             options={{
               tabBarIcon: ({focused, color}) => (
                 <MaterialCommunityIcons
@@ -169,6 +168,7 @@ const LoggedIn: React.FC = () => {
             }}
           />
         </Tab.Navigator>
+
         <Modal
           transparent={true}
           visible={modalVisible}

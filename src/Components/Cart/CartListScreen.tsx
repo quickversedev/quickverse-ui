@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   // Add the styles used in the cart list section here
   itemContainer: {
     flexDirection: 'row',
-    backgroundColor: 'white',
+    backgroundColor: '#fcefb6',
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,

@@ -44,7 +44,8 @@ const LoginScreen: React.FC = () => {
 
   const handleContinue = () => {
     if (validate()) {
-      navigation.navigate('otpverify');
+      navigation.navigate('otpverify', {phoneNumber}); // Pass the phone number
+      setPhoneNumber(''); // Reset the input field
     }
   };
 

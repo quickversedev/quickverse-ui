@@ -1,5 +1,13 @@
-import React, {useState, useRef} from 'react';
-import {View, Text, StyleSheet, TextInput, SafeAreaView} from 'react-native';
+import React, {useState, useRef, useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  SafeAreaView,
+  TouchableOpacity,
+} from 'react-native';
+import {useRoute} from '@react-navigation/native'; // Import useRoute
 import theme from '../../theme';
 import CustomButton from '../util/CustomButton';
 
@@ -7,12 +15,37 @@ const OtpVerificationScreen: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
+  const route = useRoute(); // Access the route object
+  const {phoneNumber} = route.params; // Retrieve the phone number
+
+  // State for the timer and resend button disable status
+  const [timer, setTimer] = useState<number>(30);
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
+
+  useEffect(() => {
+    // Start countdown when component mounts or when the timer is reset
+    let interval: NodeJS.Timeout | null = null;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer(prevTimer => prevTimer - 1);
+      }, 1000);
+    } else {
+      setIsButtonDisabled(false); // Enable the resend button when timer is 0
+    }
+
+    // Clear the interval when the component unmounts or timer is reset
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [timer]);
+
   const handleOtpChange = (index: number, value: string) => {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // If the input value is not empty, focus on the next input
     if (value && index < otp.length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -23,11 +56,9 @@ const OtpVerificationScreen: React.FC = () => {
       const newOtp = [...otp];
 
       if (otp[index]) {
-        // Clear the current field if it is not empty
         newOtp[index] = '';
         setOtp(newOtp);
       } else if (index > 0) {
-        // If the current field is already empty, move focus to the previous field
         inputRefs.current[index - 1]?.focus();
         newOtp[index - 1] = '';
         setOtp(newOtp);
@@ -36,9 +67,14 @@ const OtpVerificationScreen: React.FC = () => {
   };
 
   const handleLoginPress = () => {
-    // Handle OTP verification logic here
     console.log('OTP entered:', otp.join(''));
-    // Redirect to Home screen
+  };
+
+  const handleResendPress = () => {
+    console.log('Resending OTP to +91-', phoneNumber);
+    setTimer(30); // Reset the timer
+    setIsButtonDisabled(true); // Disable the button again
+    // Trigger OTP resend logic here
   };
 
   return (
@@ -46,7 +82,7 @@ const OtpVerificationScreen: React.FC = () => {
       <View style={styles.container}>
         <Text style={styles.header}>OTP Verification</Text>
         <Text style={styles.subHeader}>
-          We have sent a verification code to {'\n'} +91-9265614292
+          We have sent a verification code to {'\n'} +91-{phoneNumber}
         </Text>
         <View style={styles.otpContainer}>
           {otp.map((digit, index) => (
@@ -64,9 +100,19 @@ const OtpVerificationScreen: React.FC = () => {
             />
           ))}
         </View>
-        <Text style={styles.resendText}>
-          Didn’t get the OTP? Resend Code in 30s
-        </Text>
+        <TouchableOpacity
+          disabled={isButtonDisabled}
+          onPress={handleResendPress}>
+          <Text
+            style={
+              isButtonDisabled
+                ? styles.resendTextDisabled
+                : styles.resendTextEnabled
+            }>
+            Didn’t get the OTP?{' '}
+            {isButtonDisabled ? `Resend Code in ${timer}s` : 'Resend Code'}
+          </Text>
+        </TouchableOpacity>
         <CustomButton
           title="Login"
           onPress={handleLoginPress}
@@ -88,11 +134,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 16,
     backgroundColor: theme.colors.primary,
-  },
-  backButton: {
-    fontSize: 18,
-    color: theme.colors.ternary,
-    marginBottom: 16,
   },
   header: {
     fontSize: 32,
@@ -122,11 +163,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     backgroundColor: theme.colors.primary,
   },
-  resendText: {
+  resendTextDisabled: {
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 32,
-    color: theme.colors.secondary,
+    color: '#AAAAAA', // Hardcoded disabled text color
+  },
+  resendTextEnabled: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 32,
+    color: theme.colors.ternary, // Active color for the resend text
   },
 });
 

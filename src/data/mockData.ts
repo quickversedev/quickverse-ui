@@ -6,12 +6,6 @@ const cardData = [
     rating: 4.5,
   },
   {
-    imageUri: 'https://img.freepik.com/free-photo/grilled-chicken-sandwich_141793-2159.jpg',
-    text: 'Grilled Chicken Sandwich',
-    price: '120',
-    rating: 4.0,
-  },
-  {
     imageUri: 'https://img.freepik.com/free-photo/top-view-bacon-cheeseburger-wooden-tray_141793-14317.jpg',
     text: 'Bacon Cheeseburger',
     price: '180',
@@ -37,7 +31,7 @@ const cardData = [
   },
   {
     imageUri: 'https://img.freepik.com/free-photo/cheeseburger-with-sweet-potato-fries_141793-3164.jpg',
-    text: 'Double Cheeseburger',
+    text: 'Cheeseburger',
     price: '200',
     rating: 4.7,
   },

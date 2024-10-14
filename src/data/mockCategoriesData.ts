@@ -61,7 +61,7 @@ interface Category {
       },
       {
         id: "49735092-3f7f-4a32-a89a-90514826391a",
-        name: "Beverages",
+        name: "Beverage",
         description: "|",
         imageURLs: [
           "https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/icons_New_Beverages.png",

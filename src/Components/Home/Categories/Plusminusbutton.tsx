@@ -18,8 +18,7 @@ const CartButton = () => {
 
   return (
     <View style={styles.container}>
-
-      <View style={styles.borderedContainer}>
+      <View style={[styles.borderedContainer, { backgroundColor: quantity > 0 ? '#8F1413' : 'green' }]}>
         <TouchableOpacity style={styles.button} onPress={handleDecrement}>
           <Text style={styles.buttonText}>-</Text>
         </TouchableOpacity>
@@ -38,40 +37,36 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 40,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    marginLeft: 60,
+    marginBottom: 5,
   },
   borderedContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2, 
-    borderColor: '#8F1413', 
-    borderRadius: 50, 
-    backgroundColor: '#8F1413',
+    borderWidth: 1.5, // Reduced border width
+    borderColor: '#8F1413',
+    borderRadius: 25, // Reduced border radius
+    padding: 4, // Added padding to adjust the overall size
   },
   button: {
     backgroundColor: '#fff',
-    borderRadius: 15, 
-    width: 30, 
-    height: 30,
+    borderRadius: 12, // Reduced radius
+    width: 24, // Reduced width
+    height: 24, // Reduced height
     justifyContent: 'center',
     alignItems: 'center',
   },
   buttonText: {
     color: '#111',
-    fontSize: 20,   
+    fontSize: 16, // Reduced font size
     fontWeight: 'bold',
   },
   quantityText: {
-    fontSize: 20,
+    fontSize: 16, // Reduced font size
     fontWeight: 'bold',
-    marginHorizontal: 10,
-    color:'#fff'
+    marginHorizontal: 5, // Reduced margin
+    color: '#fff',
   },
 });
 

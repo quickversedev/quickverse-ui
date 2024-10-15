@@ -7,7 +7,6 @@ import theme from '../../../theme';
 const Categories = () => {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-    const [numColumns, setNumColumns] = useState(2); // State for managing number of columns
     const [cartCounts, setCartCounts] = useState<{ [key: string]: number }>({}); // Track counts for each product
 
     const handleCategoryPress = (categoryId: string) => {
@@ -16,9 +15,6 @@ const Categories = () => {
             (product) => product.category === categoryId
         );
         setFilteredProducts(productsInCategory);
-        
-        // Set the number of columns based on category (you can customize this logic)
-        setNumColumns(categoryId ? 2 : 1); // Example logic: 2 columns if category selected
     };
 
     const handleAddToCart = (productId: string) => {
@@ -47,7 +43,7 @@ const Categories = () => {
             <Image
                 source={{ uri: item.productImageUrl }}
                 style={styles.productImage}
-                resizeMode="cover" // Use cover to fill the container appropriately
+                resizeMode="cover"
             />
             <View style={styles.productDetails}>
                 <Text style={styles.productName}>{item.name}</Text>
@@ -58,7 +54,7 @@ const Categories = () => {
                 style={styles.addToCartButton} 
                 onPress={() => handleAddToCart(item.sku)}
             >
-                <Text style={styles.addToCartText}>Add to Cart</Text>
+                <Text style={styles.addToCartText}>Add </Text>
                 {cartCounts[item.sku] > 0 && (
                     <Text style={styles.cartCount}>{cartCounts[item.sku]}</Text>
                 )}
@@ -74,17 +70,16 @@ const Categories = () => {
                     data={mockCategoriesData}
                     renderItem={renderCategoryItem}
                     keyExtractor={(item) => item.id}
-                    showsVerticalScrollIndicator={false} // Adjust as needed
+                    showsVerticalScrollIndicator={false}
                 />
             </View>
             <View style={styles.container2}>
                 <FlatList
-                    data={filteredProducts}
+                    data={selectedCategory ? filteredProducts : mockProductData} // Show all products if no category is selected
                     renderItem={renderProductItem}
                     keyExtractor={(item) => item.sku}
-                    numColumns={numColumns} // Use the state variable for numColumns
-                    key={`${numColumns}`} // Add key prop to force re-render when numColumns changes
-                    contentContainerStyle={numColumns === 2 ? styles.productList : undefined} // Adjust styles based on number of columns
+                    numColumns={1} // Set to 1 to display one product per row
+                    contentContainerStyle={styles.productList}
                 />
             </View>
         </View>
@@ -100,10 +95,10 @@ const styles = StyleSheet.create({
     },
     container1: {
         width: "30%",
-        flexShrink: 1, // Allow the container to shrink if content is too large
+        flexShrink: 1,
     },
     container2: {
-        flex: 1, // Make sure this takes the remaining space
+        flex: 1,
     },
     title: {
         width: '100%', 
@@ -119,7 +114,7 @@ const styles = StyleSheet.create({
     },
     categoryContainer: {
         height: 100,
-        width: '100%', // Use full width for categories
+        width: 100,
         padding: 5,
         marginBottom: 10,
         borderRadius: 35,
@@ -127,46 +122,45 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 2,
         borderColor: '#F3C200',
-        flexShrink: 1, // Allow the category container to shrink
+        flexShrink: 1,
     },
     categoryImage: {
-        width: 60,
+        width: 50,
         height: 50,
         marginRight: 10,
     },
     categoryName: {
-        fontSize: 14,
+        fontSize: 13,
         color: theme.colors.secondary,
         fontWeight: 'bold',
         textAlign: 'center', 
-        textAlignVertical: 'center',
         flexWrap: 'wrap',
         width: '100%',  
         paddingHorizontal: 5, 
     },
     productContainer: {
         flex: 1,
-        flexDirection: 'row', // Keep products in a row
-        margin: 8,
+        margin: 7, // Reduced the margin between product cards
         borderRadius: 30,
         overflow: 'hidden',
-        borderWidth: 2.5,
+        borderWidth: 2,
         borderColor: '#F3C200',
-        alignItems: 'center', // Center items vertically
-        padding: 10, // Add padding for larger container size
-        width: '100%', // Ensure product takes full width
+        alignItems: 'center',
+        padding: 5, // Keep padding if needed, adjust as necessary
+        flexDirection: "row",
+        width: 250,
+        height: 90,
     },
     productImage: {
-        width: 80, // Keep the width
-        height: 80, // Keep the height (same as width)
-        borderRadius: 40, // Set borderRadius to half of width/height for a circular shape
-        overflow: 'hidden', // Ensure overflow is hidden to maintain circular shape
-        alignSelf: 'center', // Center the image in the product container
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        overflow: 'hidden',
     },
     productDetails: {
         flex: 1,
         paddingLeft: 7,
-        justifyContent: 'center', // Center text vertically
+        justifyContent: 'center',
     },
     productName: {
         fontSize: 17,
@@ -184,18 +178,18 @@ const styles = StyleSheet.create({
         fontWeight: '900',
     },
     productList: {
-        justifyContent: 'flex-start', // Align items to the start
+        justifyContent: 'flex-start',
     },
     addToCartButton: {
-        backgroundColor: 'red', // Set button color to red
-        width: 50, // Make it square-shaped
-        height: 50, // Make it square-shaped
+        backgroundColor: theme.colors.secondary,
+        width: 80,
+        height: 30,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 10,
+        borderRadius: 8,
         position: 'absolute',
-        bottom: 10, // Position it at the bottom of the product container
-        right: 10, // Align it to the right side
+        bottom: 5,
+        right: 13,
     },
     addToCartText: {
         color: 'white',

@@ -13,6 +13,8 @@ import {storage} from '../../utils/Storage';
 import ChangePinScreen from '../UserProfile/ChangePin';
 import {useState} from 'react';
 import {Platform} from 'react-native';
+import VehicleBookingScreen from '../VehicleBooking/VehicleBookingScreen'; // Import the Vehicle Booking screen
+
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
@@ -42,7 +44,6 @@ const LoggedIn: React.FC = () => {
             height: Platform.OS === 'ios' ? 80 : 60,
             paddingBottom: Platform.OS === 'ios' ? 20 : 10,
           },
-
           headerShown: false,
         }}>
         <Tab.Screen
@@ -74,9 +75,7 @@ const LoggedIn: React.FC = () => {
               ),
             }}
           />
-        ) : (
-          <></>
-        )}
+        ) : null}
         <Tab.Screen
           name="Vendors"
           component={VendorsNavigator}
@@ -84,6 +83,19 @@ const LoggedIn: React.FC = () => {
             tabBarIcon: ({focused, color}) => (
               <MaterialCommunityIcons
                 name={focused ? 'store' : 'store-outline'}
+                color={color}
+                size={focused ? 36 : 26}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Vehicle Booking"
+          component={VehicleBookingScreen}
+          options={{
+            tabBarIcon: ({focused, color}) => (
+              <MaterialCommunityIcons
+                name={focused ? 'bike' : 'bike'}
                 color={color}
                 size={focused ? 36 : 26}
               />

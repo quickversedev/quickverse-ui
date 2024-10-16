@@ -6,24 +6,35 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  Linking,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useNavigation} from '@react-navigation/native';
 import mockOrdersResponse from '../../data/orders';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {OrderStackParamList} from './OrderSNavigator';
 import {OrderMetadata} from '../../data/orders';
+
+type OrderStackNavigationProp = StackNavigationProp<
+  OrderStackParamList,
+  'OrderDetails' | 'WebView'
+>;
 
 const MyOrdersScreen: React.FC = () => {
   const [orders, setOrders] = useState<OrderMetadata[]>([]);
+  const navigation = useNavigation<OrderStackNavigationProp>();
 
   useEffect(() => {
     setOrders(mockOrdersResponse.ordersMetadata);
   }, []);
 
   const handleCardPress = (order: OrderMetadata) => {
-    if (order.orderLink) {
-      Linking.openURL(order.orderLink).catch(err =>
-        console.error('Failed to open link', err),
-      );
+    // Check if orderId starts with "QV"
+    if (order.orderId.startsWith('QV')) {
+      navigation.navigate('OrderDetails', {order});
+    } else {
+      // Assuming you want to pass a URL for the WebView
+      //const orderUrl = `https://example.com/order/${order.orderId}`; // Update this to match your desired URL structure
+      navigation.navigate('WebView', {url: order.orderLink});
     }
   };
 
@@ -88,13 +99,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fcefb6', // Lighter card background color
-    padding: 12,
+    padding: 16,
     borderRadius: 20, // Rounded corners
-    margin: 10,
+    margin: 16,
   },
   productImage: {
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
     marginRight: 16,
     borderRadius: 8,
   },

@@ -21,7 +21,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import CartScreen from '../Cart/CartScreen';
-import MyOrdersScreen from '../Orders/OrderSummary';
+import OrdersNavigation from '../Orders/OrderSNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -141,7 +141,7 @@ const LoggedIn: React.FC = () => {
           />
           <Tab.Screen
             name="Orders"
-            component={MyOrdersScreen}
+            component={OrdersNavigation}
             options={{
               tabBarIcon: ({focused, color}) => (
                 <MaterialCommunityIcons

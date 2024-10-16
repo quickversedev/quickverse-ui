@@ -8,7 +8,7 @@ export interface OrderMetadata {
     arg1: number,
   ): string | number | Date;
   deliverydate(deliverydate: any, arg1: number): string | number | Date;
-  orderId: number;
+  orderId: string;
   customerId: number;
   customerName: string;
   customerMobileNumber: number;
@@ -33,7 +33,7 @@ export interface OrdersResponse {
 const mockOrdersResponse: OrdersResponse = {
   ordersMetadata: [
     {
-      orderId: 6931496981463564,
+      orderId: 'QV6931496981463564',
       customerId: 1576482547300535,
       customerName: 'Abhilash Bhaiya',
       customerMobileNumber: 8801454674,
@@ -67,7 +67,7 @@ const mockOrdersResponse: OrdersResponse = {
       },
     },
     {
-      orderId: 6396141178054622,
+      orderId: '6396141178054622',
       customerId: 1576482547300535,
       customerName: 'Uday Sir',
       customerMobileNumber: 8801454674,
@@ -102,7 +102,7 @@ const mockOrdersResponse: OrdersResponse = {
       },
     },
     {
-      orderId: 7584938274657382,
+      orderId: '7584938274657382',
       customerId: 1576482547300535,
       customerName: 'Raj Paswan',
       customerMobileNumber: 8801454674,
@@ -137,7 +137,7 @@ const mockOrdersResponse: OrdersResponse = {
       },
     },
     {
-      orderId: 8673948572639485,
+      orderId: '8673948572639485',
       customerId: 1576482547300535,
       customerName: 'Raj Paswan',
       customerMobileNumber: 8801454674,
@@ -172,7 +172,7 @@ const mockOrdersResponse: OrdersResponse = {
       },
     },
     {
-      orderId: 9023847503847502,
+      orderId: '9023847503847502',
       customerId: 1576482547300535,
       customerName: 'Raj Paswan',
       customerMobileNumber: 8801454674,

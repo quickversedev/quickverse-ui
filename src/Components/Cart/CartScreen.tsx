@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import CartListScreen from '../Cart/CartListScreen';
 import PaymentSummaryScreen from '../Cart/PaymentSummaryScreen';
 
@@ -22,44 +22,53 @@ const initialCartItems = [
   },
 ];
 
-const CartScreen = ({ navigation }) => {
+const CartScreen = ({navigation}) => {
   const [cartItems, setCartItems] = useState(initialCartItems);
 
-  const handleIncrement = (itemId) => {
-    const updatedCartItems = cartItems.map(item => 
-      item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item
+  const handleIncrement = itemId => {
+    const updatedCartItems = cartItems.map(item =>
+      item.id === itemId ? {...item, quantity: item.quantity + 1} : item,
     );
     setCartItems(updatedCartItems);
   };
 
-  const handleDecrement = (itemId) => {
-    const updatedCartItems = cartItems.map(item => 
-      item.id === itemId ? { ...item, quantity: item.quantity - 1 } : item
-    ).filter(item => item.quantity > 0);
+  const handleDecrement = itemId => {
+    const updatedCartItems = cartItems
+      .map(item =>
+        item.id === itemId ? {...item, quantity: item.quantity - 1} : item,
+      )
+      .filter(item => item.quantity > 0);
     setCartItems(updatedCartItems);
   };
 
   const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0,
+    );
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Your Cart</Text>
       <View style={styles.cartHeader}>
-        <Text style={styles.subHeader}>{cartItems.length} Items in your cart</Text>
-        <TouchableOpacity style={styles.addMoreButton} onPress={() => navigation.navigate('Home')}>
+        <Text style={styles.subHeader}>
+          {cartItems.length} Items in your cart
+        </Text>
+        <TouchableOpacity
+          style={styles.addMoreButton}
+          onPress={() => navigation.navigate('Home')}>
           <Text style={styles.addMoreButtonText}>+ Add more</Text>
         </TouchableOpacity>
       </View>
-      <CartListScreen 
-        cartItems={cartItems} 
-        handleIncrement={handleIncrement} 
-        handleDecrement={handleDecrement} 
+      <CartListScreen
+        cartItems={cartItems}
+        handleIncrement={handleIncrement}
+        handleDecrement={handleDecrement}
       />
-      <PaymentSummaryScreen 
-        getTotalPrice={getTotalPrice} 
-        navigation={navigation} 
+      <PaymentSummaryScreen
+        getTotalPrice={getTotalPrice}
+        navigation={navigation}
       />
     </View>
   );

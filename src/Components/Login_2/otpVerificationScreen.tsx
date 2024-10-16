@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import {useRoute} from '@react-navigation/native'; // Import useRoute
 import theme from '../../theme';
-import CustomButton from '../util/CustomButton';
 
 const OtpVerificationScreen: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
@@ -113,12 +112,9 @@ const OtpVerificationScreen: React.FC = () => {
             {isButtonDisabled ? `Resend Code in ${timer}s` : 'Resend Code'}
           </Text>
         </TouchableOpacity>
-        <CustomButton
-          title="Login"
-          onPress={handleLoginPress}
-          buttonColor={theme.colors.ternary}
-          textColor={theme.colors.primary}
-        />
+        <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -174,6 +170,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 32,
     color: theme.colors.ternary, // Active color for the resend text
+  },
+  button: {
+    backgroundColor: '#8B0000',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 16,
+    width: '60%',
+    alignSelf: 'center', // Center the button
+  },
+  buttonText: {
+    color: '#FFD700',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

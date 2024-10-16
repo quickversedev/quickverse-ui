@@ -1,13 +1,16 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
+// src/screens/Categories.tsx
 import React, { useState } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
 import { mockCategoriesData, Category } from '../../../data/mockCategoriesData';
 import { mockProductData, Product } from '../../../data/mockProductData';
+import CartButton from './CartButton'; // Import the new CartButton component
 import theme from '../../../theme';
+import { red } from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
 
 const Categories = () => {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-    const [cartCounts, setCartCounts] = useState<{ [key: string]: number }>({}); // Track counts for each product
+    const [cartCounts, setCartCounts] = useState<{ [key: string]: number }>({});
 
     const handleCategoryPress = (categoryId: string) => {
         setSelectedCategory(categoryId);
@@ -20,8 +23,25 @@ const Categories = () => {
     const handleAddToCart = (productId: string) => {
         setCartCounts((prevCounts) => ({
             ...prevCounts,
-            [productId]: (prevCounts[productId] || 0) + 1 // Increment the count for this product
+            [productId]: (prevCounts[productId] || 0) + 1
         }));
+    };
+
+    const handleIncreaseQuantity = (productId: string) => {
+        setCartCounts((prevCounts) => ({
+            ...prevCounts,
+            [productId]: (prevCounts[productId] || 0) + 1,
+        }));
+    };
+
+    const handleDecreaseQuantity = (productId: string) => {
+        setCartCounts((prevCounts) => {
+            const newCount = Math.max((prevCounts[productId] || 0) - 1, 0);
+            return {
+                ...prevCounts,
+                [productId]: newCount,
+            };
+        });
     };
 
     const renderCategoryItem = ({ item }: { item: Category }) => (
@@ -49,17 +69,18 @@ const Categories = () => {
                 <Text style={styles.productName}>{item.name}</Text>
                 <Text style={styles.productPrice}>₹{item.sellingPrice}</Text>
                 <Text style={styles.productRating}>R: N/A</Text>
+                
             </View>
-            <TouchableOpacity 
-                style={styles.addToCartButton} 
-                onPress={() => handleAddToCart(item.sku)}
-            >
-                <Text style={styles.addToCartText}>Add </Text>
-                {cartCounts[item.sku] > 0 && (
-                    <Text style={styles.cartCount}>{cartCounts[item.sku]}</Text>
-                )}
-            </TouchableOpacity>
+              
+            <CartButton
+                quantity={cartCounts[item.sku] || 0}
+                onIncrease={() => handleIncreaseQuantity(item.sku)}
+                onDecrease={() => handleDecreaseQuantity(item.sku)}
+                onAdd={() => handleAddToCart(item.sku)}
+                added={cartCounts[item.sku] > 0}
+            />
         </View>
+        
     );
 
     return (
@@ -73,12 +94,13 @@ const Categories = () => {
                     showsVerticalScrollIndicator={false}
                 />
             </View>
+            <View style={styles.line}></View>
             <View style={styles.container2}>
                 <FlatList
-                    data={selectedCategory ? filteredProducts : mockProductData} // Show all products if no category is selected
+                    data={selectedCategory ? filteredProducts : mockProductData}
                     renderItem={renderProductItem}
                     keyExtractor={(item) => item.sku}
-                    numColumns={1} // Set to 1 to display one product per row
+                    numColumns={1}
                     contentContainerStyle={styles.productList}
                 />
             </View>
@@ -93,8 +115,18 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.primary,
         padding: 10,
     },
+    line: {
+        width: 1,
+        backgroundColor: 'black',
+        marginLeft: 5,
+    },
+    top: {
+        flex: 1,
+        height: 100,
+        backgroundColor: 'red'
+    },
     container1: {
-        width: "30%",
+        width: "27%",
         flexShrink: 1,
     },
     container2: {
@@ -114,7 +146,7 @@ const styles = StyleSheet.create({
     },
     categoryContainer: {
         height: 100,
-        width: 100,
+        width: 95,
         padding: 5,
         marginBottom: 10,
         borderRadius: 35,
@@ -140,16 +172,16 @@ const styles = StyleSheet.create({
     },
     productContainer: {
         flex: 1,
-        margin: 7, // Reduced the margin between product cards
+        margin: 7,
         borderRadius: 30,
         overflow: 'hidden',
         borderWidth: 2,
         borderColor: '#F3C200',
         alignItems: 'center',
-        padding: 5, // Keep padding if needed, adjust as necessary
+        padding: 5,
         flexDirection: "row",
-        width: 250,
-        height: 90,
+        width: 260,
+        height: 95,
     },
     productImage: {
         width: 70,
@@ -180,32 +212,6 @@ const styles = StyleSheet.create({
     productList: {
         justifyContent: 'flex-start',
     },
-    addToCartButton: {
-        backgroundColor: theme.colors.secondary,
-        width: 80,
-        height: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 8,
-        position: 'absolute',
-        bottom: 5,
-        right: 13,
-    },
-    addToCartText: {
-        color: 'white',
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    cartCount: {
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        backgroundColor: 'white',
-        borderRadius: 10,
-        paddingHorizontal: 5,
-        fontSize: 12,
-        fontWeight: 'bold',
-    }
 });
 
 export default Categories;

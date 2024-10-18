@@ -84,8 +84,7 @@ const mockOrdersResponse: OrdersResponse = {
       ],
       stateLabel: 'Waiting for seller confirmation',
       orderDescription: 'Power Yoga T-shirt',
-      orderLink:
-        'https://www.smartbiz.in/teststore-devops/orders/6396141178054622/order-details',
+      orderLink: 'https://www.google.com/',
       storeName: undefined,
       productId: undefined,
       estimatedDeliveryDate: function (

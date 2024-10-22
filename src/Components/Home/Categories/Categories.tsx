@@ -5,7 +5,6 @@ import { mockCategoriesData, Category } from '../../../data/mockCategoriesData';
 import { mockProductData, Product } from '../../../data/mockProductData';
 import CartButton from './CartButton'; // Import the new CartButton component
 import theme from '../../../theme';
-import { red } from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
 
 const Categories = () => {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);

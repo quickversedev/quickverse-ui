@@ -10,14 +10,11 @@ import UserDetailsSlice from '../services/UserDetailsSlice';
 import cartSlice from '../services/cartSlice';
 import laundryProductsReducer from '../services/laundryProductsSlice';
 import addressSlice from '../services/addressSclice';
-
-// Import the new slices for categories and products
-import categoriesSlice from '../services/categorySlice';  // New categories slice
-import productsSlice from '../services/productsSlice';  // New products slice
+import categoriesSlice from '../services/categorySlice';  
+import productsSlice from '../services/productsSlice';  
 
 const store = configureStore({
   reducer: {
-    // Existing reducers
     vendorList: VendorListSlice,
     foodItems: FoodItemsSlice,
     promoItems: PromoListSlice,
@@ -26,14 +23,11 @@ const store = configureStore({
     cart: cartSlice,
     laundryProducts: laundryProductsReducer,
     address: addressSlice,
-
-    // New reducers for categories and products
     categories: categoriesSlice,
     products: productsSlice,
   },
 });
 
-// Define RootState and AppDispatch types
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 

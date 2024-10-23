@@ -9,7 +9,12 @@ export const fetchPromoItems = createAsyncThunk<Promo[], string>(
   async (campus: string) => {
     try {
       const response = await axios.get(
-        `${globalConfig.apiBaseUrl}/v1/promotionItem/${campus}`,
+        `${globalConfig.apiBaseUrl}/v1/campus/${campus}/promotionItem`,
+        {
+          headers: {
+            Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+          },
+        },
       );
 
       return response.data.promotions.promotions;

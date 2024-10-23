@@ -20,7 +20,7 @@ import theme from '../../theme';
 import CustomButton from '../util/CustomButton';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dropdown from '../util/Dropdowm';
-import {setCampus} from '../../utils/Storage';
+import {setCampus, setSkipLoginFlow} from '../../utils/Storage';
 import fetchOptions from './getCampusList';
 import {ScrollView} from 'react-native-gesture-handler';
 
@@ -58,6 +58,7 @@ const LoginScreen: React.FC = () => {
     return pinRegex.test(digitpin);
   };
   const auth = useAuth();
+  const {setSkipLogin} = useAuth();
   const validate = () => {
     let isValid = true;
     setPhoneError('');
@@ -129,6 +130,16 @@ const LoginScreen: React.FC = () => {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <SafeAreaView style={styles.safeArea}>
+        <View style={styles.topRightButtonContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              setSkipLogin(true);
+              setSkipLoginFlow(true);
+            }}
+            style={styles.topRightButton}>
+            <Text style={styles.topRightButtonText}>Skip</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.container}>
           {loading ? (
             <Loading />
@@ -322,6 +333,21 @@ const styles = StyleSheet.create({
   },
   androidContainer: {
     marginBottom: 10,
+  },
+  topRightButtonContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 2,
+  },
+  topRightButton: {
+    backgroundColor: theme.colors.secondary,
+    padding: 10,
+    borderRadius: 5,
+  },
+  topRightButtonText: {
+    color: theme.colors.primary,
+    fontWeight: 'bold',
   },
 });
 

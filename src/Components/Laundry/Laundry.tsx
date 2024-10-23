@@ -1,6 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react';
 import {
-  StyleSheet,
   Text,
   View,
   Pressable,
@@ -26,6 +25,8 @@ import CartModal from './CartModel/CartModel';
 import styles from './styles';
 import CartSummary from './CartSummary';
 import AppHeader from '../util/AppHeader';
+import {useAuth} from '../../utils/AuthContext';
+import LoginCard from '../util/MandatoryLoginButton';
 
 const Laundry: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,7 +37,7 @@ const Laundry: React.FC = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const animationValue = useRef(new Animated.Value(1000)).current;
-
+  const {authData} = useAuth();
   useEffect(() => {
     dispatch(fetchLaundryProductsList());
   }, [dispatch]);
@@ -112,35 +113,41 @@ const Laundry: React.FC = () => {
       <View style={styles.header}>
         <AppHeader headerText="Laundry" />
       </View>
-      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-        {LaundryProducts.map(product => (
-          <LaundryItem
-            key={product.id}
-            item={product}
-            cartItem={cart.find(cartItem => cartItem.id === product.id)}
-            addItemToCart={addItemToCart}
-            removeItemFromCart={removeItemFromCart}
+      {!authData ? (
+        <LoginCard feature="Laundry" />
+      ) : (
+        <>
+          <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+            {LaundryProducts.map(product => (
+              <LaundryItem
+                key={product.id}
+                item={product}
+                cartItem={cart.find(cartItem => cartItem.id === product.id)}
+                addItemToCart={addItemToCart}
+                removeItemFromCart={removeItemFromCart}
+                increaseQuantity={increaseQuantity}
+                decreaseQuantity={decreaseQuantity}
+                handleCheckboxChange={handleCheckboxChange}
+              />
+            ))}
+            <Pressable onPress={openCartModal} style={styles.cartButton}>
+              <Text style={styles.cartButtonText}>View Cart</Text>
+            </Pressable>
+          </ScrollView>
+          <CartModal
+            cart={cart}
+            LaundryProducts={LaundryProducts}
+            modalVisible={modalVisible}
+            animationValue={animationValue}
+            closeCartModal={closeCartModal}
             increaseQuantity={increaseQuantity}
             decreaseQuantity={decreaseQuantity}
+            removeItemFromCart={removeItemFromCart}
             handleCheckboxChange={handleCheckboxChange}
           />
-        ))}
-        <Pressable onPress={openCartModal} style={styles.cartButton}>
-          <Text style={styles.cartButtonText}>View Cart</Text>
-        </Pressable>
-      </ScrollView>
-      <CartModal
-        cart={cart}
-        LaundryProducts={LaundryProducts}
-        modalVisible={modalVisible}
-        animationValue={animationValue}
-        closeCartModal={closeCartModal}
-        increaseQuantity={increaseQuantity}
-        decreaseQuantity={decreaseQuantity}
-        removeItemFromCart={removeItemFromCart}
-        handleCheckboxChange={handleCheckboxChange}
-      />
-      <CartSummary cart={cart} onPress={openCartModal} />
+          <CartSummary cart={cart} onPress={openCartModal} />
+        </>
+      )}
     </SafeAreaView>
   );
 };

@@ -4,6 +4,14 @@ import {Address} from './canonicalModel';
 
 export const storage = new MMKV();
 
+export const setSkipLoginFlow = (skipLogin: boolean): void => {
+  storage.set('@skipLogin', skipLogin);
+};
+
+export const getSkipLoginFlow = (): boolean | undefined => {
+  return storage.getBoolean('@skipLogin');
+};
+
 export const setJWT = (token: string): void => {
   storage.set('@AuthData', token);
 };

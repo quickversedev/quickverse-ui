@@ -6,7 +6,11 @@ import globalConfig from '../utils/GlobalConfig';
 
 export const fetchConfigs = (): Promise<config> => {
   return axios
-    .get(`${globalConfig.apiBaseUrl}/v2/configuration`)
+    .get(`${globalConfig.apiBaseUrl}/v2/configuration`, {
+      headers: {
+        Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+      },
+    })
     .then(response => {
       const data = response.data;
       return data;

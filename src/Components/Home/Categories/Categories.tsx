@@ -1,31 +1,35 @@
-// src/screens/Categories.tsx
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
-import { mockCategoriesData, Category } from '../../../data/mockCategoriesData';
-import { mockProductData, Product } from '../../../data/mockProductData';
-import CartButton from './CartButton'; // Import the new CartButton component
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../../store/store';
+import CartButton from './CartButton'; 
 import theme from '../../../theme';
 
+// Main Categories component
 const Categories = () => {
+    const dispatch = useDispatch();
+
+    // Fetch categories and products from Redux store
+    const categories = useSelector((state: RootState) => state.categories.categories);
+    const products = useSelector((state: RootState) => state.products.products);
+
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [cartCounts, setCartCounts] = useState<{ [key: string]: number }>({});
 
+    // Handle when a category is pressed
     const handleCategoryPress = (categoryId: string) => {
         setSelectedCategory(categoryId);
-        const productsInCategory = mockProductData.filter(
-            (product) => product.category === categoryId
-        );
-        setFilteredProducts(productsInCategory);
     };
 
+    // Add a product to the cart
     const handleAddToCart = (productId: string) => {
         setCartCounts((prevCounts) => ({
             ...prevCounts,
-            [productId]: (prevCounts[productId] || 0) + 1
+            [productId]: (prevCounts[productId] || 0) + 1,
         }));
     };
 
+    // Increase product quantity in the cart
     const handleIncreaseQuantity = (productId: string) => {
         setCartCounts((prevCounts) => ({
             ...prevCounts,
@@ -33,6 +37,7 @@ const Categories = () => {
         }));
     };
 
+    // Decrease product quantity in the cart
     const handleDecreaseQuantity = (productId: string) => {
         setCartCounts((prevCounts) => {
             const newCount = Math.max((prevCounts[productId] || 0) - 1, 0);
@@ -43,7 +48,13 @@ const Categories = () => {
         });
     };
 
-    const renderCategoryItem = ({ item }: { item: Category }) => (
+    // Filter products by selected category
+    const filteredProducts = selectedCategory
+        ? products.filter((product) => product.category === selectedCategory)
+        : products;
+
+    // Render a single category item
+    const renderCategoryItem = ({ item }: { item: { id: string, name: string, imageURLs: string[] } }) => (
         <TouchableOpacity
             style={styles.categoryContainer}
             onPress={() => handleCategoryPress(item.id)}
@@ -57,7 +68,8 @@ const Categories = () => {
         </TouchableOpacity>
     );
 
-    const renderProductItem = ({ item }: { item: Product }) => (
+    // Render a single product item
+    const renderProductItem = ({ item }: { item: { sku: string, name: string, productImageUrl: string, sellingPrice: number } }) => (
         <View style={styles.productContainer}>
             <Image
                 source={{ uri: item.productImageUrl }}
@@ -68,9 +80,8 @@ const Categories = () => {
                 <Text style={styles.productName}>{item.name}</Text>
                 <Text style={styles.productPrice}>₹{item.sellingPrice}</Text>
                 <Text style={styles.productRating}>R: N/A</Text>
-                
             </View>
-              
+
             <CartButton
                 quantity={cartCounts[item.sku] || 0}
                 onIncrease={() => handleIncreaseQuantity(item.sku)}
@@ -79,7 +90,6 @@ const Categories = () => {
                 added={cartCounts[item.sku] > 0}
             />
         </View>
-        
     );
 
     return (
@@ -87,7 +97,7 @@ const Categories = () => {
             <View style={styles.container1}>
                 <Text style={styles.title}>Categories</Text>
                 <FlatList
-                    data={mockCategoriesData}
+                    data={categories}
                     renderItem={renderCategoryItem}
                     keyExtractor={(item) => item.id}
                     showsVerticalScrollIndicator={false}
@@ -96,7 +106,7 @@ const Categories = () => {
             <View style={styles.line}></View>
             <View style={styles.container2}>
                 <FlatList
-                    data={selectedCategory ? filteredProducts : mockProductData}
+                    data={filteredProducts}
                     renderItem={renderProductItem}
                     keyExtractor={(item) => item.sku}
                     numColumns={1}
@@ -110,7 +120,7 @@ const Categories = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: "row",
+        flexDirection: 'row',
         backgroundColor: theme.colors.primary,
         padding: 10,
     },
@@ -119,21 +129,16 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         marginLeft: 5,
     },
-    top: {
-        flex: 1,
-        height: 100,
-        backgroundColor: 'red'
-    },
     container1: {
-        width: "27%",
+        width: '27%',
         flexShrink: 1,
     },
     container2: {
         flex: 1,
     },
     title: {
-        width: '100%', 
-        height: 50, 
+        width: '100%',
+        height: 50,
         fontSize: 14,
         fontWeight: 'bold',
         marginBottom: 20,
@@ -164,10 +169,10 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: theme.colors.secondary,
         fontWeight: 'bold',
-        textAlign: 'center', 
+        textAlign: 'center',
         flexWrap: 'wrap',
-        width: '100%',  
-        paddingHorizontal: 5, 
+        width: '100%',
+        paddingHorizontal: 5,
     },
     productContainer: {
         flex: 1,
@@ -178,7 +183,7 @@ const styles = StyleSheet.create({
         borderColor: '#F3C200',
         alignItems: 'center',
         padding: 5,
-        flexDirection: "row",
+        flexDirection: 'row',
         width: 260,
         height: 95,
     },
@@ -205,7 +210,7 @@ const styles = StyleSheet.create({
     },
     productRating: {
         fontSize: 14,
-        color: '#8F1413', 
+        color: '#8F1413',
         fontWeight: '900',
     },
     productList: {

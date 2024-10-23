@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import {storage} from './Storage';
+import {getSkipLoginFlow, storage} from './Storage';
 import {AuthData, authService} from '../services/AuthService';
 import {fetchConfigs} from '../services/configService';
 import {config} from './canonicalModel';
@@ -13,6 +13,7 @@ import {config} from './canonicalModel';
 type AuthContextData = {
   loggedInDate: string;
   authData?: AuthData;
+  skipLogin?: boolean;
   loading: boolean;
   configs: config | undefined;
   signIn(phoneNumber: string, pin: string, campusId: string): Promise<void>;
@@ -24,6 +25,7 @@ type AuthContextData = {
     email: string,
     pin: string,
   ): Promise<void>;
+  setSkipLogin(shouldSkipLogin: boolean): void;
 };
 
 // Create the Auth Context with the data type specified
@@ -37,6 +39,7 @@ type AuthProviderProps = {
 const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const [authData, setAuthData] = useState<AuthData | undefined>();
   const [loading, setLoading] = useState(true);
+  const [skipLogin, setSkipLogin] = useState<boolean | undefined>(false);
   const [loggedInDate, setLoggedInDate] = useState<string>('');
   const [configs, setConfigs] = useState<config | undefined>();
 
@@ -51,6 +54,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       // Try to get the data from MMKV storage
       const authDataSerialized = storage.getString('@AuthData');
       const logindate = storage.getString('@loginDate');
+      const skipLoginFlow = getSkipLoginFlow();
       if (authDataSerialized && logindate) {
         const _authData: AuthData = JSON.parse(authDataSerialized);
         setAuthData(_authData);
@@ -60,6 +64,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
           setConfigs(configData);
         }
       }
+      setSkipLogin(skipLoginFlow);
     } catch (error) {
       console.log('Failed to load auth data from storage', error);
     } finally {
@@ -117,10 +122,12 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         loggedInDate,
         configs,
         authData,
+        skipLogin,
         loading,
         signIn,
         signOut,
         signUp,
+        setSkipLogin,
       }}>
       {children}
     </AuthContext.Provider>

@@ -12,7 +12,11 @@ export const fetchCampusIds = (): Promise<Campus[]> => {
   //   }, 1000); // 1 second delay
   // });
   return axios
-    .get(`${globalConfig.apiBaseUrl}/v1/campus`)
+    .get(`${globalConfig.apiBaseUrl}/v1/campus`, {
+      headers: {
+        Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+      },
+    })
     .then(response => {
       const data = response.data;
       return data.campuses.campus;

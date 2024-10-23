@@ -1,7 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axios from 'axios';
 import {Vendor} from '../utils/canonicalModel';
-import {getCampus} from '../utils/Storage';
 import globalConfig from '../utils/GlobalConfig';
 
 export const fetchVendorList = createAsyncThunk<Vendor[], string>(
@@ -10,6 +9,11 @@ export const fetchVendorList = createAsyncThunk<Vendor[], string>(
     try {
       const response = await axios.get(
         `${globalConfig.apiBaseUrl}/v1/campus/${campus}/vendors`,
+        {
+          headers: {
+            Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+          },
+        },
       );
       return response.data?.vendors.vendor;
     } catch (error) {

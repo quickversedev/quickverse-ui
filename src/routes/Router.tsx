@@ -6,15 +6,15 @@ import {useAuth} from '../utils/AuthContext';
 import {Loading} from '../Components/util/Loading';
 
 export const Router = () => {
-  const {authData, loading} = useAuth();
+  const {authData, loading, skipLogin} = useAuth();
   if (loading) {
     return <Loading />;
   }
   return (
     <NavigationContainer>
-      {/* {authData ? <AppStack /> : <AuthStack />}
-       */}
-      <AppStack />
+      {authData || skipLogin ? <AppStack /> : <AuthStack />}
+
+      {/* <AppStack /> */}
     </NavigationContainer>
   );
 };

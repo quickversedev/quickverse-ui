@@ -7,16 +7,18 @@ export const fetchFoodItems = createAsyncThunk<FoodItem[], string>(
   'foodItems/fetchFoodItems',
   async (campus: string) => {
     try {
-      console.log('fetching food items:', campus);
       const response = await axios.get(
-        `${globalConfig.apiBaseUrl}/v1/featuredItem/${campus}`,
+        `${globalConfig.apiBaseUrl}/v1/campus/${campus}/featuredItem`,
+        {
+          headers: {
+            Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+          },
+        },
       );
-      // console.log(
-      //   'featured Items: ',
-      //   response.data.featuredItems.featuredItems,
-      // );
+
       return response.data.featuredItems.featuredItems;
     } catch (error) {
+      console.log('error', error);
       throw new Error('Failed to fetch vendors');
     }
   },

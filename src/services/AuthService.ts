@@ -29,11 +29,19 @@ const signIn = (
   //   }, 1000);
   // });
   return axios
-    .post(`${globalConfig.apiBaseUrl}/v1/login`, {
-      mobile: '91' + phoneNumber,
-      pin: pin,
-      campusId: campusId,
-    })
+    .post(
+      `${globalConfig.apiBaseUrl}/v1/login`,
+      {
+        mobile: '91' + phoneNumber,
+        pin: pin,
+        campusId: campusId,
+      },
+      {
+        headers: {
+          Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+        },
+      },
+    )
     .then(response => {
       const data1 = response.data;
       const data = data1?.session;
@@ -82,13 +90,21 @@ const signUp = (
   //   }, 1000);
   // });
   return axios
-    .post(`${globalConfig.apiBaseUrl}/v1/registerUser`, {
-      mobile: '91' + phoneNumber,
-      pin: pin,
-      campusId: campusId,
-      emailId: email,
-      userName: fullName,
-    })
+    .post(
+      `${globalConfig.apiBaseUrl}/v1/registerUser`,
+      {
+        mobile: '91' + phoneNumber,
+        pin: pin,
+        campusId: campusId,
+        emailId: email,
+        userName: fullName,
+      },
+      {
+        headers: {
+          Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+        },
+      },
+    )
     .then(response => {
       return response;
     })

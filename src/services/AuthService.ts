@@ -69,10 +69,9 @@ const signIn = (
 };
 const signUp = (
   fullName: string,
-  phoneNumber: string,
   campusId: string,
   email: string,
-  pin: string,
+  dob: string,
 ): Promise<any> => {
   // return new Promise(resolve => {
   //   setTimeout(() => {
@@ -83,11 +82,10 @@ const signUp = (
   // });
   return axios
     .post(`${globalConfig.apiBaseUrl}/v1/registerUser`, {
-      mobile: '91' + phoneNumber,
-      pin: pin,
       campusId: campusId,
       emailId: email,
       userName: fullName,
+      dob: dob,
     })
     .then(response => {
       return response;

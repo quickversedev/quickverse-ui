@@ -27,7 +27,9 @@ export default function LoginDetails() {
     setShowDatePicker(false);
     if (selectedDate) {
       setDob(selectedDate);
+      console.log(selectedDate)
     }
+    
   };
 
   const handleSubmit = () => {

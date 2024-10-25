@@ -15,6 +15,7 @@ import {useState} from 'react';
 import {Platform} from 'react-native';
 import Laundry from '../Laundry/Laundry';
 import {useAuth} from '../../utils/AuthContext';
+import VehicleBookingScreen from '../Vehicle/booking';
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
@@ -94,6 +95,20 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
+        <Tab.Screen
+          name="Vehicle Booking"
+          component={VehicleBookingScreen}
+          options={{
+            tabBarIcon: ({focused, color}) => (
+              <MaterialCommunityIcons
+                name={focused ? 'bike' : 'bike'}
+                color={color}
+                size={focused ? 36 : 26}
+              />
+            ),
+          }}
+        />
+
         {isLaundryAvailable && (
           <Tab.Screen
             name="Laundry"

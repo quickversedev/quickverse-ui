@@ -131,7 +131,6 @@ export default function App() {
         );
       });
   }, []);
-  
 
   const renderVehicle = ({item}: {item: Vehicle}) => (
     <View style={styles.vehicleContainer}>

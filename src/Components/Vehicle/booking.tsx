@@ -89,7 +89,6 @@ const vehiclesData: Vehicle[] = [
     type: 'Bike',
   },
 ];
-
 export default function App() {
   const [colleges, setColleges] = useState([]);
   const [selectedCollege, setSelectedCollege] = useState<string | null>(null);
@@ -105,24 +104,34 @@ export default function App() {
   const [isDropoffPickerVisible, setDropoffPickerVisible] = useState(false);
 
   useEffect(() => {
-    // Fetch colleges from the API
     axios
-      .get('http://localhost:8080/quickVerse/v1/campus', {
+      .get('http://65.0.18.159:8080/quickVerse/v1/campus', {
         headers: {
           Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+          Cookie: 'JSESSIONID=093C9E3EAFB15CE9BD4AEFD539BF98F8', // Add the Cookie header
         },
       })
       .then(response => {
-        const campusData = response.data.map((campus: any) => ({
-          label: campus.name,
-          value: campus.name,
-        }));
-        setColleges(campusData);
+        const campusArray = response.data?.campuses?.campus;
+        if (Array.isArray(campusArray)) {
+          const campusData = campusArray.map((campus: any) => ({
+            label: campus.name,
+            value: campus.name,
+            key: campus.id,
+          }));
+          setColleges(campusData);
+        } else {
+          console.error('Unexpected data format:', response.data);
+        }
       })
       .catch(error => {
-        console.error('Error fetching colleges:', error);
+        console.error(
+          'Error fetching colleges:',
+          error.response?.data || error.message,
+        );
       });
   }, []);
+  
 
   const renderVehicle = ({item}: {item: Vehicle}) => (
     <View style={styles.vehicleContainer}>
@@ -575,5 +584,3 @@ const pickerSelectStyles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
 });
-
-

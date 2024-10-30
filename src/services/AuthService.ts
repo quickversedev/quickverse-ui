@@ -10,7 +10,7 @@ export type AuthData = {
     email: string;
   };
 };
-const signIn = (
+const signIn = async (
   phoneNumber: string,
   pin: string,
   campusId: string,
@@ -29,7 +29,7 @@ const signIn = (
   //     });
   //   }, 1000);
   // });
-  const token = fetchToken();
+  const token = await fetchToken();
   return axios
     .post(
       `${globalConfig.apiBaseUrl}/v1/login`,
@@ -77,7 +77,7 @@ const signIn = (
       throw code;
     });
 };
-const signUp = (
+const signUp = async (
   fullName: string,
   phoneNumber: string,
   campusId: string,
@@ -91,6 +91,7 @@ const signUp = (
   //     });
   //   }, 1000);
   // });
+  const token = await fetchToken();
   return axios
     .post(
       `${globalConfig.apiBaseUrl}/v1/registerUser`,
@@ -103,7 +104,7 @@ const signUp = (
       },
       {
         headers: {
-          Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+          Authorization: token,
         },
       },
     )

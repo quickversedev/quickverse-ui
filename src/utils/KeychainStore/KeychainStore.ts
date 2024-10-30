@@ -4,7 +4,6 @@ import * as Keychain from 'react-native-keychain';
 export const storeToken = async (token: string): Promise<void> => {
   try {
     await Keychain.setGenericPassword('authToken', token);
-    console.log('Token stored successfully');
   } catch (error) {
     console.error('Error storing the token:', error);
   }
@@ -15,7 +14,6 @@ export const getToken = async (): Promise<string | null> => {
   try {
     const credentials = await Keychain.getGenericPassword();
     if (credentials) {
-      console.log('Token retrieved successfully');
       return credentials.password;
     } else {
       console.log('No token found');

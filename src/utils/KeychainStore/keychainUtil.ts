@@ -6,7 +6,6 @@ export const saveToken = async () => {
 
 export const fetchToken = async () => {
   const token = await getToken();
-  console.log('Retrieved Token:', token);
   return token;
 };
 

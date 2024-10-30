@@ -10,7 +10,6 @@ export const fetchVendorList = createAsyncThunk<Vendor[], string>(
   async (campus: string) => {
     try {
       const token = await fetchToken();
-      // console.log('vendors toekn', token);
       const response = await axios.get(
         `${globalConfig.apiBaseUrl}/v1/campus/${campus}/vendors`,
         {
@@ -19,7 +18,6 @@ export const fetchVendorList = createAsyncThunk<Vendor[], string>(
           },
         },
       );
-      console.log('vendors toekn', response);
       return response.data?.vendors.vendor;
     } catch (error) {
       throw new Error('Failed to fetch vendors');

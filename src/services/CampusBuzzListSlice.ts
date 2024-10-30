@@ -31,7 +31,6 @@ export const fetchBampusBuzzList = createAsyncThunk<CampusBuzz[], string>(
           },
         },
       );
-      console.log('campusBUzz', response.data);
       return response.data.campusBuzzes;
     } catch (error) {
       throw new Error('Failed to fetch vendors');

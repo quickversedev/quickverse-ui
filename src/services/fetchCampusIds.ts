@@ -13,7 +13,6 @@ export const fetchCampusIds = async (): Promise<Campus[]> => {
   //   }, 1000); // 1 second delay
   // });
   const token = await fetchToken();
-  console.log('token:', token);
   return axios
     .get(`${globalConfig.apiBaseUrl}/v1/campus`, {
       headers: {

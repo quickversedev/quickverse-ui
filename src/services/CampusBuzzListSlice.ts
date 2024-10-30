@@ -7,6 +7,7 @@ import axios from 'axios';
 import {CampusBuzz} from '../utils/canonicalModel';
 import {getCampus} from '../utils/Storage';
 import globalConfig from '../utils/GlobalConfig';
+import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 // export const fetchBampusBuzzList = createAsyncThunk(
 //   'campusBuzz/fetchBampusBuzzList',
 //   async () => {
@@ -21,11 +22,12 @@ export const fetchBampusBuzzList = createAsyncThunk<CampusBuzz[], string>(
   'campusBuzz/fetchVendorList',
   async (campus: string) => {
     try {
+      const token = await fetchToken();
       const response = await axios.get(
         `${globalConfig.apiBaseUrl}/v1/campus/${campus}/campusBuzz`,
         {
           headers: {
-            Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+            Authorization: token,
           },
         },
       );

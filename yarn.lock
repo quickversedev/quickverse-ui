@@ -8233,6 +8233,7 @@ __metadata:
     react: 18.2.0
     react-native: 0.74.1
     react-native-gesture-handler: ^2.16.2
+    react-native-keychain: ^9.1.0
     react-native-linear-gradient: ^2.8.3
     react-native-mmkv: ^2.12.2
     react-native-paper: ^5.12.3
@@ -8312,6 +8313,13 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 3f3309de471b8de654624c54793f6d72236869156ee61c1adc8bba0f4aca6ffc8ed02035eb85820473091d33eb5ec8b42a0e387a21ec25dc30ee345dff0c1142
+  languageName: node
+  linkType: hard
+
+"react-native-keychain@npm:^9.1.0":
+  version: 9.1.0
+  resolution: "react-native-keychain@npm:9.1.0"
+  checksum: 67d841a84d99c050af2837810d685125757df98be489c33ada13c3cb55aec474a4b723c84d8a18d657359b8d387e01a14311b05e7801810244b45205565c108f
   languageName: node
   linkType: hard
 

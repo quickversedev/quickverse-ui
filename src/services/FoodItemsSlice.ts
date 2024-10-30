@@ -2,16 +2,18 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {FoodItem} from '../utils/canonicalModel';
 import axios from 'axios';
 import globalConfig from '../utils/GlobalConfig';
+import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 
 export const fetchFoodItems = createAsyncThunk<FoodItem[], string>(
   'foodItems/fetchFoodItems',
   async (campus: string) => {
     try {
+      const token = await fetchToken();
       const response = await axios.get(
         `${globalConfig.apiBaseUrl}/v1/campus/${campus}/featuredItem`,
         {
           headers: {
-            Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+            Authorization: token,
           },
         },
       );

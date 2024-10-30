@@ -3,18 +3,21 @@ import axios from 'axios';
 // import campusses from '../data/campus';
 import {Campus} from '../utils/canonicalModel';
 import globalConfig from '../utils/GlobalConfig';
+import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 
-export const fetchCampusIds = (): Promise<Campus[]> => {
+export const fetchCampusIds = async (): Promise<Campus[]> => {
   // return new Promise(resolve => {
   //   // Simulate network delay with setTimeout
   //   setTimeout(() => {
   //     resolve(campusses);
   //   }, 1000); // 1 second delay
   // });
+  const token = await fetchToken();
+  console.log('token:', token);
   return axios
     .get(`${globalConfig.apiBaseUrl}/v1/campus`, {
       headers: {
-        Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+        Authorization: token,
       },
     })
     .then(response => {

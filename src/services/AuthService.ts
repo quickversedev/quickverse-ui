@@ -1,5 +1,6 @@
 import axios from 'axios';
 import globalConfig from '../utils/GlobalConfig';
+import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 
 export type AuthData = {
   session: {
@@ -28,6 +29,7 @@ const signIn = (
   //     });
   //   }, 1000);
   // });
+  const token = fetchToken();
   return axios
     .post(
       `${globalConfig.apiBaseUrl}/v1/login`,
@@ -38,7 +40,7 @@ const signIn = (
       },
       {
         headers: {
-          Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+          Authorization: token,
         },
       },
     )

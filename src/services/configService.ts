@@ -3,12 +3,14 @@ import axios from 'axios';
 // import campusses from '../data/campus'
 import {config} from '../utils/canonicalModel';
 import globalConfig from '../utils/GlobalConfig';
+import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 
 export const fetchConfigs = (): Promise<config> => {
+  const token = fetchToken();
   return axios
     .get(`${globalConfig.apiBaseUrl}/v2/configuration`, {
       headers: {
-        Authorization: 'Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx',
+        Authorization: token,
       },
     })
     .then(response => {

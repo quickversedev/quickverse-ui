@@ -1,10 +1,12 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {LaundryProduct} from '../utils/canonicalModel';
 import {mockProducts} from '../data/laundry';
+import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 
 export const fetchLaundryProductsList = createAsyncThunk<LaundryProduct[]>(
   'laundryProductList/fetchLaundryProductList',
   async () => {
+    const token = fetchToken();
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
       return mockProducts;

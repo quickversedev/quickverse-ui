@@ -27,12 +27,11 @@ export default function LoginDetails() {
     setShowDatePicker(false);
     if (selectedDate) {
       setDob(selectedDate);
-      console.log(selectedDate)
+      console.log(selectedDate);
     }
-    
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateName(name)) {
       Alert.alert('Invalid Name', 'Name can only contain letters.');
       return;
@@ -50,9 +49,34 @@ export default function LoginDetails() {
       return;
     }
 
-    // Do submission logic
-    Alert.alert('Success', 'Press ok to continue.');
-    setModalVisible(false);
+    const data = {
+      name,
+      dob: dob.toISOString(), 
+      email,
+      campus,
+    };
+
+    try {
+      const response = await fetch('I DO NOT KNOW', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const responseData = await response.json();
+      console.log('Success:', responseData);
+      Alert.alert('Success', 'Your details have been submitted successfully.');
+      setModalVisible(false);
+    } catch (error) {
+      console.error('Error:', error);
+      Alert.alert('Submission Failed', 'There was an error submitting your details. Please try again.');
+    }
   };
 
   return (

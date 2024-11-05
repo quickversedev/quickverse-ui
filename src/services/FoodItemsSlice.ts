@@ -2,21 +2,25 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {FoodItem} from '../utils/canonicalModel';
 import axios from 'axios';
 import globalConfig from '../utils/GlobalConfig';
+import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 
 export const fetchFoodItems = createAsyncThunk<FoodItem[], string>(
   'foodItems/fetchFoodItems',
   async (campus: string) => {
     try {
-      console.log('fetching food items:', campus);
+      const token = await fetchToken();
       const response = await axios.get(
-        `${globalConfig.apiBaseUrl}/v1/featuredItem/${campus}`,
+        `${globalConfig.apiBaseUrl}/v1/campus/${campus}/featuredItem`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
-      // console.log(
-      //   'featured Items: ',
-      //   response.data.featuredItems.featuredItems,
-      // );
+
       return response.data.featuredItems.featuredItems;
     } catch (error) {
+      console.log('error', error);
       throw new Error('Failed to fetch vendors');
     }
   },

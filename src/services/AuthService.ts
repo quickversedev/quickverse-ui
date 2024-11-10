@@ -92,30 +92,12 @@ const signUp = async (
   // });
   const token = await fetchToken();
   return axios
-<<<<<<< HEAD
     .post(`${globalConfig.apiBaseUrl}/v1/registerUser`, {
       campusId: campusId,
       emailId: email,
       userName: fullName,
       dob: dob,
     })
-=======
-    .post(
-      `${globalConfig.apiBaseUrl}/v1/registerUser`,
-      {
-        mobile: '91' + phoneNumber,
-        pin: pin,
-        campusId: campusId,
-        emailId: email,
-        userName: fullName,
-      },
-      {
-        headers: {
-          Authorization: token,
-        },
-      },
-    )
->>>>>>> cde7ca800c4433f806666f1c922568986847c881
     .then(response => {
       return response;
     })

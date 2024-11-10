@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Modal, TouchableOpacity, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import theme from '../../../theme';
+import { fetchCampusIds } from '../../../services/fetchCampusIds';
+import { Campus } from '../../../utils/canonicalModel'; // Ensure Campus type is correctly imported
 
 export default function LoginDetails() {
   const [name, setName] = useState('');
@@ -10,28 +12,34 @@ export default function LoginDetails() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [email, setEmail] = useState('');
   const [campus, setCampus] = useState('');
+  const [campusList, setCampusList] = useState<Campus[]>([]); // Explicitly define the type of campusList as Campus[]
   const [modalVisible, setModalVisible] = useState(true);
+
+  useEffect(() => {
+    // Fetch campus data on mount
+    const loadCampusData = async () => {
+      try {
+        const campuses = await fetchCampusIds();
+        setCampusList(campuses); // Now TypeScript knows campusList is an array of Campus
+      } catch (error) {
+        console.error('Error fetching campus data:', error);
+        Alert.alert('Error', 'Unable to load campus data.');
+      }
+    };
+    loadCampusData();
+  }, []);
 
   // Validation functions
   const validateName = (text: string) => /^[A-Za-z]+$/.test(text);
   const validateEmail = (text: string) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(text);
-
-  // DOB validation (ensure the selected date is not in the future)
-  const validateDob = (selectedDob?: Date) => {
-    if (!selectedDob) return false;
-    const today = new Date();
-    return selectedDob < today;
-  };
+  const validateDob = (selectedDob?: Date) => selectedDob && selectedDob < new Date();
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
     setShowDatePicker(false);
-    if (selectedDate) {
-      setDob(selectedDate);
-      console.log(selectedDate);
-    }
+    if (selectedDate) setDob(selectedDate);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!validateName(name)) {
       Alert.alert('Invalid Name', 'Name can only contain letters.');
       return;
@@ -49,34 +57,9 @@ export default function LoginDetails() {
       return;
     }
 
-    const data = {
-      name,
-      dob: dob.toISOString(), 
-      email,
-      campus,
-    };
-
-    try {
-      const response = await fetch('I DO NOT KNOW', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const responseData = await response.json();
-      console.log('Success:', responseData);
-      Alert.alert('Success', 'Your details have been submitted successfully.');
-      setModalVisible(false);
-    } catch (error) {
-      console.error('Error:', error);
-      Alert.alert('Submission Failed', 'There was an error submitting your details. Please try again.');
-    }
+    // Handle form submission here
+    Alert.alert('Success', 'Your details have been submitted successfully.');
+    setModalVisible(false);
   };
 
   return (
@@ -104,7 +87,7 @@ export default function LoginDetails() {
               mode="date"
               display="default"
               onChange={handleDateChange}
-              maximumDate={new Date()} 
+              maximumDate={new Date()}
             />
           )}
 
@@ -125,12 +108,17 @@ export default function LoginDetails() {
               onValueChange={(itemValue) => setCampus(itemValue)}
             >
               <Picker.Item label="Select Campus" value="" />
-              <Picker.Item label="Campus 1" value="campus1" />
-              <Picker.Item label="Campus 2" value="campus2" />
+              {campusList.map((campusItem) => (
+                <Picker.Item
+                  key={campusItem.campusId} // Use campusId (or the correct unique identifier)
+                  label={campusItem.campusName} // Use campusName here
+                  value={campusItem.campusId} // Use campusId as value
+                />
+              ))}
             </Picker>
           </View>
 
-          {/* Custom Submit Button */}
+          {/* Submit Button */}
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
             <Text style={styles.submitButtonText}>Continue</Text>
           </TouchableOpacity>

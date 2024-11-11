@@ -1,29 +1,31 @@
 import React from 'react';
-import {View, StyleSheet, FlatList, Dimensions} from 'react-native';
+import { View, StyleSheet, FlatList, Dimensions, Image } from 'react-native';
 import CardItem from '../../util/CardItem';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamListHome} from '../HomeNavigation';
-import {useNavigation} from '@react-navigation/native';
-import {CampusBuzz} from '../../../utils/canonicalModel';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamListHome } from '../HomeNavigation';
+import { useNavigation } from '@react-navigation/native';
+import { CampusBuzz } from '../../../utils/canonicalModel';
 
-const {width} = Dimensions.get('window');
-const SPACING: any = 3;
-const ITEM_SIZE: any = width * 0.46;
-// const EMPTY_ITEM_SIZE: any = width - ITEM_SIZE * 2.5;
+const screenWidth = Dimensions.get('window').width;
+const aspectRatio = 6912 / 3456;
+const bannerHeight = screenWidth / aspectRatio;
+const itemSpacing = 16;
+const bannerWidth = screenWidth - 2 * itemSpacing;
 
 type HomeNavigationProp = StackNavigationProp<
   RootStackParamListHome,
   'WebView'
 >;
+
 interface Props {
   buzzData?: CampusBuzz[];
 }
-const CampusBuzzList: React.FC<Props> = ({buzzData}) => {
+
+const CampusBuzzList: React.FC<Props> = ({ buzzData }) => {
   const navigation = useNavigation<HomeNavigationProp>();
 
   const handleCardPress = (url: string | undefined) => {
-    navigation.removeListener;
-    url && navigation.navigate('WebView', {url});
+    url && navigation.navigate('WebView', { url });
   };
 
   return (
@@ -31,28 +33,27 @@ const CampusBuzzList: React.FC<Props> = ({buzzData}) => {
       <FlatList
         showsHorizontalScrollIndicator={false}
         data={buzzData}
-        keyExtractor={(item, index) => {
-          return index.toString();
-        }}
+        keyExtractor={(item, index) => index.toString()}
         horizontal
-        contentContainerStyle={{alignItems: 'center'}}
-        snapToInterval={ITEM_SIZE}
-        decelerationRate={0.98}
-        snapToAlignment="start"
+        contentContainerStyle={{ alignItems: 'center' }}
+        snapToInterval={bannerWidth + itemSpacing * 2}
+        decelerationRate="fast"
+        snapToAlignment="center"
         bounces={false}
         scrollEventThrottle={16}
-        renderItem={({item, index}) => {
-          return (
-            <View key={index} style={{width: ITEM_SIZE, margin: SPACING * 2}}>
-              <CardItem
-                // name={item.vendorName}
-                // distance={item.distance}
-                image={{uri: `${item.buzzImage}.jpg`}}
-                onPress={() => handleCardPress(item.buzzUrl)}
-              />
-            </View>
-          );
-        }}
+        renderItem={({ item }) => (
+          <View style={[styles.cardContainer, { marginHorizontal: itemSpacing }]}>
+            <Image
+              // source={{ uri: `${item?.buzzImage}.jpg` }}
+              source={require('../../../data/images/1.png')}
+              style={styles.image}
+              resizeMode="cover"
+            />
+            <CardItem
+              onPress={() => handleCardPress(item?.buzzUrl)} image={0}
+            />
+          </View>
+        )}
       />
     </View>
   );
@@ -61,7 +62,30 @@ const CampusBuzzList: React.FC<Props> = ({buzzData}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: SPACING * 10,
+    paddingTop: itemSpacing * 2,
+    paddingBottom: itemSpacing * 2,
+    // backgroundColor: '#FFDC52', // Match with user background preference
+  },
+  cardContainer: {
+    width: bannerWidth,
+    height: bannerHeight,
+    borderRadius: 10,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

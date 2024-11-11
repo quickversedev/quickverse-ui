@@ -1,20 +1,20 @@
 // src/components/Heading.tsx
-import React, {useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Text} from 'react-native-paper';
+import React, { useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Text } from 'react-native-paper';
 // import HorizontalCardList from '../homeVendors/HorizontalCardList';
 import PromoScroll from './PromoScroll';
-import {Loading} from '../../util/Loading';
-import {AppDispatch, RootState} from '../../../store/store';
-import {useDispatch, useSelector} from 'react-redux';
-import {fetchPromoItems} from '../../../services/promoListSlice';
+import { Loading } from '../../util/Loading';
+import { AppDispatch, RootState } from '../../../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchPromoItems } from '../../../services/promoListSlice';
 import theme from '../../../theme';
 interface PromoDiscountsProps {
   campus: string | undefined; // Define the type for the campus prop
 }
-const PromoDiscounts: React.FC<PromoDiscountsProps> = ({campus}) => {
+const PromoDiscounts: React.FC<PromoDiscountsProps> = ({ campus }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const {promoItemsList, loading} = useSelector(
+  const { promoItemsList, loading } = useSelector(
     (state: RootState) => state.promoItems,
   );
   useEffect(() => {
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.ternary,
     marginHorizontal: 8,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,

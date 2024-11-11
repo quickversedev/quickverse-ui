@@ -14,7 +14,7 @@ import {setSkipLoginFlow} from '../../utils/Storage';
 const screenWidth = Dimensions.get('window').width;
 
 interface LoginCardProps {
-  feature: string; // Functionality passed as a prop
+  feature?: string; // Functionality passed as a prop
 }
 
 const LoginCard: React.FC<LoginCardProps> = ({feature}) => {
@@ -28,7 +28,10 @@ const LoginCard: React.FC<LoginCardProps> = ({feature}) => {
   };
   return (
     <View style={styles.card}>
-      <Text style={styles.message}>{`Please login to use the ${feature}`}</Text>
+      {feature && (
+        <Text
+          style={styles.message}>{`Please login to use the ${feature}`}</Text>
+      )}
       <TouchableOpacity style={styles.button} onPress={handleClick}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>

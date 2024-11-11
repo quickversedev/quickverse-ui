@@ -4,7 +4,7 @@ const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#FAEA7B',
+    primary: '#FFDC52',
     foregroupd: 'white', // your primary color
     secondary: '#8F1413', // your secondary color
     ternary: '#113E50',

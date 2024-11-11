@@ -1,5 +1,6 @@
 import axios from 'axios';
 import globalConfig from '../utils/GlobalConfig';
+import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 
 export type AuthData = {
   session: {
@@ -9,7 +10,7 @@ export type AuthData = {
     email: string;
   };
 };
-const signIn = (
+const signIn = async (
   phoneNumber: string,
   pin: string,
   campusId: string,
@@ -28,12 +29,21 @@ const signIn = (
   //     });
   //   }, 1000);
   // });
+  const token = await fetchToken();
   return axios
-    .post(`${globalConfig.apiBaseUrl}/v1/login`, {
-      mobile: '91' + phoneNumber,
-      pin: pin,
-      campusId: campusId,
-    })
+    .post(
+      `${globalConfig.apiBaseUrl}/v1/login`,
+      {
+        mobile: '91' + phoneNumber,
+        pin: pin,
+        campusId: campusId,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    )
     .then(response => {
       const data1 = response.data;
       const data = data1?.session;
@@ -67,7 +77,7 @@ const signIn = (
       throw code;
     });
 };
-const signUp = (
+const signUp = async (
   fullName: string,
   phoneNumber: string,
   campusId: string,
@@ -81,14 +91,23 @@ const signUp = (
   //     });
   //   }, 1000);
   // });
+  const token = await fetchToken();
   return axios
-    .post(`${globalConfig.apiBaseUrl}/v1/registerUser`, {
-      mobile: '91' + phoneNumber,
-      pin: pin,
-      campusId: campusId,
-      emailId: email,
-      userName: fullName,
-    })
+    .post(
+      `${globalConfig.apiBaseUrl}/v1/registerUser`,
+      {
+        mobile: '91' + phoneNumber,
+        pin: pin,
+        campusId: campusId,
+        emailId: email,
+        userName: fullName,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    )
     .then(response => {
       return response;
     })

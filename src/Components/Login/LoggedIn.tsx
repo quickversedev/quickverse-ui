@@ -13,12 +13,19 @@ import {storage} from '../../utils/Storage';
 import ChangePinScreen from '../UserProfile/ChangePin';
 import {useState} from 'react';
 import {Platform} from 'react-native';
+<<<<<<< HEAD
 import LoginScreen from 'F:/Qickverse/NEw_login/quickverse-ui/src/Components/Login_2/login_2';
 import LoginNavigator from '../Login_2/login_navigator';
 
+=======
+import Laundry from '../Laundry/Laundry';
+import {useAuth} from '../../utils/AuthContext';
+>>>>>>> cde7ca800c4433f806666f1c922568986847c881
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
+  const {configs} = useAuth();
+  const isLaundryAvailable = configs?.configuration?.isLaundryEnabled;
   const [forgotPasswordFlow, setForgotPasswordFlow] = useState<boolean>();
   
   React.useEffect(() => {
@@ -97,6 +104,7 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
+<<<<<<< HEAD
         
         <Tab.Screen
           name="Login"
@@ -112,6 +120,23 @@ const LoggedIn: React.FC = () => {
           }}
         />
 
+=======
+        {isLaundryAvailable && (
+          <Tab.Screen
+            name="Laundry"
+            component={Laundry}
+            options={{
+              tabBarIcon: ({focused, color}) => (
+                <MaterialCommunityIcons
+                  name={focused ? 'washing-machine' : 'washing-machine'}
+                  color={color}
+                  size={focused ? 36 : 26}
+                />
+              ),
+            }}
+          />
+        )}
+>>>>>>> cde7ca800c4433f806666f1c922568986847c881
         <Tab.Screen
           name="User Profile"
           component={ProfileNavigation}

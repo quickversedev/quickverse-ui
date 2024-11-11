@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, StatusBar, FlatList, Dimensions} from 'react-native';
+import {View, StyleSheet, FlatList, Dimensions} from 'react-native';
 import CardItem from '../../util/CardItem';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamListHome} from '../HomeNavigation';
@@ -35,7 +35,7 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
           return index.toString();
         }}
         horizontal
-        contentContainerStyle={{alignItems: 'center'}}
+        // contentContainerStyle={{alignItems: 'center'}}
         snapToInterval={ITEM_SIZE}
         decelerationRate={0.98}
         snapToAlignment="start"

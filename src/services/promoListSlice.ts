@@ -3,13 +3,20 @@ import {Promo} from '../utils/canonicalModel';
 import axios from 'axios';
 import {getCampus} from '../utils/Storage';
 import globalConfig from '../utils/GlobalConfig';
+import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 
 export const fetchPromoItems = createAsyncThunk<Promo[], string>(
   'promoItems/fetchPromoItems',
   async (campus: string) => {
+    const token = await fetchToken();
     try {
       const response = await axios.get(
-        `${globalConfig.apiBaseUrl}/v1/promotionItem/${campus}`,
+        `${globalConfig.apiBaseUrl}/v1/campus/${campus}/promotionItem`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
 
       return response.data.promotions.promotions;

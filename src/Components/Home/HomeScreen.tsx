@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -9,10 +9,8 @@ import {
   Text,
   // TextInput,
 } from 'react-native';
-// import RNPickerSelect from 'react-native-picker-select';
 import theme from '../../theme';
 import HomeScreenVendors from './homeVendors/HomeScreenVendors';
-// import AppHeader from '../util/AppHeader';
 import PromoDiscounts from './PromoAndDiscount/PromoDiscounts';
 import CampusBuzz from './campusBuzz/CampusBuzz';
 import FeaturedItems from './featuredItems/FeaturedItems';
@@ -20,9 +18,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {getCampus, setCampus} from '../../utils/Storage';
 import {fetchCampusIds} from '../../services/fetchCampusIds';
 const HomeScreen: React.FC = () => {
-  const [selectedCampus, setSelectedCampus] = useState<string | undefined>(
-    'IIMU-313001',
-  );
+  const [selectedCampus, setSelectedCampus] = useState<string | undefined>();
   const [campusOptions, setCampusOptions] = useState<any>();
   const [clicked, setClicked] = useState(false);
 
@@ -35,18 +31,15 @@ const HomeScreen: React.FC = () => {
     setCampusOptions(campusOption);
   };
   useEffect(() => {
-    // getCampusDetails();
     fetchCampus();
-
-    console.log('selected camous:', selectedCampus);
     setTimeout(() => {
       const camp = getCampus();
-      console.log('campussssssssssssss:', camp);
-      camp && setSelectedCampus(camp);
+      camp ? setSelectedCampus(camp) : setSelectedCampus('IIMU-313001');
     }, 1000);
-    console.log('selecteddddd camous:', selectedCampus);
+
     selectedCampus && setCampus(selectedCampus);
   }, [selectedCampus]);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -92,9 +85,9 @@ const HomeScreen: React.FC = () => {
         ) : null}
       </View>
       <ScrollView>
+        <PromoDiscounts campus={selectedCampus} />
         <FeaturedItems campus={selectedCampus} />
         <HomeScreenVendors campus={selectedCampus} />
-        <PromoDiscounts campus={selectedCampus} />
         <CampusBuzz campus={selectedCampus} />
       </ScrollView>
     </SafeAreaView>

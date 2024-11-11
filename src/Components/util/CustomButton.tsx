@@ -22,6 +22,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     <TouchableOpacity
       style={[
         styles.button,
+        // eslint-disable-next-line react-native/no-inline-styles
         {
           backgroundColor: enabled
             ? buttonColor || theme.colors.primary

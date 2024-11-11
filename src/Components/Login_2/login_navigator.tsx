@@ -1,11 +1,11 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import LoginScreen from './login_2';
+import LoginScreen from '../Login/LoginScreen';
 import OtpVerificationScreen from './otpVerificationScreen';
 
 export type loginRootStackParamList = {
   LoginScreen1: undefined;
-  otpverify: undefined;
+  otpverify: {phoneNumber: string};
 };
 
 const Stack = createStackNavigator<loginRootStackParamList>();

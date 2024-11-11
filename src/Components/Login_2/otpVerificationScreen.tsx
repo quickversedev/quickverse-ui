@@ -7,32 +7,33 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
-import {useRoute} from '@react-navigation/native'; // Import useRoute
+import {RouteProp, useRoute} from '@react-navigation/native';
 import theme from '../../theme';
+
+type RootStackParamList = {
+  OtpVerification: {phoneNumber: string};
+};
 
 const OtpVerificationScreen: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
-  const route = useRoute(); // Access the route object
-  const {phoneNumber} = route.params; // Retrieve the phone number
+  const route = useRoute<RouteProp<RootStackParamList, 'OtpVerification'>>();
+  const {phoneNumber} = route.params;
 
-  // State for the timer and resend button disable status
   const [timer, setTimer] = useState<number>(30);
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
   useEffect(() => {
-    // Start countdown when component mounts or when the timer is reset
     let interval: NodeJS.Timeout | null = null;
     if (timer > 0) {
       interval = setInterval(() => {
         setTimer(prevTimer => prevTimer - 1);
       }, 1000);
     } else {
-      setIsButtonDisabled(false); // Enable the resend button when timer is 0
+      setIsButtonDisabled(false);
     }
 
-    // Clear the interval when the component unmounts or timer is reset
     return () => {
       if (interval) {
         clearInterval(interval);
@@ -71,9 +72,8 @@ const OtpVerificationScreen: React.FC = () => {
 
   const handleResendPress = () => {
     console.log('Resending OTP to +91-', phoneNumber);
-    setTimer(30); // Reset the timer
-    setIsButtonDisabled(true); // Disable the button again
-    // Trigger OTP resend logic here
+    setTimer(30);
+    setIsButtonDisabled(true);
   };
 
   return (
@@ -163,13 +163,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 32,
-    color: '#AAAAAA', // Hardcoded disabled text color
+    color: '#AAAAAA',
   },
   resendTextEnabled: {
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 32,
-    color: theme.colors.ternary, // Active color for the resend text
+    color: theme.colors.ternary,
   },
   button: {
     backgroundColor: '#8B0000',
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
     width: '60%',
-    alignSelf: 'center', // Center the button
+    alignSelf: 'center',
   },
   buttonText: {
     color: '#FFD700',

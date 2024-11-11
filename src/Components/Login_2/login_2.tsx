@@ -16,6 +16,8 @@ import theme from '../../theme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {GestureHandlerRootView, ScrollView} from 'react-native-gesture-handler';
 import {loginRootStackParamList} from './login_navigator';
+import {setSkipLoginFlow} from '../../utils/Storage';
+import {useAuth} from '../../utils/AuthContext';
 
 type LoginScreenNavigationProp = StackNavigationProp<
   loginRootStackParamList,
@@ -23,6 +25,7 @@ type LoginScreenNavigationProp = StackNavigationProp<
 >;
 
 const LoginScreen: React.FC = () => {
+  const {setSkipLogin} = useAuth();
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [phoneError, setPhoneError] = useState<string>('');
   const navigation = useNavigation<LoginScreenNavigationProp>();
@@ -44,9 +47,14 @@ const LoginScreen: React.FC = () => {
 
   const handleContinue = () => {
     if (validate()) {
-      navigation.navigate('otpverify', {phoneNumber}); // Pass the phone number
-      setPhoneNumber(''); // Reset the input field
+      navigation.navigate('otpverify', {phoneNumber});
+      setPhoneNumber('');
     }
+  };
+
+  const handleSkipLogin = async () => {
+    setSkipLoginFlow(true);
+    setSkipLogin(true);
   };
 
   return (
@@ -95,7 +103,7 @@ const LoginScreen: React.FC = () => {
             </ScrollView>
 
             <TouchableOpacity
-              onPress={() => navigation.navigate('HomeScreen')}
+              onPress={handleSkipLogin}
               style={styles.skipButton}>
               <Text style={styles.skipButtonText}>Skip</Text>
             </TouchableOpacity>

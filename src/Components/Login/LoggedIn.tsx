@@ -13,21 +13,16 @@ import {storage} from '../../utils/Storage';
 import ChangePinScreen from '../UserProfile/ChangePin';
 import {useState} from 'react';
 import {Platform} from 'react-native';
-<<<<<<< HEAD
-import LoginScreen from 'F:/Qickverse/NEw_login/quickverse-ui/src/Components/Login_2/login_2';
-import LoginNavigator from '../Login_2/login_navigator';
-
-=======
 import Laundry from '../Laundry/Laundry';
 import {useAuth} from '../../utils/AuthContext';
->>>>>>> cde7ca800c4433f806666f1c922568986847c881
+import LoginNavigator from '../Login_2/login_navigator';
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
   const {configs} = useAuth();
   const isLaundryAvailable = configs?.configuration?.isLaundryEnabled;
   const [forgotPasswordFlow, setForgotPasswordFlow] = useState<boolean>();
-  
+
   React.useEffect(() => {
     const forgotPass = async () => {
       const resetFlow = await storage.getBoolean('@resetPass');
@@ -35,7 +30,7 @@ const LoggedIn: React.FC = () => {
     };
     forgotPass();
   }, [forgotPasswordFlow]);
-  
+
   const handleForgotPasswordFlow = (forgotpass: boolean) => {
     setForgotPasswordFlow(forgotpass);
   };
@@ -58,7 +53,6 @@ const LoggedIn: React.FC = () => {
           },
           headerShown: false,
         }}>
-        
         <Tab.Screen
           name="HomeNavigator"
           component={HomeNavigation}
@@ -104,23 +98,19 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
-<<<<<<< HEAD
-        
         <Tab.Screen
-          name="Login"
+          name="login"
           component={LoginNavigator}
           options={{
             tabBarIcon: ({focused, color}) => (
               <MaterialCommunityIcons
-                name={focused ? 'login' : 'login-variant'}
+                name={focused ? 'store' : 'store-outline'}
                 color={color}
                 size={focused ? 36 : 26}
               />
             ),
           }}
         />
-
-=======
         {isLaundryAvailable && (
           <Tab.Screen
             name="Laundry"
@@ -136,7 +126,6 @@ const LoggedIn: React.FC = () => {
             }}
           />
         )}
->>>>>>> cde7ca800c4433f806666f1c922568986847c881
         <Tab.Screen
           name="User Profile"
           component={ProfileNavigation}
@@ -150,7 +139,6 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
-        
       </Tab.Navigator>
     </PaperProvider>
   );

@@ -79,10 +79,9 @@ const signIn = async (
 };
 const signUp = async (
   fullName: string,
-  phoneNumber: string,
   campusId: string,
   email: string,
-  pin: string,
+  dob: string,
 ): Promise<any> => {
   // return new Promise(resolve => {
   //   setTimeout(() => {
@@ -93,21 +92,12 @@ const signUp = async (
   // });
   const token = await fetchToken();
   return axios
-    .post(
-      `${globalConfig.apiBaseUrl}/v1/registerUser`,
-      {
-        mobile: '91' + phoneNumber,
-        pin: pin,
-        campusId: campusId,
-        emailId: email,
-        userName: fullName,
-      },
-      {
-        headers: {
-          Authorization: token,
-        },
-      },
-    )
+    .post(`${globalConfig.apiBaseUrl}/v1/registerUser`, {
+      campusId: campusId,
+      emailId: email,
+      userName: fullName,
+      dob: dob,
+    })
     .then(response => {
       return response;
     })

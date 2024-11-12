@@ -20,10 +20,9 @@ type AuthContextData = {
   signOut(): void;
   signUp(
     fullName: string,
-    phoneNumber: string,
     campusId: string,
     email: string,
-    pin: string,
+    dob: string,
   ): Promise<void>;
   setSkipLogin(shouldSkipLogin: boolean): void;
 };
@@ -95,17 +94,15 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
   const signUp = async (
     fullName: string,
-    phoneNumber: string,
     campusId: string,
     email: string,
-    pin: string,
+    dob: string,
   ) => {
     return await authService.signUp(
       fullName,
-      phoneNumber,
       campusId,
       email,
-      pin,
+      dob,
     );
   };
 

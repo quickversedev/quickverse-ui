@@ -4,8 +4,10 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import theme from '../../../theme';
 import { fetchCampusIds } from '../../../services/fetchCampusIds';
+import { Campus } from '../../../utils/canonicalModel'; // Ensure Campus type is correctly imported
 import { authService } from '../../../services/authService'; // Import authService
-import { Campus } from '../../../utils/canonicalModel';
+import { useAuth } from '../../../utils/AuthContext';
+
 
 export default function LoginDetails() {
   const [name, setName] = useState('');
@@ -13,14 +15,15 @@ export default function LoginDetails() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [email, setEmail] = useState('');
   const [campus, setCampus] = useState('');
-  const [campusList, setCampusList] = useState<Campus[]>([]);
+  const [campusList, setCampusList] = useState<Campus[]>([]); // Explicitly define the type of campusList as Campus[]
   const [modalVisible, setModalVisible] = useState(true);
 
   useEffect(() => {
+    // Fetch campus data on mount
     const loadCampusData = async () => {
       try {
         const campuses = await fetchCampusIds();
-        setCampusList(campuses);
+        setCampusList(campuses); // Now TypeScript knows campusList is an array of Campus
       } catch (error) {
         console.error('Error fetching campus data:', error);
         Alert.alert('Error', 'Unable to load campus data.');
@@ -29,6 +32,7 @@ export default function LoginDetails() {
     loadCampusData();
   }, []);
 
+  // Validation functions
   const validateName = (text: string) => /^[A-Za-z]+$/.test(text);
   const validateEmail = (text: string) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(text);
   const validateDob = (selectedDob?: Date) => selectedDob && selectedDob < new Date();
@@ -37,7 +41,6 @@ export default function LoginDetails() {
     setShowDatePicker(false);
     if (selectedDate) setDob(selectedDate);
   };
-
   const handleSubmit = async () => {
     if (!validateName(name)) {
       Alert.alert('Invalid Name', 'Name can only contain letters.');
@@ -58,27 +61,25 @@ export default function LoginDetails() {
 
     // Prepare data for API call
     const formattedDob = dob.toISOString().split('T')[0]; // Format the date to YYYY-MM-DD
-
+    const auth = useAuth();
     try {
-      const response = await authService.signUp(name, campus, email, formattedDob);
-      if (response.status === 200) {
+      await auth.signUp(name, campus, email, formattedDob);
         Alert.alert('Success', 'Your details have been submitted successfully.');
         setModalVisible(false); // Close modal after successful submission
-      } else {
-        Alert.alert('Error', 'Failed to submit details.');
-      }
+     
     } catch (error) {
       console.error('Sign-up error:', error);
       Alert.alert('Error', 'Unable to submit details. Please try again.');
     }
   };
-
+  
   return (
     <Modal visible={modalVisible} transparent={true} animationType="slide">
       <View style={styles.modalContainer}>
         <View style={styles.formContainer}>
           <Text style={styles.title}>Enter details</Text>
 
+          {/* Name Input */}
           <TextInput
             style={styles.input}
             placeholder="Enter your name"
@@ -87,6 +88,7 @@ export default function LoginDetails() {
             keyboardType="default"
           />
 
+          {/* Date of Birth Input */}
           <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
             <Text>{dob ? dob.toDateString() : 'Enter your date of birth'}</Text>
           </TouchableOpacity>
@@ -100,6 +102,7 @@ export default function LoginDetails() {
             />
           )}
 
+          {/* Email Input */}
           <TextInput
             style={styles.input}
             placeholder="Enter your email"
@@ -109,6 +112,7 @@ export default function LoginDetails() {
             autoCapitalize="none"
           />
 
+          {/* Campus Picker */}
           <View style={styles.input}>
             <Picker
               selectedValue={campus}
@@ -117,14 +121,15 @@ export default function LoginDetails() {
               <Picker.Item label="Select Campus" value="" />
               {campusList.map((campusItem) => (
                 <Picker.Item
-                  key={campusItem.campusId}
-                  label={campusItem.campusName}
-                  value={campusItem.campusId}
+                  key={campusItem.campusId} // Use campusId (or the correct unique identifier)
+                  label={campusItem.campusName} // Use campusName here
+                  value={campusItem.campusId} // Use campusId as value
                 />
               ))}
             </Picker>
           </View>
 
+          {/* Submit Button */}
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
             <Text style={styles.submitButtonText}>Continue</Text>
           </TouchableOpacity>

@@ -9,6 +9,7 @@ import {getSkipLoginFlow, storage} from './Storage';
 import {AuthData, authService} from '../services/AuthService';
 import {fetchConfigs} from '../services/configService';
 import {config} from './canonicalModel';
+import { Alert } from 'react-native';
 
 type AuthContextData = {
   loggedInDate: string;
@@ -98,14 +99,36 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     email: string,
     dob: string,
   ) => {
-    return await authService.signUp(
-      fullName,
-      campusId,
-      email,
-      dob,
-    );
-  };
+    try {
+      const response = await authService.signUp(fullName, campusId, email, dob);
 
+      if (response && response.data) {
+        setAuthData(response.data);
+        storage.set('@AuthData', JSON.stringify(response.data));
+        const date = new Date();
+        storage.set('@loginDate', date.toISOString());
+      } else {
+        throw new Error('No data received from the sign-up response');
+      }
+    } catch (error: any) {
+      console.error('Sign-up error in AuthProvider:', error);
+
+      // Handle known error codes with custom messages
+      if (error.code === 1021) {
+        Alert.alert(
+          'Sign-up Error',
+          'The email is already in use. Please use a different email.',
+        );
+      } else {
+        Alert.alert(
+          'Sign-up Error',
+          'An unexpected error occurred. Please try again.',
+        );
+      }
+
+      throw error; // Optionally rethrow the error to propagate to the caller
+    }
+  };
   const signOut = async () => {
     setAuthData(undefined);
     storage.delete('@AuthData');

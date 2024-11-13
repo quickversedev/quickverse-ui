@@ -211,9 +211,13 @@ export default function App() {
               {/* Terms & Conditions */}
               <ScrollView style={styles.termsContainer}>
                 <Text style={styles.termsTitle}>Terms & Conditions</Text>
-                <Text style={styles.termsText}>1. Lorem Ipsum</Text>
-                <Text style={styles.termsText}>2. Lorem Ipsum</Text>
-                <Text style={styles.termsText}>3. Lorem Ipsum</Text>
+                <Text style={styles.termsText}>
+                  1. Late returns incur extra fees.
+                </Text>
+                <Text style={styles.termsText}>2. Must be 18 or older.</Text>
+                <Text style={styles.termsText}>
+                  3. Renter responsible for bike damage.
+                </Text>
               </ScrollView>
 
               <View style={styles.modalFooter}>

@@ -15,11 +15,13 @@ import {useState} from 'react';
 import {Platform} from 'react-native';
 import Laundry from '../Laundry/Laundry';
 import {useAuth} from '../../utils/AuthContext';
+// import PharmacyScreen from '../pharmacy/Pharmacy';
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
   const {configs} = useAuth();
   const isLaundryAvailable = configs?.configuration?.isLaundryEnabled;
+  // const isPharmacyAvailable = configs?.configuration?.isLaundryEnabled;
   const [forgotPasswordFlow, setForgotPasswordFlow] = useState<boolean>();
   React.useEffect(() => {
     const forgotPass = async () => {
@@ -109,6 +111,21 @@ const LoggedIn: React.FC = () => {
             }}
           />
         )}
+        {/* {isPharmacyAvailable && (
+          <Tab.Screen
+            name="Pharmacy"
+            component={PharmacyScreen}
+            options={{
+              tabBarIcon: ({focused, color}) => (
+                <MaterialCommunityIcons
+                  name={focused ? 'store' : 'store'}
+                  color={color}
+                  size={focused ? 36 : 26}
+                />
+              ),
+            }}
+          />
+        )} */}
         <Tab.Screen
           name="User Profile"
           component={ProfileNavigation}

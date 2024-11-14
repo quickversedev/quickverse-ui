@@ -143,20 +143,23 @@ const ProfileScreen = () => {
             color={theme.colors.ternary}
           />
         </TouchableOpacity>
-        {/* <TouchableOpacity onPress={handleDeleteAccount}>
-          <Text style={styles.deleteAccount}>Delete Account?</Text>
-        </TouchableOpacity> */}
+
         {authData ? (
-          <View style={styles.buttonContainer}>
-            <CustomButton
-              title="LogOut"
-              onPress={signOut}
-              buttonColor={theme.colors.ternary}
-              textColor={theme.colors.primary}
-            />
-          </View>
+          <>
+            <TouchableOpacity onPress={handleDeleteAccount}>
+              <Text style={styles.deleteAccount}>Delete Account?</Text>
+            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              <CustomButton
+                title="LogOut"
+                onPress={signOut}
+                buttonColor={theme.colors.ternary}
+                textColor={theme.colors.primary}
+              />
+            </View>
+          </>
         ) : (
-          <LoginCard feature={''} />
+          <LoginCard />
         )}
       </View>
     </SafeAreaView>

@@ -111,8 +111,7 @@ export default StyleSheet.create({
   },
   cartSummary: {
     position: 'absolute',
-    // justifyContent: 'space-between',
-    // flexDirection: 'row',
+
     bottom: 0,
     left: 0,
     right: 0,
@@ -188,16 +187,6 @@ export default StyleSheet.create({
     color: theme.colors.ternary, // Set to your text color
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  // container: {
-  //   flex: 1,
-  //   padding: 16,
-  //   backgroundColor: '#fff',
-  // },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
   },
   addressCard: {
     marginBottom: 16,

@@ -12,7 +12,7 @@ export type AuthData = {
 };
 
 const signIn = async (
-  phoneNumber: string,
+  phoneNumber: string, 
   pin: string,
   campusId: string,
 ): Promise<AuthData> => {

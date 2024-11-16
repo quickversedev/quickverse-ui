@@ -40,6 +40,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     alignItems: 'center',
     color: 'black',
+    fontWeight: 'bold',
   },
   vehicleIconContainer: {
     alignItems: 'center',
@@ -212,7 +213,7 @@ export const styles = StyleSheet.create({
 export const pickerSelectStyles = StyleSheet.create({
   inputIOS: {
     fontSize: 16,
-    color: 'black',
+    color: '#000',
     paddingVertical: 12,
     paddingHorizontal: 10,
     borderWidth: 1,
@@ -228,8 +229,11 @@ export const pickerSelectStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FFE474',
     borderRadius: 8,
-    color: 'black',
+    color: '#000',
     paddingRight: 30,
     backgroundColor: '#FFE474',
+  },
+  placeholder: {
+    color: '#000',
   },
 });

@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {
   View,
@@ -162,7 +163,7 @@ export default function App() {
                     label: `${qty}`,
                     value: qty,
                   }))}
-                  placeholder={{label: 'Quantity', value: null}}
+                  placeholder={{label: 'Quantity', value: null, color: 'Black'}}
                   style={pickerSelectStyles}
                 />
               </View>
@@ -170,7 +171,7 @@ export default function App() {
               <TouchableOpacity
                 onPress={() => setPickupPickerVisible(true)}
                 style={styles.pickerContainer}>
-                <Text>
+                <Text style={{color: '#000'}}>
                   {pickupDate
                     ? `Pickup: ${pickupDate.toLocaleString()}`
                     : 'Select Pickup Date & Time'}
@@ -188,7 +189,7 @@ export default function App() {
               <TouchableOpacity
                 onPress={() => setDropoffPickerVisible(true)}
                 style={styles.pickerContainer}>
-                <Text>
+                <Text style={{color: '#000'}}>
                   {dropoffDate
                     ? `Dropoff: ${dropoffDate.toLocaleString()}`
                     : 'Select Dropoff Date & Time'}

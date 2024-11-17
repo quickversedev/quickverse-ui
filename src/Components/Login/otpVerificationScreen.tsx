@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import theme from '../../theme';
+import {useAuth} from '../../utils/AuthContext';
 
 type RootStackParamList = {
   OtpVerification: {phoneNumber: string};
@@ -16,6 +17,7 @@ type RootStackParamList = {
 
 const OtpVerificationScreen: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
+  const [error, setError] = useState<boolean>(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const route = useRoute<RouteProp<RootStackParamList, 'OtpVerification'>>();
@@ -23,7 +25,7 @@ const OtpVerificationScreen: React.FC = () => {
 
   const [timer, setTimer] = useState<number>(30);
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
-
+  const auth = useAuth();
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     if (timer > 0) {
@@ -66,12 +68,24 @@ const OtpVerificationScreen: React.FC = () => {
     }
   };
 
-  const handleLoginPress = () => {
+  const handleLoginPress = async () => {
     console.log('OTP entered:', otp.join(''));
+    const finalOtp = otp.join();
+    await auth.verifyOtp(phoneNumber, finalOtp).catch(() => {
+      setError(true);
+    });
   };
 
-  const handleResendPress = () => {
+  const handleResendPress = async () => {
     console.log('Resending OTP to +91-', phoneNumber);
+    await auth
+      .sendOtp(phoneNumber)
+      .then(() => {
+        // navigation.navigate('otpverify', {phoneNumber});
+      })
+      .catch(() => {
+        setError(true);
+      });
     setTimer(30);
     setIsButtonDisabled(true);
   };
@@ -115,6 +129,11 @@ const OtpVerificationScreen: React.FC = () => {
         <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
+        {error ? (
+          <Text style={styles.error}>
+            Error ocured while sending otp , please try again later
+          </Text>
+        ) : null}
       </View>
     </SafeAreaView>
   );
@@ -184,6 +203,11 @@ const styles = StyleSheet.create({
     color: '#FFD700',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  error: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 8,
   },
 });
 

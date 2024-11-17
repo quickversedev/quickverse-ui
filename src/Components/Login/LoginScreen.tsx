@@ -28,8 +28,9 @@ const LoginScreen: React.FC = () => {
   const {setSkipLogin} = useAuth();
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [phoneError, setPhoneError] = useState<string>('');
+  const [error, setError] = useState<boolean>(false);
   const navigation = useNavigation<LoginScreenNavigationProp>();
-
+  const auth = useAuth();
   const validatePhoneNumber = (phone: string) => {
     const phoneRegex = /^[0-9]{10}$/;
     return phoneRegex.test(phone);
@@ -45,8 +46,16 @@ const LoginScreen: React.FC = () => {
     return isValid;
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (validate()) {
+      await auth
+        .sendOtp(phoneNumber)
+        .then(() => {
+          // navigation.navigate('otpverify', {phoneNumber});
+        })
+        .catch(() => {
+          setError(true);
+        });
       navigation.navigate('otpverify', {phoneNumber});
       setPhoneNumber('');
     }
@@ -87,6 +96,7 @@ const LoginScreen: React.FC = () => {
                   onChangeText={text => {
                     setPhoneError('');
                     setPhoneNumber(text);
+                    // setError(false);
                   }}
                   placeholderTextColor={theme.colors.secondary}
                   keyboardType="phone-pad"
@@ -96,7 +106,11 @@ const LoginScreen: React.FC = () => {
               {phoneError ? (
                 <Text style={styles.error}>{phoneError}</Text>
               ) : null}
-
+              {error ? (
+                <Text style={styles.error}>
+                  Error ocured while sending otp , please try again later
+                </Text>
+              ) : null}
               <TouchableOpacity onPress={handleContinue} style={styles.button}>
                 <Text style={styles.buttonText}>Continue</Text>
               </TouchableOpacity>
@@ -199,3 +213,6 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
+function sendOtp() {
+  throw new Error('Function not implemented.');
+}

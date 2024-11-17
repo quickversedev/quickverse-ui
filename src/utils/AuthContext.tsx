@@ -16,7 +16,8 @@ type AuthContextData = {
   skipLogin?: boolean;
   loading: boolean;
   configs: config | undefined;
-  signIn(phoneNumber: string, pin: string, campusId: string): Promise<void>;
+  sendOtp(phoneNumber: string): Promise<void>;
+  verifyOtp(phoneNumber: string, otp: string): Promise<void>;
   signOut(): void;
   signUp(
     fullName: string,
@@ -72,19 +73,20 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     }
   }
 
-  const signIn = async (
-    _phoneNumber: string,
-    pin: string,
-    campusId: string,
-  ) => {
+  const sendOtp = async (_phoneNumber: string) => {
     try {
-      const _authData = await authService.signIn(_phoneNumber, pin, campusId);
+      await authService.sendOtp(_phoneNumber);
+    } catch (error) {
+      throw error; // Rethrow the error to propagate it to the caller
+    }
+  };
+  const verifyOtp = async (_phoneNumber: string, otp: string) => {
+    try {
+      const _authData = await authService.VerifyOtp(_phoneNumber, otp);
       if (_authData) {
         setAuthData(_authData);
         storage.set('@AuthData', JSON.stringify(_authData));
-        if (pin === '7779') {
-          storage.set('@resetPass', true);
-        }
+
         const date = new Date();
         storage.set('@loginDate', date.toISOString());
       }
@@ -124,7 +126,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         authData,
         skipLogin,
         loading,
-        signIn,
+        sendOtp,
+        verifyOtp,
         signOut,
         signUp,
         setSkipLogin,

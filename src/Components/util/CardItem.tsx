@@ -8,10 +8,10 @@ import {
   ImageSourcePropType,
   View,
 } from 'react-native';
-import {Card} from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import theme from '../../theme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 interface CardItemProps {
   name?: string;
@@ -19,8 +19,10 @@ interface CardItemProps {
   image: ImageSourcePropType;
   onPress: () => void;
 }
+
 const ITEM_SIZE: any = width * 0.76;
 const SPACING: any = 4;
+
 const CardItem: React.FC<CardItemProps> = ({
   name,
   distance,
@@ -30,8 +32,13 @@ const CardItem: React.FC<CardItemProps> = ({
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
       <Card.Cover source={image} style={styles.posterImage} />
-      <Card.Content style={{alignItems: 'center'}}>
-        <Text style={styles.title} numberOfLines={2}>
+      <Card.Content style={{ alignItems: 'center' }}>
+        <Text
+          style={styles.title}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}
+        >
           {name}
         </Text>
         {distance && (
@@ -42,7 +49,12 @@ const CardItem: React.FC<CardItemProps> = ({
               color={theme.colors.secondary}
               style={styles.icon}
             />
-            <Text style={styles.distance} numberOfLines={1}>
+            <Text
+              style={styles.distance}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
+            >
               {distance}
             </Text>
           </View>
@@ -68,14 +80,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   title: {
-    fontSize: 18,
+    fontSize: 22,
     textAlign: 'center',
     color: theme.colors.ternary,
     fontWeight: 'bold',
+    height: 24, 
   },
   distance: {
     fontSize: 14,
     color: theme.colors.secondary,
+    height: 20, 
   },
   icon: {
     marginRight: 5,

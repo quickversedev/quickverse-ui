@@ -125,10 +125,9 @@ const VerifyOtp = async (
 };
 const signUp = async (
   fullName: string,
-  phoneNumber: string,
+  dob: string,
   campusId: string,
   email: string,
-  pin: string,
 ): Promise<any> => {
   // return new Promise(resolve => {
   //   setTimeout(() => {
@@ -142,8 +141,7 @@ const signUp = async (
     .post(
       `${globalConfig.apiBaseUrl}/v1/registerUser`,
       {
-        mobile: '91' + phoneNumber,
-        pin: pin,
+        dob: dob,
         campusId: campusId,
         emailId: email,
         userName: fullName,

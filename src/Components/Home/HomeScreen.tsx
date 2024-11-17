@@ -17,6 +17,7 @@ import FeaturedItems from './featuredItems/FeaturedItems';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {getCampus, setCampus} from '../../utils/Storage';
 import {fetchCampusIds} from '../../services/fetchCampusIds';
+import LoginDetails from '../Login/loginDetails';
 const HomeScreen: React.FC = () => {
   const [selectedCampus, setSelectedCampus] = useState<string | undefined>();
   const [campusOptions, setCampusOptions] = useState<any>();
@@ -39,7 +40,7 @@ const HomeScreen: React.FC = () => {
 
     selectedCampus && setCampus(selectedCampus);
   }, [selectedCampus]);
-
+  const isForstTimeLogin = true;
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -84,12 +85,16 @@ const HomeScreen: React.FC = () => {
           </View>
         ) : null}
       </View>
-      <ScrollView>
-        <PromoDiscounts campus={selectedCampus} />
-        <FeaturedItems campus={selectedCampus} />
-        <HomeScreenVendors campus={selectedCampus} />
-        <CampusBuzz campus={selectedCampus} />
-      </ScrollView>
+      {isForstTimeLogin ? (
+        <LoginDetails />
+      ) : (
+        <ScrollView>
+          <PromoDiscounts campus={selectedCampus} />
+          <FeaturedItems campus={selectedCampus} />
+          <HomeScreenVendors campus={selectedCampus} />
+          <CampusBuzz campus={selectedCampus} />
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

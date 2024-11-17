@@ -4,6 +4,14 @@ import {Address} from './canonicalModel';
 
 export const storage = new MMKV();
 
+export const setIsFirstTimeLogin = (skipLogin: boolean): void => {
+  storage.set('@firstTimeLogin', skipLogin);
+};
+
+export const getIsfirstTimeLogin = (): boolean | undefined => {
+  return storage.getBoolean('@firstTimeLogin');
+};
+
 export const setSkipLoginFlow = (skipLogin: boolean): void => {
   storage.set('@skipLogin', skipLogin);
 };

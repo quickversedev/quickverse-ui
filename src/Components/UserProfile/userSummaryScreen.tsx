@@ -20,6 +20,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../store/store';
 import {Loading} from '../util/Loading';
 import {fetchUserDetails} from '../../services/UserDetailsSlice';
+import LoginCard from '../util/MandatoryLoginButton';
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -53,7 +54,6 @@ const ProfileScreen = () => {
       <View style={styles.container}>
         {/* <View style={styles.header}> */}
         <Image
-          // eslint-disable-next-line prettier/prettier
           source={require('../../data/images/qv-blue.png')}
           style={styles.profileImage}
         />
@@ -143,18 +143,23 @@ const ProfileScreen = () => {
             color={theme.colors.ternary}
           />
         </TouchableOpacity>
-        {/* <TouchableOpacity onPress={handleDeleteAccount}>
-          <Text style={styles.deleteAccount}>Delete Account?</Text>
-        </TouchableOpacity> */}
-        {authData && (
-          <View style={styles.buttonContainer}>
-            <CustomButton
-              title="LogOut"
-              onPress={signOut}
-              buttonColor={theme.colors.ternary}
-              textColor={theme.colors.primary}
-            />
-          </View>
+
+        {authData ? (
+          <>
+            <TouchableOpacity onPress={handleDeleteAccount}>
+              <Text style={styles.deleteAccount}>Delete Account?</Text>
+            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              <CustomButton
+                title="LogOut"
+                onPress={signOut}
+                buttonColor={theme.colors.ternary}
+                textColor={theme.colors.primary}
+              />
+            </View>
+          </>
+        ) : (
+          <LoginCard />
         )}
       </View>
     </SafeAreaView>

@@ -33,12 +33,7 @@ const CardItem: React.FC<CardItemProps> = ({
     <TouchableOpacity onPress={onPress} style={styles.card}>
       <Card.Cover source={image} style={styles.posterImage} />
       <Card.Content style={{ alignItems: 'center' }}>
-        <Text
-          style={styles.title}
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.8}
-        >
+        <Text style={styles.title} adjustsFontSizeToFit minimumFontScale={0.8}>
           {name}
         </Text>
         {distance && (
@@ -49,12 +44,7 @@ const CardItem: React.FC<CardItemProps> = ({
               color={theme.colors.secondary}
               style={styles.icon}
             />
-            <Text
-              style={styles.distance}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              minimumFontScale={0.8}
-            >
+            <Text style={styles.distance} adjustsFontSizeToFit minimumFontScale={0.8}>
               {distance}
             </Text>
           </View>
@@ -84,12 +74,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: theme.colors.ternary,
     fontWeight: 'bold',
-    height: 24, 
+    height: 48, // Increased height for multiple lines
   },
   distance: {
     fontSize: 14,
     color: theme.colors.secondary,
-    height: 20, 
+    height: 20,
   },
   icon: {
     marginRight: 5,

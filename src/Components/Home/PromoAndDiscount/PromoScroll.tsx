@@ -8,12 +8,12 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
-import { Promo } from '../../../utils/canonicalModel';
+import React, {useEffect, useRef, useState} from 'react';
+import {Promo} from '../../../utils/canonicalModel';
 import theme from '../../../theme';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamListHome } from '../HomeNavigation';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamListHome} from '../HomeNavigation';
 
 type HomeNavigationProp = StackNavigationProp<
   RootStackParamListHome,
@@ -22,18 +22,16 @@ type HomeNavigationProp = StackNavigationProp<
 interface Props {
   promoItemsList: Promo[];
 }
-const PromoScroll: React.FC<Props> = ({ promoItemsList }) => {
+const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
   const navigation = useNavigation<HomeNavigationProp>();
   const flatlistRef = useRef<FlatList<Promo>>(null);
   const screenWidth = Dimensions.get('window').width;
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const aspectRatio = 6912 / 3456;
   const bannerHeight = screenWidth / aspectRatio;
-
   // Adjusted padding between banners
   const itemSpacing = 16;
   const bannerWidth = screenWidth - 2 * itemSpacing;
-
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -48,7 +46,7 @@ const PromoScroll: React.FC<Props> = ({ promoItemsList }) => {
           index: activeIndex + 1,
           animated: true,
         });
-        setActiveIndex((prev) => prev + 1);
+        setActiveIndex(prev => prev + 1);
       }
     }, 5000);
 
@@ -62,17 +60,16 @@ const PromoScroll: React.FC<Props> = ({ promoItemsList }) => {
   });
   const handleCardPress = (url: string | undefined) => {
     navigation.removeListener;
-    url && navigation.navigate('WebView', { url });
+    url && navigation.navigate('WebView', {url});
   };
 
-  const renderItem = ({ item }: { item: Promo }) => {
+  const renderItem = ({item}: {item: Promo}) => {
     return (
       <TouchableOpacity onPress={() => handleCardPress(item.promoLink)}>
-        <View style={[styles.imageContainer, { width: bannerWidth }]}>
+        <View style={[styles.imageContainer, {width: bannerWidth}]}>
           <Image
-            // source={{ uri: `${item.promoImage}.jpg` }}
-            source={require('../../../data/images/3.png')}
-            style={[styles.image, { height: bannerHeight }]}
+            source={{uri: `${item.promoImage}.jpg`}}
+            style={[styles.image, {height: bannerHeight}]}
             resizeMode="cover"
           />
         </View>
@@ -120,9 +117,8 @@ const PromoScroll: React.FC<Props> = ({ promoItemsList }) => {
         onScroll={handleScroll}
         scrollEventThrottle={16}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: itemSpacing }}
-        ItemSeparatorComponent={() => <View style={{ width: itemSpacing }} />}
-
+        contentContainerStyle={{paddingHorizontal: itemSpacing}}
+        ItemSeparatorComponent={() => <View style={{width: itemSpacing}} />}
       />
 
       <View style={styles.dotContainer}>{renderDotIndicators()}</View>
@@ -134,7 +130,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 30,
-
   },
   imageContainer: {
     backgroundColor: 'red',

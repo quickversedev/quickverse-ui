@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, StyleSheet, FlatList, Dimensions, Image } from 'react-native';
+import {View, StyleSheet, FlatList, Dimensions, Image} from 'react-native';
 import CardItem from '../../util/CardItem';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamListHome } from '../HomeNavigation';
-import { useNavigation } from '@react-navigation/native';
-import { CampusBuzz } from '../../../utils/canonicalModel';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamListHome} from '../HomeNavigation';
+import {useNavigation} from '@react-navigation/native';
+import {CampusBuzz} from '../../../utils/canonicalModel';
 
 const screenWidth = Dimensions.get('window').width;
 const aspectRatio = 6912 / 3456;
@@ -21,13 +21,13 @@ interface Props {
   buzzData?: CampusBuzz[];
 }
 
-const CampusBuzzList: React.FC<Props> = ({ buzzData }) => {
+const CampusBuzzList: React.FC<Props> = ({buzzData}) => {
   const navigation = useNavigation<HomeNavigationProp>();
 
   const handleCardPress = (url: string | undefined) => {
-    url && navigation.navigate('WebView', { url });
+    url && navigation.navigate('WebView', {url});
   };
-
+  console.log('buzzdata', buzzData);
   return (
     <View style={styles.container}>
       <FlatList
@@ -35,22 +35,22 @@ const CampusBuzzList: React.FC<Props> = ({ buzzData }) => {
         data={buzzData}
         keyExtractor={(item, index) => index.toString()}
         horizontal
-        contentContainerStyle={{ alignItems: 'center' }}
+        contentContainerStyle={{alignItems: 'center'}}
         snapToInterval={bannerWidth + itemSpacing * 2}
         decelerationRate="fast"
         snapToAlignment="center"
         bounces={false}
         scrollEventThrottle={16}
-        renderItem={({ item }) => (
-          <View style={[styles.cardContainer, { marginHorizontal: itemSpacing }]}>
+        renderItem={({item}) => (
+          <View style={[styles.cardContainer, {marginHorizontal: itemSpacing}]}>
             <Image
-              // source={{ uri: `${item?.buzzImage}.jpg` }}
-              source={require('../../../data/images/1.png')}
+              source={{uri: `${item?.buzzImage}.jpg`}}
               style={styles.image}
               resizeMode="cover"
             />
             <CardItem
-              onPress={() => handleCardPress(item?.buzzUrl)} image={0}
+              onPress={() => handleCardPress(item?.buzzUrl)}
+              image={0}
             />
           </View>
         )}

@@ -4,8 +4,8 @@ import {Address} from './canonicalModel';
 
 export const storage = new MMKV();
 
-export const setIsNewUser = (skipLogin: boolean): void => {
-  storage.set('@isNewUser', skipLogin);
+export const setIsNewUser = (newUser: boolean): void => {
+  storage.set('@isNewUser', newUser);
 };
 
 export const getIsNewUser = (): boolean | undefined => {

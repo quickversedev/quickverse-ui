@@ -35,7 +35,9 @@ const ProfileScreen = () => {
   };
   const dispatch = useDispatch<AppDispatch>();
   const {authData} = useAuth();
-  const {loading} = useSelector((state: RootState) => state.userDetails);
+  const {loading, userDetails} = useSelector(
+    (state: RootState) => state.userDetails,
+  );
   useEffect(() => {
     authData && dispatch(fetchUserDetails(authData?.session.token));
   }, [authData, dispatch]);
@@ -50,59 +52,50 @@ const ProfileScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* <View style={styles.header}> */}
-        <Image
-          source={require('../../data/images/qv-blue.png')}
-          style={styles.profileImage}
-        />
-        <TouchableOpacity
-          style={styles.option}
-          onPress={() => {
-            navigation.navigate('Address');
-          }}>
-          <MaterialCommunityIcons
-            name="home-map-marker"
-            size={24}
-            color={theme.colors.ternary}
+        {authData ? (
+          <>
+            <View style={styles.header}>
+              <Image
+                source={require('../../data/images/qv-blue.png')}
+                style={styles.profileImage}
+              />
+              <View style={styles.headerText}>
+                <Text style={styles.name}>{userDetails.userName}</Text>
+                <Text style={styles.phone}>+{userDetails.mobile}</Text>
+                <Text style={styles.email}>{userDetails.emailId}</Text>
+              </View>
+              <TouchableOpacity style={styles.editIcon}>
+                <MaterialCommunityIcons
+                  name="pencil-outline"
+                  size={24}
+                  color={theme.colors.ternary}
+                />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity
+              style={styles.option}
+              onPress={() => {
+                navigation.navigate('Address');
+              }}>
+              <MaterialCommunityIcons
+                name="home-map-marker"
+                size={24}
+                color={theme.colors.ternary}
+              />
+              <Text style={styles.optionText}>Address</Text>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={24}
+                color={theme.colors.ternary}
+              />
+            </TouchableOpacity>
+          </>
+        ) : (
+          <Image
+            source={require('../../data/images/qv-blue.png')}
+            style={styles.profileImage}
           />
-          <Text style={styles.optionText}>Address</Text>
-          <MaterialCommunityIcons
-            name="chevron-right"
-            size={24}
-            color={theme.colors.ternary}
-          />
-        </TouchableOpacity>
-        {/* <View style={styles.headerText}>
-            <Text style={styles.name}>{userDetails.userName}</Text>
-            <Text style={styles.phone}>+{userDetails.mobile}</Text>
-            <Text style={styles.email}>{userDetails.emailId}</Text>
-          </View> */}
-        {/* <TouchableOpacity style={styles.editIcon}>
-          <MaterialCommunityIcons
-            name="pencil-outline"
-            size={24}
-            color={theme.colors.ternary}
-          />
-        </TouchableOpacity> */}
-        {/* </View> */}
-        {/* <TouchableOpacity
-          style={styles.option}
-          onPress={() => {
-            navigation.removeListener;
-            navigation.navigate('ChangePinScreen');
-          }}>
-          <MaterialCommunityIcons
-            name="lock"
-            size={24}
-            color={theme.colors.ternary}
-          />
-          <Text style={styles.optionText}>Change Pin</Text>
-          <MaterialCommunityIcons
-            name="chevron-right"
-            size={24}
-            color={theme.colors.ternary}
-          />
-        </TouchableOpacity> */}
+        )}
         <TouchableOpacity
           style={styles.option}
           onPress={() => {

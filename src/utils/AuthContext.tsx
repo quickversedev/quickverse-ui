@@ -82,11 +82,11 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const verifyOtp = async (_phoneNumber: string, otp: string) => {
     try {
       const _authData = await authService.VerifyOtp(_phoneNumber, otp);
-      const {campus, token, isNewUser} = _authData?.session;
+      const {campus, token, newUser} = _authData?.session;
       if (_authData) {
         setAuthData(_authData);
         storage.set('@AuthData', JSON.stringify(token));
-        isNewUser && setIsNewUser(isNewUser);
+        newUser && setIsNewUser(newUser);
         campus && setCampus(campus);
 
         const date = new Date();

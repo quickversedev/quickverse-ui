@@ -6,7 +6,7 @@ export type AuthData = {
   session: {
     token: string;
     phoneNumber: string;
-    isNewUser: boolean;
+    newUser: boolean;
     campus: string;
     name: string;
     email: string;
@@ -99,9 +99,9 @@ const VerifyOtp = async (
         session: {
           token: data.jwt,
           phoneNumber: data.mobile,
-          isNewUser: data.isNewUser,
+          newUser: data.newUser,
           name: data.userName,
-          campus: data.campus,
+          campus: data.campusId,
           email: data.email,
         },
       };

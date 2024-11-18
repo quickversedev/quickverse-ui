@@ -40,7 +40,7 @@ const HomeScreen: React.FC = () => {
 
     selectedCampus && setCampus(selectedCampus);
   }, [selectedCampus]);
-  const isForstTimeLogin = getIsNewUser();
+  const isFirstTimeLogin = getIsNewUser();
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -85,7 +85,7 @@ const HomeScreen: React.FC = () => {
           </View>
         ) : null}
       </View>
-      {isForstTimeLogin ? (
+      {isFirstTimeLogin ? (
         <LoginDetails />
       ) : (
         <ScrollView>

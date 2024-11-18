@@ -2317,6 +2317,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-community/datetimepicker@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "@react-native-community/datetimepicker@npm:8.2.0"
+  dependencies:
+    invariant: ^2.2.4
+  peerDependencies:
+    expo: ">=50.0.0"
+    react: "*"
+    react-native: "*"
+    react-native-windows: "*"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+    react-native-windows:
+      optional: true
+  checksum: 3adc9346f8948abed246da3bfa3a223e44c2c5903070178a82e583ce6f8273607fe5a542af834b3a27aff81980c555e5f72bf0e87c85e3f00856a0de21525374
+  languageName: node
+  linkType: hard
+
 "@react-native-cookies/cookies@npm:^6.2.1":
   version: 6.2.1
   resolution: "@react-native-cookies/cookies@npm:6.2.1"
@@ -8169,6 +8188,7 @@ __metadata:
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
     "@react-native-community/checkbox": ^0.5.17
+    "@react-native-community/datetimepicker": ^8.2.0
     "@react-native-cookies/cookies": ^6.2.1
     "@react-native-picker/picker": ^2.7.7
     "@react-native/babel-preset": 0.74.83

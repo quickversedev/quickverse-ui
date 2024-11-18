@@ -35,9 +35,7 @@ const ProfileScreen = () => {
   };
   const dispatch = useDispatch<AppDispatch>();
   const {authData} = useAuth();
-  const {userDetails, loading} = useSelector(
-    (state: RootState) => state.userDetails,
-  );
+  const {loading} = useSelector((state: RootState) => state.userDetails);
   useEffect(() => {
     authData && dispatch(fetchUserDetails(authData?.session.token));
   }, [authData, dispatch]);
@@ -57,6 +55,23 @@ const ProfileScreen = () => {
           source={require('../../data/images/qv-blue.png')}
           style={styles.profileImage}
         />
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => {
+            navigation.navigate('Address');
+          }}>
+          <MaterialCommunityIcons
+            name="home-map-marker"
+            size={24}
+            color={theme.colors.ternary}
+          />
+          <Text style={styles.optionText}>Address</Text>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={24}
+            color={theme.colors.ternary}
+          />
+        </TouchableOpacity>
         {/* <View style={styles.headerText}>
             <Text style={styles.name}>{userDetails.userName}</Text>
             <Text style={styles.phone}>+{userDetails.mobile}</Text>
@@ -185,8 +200,8 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   profileImage: {
-    width: 150,
-    height: 150,
+    width: 200,
+    height: 200,
     alignItems: 'center',
   },
   headerText: {

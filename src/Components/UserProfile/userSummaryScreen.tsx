@@ -54,7 +54,6 @@ const ProfileScreen = () => {
       <View style={styles.container}>
         {/* <View style={styles.header}> */}
         <Image
-          // eslint-disable-next-line prettier/prettier
           source={require('../../data/images/qv-blue.png')}
           style={styles.profileImage}
         />

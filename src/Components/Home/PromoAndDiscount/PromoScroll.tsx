@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {Promo} from '../../../utils/canonicalModel';
-
 import theme from '../../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -28,6 +27,11 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
   const flatlistRef = useRef<FlatList<Promo>>(null);
   const screenWidth = Dimensions.get('window').width;
   const [activeIndex, setActiveIndex] = useState<number>(0);
+  const aspectRatio = 6912 / 3456;
+  const bannerHeight = screenWidth / aspectRatio;
+  // Adjusted padding between banners
+  const itemSpacing = 16;
+  const bannerWidth = screenWidth - 2 * itemSpacing;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -36,11 +40,13 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
           index: 0,
           animated: true,
         });
+        setActiveIndex(0);
       } else {
         flatlistRef.current?.scrollToIndex({
           index: activeIndex + 1,
           animated: true,
         });
+        setActiveIndex(prev => prev + 1);
       }
     }, 5000);
 
@@ -48,9 +54,9 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
   }, [activeIndex, promoItemsList.length]);
 
   const getItemLayout = (_: any, index: number) => ({
-    length: screenWidth,
-    offset: screenWidth * index,
-    index: index,
+    length: bannerWidth + itemSpacing,
+    offset: (bannerWidth + itemSpacing) * index,
+    index,
   });
   const handleCardPress = (url: string | undefined) => {
     navigation.removeListener;
@@ -60,11 +66,11 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
   const renderItem = ({item}: {item: Promo}) => {
     return (
       <TouchableOpacity onPress={() => handleCardPress(item.promoLink)}>
-        <View style={styles.imageContainer}>
+        <View style={[styles.imageContainer, {width: bannerWidth}]}>
           <Image
             source={{uri: `${item.promoImage}.jpg`}}
-            style={[styles.image, {width: screenWidth, borderRadius: 5}]}
-            // resizeMode="contain"
+            style={[styles.image, {height: bannerHeight}]}
+            resizeMode="cover"
           />
         </View>
       </TouchableOpacity>
@@ -73,12 +79,12 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const scrollPosition = event.nativeEvent.contentOffset.x;
-    const index = Math.round(scrollPosition / screenWidth);
+    const index = Math.round(scrollPosition / (bannerWidth + itemSpacing));
     setActiveIndex(index);
   };
 
   const renderDotIndicators = () => {
-    return promoItemsList.map((dot, index) => {
+    return promoItemsList.map((_, index) => {
       return (
         <View
           key={index}
@@ -106,9 +112,13 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
           return index.toString();
         }}
         horizontal={true}
-        pagingEnabled={true}
+        snapToInterval={bannerWidth + itemSpacing}
+        decelerationRate="fast"
         onScroll={handleScroll}
         scrollEventThrottle={16}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{paddingHorizontal: itemSpacing}}
+        ItemSeparatorComponent={() => <View style={{width: itemSpacing}} />}
       />
 
       <View style={styles.dotContainer}>{renderDotIndicators()}</View>
@@ -120,13 +130,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 30,
-    marginLeft: 20,
-    marginRight: 20,
-    // borderRadius: 25,
   },
   imageContainer: {
-    height: 250,
     backgroundColor: 'red',
+    overflow: 'hidden',
+    borderRadius: 10,
   },
   image: {
     height: '100%',

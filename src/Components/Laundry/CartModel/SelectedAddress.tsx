@@ -14,7 +14,9 @@ const SelectedAddress: React.FC<SelectedAddressProps> = ({
   selectedAddress,
   onChangeAddress,
 }) => {
-  if (!selectedAddress) return null;
+  if (!selectedAddress) {
+    return null;
+  }
 
   return (
     <View style={styles.AddressContainer}>

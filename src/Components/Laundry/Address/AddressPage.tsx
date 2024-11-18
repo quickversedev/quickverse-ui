@@ -1,20 +1,18 @@
-// components/AddressForm.tsx
-
 import React, {useState} from 'react';
 import {
   View,
   Text,
   TextInput,
-  Button,
+  TouchableOpacity,
   StyleSheet,
   ScrollView,
+  KeyboardTypeOptions,
 } from 'react-native';
-import theme from '../../../theme';
-import {Address} from '../../../utils/canonicalModel';
 import uuid from 'react-native-uuid';
-import {addAddress} from '../../../services/addressSclice';
 import {useDispatch} from 'react-redux';
+import {addAddress} from '../../../services/addressSclice';
 import {AppDispatch} from '../../../store/store';
+import theme from '../../../theme';
 
 interface AddressFormProps {
   onBack: () => void;
@@ -80,96 +78,80 @@ const AddressForm: React.FC<AddressFormProps> = ({onBack}) => {
     }
 
     const keyId = uuid.v4().toString();
-    const concatenatedAddress = `Room Number:${roomNumber}, Floor:${floor}, Address: ${address}, Hostel: ${hostelName}, How to Reach: ${howToReach}`;
+    const concatenatedAddress = `Room Number: ${roomNumber}, Floor: ${floor}, Address: ${address}, Hostel: ${hostelName}, How to Reach: ${howToReach}`;
 
-    const newAddress: Address = {
-      keyId,
-      address: {
-        name,
-        phone,
-        concatenatedAddress,
-      },
-    };
+    dispatch(
+      addAddress({
+        keyId,
+        address: {
+          name,
+          phone,
+          concatenatedAddress,
+        },
+      }),
+    );
 
-    dispatch(addAddress(newAddress));
     onBack();
   };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.formContainer}>
-        <View style={styles.header}>
-          <Button title="Back" onPress={onBack} />
-          <Text style={styles.title}>Address Details</Text>
-        </View>
-        <TextInput
-          style={[styles.input, errors.name && styles.errorInput]}
-          placeholder="Name"
-          value={name}
-          onChangeText={setName}
-          keyboardType="default"
-        />
-        {errors.name ? (
-          <Text style={styles.errorText}>{errors.name}</Text>
-        ) : null}
-        <TextInput
-          style={[styles.input, errors.phone && styles.errorInput]}
-          placeholder="Phone Number"
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType="phone-pad"
-        />
-        {errors.phone ? (
-          <Text style={styles.errorText}>{errors.phone}</Text>
-        ) : null}
-        <TextInput
-          style={[styles.input, errors.roomNumber && styles.errorInput]}
-          placeholder="Room Number"
-          value={roomNumber}
-          onChangeText={setRoomNumber}
-          keyboardType="numeric"
-        />
-        {errors.roomNumber ? (
-          <Text style={styles.errorText}>{errors.roomNumber}</Text>
-        ) : null}
-        <TextInput
-          style={[styles.input, errors.floor && styles.errorInput]}
-          placeholder="Floor"
-          value={floor}
-          onChangeText={setFloor}
-          keyboardType="numeric"
-        />
-        {errors.floor ? (
-          <Text style={styles.errorText}>{errors.floor}</Text>
-        ) : null}
-        <TextInput
-          style={[styles.input, errors.hostelName && styles.errorInput]}
-          placeholder="Hostel Name"
-          value={hostelName}
-          onChangeText={setHostelName}
-          keyboardType="default"
-        />
-        {errors.hostelName ? (
-          <Text style={styles.errorText}>{errors.hostelName}</Text>
-        ) : null}
-        <TextInput
-          style={[styles.input, errors.address && styles.errorInput]}
-          placeholder="Address"
-          value={address}
-          onChangeText={setAddress}
-          keyboardType="default"
-        />
-        {errors.address ? (
-          <Text style={styles.errorText}>{errors.address}</Text>
-        ) : null}
-        <TextInput
-          style={styles.input}
-          placeholder="How to Reach (Optional)"
-          value={howToReach}
-          onChangeText={setHowToReach}
-          keyboardType="default"
-        />
-        <Button title="Submit" onPress={handleSubmit} />
+        {[
+          {label: 'Name', value: name, setter: setName, error: errors.name},
+          {
+            label: 'Phone Number',
+            value: phone,
+            setter: setPhone,
+            error: errors.phone,
+            keyboardType: 'phone-pad',
+          },
+          {
+            label: 'Room Number',
+            value: roomNumber,
+            setter: setRoomNumber,
+            error: errors.roomNumber,
+            keyboardType: 'numeric',
+          },
+          {
+            label: 'Floor',
+            value: floor,
+            setter: setFloor,
+            error: errors.floor,
+            keyboardType: 'numeric',
+          },
+          {
+            label: 'Hostel Name',
+            value: hostelName,
+            setter: setHostelName,
+            error: errors.hostelName,
+          },
+          {
+            label: 'Address',
+            value: address,
+            setter: setAddress,
+            error: errors.address,
+          },
+          {
+            label: 'How to Reach (Optional)',
+            value: howToReach,
+            setter: setHowToReach,
+          },
+        ].map(({label, value, setter, error, keyboardType}, index) => (
+          <View key={index} style={styles.inputContainer}>
+            <TextInput
+              style={[styles.input, error ? styles.errorInput : null]}
+              placeholder={label}
+              value={value}
+              onChangeText={setter}
+              keyboardType={(keyboardType as KeyboardTypeOptions) || 'default'}
+            />
+            {error && <Text style={styles.errorText}>{error}</Text>}
+          </View>
+        ))}
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText}>Submit</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -195,13 +177,39 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 15,
-    paddingHorizontal: 10,
+  inputContainer: {
+    marginBottom: 20,
+  },
+  submitButton: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: theme.colors.secondary,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  backButton: {
+    padding: 10,
+    backgroundColor: theme.colors.secondary,
     borderRadius: 5,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  input: {
+    height: 50,
+    borderColor: '#000',
+    borderWidth: 2,
+    marginBottom: 6,
+    paddingHorizontal: 15,
+    borderRadius: 12,
+    fontWeight: 'bold',
+    fontSize: 18,
   },
   errorInput: {
     borderColor: 'red',

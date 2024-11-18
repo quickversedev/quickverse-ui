@@ -3,7 +3,7 @@ import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/Ionicons';
-import AddressList from '../Laundry/addresses';
+import AddressList from '../Laundry/Address/AddressList';
 
 type RootStackParamList = {
   ProfileScreen: undefined;

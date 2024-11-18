@@ -174,17 +174,31 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  checkoutButton: {
-    backgroundColor: theme.colors.primary, // Set to your primary color
+  backb: {
+    backgroundColor: theme.colors.secondary, // Set to your primary color
     paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    paddingHorizontal: 40,
+    marginHorizontal: 15,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20, // Adjust as needed
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  checkoutButton: {
+    backgroundColor: theme.colors.secondary, // Set to your primary color
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    marginHorizontal: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16, // Adjust as needed
   },
   checkoutButtonText: {
-    color: theme.colors.ternary, // Set to your text color
+    color: 'white', // Set to your text color
     fontSize: 16,
     fontWeight: 'bold',
   },

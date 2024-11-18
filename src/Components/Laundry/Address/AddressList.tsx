@@ -14,9 +14,14 @@ import Header from './AddressHeader';
 interface AddressListProps {
   onBack: () => void;
   onAddressSelect: (address: Address) => void;
+  showHeader?: boolean;
 }
 
-const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
+const AddressList: React.FC<AddressListProps> = ({
+  onBack,
+  onAddressSelect,
+  showHeader = true,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
   const {addresses, loading} = useSelector((state: RootState) => state.address);
   const [showAddress, setShowAddress] = useState(false);
@@ -53,10 +58,13 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
 
   return (
     <View style={styles.container}>
-      <Header onBack={onBack} />
+      {/* Conditionally render the header based on the showHeader prop */}
+      {showHeader && <Header onBack={onBack} />}
       {!showAddress ? (
         <>
+          {/* Add New Address Button */}
           <AddNewAddressButton onPress={handleShowAddress} />
+          {/* Address List */}
           <FlatList
             data={addresses}
             keyExtractor={item => item.keyId}
@@ -72,6 +80,7 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
           />
         </>
       ) : (
+        /* Address Form */
         <AddressForm onSubmit={handleAddressSubmit} onBack={handleBackToCart} />
       )}
     </View>

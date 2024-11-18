@@ -7,9 +7,6 @@ export const initializeNotificationService = async (): Promise<void> => {
   if (!permissionGranted) return;
 
   await createNotificationChannel();
-
-  const token = await messaging().getToken();
-  console.log('FCM Token:', token);
 };
 
 export const onForegroundMessage = async (remoteMessage: any): Promise<void> => {

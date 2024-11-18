@@ -15,7 +15,7 @@ import PromoDiscounts from './PromoAndDiscount/PromoDiscounts';
 import CampusBuzz from './campusBuzz/CampusBuzz';
 import FeaturedItems from './featuredItems/FeaturedItems';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {getCampus, setCampus} from '../../utils/Storage';
+import {getCampus, getIsNewUser, setCampus} from '../../utils/Storage';
 import {fetchCampusIds} from '../../services/fetchCampusIds';
 import LoginDetails from '../Login/loginDetails';
 const HomeScreen: React.FC = () => {
@@ -40,7 +40,7 @@ const HomeScreen: React.FC = () => {
 
     selectedCampus && setCampus(selectedCampus);
   }, [selectedCampus]);
-  const isForstTimeLogin = true;
+  const isForstTimeLogin = getIsNewUser();
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>

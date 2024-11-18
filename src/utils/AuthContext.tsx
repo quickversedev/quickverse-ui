@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import {getSkipLoginFlow, storage} from './Storage';
+import {getSkipLoginFlow, setCampus, setIsNewUser, storage} from './Storage';
 import {AuthData, authService} from '../services/AuthService';
 import {fetchConfigs} from '../services/configService';
 import {config} from './canonicalModel';
@@ -82,9 +82,12 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const verifyOtp = async (_phoneNumber: string, otp: string) => {
     try {
       const _authData = await authService.VerifyOtp(_phoneNumber, otp);
+      const {campus, token, isNewUser} = _authData?.session;
       if (_authData) {
         setAuthData(_authData);
-        storage.set('@AuthData', JSON.stringify(_authData));
+        storage.set('@AuthData', JSON.stringify(token));
+        isNewUser && setIsNewUser(isNewUser);
+        campus && setCampus(campus);
 
         const date = new Date();
         storage.set('@loginDate', date.toISOString());

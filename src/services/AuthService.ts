@@ -6,6 +6,8 @@ export type AuthData = {
   session: {
     token: string;
     phoneNumber: string;
+    isNewUser: boolean;
+    campus: string;
     name: string;
     email: string;
   };
@@ -30,7 +32,7 @@ const sendOtp = async (phoneNumber: string): Promise<any> => {
     .post(
       `${globalConfig.apiBaseUrl}/v1/login`,
       {
-        phoneNumber: '91' + phoneNumber,
+        mobile: '91' + phoneNumber,
       },
       {
         headers: {
@@ -97,8 +99,9 @@ const VerifyOtp = async (
         session: {
           token: data.jwt,
           phoneNumber: data.mobile,
+          isNewUser: data.isNewUser,
           name: data.userName,
-          campus: 'iim ',
+          campus: data.campus,
           email: data.email,
         },
       };

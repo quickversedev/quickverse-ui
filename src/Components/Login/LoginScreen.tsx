@@ -51,12 +51,12 @@ const LoginScreen: React.FC = () => {
       await auth
         .sendOtp(phoneNumber)
         .then(() => {
-          // navigation.navigate('otpverify', {phoneNumber});
+          navigation.navigate('otpverify', {phoneNumber});
         })
         .catch(() => {
           setError(true);
         });
-      navigation.navigate('otpverify', {phoneNumber});
+      // navigation.navigate('otpverify', {phoneNumber});
       setPhoneNumber('');
     }
   };

@@ -86,7 +86,7 @@ const OtpVerificationScreen: React.FC = () => {
       .catch(() => {
         setError(true);
       });
-    setTimer(30);
+    setTimer(60);
     setIsButtonDisabled(true);
   };
 

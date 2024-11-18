@@ -30,7 +30,7 @@ const sendOtp = async (phoneNumber: string): Promise<any> => {
   const token = await fetchToken();
   return axios
     .post(
-      `${globalConfig.apiBaseUrl}/v1/login`,
+      `${globalConfig.apiBaseUrl}/v1/requestOtp`,
       {
         mobile: '91' + phoneNumber,
       },

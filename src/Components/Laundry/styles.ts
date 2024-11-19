@@ -13,13 +13,14 @@ export default StyleSheet.create({
   },
   header: {
     backgroundColor: theme.colors.primary,
-    paddingBottom: 50,
+    paddingBottom: 10,
   },
   title: {
+    marginTop: -10,
     textAlign: 'center',
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
     color: theme.colors.secondary,
   },
   itemContainer: {
@@ -174,17 +175,22 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  backButton: {
+    marginRight: 10,
+    padding: 5,
+  },
   checkoutButton: {
-    backgroundColor: theme.colors.primary, // Set to your primary color
+    backgroundColor: theme.colors.secondary,
     paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    paddingHorizontal: 40,
+    marginHorizontal: 15,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20, // Adjust as needed
+    marginTop: 8,
   },
   checkoutButtonText: {
-    color: theme.colors.ternary, // Set to your text color
+    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },

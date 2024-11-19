@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {RootState, AppDispatch} from '../../store/store'; // Adjust the import path as needed
+import {RootState, AppDispatch} from '../../store/store';
 import {loadAddresses, deleteAddress} from '../../services/addressSclice';
 import {
   View,
@@ -20,9 +20,14 @@ import theme from '../../theme';
 interface AddressListProps {
   onBack: () => void;
   onAddressSelect: (address: Address) => void;
+  showHeader?: boolean;
 }
 
-const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
+const AddressList: React.FC<AddressListProps> = ({
+  onBack,
+  onAddressSelect,
+  showHeader = true,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
   const {addresses, loading} = useSelector((state: RootState) => state.address);
   const [showAddress, setShowAddress] = useState(false);
@@ -52,13 +57,9 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
     setShowAddress(false);
   };
 
-  // const handleAddressSubmit = (formData: Address) => {
-  //   console.log('Address Submitted:', formData);
-  // };
-
   const handleSelectAddress = (address: Address) => {
     setSelectedAddressId(address.keyId);
-    onAddressSelect(address); // Pass selected address to the parent component
+    onAddressSelect(address);
   };
 
   const renderItem = ({item}: {item: Address}) => (
@@ -93,10 +94,12 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Address List</Text>
-        <Button title="Back" onPress={onBack} />
-      </View>
+      {showHeader && (
+        <View style={styles.header}>
+          <Text style={styles.title}>Address List</Text>
+          <Button title="Back" onPress={onBack} />
+        </View>
+      )}
       {!showAddress ? (
         <>
           <Pressable style={styles.checkoutButton} onPress={handleShowAddress}>
@@ -115,6 +118,77 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: theme.colors.primary,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  addressCard: {
+    marginBottom: 16,
+    padding: 16,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.ternary,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    borderRadius: 20,
+    padding: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioButton: {
+    marginRight: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 16,
+    marginBottom: 4,
+    color: theme.colors.ternary,
+  },
+  checkoutButton: {
+    backgroundColor: theme.colors.secondary,
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    margin: 16,
+  },
+  checkoutButtonText: {
+    color: theme.colors.primary,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  list: {
+    flexGrow: 1,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
+
+export default AddressList;
 
 //   container: {
 //     flex: 1,
@@ -182,74 +256,3 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
 //     alignItems: 'center',
 //   },
 // });
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: theme.colors.primary,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  addressCard: {
-    marginBottom: 16,
-    padding: 16,
-    backgroundColor: theme.colors.primary,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: theme.colors.ternary,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  deleteButton: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    // backgroundColor: theme.colors.primary,
-    borderRadius: 20,
-    padding: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  radioButton: {
-    marginRight: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 16,
-    marginBottom: 4,
-    color: theme.colors.ternary,
-  },
-  checkoutButton: {
-    backgroundColor: theme.colors.secondary,
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    margin: 16,
-  },
-  checkoutButtonText: {
-    color: theme.colors.primary,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  list: {
-    flexGrow: 1,
-  },
-  loader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
-
-export default AddressList;

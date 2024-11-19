@@ -35,7 +35,7 @@ const ProfileScreen = () => {
   };
   const dispatch = useDispatch<AppDispatch>();
   const {authData} = useAuth();
-  const {userDetails, loading} = useSelector(
+  const {loading, userDetails} = useSelector(
     (state: RootState) => state.userDetails,
   );
   useEffect(() => {
@@ -75,15 +75,14 @@ const ProfileScreen = () => {
             <TouchableOpacity
               style={styles.option}
               onPress={() => {
-                navigation.removeListener;
-                navigation.navigate('ChangePinScreen');
+                navigation.navigate('Address');
               }}>
               <MaterialCommunityIcons
-                name="lock"
+                name="home-map-marker"
                 size={24}
                 color={theme.colors.ternary}
               />
-              <Text style={styles.optionText}>Change Pin</Text>
+              <Text style={styles.optionText}>Address</Text>
               <MaterialCommunityIcons
                 name="chevron-right"
                 size={24}
@@ -194,8 +193,8 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   profileImage: {
-    width: 150,
-    height: 150,
+    width: 200,
+    height: 200,
     alignItems: 'center',
   },
   headerText: {

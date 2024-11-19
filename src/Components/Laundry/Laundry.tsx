@@ -106,7 +106,9 @@ const Laundry: React.FC = () => {
     }).start(() => setModalVisible(false));
   };
 
-  if (loading) return <Loading />;
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <SafeAreaView style={styles.safeView}>

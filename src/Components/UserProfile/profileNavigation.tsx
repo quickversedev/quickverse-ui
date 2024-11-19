@@ -1,12 +1,12 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import ProfileScreen from './userSummaryScreen';
-
 import AboutUs from './AboutUs';
 import Help from './Help';
 import Feedback from './Feedback';
 import theme from '../../theme';
 import ChangePinScreen from './ChangePin';
+import Address from './Address';
 
 export type RootStackParamList = {
   ProfileScreen: undefined;
@@ -14,6 +14,7 @@ export type RootStackParamList = {
   Help: undefined;
   Feedback: undefined;
   ChangePinScreen: undefined;
+  Address: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -47,7 +48,7 @@ const ProfileNavigation: React.FC = () => {
             backgroundColor: theme.colors.primary,
             height: 60,
           },
-          title: 'AboutUs..!',
+          title: 'About Us',
         }}
       />
       <Stack.Screen
@@ -72,6 +73,18 @@ const ProfileNavigation: React.FC = () => {
             height: 60,
           },
           title: 'Change Pin',
+        }}
+      />
+      <Stack.Screen
+        name="Address"
+        component={Address}
+        options={{
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: theme.colors.primary,
+            height: 60,
+          },
+          title: 'Saved Addresses',
         }}
       />
     </Stack.Navigator>

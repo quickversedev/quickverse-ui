@@ -1,21 +1,21 @@
 // src/components/Heading.tsx
-import React, {useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Text} from 'react-native-paper';
+import React, { useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Text } from 'react-native-paper';
 import HorizontalScroll from './HorizontalScroll';
 
-import {useDispatch, useSelector} from 'react-redux';
-import {Loading} from '../../util/Loading';
-import {AppDispatch, RootState} from '../../../store/store';
-import {fetchFoodItems} from '../../../services/FoodItemsSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { Loading } from '../../util/Loading';
+import { AppDispatch, RootState } from '../../../store/store';
+import { fetchFoodItems } from '../../../services/FoodItemsSlice';
 import theme from '../../../theme';
 interface FeaturedItemsProps {
   campus: string | undefined; // Define the type for the campus prop
 }
 
-const FeaturedItems: React.FC<FeaturedItemsProps> = ({campus}) => {
+const FeaturedItems: React.FC<FeaturedItemsProps> = ({ campus }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const {foodItemsList, loading} = useSelector(
+  const { foodItemsList, loading } = useSelector(
     (state: RootState) => state.foodItems,
   );
   useEffect(() => {
@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'flex-start',
     paddingTop: 25,
+    paddingBottom: 25
   },
   lineContainer: {
     flexDirection: 'row',
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.ternary,
     marginHorizontal: 8,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,

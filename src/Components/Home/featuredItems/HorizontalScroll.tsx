@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   Animated,
-  StatusBar,
   FlatList,
   Dimensions,
   TouchableOpacity,
@@ -16,22 +15,23 @@ import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamListHome} from '../HomeNavigation';
 
-const SPACING: any = 4;
-const ITEM_SIZE: any = width * 0.76;
+const SPACING: any = 10;
+const ITEM_SIZE: any = width * 0.5;
 const EMPTY_ITEM_SIZE: any = (width - ITEM_SIZE) / 2;
 
 type HomeNavigationProp = StackNavigationProp<
   RootStackParamListHome,
   'WebView'
 >;
+
 interface Props {
   featuredItems: FoodItem[];
 }
+
 const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
   const navigation = useNavigation<HomeNavigationProp>();
 
   const handleCardPress = (url: string | undefined) => {
-    navigation.removeListener;
     url && navigation.navigate('WebView', {url});
   };
   const scrollx = React.useRef(new Animated.Value(0)).current;
@@ -42,6 +42,7 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
     ...featuredItems,
     {itemId: 'empty-right'},
   ];
+
   return (
     <View style={styles.container}>
       <Animated.FlatList
@@ -53,7 +54,7 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
         }}
         horizontal
         contentContainerStyle={{alignItems: 'center'}}
-        snapToInterval={ITEM_SIZE}
+        snapToInterval={ITEM_SIZE + SPACING * 2} // Adjusted spacing
         decelerationRate={0.98}
         snapToAlignment="start"
         bounces={false}
@@ -73,35 +74,41 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
           ];
           const translateY = scrollx.interpolate({
             inputRange,
-            outputRange: [0, -50, 0],
+            outputRange: [0, -40, 0],
             extrapolate: 'clamp',
           });
+
           return (
-            <View key={index} style={{width: ITEM_SIZE}}>
+            <View key={index} style={{width: ITEM_SIZE, marginBottom: 30}}>
               <Animated.View
                 style={{
                   marginHorizontal: SPACING,
-                  padding: SPACING * 2,
+                  padding: SPACING,
                   alignItems: 'center',
-                  paddingTop: SPACING * 15,
-                  transform: [{translateY}],
-                  borderRadius: 34,
+                  transform: [{translateY}, {translateY: 40}], // Added constant shift down
+                  borderRadius: 20, // Rounded rectangle
+                  backgroundColor: '#FFE474', // Yellow background
+                  paddingBottom: 20,
+                  ...styles.elevatedCard, // Apply the elevation styles
                 }}>
                 <TouchableOpacity
-                  onPress={() => handleCardPress(item.itemLink)}
-                  style={styles.posterImage}>
-                  <Card.Cover
-                    source={{uri: `${item.itemImage}.jpg`}}
-                    style={styles.posterImage}
-                  />
-                  <Card.Content style={{alignItems: 'center'}}>
+                  onPress={() => handleCardPress(item.itemLink)}>
+                  <View style={styles.cardContainer}>
+                    <View style={styles.imageContainer}>
+                      <Card.Cover
+                        source={{uri: `${item.itemImage}.jpg`}}
+                        style={styles.posterImage}
+                      />
+                    </View>
                     <Text style={styles.itemName} numberOfLines={1}>
                       {item.itemName}
                     </Text>
-                    <Text style={styles.itemDesc} numberOfLines={3}>
-                      {item.itemDesc}
-                    </Text>
-                  </Card.Content>
+                    <TouchableOpacity
+                      style={styles.orderButton}
+                      onPress={() => handleCardPress(item.itemLink)}>
+                      <Text style={styles.buttonText}>Order Now</Text>
+                    </TouchableOpacity>
+                  </View>
                 </TouchableOpacity>
               </Animated.View>
             </View>
@@ -115,18 +122,56 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
 const styles = StyleSheet.create({
   container: {
     display: 'flex',
+    paddingTop: 10,
+    paddingBottom: 10,
     justifyContent: 'flex-start',
+  },
+  cardContainer: {
+    alignItems: 'center',
+    borderRadius: 20, // Ensures the entire card is rounded
+    overflow: 'hidden',
+  },
+  imageContainer: {
+    width: ITEM_SIZE * 0.6, // Adjust this size for the circle
+    height: ITEM_SIZE * 0.5, // Equal height and width to make it a circle
+    borderRadius: ITEM_SIZE * 0.25, // This makes the image circular
+    overflow: 'hidden',
+    marginBottom: 10, // Spacing below the image
+    // padding:10,
+    // backgroundColor: '#FFF', // Optional background color for the gap
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   posterImage: {
     width: '100%',
-    height: ITEM_SIZE * 0.8,
-    resizeMode: 'cover',
-    borderRadius: 24,
-    margin: 0,
+    height: '100%',
+    borderRadius: ITEM_SIZE * 0.25, // Ensures the image itself is also circular
+  },
+  elevatedCard: {
+    shadowColor: '#000', // Black shadow color
+    shadowOffset: {width: 0, height: 4}, // Offset for iOS
+    shadowOpacity: 0.3, // Opacity for iOS
+    shadowRadius: 6, // Shadow blur radius for iOS
+    elevation: 6, //
+  },
+  itemName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1A3C40', // Darker greenish color for the text
     marginBottom: 10,
   },
-  itemName: {fontSize: 24, color: theme.colors.ternary, fontWeight: 'bold'},
-  itemDesc: {fontSize: 14, color: theme.colors.secondary, textAlign: 'center'},
+  orderButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    backgroundColor: '#8B0000', // Dark red background for the button
+    borderRadius: 20,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#FFFFFF', // White text for the button
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
 
 export default HorizontalScroll;

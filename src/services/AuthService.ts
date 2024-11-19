@@ -6,6 +6,8 @@ export type AuthData = {
   session: {
     token: string;
     phoneNumber: string;
+    newUser: boolean;
+    campus: string;
     name: string;
     email: string;
   };
@@ -28,9 +30,9 @@ const sendOtp = async (phoneNumber: string): Promise<any> => {
   const token = await fetchToken();
   return axios
     .post(
-      `${globalConfig.apiBaseUrl}/v1/login`,
+      `${globalConfig.apiBaseUrl}/v1/requestOtp`,
       {
-        phoneNumber: '91' + phoneNumber,
+        mobile: '91' + phoneNumber,
       },
       {
         headers: {
@@ -97,8 +99,9 @@ const VerifyOtp = async (
         session: {
           token: data.jwt,
           phoneNumber: data.mobile,
+          newUser: data.newUser,
           name: data.userName,
-          campus: 'iim ',
+          campus: data.campusId,
           email: data.email,
         },
       };
@@ -125,10 +128,9 @@ const VerifyOtp = async (
 };
 const signUp = async (
   fullName: string,
-  phoneNumber: string,
+  dob: string,
   campusId: string,
   email: string,
-  pin: string,
 ): Promise<any> => {
   // return new Promise(resolve => {
   //   setTimeout(() => {
@@ -142,8 +144,7 @@ const signUp = async (
     .post(
       `${globalConfig.apiBaseUrl}/v1/registerUser`,
       {
-        mobile: '91' + phoneNumber,
-        pin: pin,
+        dob: dob,
         campusId: campusId,
         emailId: email,
         userName: fullName,

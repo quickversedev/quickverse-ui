@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import {getSkipLoginFlow, storage} from './Storage';
+import {getSkipLoginFlow, setCampus, setIsNewUser, storage} from './Storage';
 import {AuthData, authService} from '../services/AuthService';
 import {fetchConfigs} from '../services/configService';
 import {config} from './canonicalModel';
@@ -21,10 +21,9 @@ type AuthContextData = {
   signOut(): void;
   signUp(
     fullName: string,
-    phoneNumber: string,
     campusId: string,
     email: string,
-    pin: string,
+    dob: string,
   ): Promise<void>;
   setSkipLogin(shouldSkipLogin: boolean): void;
 };
@@ -83,9 +82,12 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const verifyOtp = async (_phoneNumber: string, otp: string) => {
     try {
       const _authData = await authService.VerifyOtp(_phoneNumber, otp);
+      const {campus, token, newUser} = _authData?.session;
       if (_authData) {
         setAuthData(_authData);
-        storage.set('@AuthData', JSON.stringify(_authData));
+        storage.set('@AuthData', JSON.stringify(token));
+        newUser && setIsNewUser(newUser);
+        campus && setCampus(campus);
 
         const date = new Date();
         storage.set('@loginDate', date.toISOString());
@@ -97,18 +99,11 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
   const signUp = async (
     fullName: string,
-    phoneNumber: string,
     campusId: string,
     email: string,
-    pin: string,
+    dob: string,
   ) => {
-    return await authService.signUp(
-      fullName,
-      phoneNumber,
-      campusId,
-      email,
-      pin,
-    );
+    return await authService.signUp(fullName, dob, campusId, email);
   };
 
   const signOut = async () => {

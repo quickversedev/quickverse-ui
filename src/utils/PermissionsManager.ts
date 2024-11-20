@@ -42,21 +42,6 @@ const requestPhotoLibraryPermission = async (): Promise<PermissionStatus> => {
   }
 };
 
-const requestLocationPermission = async (): Promise<PermissionStatus> => {
-  const permission: Permission =
-    Platform.OS === 'ios'
-      ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
-      : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
-
-  try {
-    const result = await request(permission);
-    return mapResultToStatus(result);
-  } catch (error) {
-    console.error('Error requesting location permission:', error);
-    return 'denied';
-  }
-};
-
 const mapResultToStatus = (result: string): PermissionStatus => {
   switch (result) {
     case RESULTS.GRANTED:
@@ -77,14 +62,12 @@ const mapResultToStatus = (result: string): PermissionStatus => {
 export const requestAllPermissions = async (): Promise<{
   camera: PermissionStatus;
   photoLibrary: PermissionStatus;
-  location: PermissionStatus;
 }> => {
   try {
     const camera = await requestCameraPermission();
     const photoLibrary = await requestPhotoLibraryPermission();
-    const location = await requestLocationPermission();
 
-    return {camera, photoLibrary, location};
+    return {camera, photoLibrary};
   } catch (error) {
     console.error('Error requesting all permissions:', error);
     throw error;
@@ -106,7 +89,6 @@ const checkPermissionStatus = async (
 export const checkAllPermissions = async (): Promise<{
   camera: PermissionStatus;
   photoLibrary: PermissionStatus;
-  location: PermissionStatus;
 }> => {
   try {
     const camera = await checkPermissionStatus(
@@ -119,13 +101,8 @@ export const checkAllPermissions = async (): Promise<{
         ? PERMISSIONS.IOS.PHOTO_LIBRARY
         : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
     );
-    const location = await checkPermissionStatus(
-      Platform.OS === 'ios'
-        ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
-        : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-    );
 
-    return {camera, photoLibrary, location};
+    return {camera, photoLibrary};
   } catch (error) {
     console.error('Error checking all permissions:', error);
     throw error;

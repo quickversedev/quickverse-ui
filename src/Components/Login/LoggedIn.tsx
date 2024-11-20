@@ -15,7 +15,6 @@ import {useState} from 'react';
 import {Platform} from 'react-native';
 import Laundry from '../Laundry/Laundry';
 import {useAuth} from '../../utils/AuthContext';
-// import PharmacyScreen from '../pharmacy/Pharmacy';
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {

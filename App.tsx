@@ -17,8 +17,9 @@ const App: React.FC = () => {
         if (!hasAskedPermissions) {
           console.log('Requesting permissions...');
 
-          const permissions = await requestAllPermissions();
-          console.log('Permissions granted:', permissions);
+          const {camera, photoLibrary} = await requestAllPermissions();
+          console.log('Camera permission:', camera);
+          console.log('Photo library permission:', photoLibrary);
 
           await AsyncStorage.setItem('permissionsRequested', 'true');
         } else {

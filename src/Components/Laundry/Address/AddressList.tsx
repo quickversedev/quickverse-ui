@@ -41,11 +41,6 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
   const handleShowAddress = () => setShowAddress(true);
   const handleBackToCart = () => setShowAddress(false);
 
-  const handleAddressSubmit = (formData: Address) => {
-    console.log('Address Submitted:', formData);
-    // Handle address submission logic
-  };
-
   const handleSelectAddress = (address: Address) => {
     setSelectedAddressId(address.keyId);
     onAddressSelect(address); // Pass selected address to the parent component
@@ -72,7 +67,7 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
           />
         </>
       ) : (
-        <AddressForm onSubmit={handleAddressSubmit} onBack={handleBackToCart} />
+        <AddressForm onBack={handleBackToCart} />
       )}
     </View>
   );

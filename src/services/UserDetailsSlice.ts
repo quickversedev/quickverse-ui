@@ -1,16 +1,21 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {User} from '../utils/canonicalModel';
 import axios from 'axios';
-import {getCampus} from '../utils/Storage';
 import globalConfig from '../utils/GlobalConfig';
 
 export const fetchUserDetails = createAsyncThunk<User, string>(
   'userDetails/fetchUserDetails',
   async (token, {rejectWithValue}) => {
     try {
-      const response = await axios.post(
-        `${globalConfig.apiBaseUrl}/v1/campus/${getCampus()}/user`,
-        {token},
+      console.log('user details token', token);
+
+      const response = await axios.get(
+        `${globalConfig.apiBaseUrl}/v1/campus/user`,
+        {
+          headers: {
+            SessionKey: token,
+          },
+        },
       );
       // console.log('userResponse:', response);
       return response.data;

@@ -9,9 +9,6 @@ import globalConfig from '../../utils/GlobalConfig';
 import VendorsNavigator from '../Vendors/VendorsNavigator';
 import HomeNavigation from '../Home/HomeNavigation';
 import ProfileNavigation from '../UserProfile/profileNavigation';
-import {storage} from '../../utils/Storage';
-import ChangePinScreen from '../UserProfile/ChangePin';
-import {useState} from 'react';
 import {Platform} from 'react-native';
 import Laundry from '../Laundry/Laundry';
 import {useAuth} from '../../utils/AuthContext';
@@ -22,20 +19,6 @@ const LoggedIn: React.FC = () => {
   const {configs} = useAuth();
   const isLaundryAvailable = configs?.configuration?.isLaundryEnabled;
   // const isPharmacyAvailable = configs?.configuration?.isLaundryEnabled;
-  const [forgotPasswordFlow, setForgotPasswordFlow] = useState<boolean>();
-  React.useEffect(() => {
-    const forgotPass = async () => {
-      const resetFlow = await storage.getBoolean('@resetPass');
-      setForgotPasswordFlow(resetFlow);
-    };
-    forgotPass();
-  }, [forgotPasswordFlow]);
-  const handleForgotPasswordFlow = (forgotpass: boolean) => {
-    setForgotPasswordFlow(forgotpass);
-  };
-  if (forgotPasswordFlow) {
-    return <ChangePinScreen forgotPasswordRoute={handleForgotPasswordFlow} />;
-  }
   return (
     <PaperProvider theme={theme}>
       <Tab.Navigator

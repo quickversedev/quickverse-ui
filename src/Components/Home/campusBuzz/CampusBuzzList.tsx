@@ -27,7 +27,7 @@ const CampusBuzzList: React.FC<Props> = ({buzzData}) => {
   const handleCardPress = (url: string | undefined) => {
     url && navigation.navigate('WebView', {url});
   };
-  console.log('buzzdata', buzzData);
+
   return (
     <View style={styles.container}>
       <FlatList

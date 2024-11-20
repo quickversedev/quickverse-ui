@@ -20,7 +20,6 @@ interface LoginCardProps {
 const LoginCard: React.FC<LoginCardProps> = ({feature}) => {
   const {authData, setSkipLogin} = useAuth();
   const handleClick = () => {
-    console.log('buttonslivked');
     if (!authData) {
       setSkipLogin(false);
       setSkipLoginFlow(false);

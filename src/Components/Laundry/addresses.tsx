@@ -52,10 +52,6 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
     setShowAddress(false);
   };
 
-  // const handleAddressSubmit = (formData: Address) => {
-  //   console.log('Address Submitted:', formData);
-  // };
-
   const handleSelectAddress = (address: Address) => {
     setSelectedAddressId(address.keyId);
     onAddressSelect(address); // Pass selected address to the parent component
@@ -116,72 +112,6 @@ const AddressList: React.FC<AddressListProps> = ({onBack, onAddressSelect}) => {
   );
 };
 
-//   container: {
-//     flex: 1,
-//     padding: 16,
-//     backgroundColor: '#fff',
-//   },
-//   header: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     marginBottom: 20,
-//   },
-//   title: {
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//   },
-//   addressCard: {
-//     marginBottom: 16,
-//     padding: 16,
-//     backgroundColor: '#f9f9f9',
-//     borderRadius: 8,
-//     borderWidth: 1,
-//     borderColor: '#ddd',
-//     position: 'relative', // For absolute positioning of delete button
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//   },
-//   deleteButton: {
-//     position: 'absolute',
-//     top: 8,
-//     right: 8,
-//     backgroundColor: '#ff6f61',
-//     borderRadius: 20,
-//     padding: 4,
-//     width: 36,
-//     height: 36,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-//   radioButton: {
-//     marginRight: 16,
-//   },
-//   text: {
-//     fontSize: 16,
-//     marginBottom: 8,
-//   },
-//   checkoutButton: {
-//     backgroundColor: '#007bff',
-//     padding: 16,
-//     borderRadius: 8,
-//     alignItems: 'center',
-//     margin: 16,
-//   },
-//   checkoutButtonText: {
-//     color: '#fff',
-//     fontSize: 16,
-//     fontWeight: 'bold',
-//   },
-//   list: {
-//     flexGrow: 1,
-//   },
-//   loader: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-// });
 const styles = StyleSheet.create({
   container: {
     flex: 1,

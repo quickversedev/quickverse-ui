@@ -19,7 +19,6 @@ const AddressCard: React.FC<AddressCardProps> = ({
   onSelect,
 }) => {
   const handleDeleteClick = () => {
-    console.log('delete clicked');
     onDelete();
   };
 

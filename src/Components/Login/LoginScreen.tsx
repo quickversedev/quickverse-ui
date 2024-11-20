@@ -53,10 +53,10 @@ const LoginScreen: React.FC = () => {
         .then(() => {
           navigation.navigate('otpverify', {phoneNumber});
         })
-        .catch(() => {
+        .catch(errorr => {
           setError(true);
+          console.log('error in phone,', errorr);
         });
-      // navigation.navigate('otpverify', {phoneNumber});
       setPhoneNumber('');
     }
   };
@@ -96,7 +96,7 @@ const LoginScreen: React.FC = () => {
                   onChangeText={text => {
                     setPhoneError('');
                     setPhoneNumber(text);
-                    // setError(false);
+                    setError(false);
                   }}
                   placeholderTextColor={theme.colors.secondary}
                   keyboardType="phone-pad"
@@ -213,6 +213,3 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
-function sendOtp() {
-  throw new Error('Function not implemented.');
-}

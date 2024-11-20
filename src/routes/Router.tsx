@@ -8,7 +8,7 @@ import {saveToken} from '../utils/KeychainStore/keychainUtil';
 
 export const Router = () => {
   const {authData, loading, skipLogin} = useAuth();
-
+  console.log('token', authData);
   useEffect(() => {
     saveToken();
   }, []);

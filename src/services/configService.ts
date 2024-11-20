@@ -18,7 +18,6 @@ export const fetchConfigs = (): Promise<config> => {
       return data;
     })
     .catch(error => {
-      const {code} = error.response.data.error;
       if (error.response) {
         // The request was made and the server responded with a status code
         console.log(
@@ -34,6 +33,6 @@ export const fetchConfigs = (): Promise<config> => {
         console.log('Error setting up the request:', error.message);
       }
       // Throw the error again to propagate it to the caller
-      throw code;
+      throw error;
     });
 };

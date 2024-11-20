@@ -193,7 +193,10 @@ export default function LoginDetails() {
               onPress={loading ? undefined : handleSubmit}
               disabled={loading}>
               {loading ? (
-                <ActivityIndicator size="small" color="#ffffff" />
+                <ActivityIndicator
+                  size="small"
+                  color={theme.colors.secondary}
+                />
               ) : (
                 <Text style={styles.submitButtonText}>Continue</Text>
               )}

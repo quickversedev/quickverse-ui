@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -29,6 +30,7 @@ const LoginScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [phoneError, setPhoneError] = useState<string>('');
   const [error, setError] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const auth = useAuth();
   const validatePhoneNumber = (phone: string) => {
@@ -48,6 +50,7 @@ const LoginScreen: React.FC = () => {
 
   const handleContinue = async () => {
     if (validate()) {
+      setLoading(true);
       await auth
         .sendOtp(phoneNumber)
         .then(() => {
@@ -56,6 +59,9 @@ const LoginScreen: React.FC = () => {
         .catch(errorr => {
           setError(true);
           console.log('error in phone,', errorr);
+        })
+        .finally(() => {
+          setLoading(false);
         });
       setPhoneNumber('');
     }
@@ -111,8 +117,19 @@ const LoginScreen: React.FC = () => {
                   Error ocured while sending otp , please try again later
                 </Text>
               ) : null}
-              <TouchableOpacity onPress={handleContinue} style={styles.button}>
-                <Text style={styles.buttonText}>Continue</Text>
+
+              <TouchableOpacity
+                style={[styles.button, loading && styles.disabledButton]}
+                onPress={loading ? undefined : handleContinue}
+                disabled={loading}>
+                {loading ? (
+                  <ActivityIndicator
+                    size="small"
+                    color={theme.colors.secondary}
+                  />
+                ) : (
+                  <Text style={styles.buttonText}>Continue</Text>
+                )}
               </TouchableOpacity>
             </ScrollView>
 
@@ -150,6 +167,9 @@ const styles = StyleSheet.create({
     height: 250,
     alignSelf: 'center',
     marginBottom: 50,
+  },
+  disabledButton: {
+    backgroundColor: '#bdbdbd',
   },
   header: {
     fontSize: 24,

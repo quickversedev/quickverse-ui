@@ -44,7 +44,7 @@ export default function LoginDetails() {
     };
     loadCampusData();
   }, []);
-
+  console.log('date', dob);
   // Validation functions
   const validateName = (text: string) => /^[A-Za-z]+$/.test(text);
   const validateEmail = (text: string) =>

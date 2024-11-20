@@ -101,7 +101,7 @@ const VerifyOtp = async (
           phoneNumber: data.mobile,
           newUser: data.newUser,
           name: data.userName,
-          campus: data.campus,
+          campus: data.campusId,
           email: data.email,
         },
       };

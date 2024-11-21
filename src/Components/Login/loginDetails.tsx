@@ -24,19 +24,22 @@ export default function LoginDetails() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [email, setEmail] = useState('');
   const [campusId, setCampusId] = useState('');
-  const [campusList, setCampusList] = useState<Campus[]>([]); // Explicitly define the type of campusList as Campus[]
+  const [campusList, setCampusList] = useState<Campus[]>([]);
   const [modalVisible, setModalVisible] = useState(true);
-  const auth = useAuth(); // Move useAuth to the main body of the component
+  const [fetchError, setFetchError] = useState(false); // Track fetch error
+  const auth = useAuth();
+  const {setSelectedCampus} = useAuth();
 
   useEffect(() => {
     // Fetch campus data on mount
     const loadCampusData = async () => {
+      setFetchError(false); // Reset error state before fetch
       try {
         const campuses = await fetchCampusIds();
-        setCampusList(campuses); // Now TypeScript knows campusList is an array of Campus
+        setCampusList(campuses);
       } catch (error) {
         console.error('Error fetching campus data:', error);
-        Alert.alert('Error', 'Unable to load campus data.');
+        setFetchError(true);
       }
     };
     loadCampusData();
@@ -55,6 +58,25 @@ export default function LoginDetails() {
       setDob(selectedDate);
     }
   };
+
+  const handleRetry = async () => {
+    const loadCampusData = async () => {
+      setFetchError(false); // Reset error state before retry
+      try {
+        const campuses = await fetchCampusIds();
+        setCampusList(campuses);
+      } catch (error) {
+        console.error('Error fetching campus data:', error);
+        setFetchError(true);
+      }
+    };
+    loadCampusData();
+  };
+
+  const handleCancel = () => {
+    auth.signOut();
+  };
+
   const handleSubmit = async () => {
     if (!validateName(name)) {
       Alert.alert('Invalid Name', 'Name can only contain letters.');
@@ -83,6 +105,7 @@ export default function LoginDetails() {
       Alert.alert('Success', 'Your details have been submitted successfully.');
       setModalVisible(false); // Close modal after successful submission
       setCampus(campusId);
+      setSelectedCampus(campusId);
     } catch (error) {
       console.error('Sign-up error:', error);
       Alert.alert('Error', 'Unable to submit details. Please try again.');
@@ -97,67 +120,93 @@ export default function LoginDetails() {
         <View style={styles.formContainer}>
           <Text style={styles.title}>Enter details</Text>
 
-          {/* Name Input */}
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your name"
-            value={name}
-            onChangeText={setName}
-            keyboardType="default"
-          />
+          {fetchError ? (
+            <View>
+              <Text style={styles.errorText}>Failed to load campus data.</Text>
+              <TouchableOpacity
+                style={styles.retryButton}
+                onPress={handleRetry}>
+                <Text style={styles.retryButtonText}>Retry</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <>
+              {/* Name Input */}
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your name"
+                value={name}
+                onChangeText={setName}
+                keyboardType="default"
+              />
 
-          {/* Date of Birth Input */}
-          <TouchableOpacity
-            onPress={() => setShowDatePicker(true)}
-            style={styles.input}>
-            <Text>{dob ? dob.toDateString() : 'Enter your date of birth'}</Text>
-          </TouchableOpacity>
-          {showDatePicker && (
-            <DateTimePicker
-              value={dob || new Date()}
-              mode="date"
-              display="default"
-              onChange={handleDateChange}
-              maximumDate={new Date()}
-            />
-          )}
-          {/* Email Input */}
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-
-          {/* Campus Picker */}
-          <View style={styles.input}>
-            <Picker
-              selectedValue={campusId}
-              onValueChange={itemValue => setCampusId(itemValue)}>
-              <Picker.Item label="Select Campus" value="" />
-              {campusList.map(campusItem => (
-                <Picker.Item
-                  key={campusItem.campusId} // Use campusId (or the correct unique identifier)
-                  label={campusItem.campusName} // Use campusName here
-                  value={campusItem.campusId} // Use campusId as value
+              {/* Date of Birth Input */}
+              <TouchableOpacity
+                onPress={() => setShowDatePicker(true)}
+                style={styles.input}>
+                <Text>
+                  {dob ? dob.toDateString() : 'Enter your date of birth'}
+                </Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={dob || new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={handleDateChange}
+                  maximumDate={new Date()}
                 />
-              ))}
-            </Picker>
-          </View>
+              )}
+
+              {/* Email Input */}
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your email"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+
+              {/* Campus Picker */}
+              <View style={styles.input}>
+                <Picker
+                  selectedValue={campusId}
+                  onValueChange={itemValue => setCampusId(itemValue)}>
+                  <Picker.Item label="Select Campus" value="" />
+                  {campusList.map(campusItem => (
+                    <Picker.Item
+                      key={campusItem.campusId}
+                      label={campusItem.campusName}
+                      value={campusItem.campusId}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </>
+          )}
 
           {/* Submit Button */}
+          {!fetchError && (
+            <TouchableOpacity
+              style={[styles.submitButton, loading && styles.disabledButton]}
+              onPress={loading ? undefined : handleSubmit}
+              disabled={loading}>
+              {loading ? (
+                <ActivityIndicator
+                  size="small"
+                  color={theme.colors.secondary}
+                />
+              ) : (
+                <Text style={styles.submitButtonText}>Continue</Text>
+              )}
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity
             style={[styles.submitButton, loading && styles.disabledButton]}
-            onPress={loading ? undefined : handleSubmit}
-            disabled={loading} // Prevent multiple submissions
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color="#ffffff" />
-            ) : (
-              <Text style={styles.submitButtonText}>Continue</Text>
-            )}
+            onPress={handleCancel}>
+            <Text style={styles.submitButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -171,9 +220,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  disabledButton: {
-    backgroundColor: '#bdbdbd',
   },
   formContainer: {
     width: '80%',
@@ -198,6 +244,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     justifyContent: 'center',
   },
+  retryButton: {
+    backgroundColor: theme.colors.secondary,
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
   submitButton: {
     width: '70%',
     paddingVertical: 15,
@@ -207,9 +264,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 15,
   },
+  disabledButton: {
+    backgroundColor: '#bdbdbd',
+  },
   submitButtonText: {
     color: theme.colors.primary,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginBottom: 10,
   },
 });

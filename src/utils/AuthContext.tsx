@@ -5,14 +5,20 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import {getSkipLoginFlow, setCampus, setIsNewUser, storage} from './Storage';
-import {AuthData, authService} from '../services/AuthService';
+import {
+  getCampus,
+  getSkipLoginFlow,
+  setCampus,
+  setIsNewUser,
+  storage,
+} from './Storage';
+import {authService} from '../services/AuthService';
 import {fetchConfigs} from '../services/configService';
 import {config} from './canonicalModel';
 
 type AuthContextData = {
   loggedInDate: string;
-  authData?: AuthData;
+  authData?: string | undefined;
   skipLogin?: boolean;
   loading: boolean;
   configs: config | undefined;
@@ -26,6 +32,8 @@ type AuthContextData = {
     dob: string,
   ): Promise<void>;
   setSkipLogin(shouldSkipLogin: boolean): void;
+  selectedCampus: string | undefined;
+  setSelectedCampus(campus: string): void;
 };
 
 // Create the Auth Context with the data type specified
@@ -37,10 +45,11 @@ type AuthProviderProps = {
 };
 
 const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
-  const [authData, setAuthData] = useState<AuthData | undefined>();
+  const [authData, setAuthData] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
   const [skipLogin, setSkipLogin] = useState<boolean | undefined>(false);
   const [loggedInDate, setLoggedInDate] = useState<string>('');
+  const [selectedCampus, setSelectedCampus] = useState<string | undefined>('');
   const [configs, setConfigs] = useState<config | undefined>();
 
   useEffect(() => {
@@ -54,9 +63,10 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       // Try to get the data from MMKV storage
       const authDataSerialized = storage.getString('@AuthData');
       const logindate = storage.getString('@loginDate');
+      const campusId = getCampus();
       const skipLoginFlow = getSkipLoginFlow();
       if (authDataSerialized && logindate) {
-        const _authData: AuthData = JSON.parse(authDataSerialized);
+        const _authData = authDataSerialized;
         setAuthData(_authData);
         setLoggedInDate(logindate);
         const configData = await fetchConfigs();
@@ -65,6 +75,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         }
       }
       setSkipLogin(skipLoginFlow);
+      setSelectedCampus(campusId);
     } catch (error) {
       console.log('Failed to load auth data from storage', error);
     } finally {
@@ -84,8 +95,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       const _authData = await authService.VerifyOtp(_phoneNumber, otp);
       const {campus, token, newUser} = _authData?.session;
       if (_authData) {
-        setAuthData(_authData);
-        storage.set('@AuthData', JSON.stringify(token));
+        setAuthData(token);
+        storage.set('@AuthData', token);
         newUser && setIsNewUser(newUser);
         campus && setCampus(campus);
 
@@ -107,10 +118,13 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   };
 
   const signOut = async () => {
+    console.log('signing out');
     setAuthData(undefined);
     storage.delete('@AuthData');
     storage.delete('@CampusID');
     storage.delete('@loginDate');
+    storage.delete('@isNewUser');
+    storage.delete('@skipLogin');
   };
 
   return (
@@ -126,6 +140,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         signOut,
         signUp,
         setSkipLogin,
+        selectedCampus,
+        setSelectedCampus,
       }}>
       {children}
     </AuthContext.Provider>

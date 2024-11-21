@@ -39,7 +39,7 @@ const ProfileScreen = () => {
     (state: RootState) => state.userDetails,
   );
   useEffect(() => {
-    authData && dispatch(fetchUserDetails(authData?.session.token));
+    authData && dispatch(fetchUserDetails(authData));
   }, [authData, dispatch]);
   const handleDeleteAccount = () => {
     // Open the terms and conditions link
@@ -48,6 +48,7 @@ const ProfileScreen = () => {
   if (loading) {
     return <Loading />;
   }
+  console.log('userDetails,', userDetails.user);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -60,36 +61,11 @@ const ProfileScreen = () => {
                 style={styles.profileImage}
               />
               <View style={styles.headerText}>
-                <Text style={styles.name}>{userDetails.userName}</Text>
-                <Text style={styles.phone}>+{userDetails.mobile}</Text>
-                <Text style={styles.email}>{userDetails.emailId}</Text>
+                <Text style={styles.name}>{userDetails?.user?.userName}</Text>
+                <Text style={styles.phone}>+{userDetails?.user?.mobile}</Text>
+                <Text style={styles.email}>{userDetails?.user?.emailId}</Text>
               </View>
-              <TouchableOpacity style={styles.editIcon}>
-                <MaterialCommunityIcons
-                  name="pencil-outline"
-                  size={24}
-                  color={theme.colors.ternary}
-                />
-              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              style={styles.option}
-              onPress={() => {
-                navigation.removeListener;
-                navigation.navigate('ChangePinScreen');
-              }}>
-              <MaterialCommunityIcons
-                name="lock"
-                size={24}
-                color={theme.colors.ternary}
-              />
-              <Text style={styles.optionText}>Change Pin</Text>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={24}
-                color={theme.colors.ternary}
-              />
-            </TouchableOpacity>
           </>
         ) : (
           <Image

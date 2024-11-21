@@ -1,6 +1,7 @@
 import axios from 'axios';
 import globalConfig from '../utils/GlobalConfig';
 import {fetchToken} from '../utils/KeychainStore/keychainUtil';
+import {getJWT} from '../utils/Storage';
 
 export type AuthData = {
   session: {
@@ -41,8 +42,7 @@ const sendOtp = async (phoneNumber: string): Promise<any> => {
       },
     )
     .catch(error => {
-      const {code} = error.response.data.error;
-      if (error.response) {
+      if (error?.response) {
         // The request was made and the server responded with a status code
         console.log(
           'Server responded with non-2xx status:',
@@ -57,7 +57,7 @@ const sendOtp = async (phoneNumber: string): Promise<any> => {
         console.log('Error setting up the request:', error.message);
       }
       // Throw the error again to propagate it to the caller
-      throw code;
+      throw error;
     });
 };
 const VerifyOtp = async (
@@ -107,8 +107,7 @@ const VerifyOtp = async (
       };
     })
     .catch(error => {
-      const {code} = error.response.data.error;
-      if (error.response) {
+      if (error?.response) {
         // The request was made and the server responded with a status code
         console.log(
           'Server responded with non-2xx status:',
@@ -123,7 +122,7 @@ const VerifyOtp = async (
         console.log('Error setting up the request:', error.message);
       }
       // Throw the error again to propagate it to the caller
-      throw code;
+      throw error;
     });
 };
 const signUp = async (
@@ -139,19 +138,19 @@ const signUp = async (
   //     });
   //   }, 1000);
   // });
-  const token = await fetchToken();
+  const token = getJWT();
   return axios
     .post(
       `${globalConfig.apiBaseUrl}/v1/registerUser`,
       {
-        dob: dob,
+        birthdate: dob,
         campusId: campusId,
         emailId: email,
         userName: fullName,
       },
       {
         headers: {
-          Authorization: token,
+          SessionKey: token,
         },
       },
     )

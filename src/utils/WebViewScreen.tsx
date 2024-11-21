@@ -73,7 +73,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
         const cookies: Cookie[] = [
           {
             name: 'X_AMZ_JWT',
-            value: authData?.session?.token,
+            value: authData,
             domain: effectiveurl,
             path: '/',
             version: '1',

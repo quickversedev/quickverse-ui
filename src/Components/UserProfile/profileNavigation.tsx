@@ -6,7 +6,6 @@ import AboutUs from './AboutUs';
 import Help from './Help';
 import Feedback from './Feedback';
 import theme from '../../theme';
-import ChangePinScreen from './ChangePin';
 
 export type RootStackParamList = {
   ProfileScreen: undefined;
@@ -60,18 +59,6 @@ const ProfileNavigation: React.FC = () => {
             height: 60,
           },
           title: 'Help',
-        }}
-      />
-      <Stack.Screen
-        name="ChangePinScreen"
-        component={ChangePinScreen}
-        options={{
-          headerShown: false,
-          headerStyle: {
-            backgroundColor: theme.colors.primary,
-            height: 60,
-          },
-          title: 'Change Pin',
         }}
       />
     </Stack.Navigator>

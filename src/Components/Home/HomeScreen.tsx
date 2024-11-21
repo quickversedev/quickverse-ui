@@ -7,7 +7,6 @@ import {
   FlatList,
   TouchableOpacity,
   Text,
-  // TextInput,
 } from 'react-native';
 import theme from '../../theme';
 import HomeScreenVendors from './homeVendors/HomeScreenVendors';
@@ -18,11 +17,15 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {getCampus, getIsNewUser, setCampus} from '../../utils/Storage';
 import {fetchCampusIds} from '../../services/fetchCampusIds';
 import LoginDetails from '../Login/loginDetails';
+import {useAuth} from '../../utils/AuthContext';
 const HomeScreen: React.FC = () => {
-  const [selectedCampus, setSelectedCampus] = useState<string | undefined>();
+  const [selectedCampusId, setSelectedCampusId] = useState<
+    string | undefined
+  >();
   const [campusOptions, setCampusOptions] = useState<any>();
   const [clicked, setClicked] = useState(false);
-
+  const isFirstTimeLogin = getIsNewUser();
+  const {selectedCampus} = useAuth();
   const fetchCampus = async () => {
     const response = await fetchCampusIds();
     const campusOption = response?.map(campus => ({
@@ -35,12 +38,16 @@ const HomeScreen: React.FC = () => {
     fetchCampus();
     setTimeout(() => {
       const camp = getCampus();
-      camp ? setSelectedCampus(camp) : setSelectedCampus('IIMU-313001');
+      camp ? setSelectedCampusId(camp) : setSelectedCampusId('IIMU-313001');
     }, 1000);
 
-    selectedCampus && setCampus(selectedCampus);
+    if (selectedCampusId) {
+      setCampus(selectedCampusId);
+    }
+  }, [selectedCampusId]);
+  useEffect(() => {
+    selectedCampus && setSelectedCampusId(selectedCampus);
   }, [selectedCampus]);
-  const isFirstTimeLogin = getIsNewUser();
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -50,7 +57,7 @@ const HomeScreen: React.FC = () => {
             setClicked(!clicked);
           }}>
           <Text style={styles.touchableText}>
-            {selectedCampus === '' ? 'Select Campus' : selectedCampus}
+            {selectedCampusId === '' ? 'Select Campus' : selectedCampusId}
           </Text>
           {clicked ? (
             <MaterialCommunityIcons
@@ -75,7 +82,7 @@ const HomeScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.listItem}
                   onPress={() => {
-                    setSelectedCampus(item.value);
+                    setSelectedCampusId(item.value);
                     setClicked(!clicked);
                   }}>
                   <Text style={styles.listItemText}>{item.value}</Text>
@@ -85,16 +92,13 @@ const HomeScreen: React.FC = () => {
           </View>
         ) : null}
       </View>
-      {isFirstTimeLogin ? (
-        <LoginDetails />
-      ) : (
-        <ScrollView>
-          <PromoDiscounts campus={selectedCampus} />
-          <FeaturedItems campus={selectedCampus} />
-          <HomeScreenVendors campus={selectedCampus} />
-          <CampusBuzz campus={selectedCampus} />
-        </ScrollView>
-      )}
+      {isFirstTimeLogin && <LoginDetails />}
+      <ScrollView>
+        <PromoDiscounts campus={selectedCampusId} />
+        <FeaturedItems campus={selectedCampusId} />
+        <HomeScreenVendors campus={selectedCampusId} />
+        <CampusBuzz campus={selectedCampusId} />
+      </ScrollView>
     </SafeAreaView>
   );
 };

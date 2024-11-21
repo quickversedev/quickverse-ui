@@ -69,15 +69,13 @@ const OtpVerificationScreen: React.FC = () => {
   };
 
   const handleLoginPress = async () => {
-    console.log('OTP entered:', otp.join(''));
-    const finalOtp = otp.join();
+    const finalOtp = otp.join('');
     await auth.verifyOtp(phoneNumber, finalOtp).catch(() => {
       setError(true);
     });
   };
 
   const handleResendPress = async () => {
-    console.log('Resending OTP to +91-', phoneNumber);
     await auth
       .sendOtp(phoneNumber)
       .then(() => {

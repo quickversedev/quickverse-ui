@@ -1,61 +1,75 @@
-// src/redux/slices/categoriesSlice.ts
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { Category } from '../data/mockCategoriesData'; // Import your Category type
-import mockCategoriesData from '../data/mockCategoriesData'; // Import mocked categories data
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { Category } from '../data/mockCategoriesData';
+import { mockCategoriesData } from '../data/mockCategoriesData';
+import { RootState } from '../store/store';
 
-// Simulating an API call with a delay
-export const fetchCategories = createAsyncThunk<Category[], void>(
-  'categories/fetchCategories',
-  async () => {
-    return new Promise<Category[]>(resolve => {
-      setTimeout(() => {
-        resolve(mockCategoriesData); // Resolve with mocked data
-      }, 1000); // 1 second delay
-    });
-  }
+// Define the state interface
+interface CategoryState {
+    categories: Category[];
+    loading: boolean;
+    error: string | null;
+}
+
+// Initial state with mock data
+const initialState: CategoryState = {
+    categories: mockCategoriesData,
+    loading: false,
+    error: null,
+};
+
+// Helper function to create a delay
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Async thunk to fetch categories from an API with a 1-second delay
+export const fetchCategories = createAsyncThunk(
+    'categories/fetchCategories',
+    async (_, { rejectWithValue }) => {
+        try {
+            // Add a 1-second delay
+            await delay(1000);
+
+            const response = await fetch('https://api.example.com/categories');
+            if (!response.ok) {
+                throw new Error('Failed to fetch categories');
+            }
+            const data: Category[] = await response.json();
+            return data;
+        } catch (error) {
+            return rejectWithValue('Failed to fetch categories');
+        }
+    }
 );
 
-const categoriesSlice = createSlice({
-  name: 'categories',
-  initialState: {
-    categories: [] as Category[],
-    loading: false,
-    error: null as string | null,
-  },
-  reducers: {
-    addCategory: (state, action: { payload: Category }) => {
-      state.categories.push(action.payload);
+// Category slice
+export const categorySlice = createSlice({
+    name: 'categories',
+    initialState,
+    reducers: {
+        setCategories: (state, action: PayloadAction<Category[]>) => {
+            state.categories = action.payload;
+        },
     },
-    removeCategory: (state, action: { payload: string }) => { // Ensure the type matches your Category ID type
-      state.categories = state.categories.filter(
-        category => category.id !== action.payload // Compare with the correct type
-      );
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchCategories.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchCategories.fulfilled, (state, action: PayloadAction<Category[]>) => {
+                state.categories = action.payload;
+                state.loading = false;
+            })
+            .addCase(fetchCategories.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            });
     },
-    updateCategory: (state, action: { payload: Category }) => {
-      const index = state.categories.findIndex(
-        category => category.id === action.payload.id
-      );
-      if (index !== -1) {
-        state.categories[index] = action.payload; // Update the category
-      }
-    },
-  },
-  extraReducers: builder => {
-    builder
-      .addCase(fetchCategories.pending, state => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchCategories.fulfilled, (state, action) => {
-        state.loading = false;
-        state.categories = action.payload; // Populate categories with fetched data
-      })
-      .addCase(fetchCategories.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Failed to fetch categories';
-      });
-  },
 });
 
-export const { addCategory, removeCategory, updateCategory } = categoriesSlice.actions;
-export default categoriesSlice.reducer;
+// Selectors
+export const selectCategories = (state: RootState) => state.categories.categories;
+export const selectCategoryLoading = (state: RootState) => state.categories.loading;
+export const selectCategoryError = (state: RootState) => state.categories.error;
+
+export const { setCategories } = categorySlice.actions;
+export default categorySlice.reducer;

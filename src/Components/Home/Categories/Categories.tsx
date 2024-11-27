@@ -20,7 +20,7 @@ const Categories = () => {
     const handleCategoryPress = (categoryId: string) => {
         setSelectedCategory(categoryId);
     };
-
+    
     // Add a product to the cart
     const handleAddToCart = (productId: string) => {
         setCartCounts((prevCounts) => ({

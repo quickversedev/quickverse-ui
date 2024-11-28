@@ -225,13 +225,13 @@ const styles = StyleSheet.create({
   floatingButtonContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: -25, // Adjust this to position the bubble correctly (75% visible)
+    marginTop: -25,
   },
   floatingButton: {
-    width: 100, // Bubble size
-    height: 100, // Bubble size
-    borderRadius: 50, // Make it perfectly round
-    backgroundColor: 'white', // Set the bubble color to white
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 6,
-    marginTop: 25, // Position the button so that 75% is visible
+    marginTop: 25,
   },
 });
 

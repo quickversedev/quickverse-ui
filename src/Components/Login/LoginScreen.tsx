@@ -59,10 +59,10 @@ const LoginScreen: React.FC = () => {
         .catch(errorr => {
           setError(true);
           console.log('error in phone,', errorr);
-        })
-        .finally(() => {
-          setLoading(false);
         });
+
+      setLoading(false);
+
       setPhoneNumber('');
     }
   };

@@ -17,7 +17,7 @@ const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
   const {configs} = useAuth();
-  const isLaundryAvailable = configs?.configuration?.isLaundryEnabled;
+  const isLaundryEnabled = configs?.configuration?.isLaundryEnabled;
   // const isPharmacyAvailable = configs?.configuration?.isLaundryEnabled;
   return (
     <PaperProvider theme={theme}>
@@ -79,7 +79,7 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
-        {isLaundryAvailable && (
+        {isLaundryEnabled && (
           <Tab.Screen
             name="Laundry"
             component={Laundry}

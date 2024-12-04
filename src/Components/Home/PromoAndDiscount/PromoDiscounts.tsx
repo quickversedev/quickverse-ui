@@ -2,13 +2,12 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import PromoScroll from './PromoScroll';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Loading } from '../../util/Loading';
 import { AppDispatch, RootState } from '../../../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPromoItems } from '../../../services/promoListSlice';
 import theme from '../../../theme';
-// import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-// import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
 
 interface PromoDiscountsProps {
   campus: string | undefined;
@@ -37,7 +36,11 @@ const PromoDiscounts: React.FC<PromoDiscountsProps> = ({ campus }) => {
         <Text variant="titleLarge" style={styles.heading}>
           Promotions
         </Text>
-        {/* <FontAwesomeIcon icon={faBullhorn} /> */}
+        <MaterialCommunityIcons
+          name="gift-outline"
+          size={30}
+          color={theme.colors.secondary}
+        />
       </View>
       <PromoScroll promoItemsList={promoItemsList} />
     </View>

@@ -7,6 +7,7 @@ import { fetchBampusBuzzList } from '../../../services/CampusBuzzListSlice';
 import { AppDispatch, RootState } from '../../../store/store';
 import { Loading } from '../../util/Loading';
 import theme from '../../../theme';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 interface PCampusBuzzProps {
   campus: string | undefined; // Define the type for the campus prop
 }
@@ -32,6 +33,10 @@ const CampusBuzz: React.FC<PCampusBuzzProps> = ({ campus }) => {
         <Text variant="titleLarge" style={styles.heading}>
           Campus Buzzzz
         </Text>
+        <MaterialIcons
+          name="school"
+          size={30}
+          color={theme.colors.secondary} />
       </View>
       <CampusBuzzList buzzData={campusBuzz} />
     </View>

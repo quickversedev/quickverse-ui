@@ -9,6 +9,7 @@ import { Loading } from '../../util/Loading';
 import { AppDispatch, RootState } from '../../../store/store';
 import { fetchFoodItems } from '../../../services/FoodItemsSlice';
 import theme from '../../../theme';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 interface FeaturedItemsProps {
   campus: string | undefined; // Define the type for the campus prop
 }
@@ -34,6 +35,10 @@ const FeaturedItems: React.FC<FeaturedItemsProps> = ({ campus }) => {
         <Text variant="titleLarge" style={styles.heading}>
           Featured Items
         </Text>
+        <MaterialIcons
+          name="star-outline"
+          size={30}
+          color={theme.colors.secondary} />
       </View>
       <HorizontalScroll featuredItems={foodItemsList} />
     </View>

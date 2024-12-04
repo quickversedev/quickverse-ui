@@ -3,12 +3,13 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import HorizontalCardList from './HorizontalCardList';
-
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchVendorList } from '../../../services/VendorListSlice';
 import { Loading } from '../../util/Loading';
 import { AppDispatch, RootState } from '../../../store/store';
 import theme from '../../../theme';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 interface HomeScreenVendorsProps {
   campus: string | undefined; // Define the type for the campus prop
@@ -35,6 +36,10 @@ const HomeScreenVendors: React.FC<HomeScreenVendorsProps> = ({ campus }) => {
         <Text variant="titleLarge" style={styles.heading}>
           Promo and Discounts
         </Text>
+        <MaterialIcons
+          name="local-offer"
+          size={30}
+          color={theme.colors.secondary} />
       </View>
       <HorizontalCardList vendors={enabledVendors} />
     </View>

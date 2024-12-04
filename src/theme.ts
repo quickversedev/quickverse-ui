@@ -1,4 +1,4 @@
-import {MD3LightTheme as DefaultTheme} from 'react-native-paper';
+import { MD3LightTheme as DefaultTheme } from 'react-native-paper';
 
 const theme = {
   ...DefaultTheme,
@@ -13,6 +13,7 @@ const theme = {
     secondaryText: '#666666', // Medium grey for secondary text
     buttonText: '#FFFFFF', // White text for buttons
     border: '#DDDDDD',
+    button: '#FFDF63'//light yellow
   },
   // fonts: {
   //   regular: {

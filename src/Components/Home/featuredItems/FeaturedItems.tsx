@@ -32,9 +32,8 @@ const FeaturedItems: React.FC<FeaturedItemsProps> = ({ campus }) => {
       <View style={styles.lineContainer}>
         <View style={styles.line} />
         <Text variant="titleLarge" style={styles.heading}>
-          Best Sellers..!
+          Featured Items
         </Text>
-        <View style={styles.line} />
       </View>
       <HorizontalScroll featuredItems={foodItemsList} />
     </View>
@@ -49,19 +48,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     display: 'flex',
     justifyContent: 'flex-start',
-    paddingTop: 25,
-    paddingBottom: 25
+    marginTop: 24,
   },
   lineContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    width: '100%',
+    justifyContent: 'flex-start',
   },
   line: {
-    flex: 1,
     height: 3, // Thicker line
     backgroundColor: theme.colors.ternary,
-    marginHorizontal: 8,
-    shadowColor: '#000',
+    width: '15%',
+    marginRight: 8,
+    shadowColor: theme.colors.border,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,

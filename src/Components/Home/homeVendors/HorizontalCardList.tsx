@@ -1,12 +1,12 @@
 import React from 'react';
-import {View, StyleSheet, FlatList, Dimensions} from 'react-native';
+import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
 import CardItem from '../../util/CardItem';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamListHome} from '../HomeNavigation';
-import {useNavigation} from '@react-navigation/native';
-import {Vendor} from '../../../utils/canonicalModel';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamListHome } from '../HomeNavigation';
+import { useNavigation } from '@react-navigation/native';
+import { Vendor } from '../../../utils/canonicalModel';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const SPACING: any = 3;
 const ITEM_SIZE: any = width * 0.46;
 // const EMPTY_ITEM_SIZE: any = width - ITEM_SIZE * 2.5;
@@ -18,12 +18,12 @@ type HomeNavigationProp = StackNavigationProp<
 interface Props {
   vendors: Vendor[];
 }
-const HorizontalCardList: React.FC<Props> = ({vendors}) => {
+const HorizontalCardList: React.FC<Props> = ({ vendors }) => {
   const navigation = useNavigation<HomeNavigationProp>();
 
   const handleCardPress = (url: string) => {
     navigation.removeListener;
-    navigation.navigate('WebView', {url});
+    navigation.navigate('WebView', { url });
   };
 
   return (
@@ -41,13 +41,13 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
         snapToAlignment="start"
         bounces={false}
         scrollEventThrottle={16}
-        renderItem={({item, index}) => {
+        renderItem={({ item, index }) => {
           return (
-            <View key={index} style={{width: ITEM_SIZE, margin: SPACING * 2}}>
+            <View key={index} style={{ width: ITEM_SIZE, margin: SPACING * 2 }}>
               <CardItem
                 name={item.vendorName}
                 distance={item.distance}
-                image={{uri: `${item.vendorBanner}.jpg`}}
+                image={{ uri: `${item.vendorBanner}.jpg` }}
                 onPress={() => handleCardPress(item.vendorEndPoint)}
               />
             </View>
@@ -61,7 +61,8 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: SPACING * 8,
+    marginTop: 14,
+    marginBottom: 14,
   },
 });
 

@@ -8,12 +8,12 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
-import {Promo} from '../../../utils/canonicalModel';
+import React, { useEffect, useRef, useState } from 'react';
+import { Promo } from '../../../utils/canonicalModel';
 import theme from '../../../theme';
-import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamListHome} from '../HomeNavigation';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamListHome } from '../HomeNavigation';
 
 type HomeNavigationProp = StackNavigationProp<
   RootStackParamListHome,
@@ -22,7 +22,7 @@ type HomeNavigationProp = StackNavigationProp<
 interface Props {
   promoItemsList: Promo[];
 }
-const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
+const PromoScroll: React.FC<Props> = ({ promoItemsList }) => {
   const navigation = useNavigation<HomeNavigationProp>();
   const flatlistRef = useRef<FlatList<Promo>>(null);
   const screenWidth = Dimensions.get('window').width;
@@ -60,16 +60,16 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
   });
   const handleCardPress = (url: string | undefined) => {
     navigation.removeListener;
-    url && navigation.navigate('WebView', {url});
+    url && navigation.navigate('WebView', { url });
   };
 
-  const renderItem = ({item}: {item: Promo}) => {
+  const renderItem = ({ item }: { item: Promo }) => {
     return (
       <TouchableOpacity onPress={() => handleCardPress(item.promoLink)}>
-        <View style={[styles.imageContainer, {width: bannerWidth}]}>
+        <View style={[styles.imageContainer, { width: bannerWidth }]}>
           <Image
-            source={{uri: `${item.promoImage}.jpg`}}
-            style={[styles.image, {height: bannerHeight}]}
+            source={{ uri: `${item.promoImage}.jpg` }}
+            style={[styles.image, { height: bannerHeight }]}
             resizeMode="cover"
           />
         </View>
@@ -117,8 +117,8 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
         onScroll={handleScroll}
         scrollEventThrottle={16}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{paddingHorizontal: itemSpacing}}
-        ItemSeparatorComponent={() => <View style={{width: itemSpacing}} />}
+        contentContainerStyle={{ paddingHorizontal: itemSpacing }}
+        ItemSeparatorComponent={() => <View style={{ width: itemSpacing }} />}
       />
 
       <View style={styles.dotContainer}>{renderDotIndicators()}</View>
@@ -129,10 +129,10 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 30,
+    marginTop: 24,
   },
   imageContainer: {
-    backgroundColor: 'red',
+    backgroundColor: theme.colors.secondary,
     overflow: 'hidden',
     borderRadius: 10,
   },
@@ -143,14 +143,15 @@ const styles = StyleSheet.create({
   dotContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 15,
-    marginBottom: 20,
+    marginTop: 14,
+
   },
   dot: {
     height: 10,
     width: 10,
     borderRadius: 5,
     marginHorizontal: 10,
+
   },
 });
 

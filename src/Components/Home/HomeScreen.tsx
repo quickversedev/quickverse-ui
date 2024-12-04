@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -14,18 +14,20 @@ import PromoDiscounts from './PromoAndDiscount/PromoDiscounts';
 import CampusBuzz from './campusBuzz/CampusBuzz';
 import FeaturedItems from './featuredItems/FeaturedItems';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {getCampus, getIsNewUser, setCampus} from '../../utils/Storage';
-import {fetchCampusIds} from '../../services/fetchCampusIds';
+import { getCampus, getIsNewUser, setCampus } from '../../utils/Storage';
+import { fetchCampusIds } from '../../services/fetchCampusIds';
 import LoginDetails from '../Login/loginDetails';
-import {useAuth} from '../../utils/AuthContext';
+import { useAuth } from '../../utils/AuthContext';
+import HomeButtons from './Homebuttons/HomeButtons';
+import SearchBarScreen from './Searchbar/SearchBarScreen';
+
 const HomeScreen: React.FC = () => {
-  const [selectedCampusId, setSelectedCampusId] = useState<
-    string | undefined
-  >();
+  const [selectedCampusId, setSelectedCampusId] = useState<string | undefined>();
   const [campusOptions, setCampusOptions] = useState<any>();
   const [clicked, setClicked] = useState(false);
   const isFirstTimeLogin = getIsNewUser();
-  const {selectedCampus} = useAuth();
+  const { selectedCampus } = useAuth();
+
   const fetchCampus = async () => {
     const response = await fetchCampusIds();
     const campusOption = response?.map(campus => ({
@@ -34,6 +36,7 @@ const HomeScreen: React.FC = () => {
     }));
     setCampusOptions(campusOption);
   };
+
   useEffect(() => {
     fetchCampus();
     setTimeout(() => {
@@ -45,55 +48,69 @@ const HomeScreen: React.FC = () => {
       setCampus(selectedCampusId);
     }
   }, [selectedCampusId]);
+
   useEffect(() => {
     selectedCampus && setSelectedCampusId(selectedCampus);
   }, [selectedCampus]);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity
-          style={styles.touchableOpacity}
-          onPress={() => {
-            setClicked(!clicked);
-          }}>
-          <Text style={styles.touchableText}>
-            {selectedCampusId === '' ? 'Select Campus' : selectedCampusId}
-          </Text>
-          {clicked ? (
-            <MaterialCommunityIcons
-              name="chevron-up"
-              size={20}
-              color={theme.colors.ternary}
-            />
-          ) : (
-            <MaterialCommunityIcons
-              name="chevron-down"
-              size={20}
-              color={theme.colors.ternary}
-            />
+        <View style={styles.campusSelector}>
+          <TouchableOpacity
+            style={styles.touchableOpacity}
+            onPress={() => {
+              setClicked(!clicked);
+            }}
+          >
+            <Text style={styles.touchableText}>
+              {selectedCampusId === '' ? 'Select Campus' : selectedCampusId}
+            </Text>
+            {clicked ? (
+              <MaterialCommunityIcons
+                name="chevron-up"
+                size={20}
+                color={theme.colors.ternary}
+              />
+            ) : (
+              <MaterialCommunityIcons
+                name="chevron-down"
+                size={20}
+                color={theme.colors.ternary}
+              />
+            )}
+          </TouchableOpacity>
+          {clicked && (
+            <View style={styles.dropdownContainer}>
+              <FlatList
+                data={campusOptions}
+                keyExtractor={item => item.value}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.listItem}
+                    onPress={() => {
+                      setSelectedCampusId(item.value);
+                      setClicked(!clicked);
+                    }}
+                  >
+                    <Text style={styles.listItemText}>{item.value}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
           )}
+        </View>
+
+        {/* Cart Button */}
+        <TouchableOpacity style={styles.cartButton}>
+          <MaterialCommunityIcons name="cart-outline" size={24} color="#FFDC52" />
         </TouchableOpacity>
-        {clicked ? (
-          <View style={styles.dropdownContainer}>
-            <FlatList
-              data={campusOptions}
-              keyExtractor={item => item.value}
-              renderItem={({item}) => (
-                <TouchableOpacity
-                  style={styles.listItem}
-                  onPress={() => {
-                    setSelectedCampusId(item.value);
-                    setClicked(!clicked);
-                  }}>
-                  <Text style={styles.listItemText}>{item.value}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        ) : null}
       </View>
+
       {isFirstTimeLogin && <LoginDetails />}
-      <ScrollView>
+      <ScrollView style={styles.scrollView}>
+        <SearchBarScreen />
+        <HomeButtons />
         <PromoDiscounts campus={selectedCampusId} />
         <FeaturedItems campus={selectedCampusId} />
         <HomeScreenVendors campus={selectedCampusId} />
@@ -109,21 +126,29 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   headerContainer: {
-    zIndex: 1000, // Ensure the dropdown is above other elements
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    marginTop: 10,
+    position: 'relative', // Allow dropdown to be positioned relative to this container
+    zIndex: 2, // header stays above other components
+  },
+  campusSelector: {
+    flex: 1,
+    zIndex: 2,
   },
   touchableOpacity: {
     width: '90%',
     height: 50,
     borderRadius: 10,
     borderWidth: 0.9,
-    alignSelf: 'center',
-    marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingLeft: 15,
     paddingRight: 15,
-    backgroundColor: theme.colors.primary, // Ensure background is set for visibility
+    backgroundColor: theme.colors.primary,
   },
   touchableText: {
     fontWeight: '600',
@@ -132,15 +157,15 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     elevation: 5,
     marginTop: 10,
-    maxHeight: 500, // Limit the height of the dropdown
+    maxHeight: 500, // Limit the height of dropdown
     alignSelf: 'center',
     width: '90%',
     borderWidth: 0.9,
     backgroundColor: theme.colors.primary,
     borderRadius: 10,
     position: 'absolute',
-    top: 60, // Adjust as needed to position below the button
-    zIndex: 1000,
+    top: 60,
+    zIndex: 10, // Ensure the dropdown is above the search bar and buttons
     overflow: 'scroll',
   },
   searchInput: {
@@ -152,6 +177,7 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     marginTop: 20,
     paddingLeft: 20,
+    zIndex: 1, // Ensure it stays under the dropdown
   },
   listItem: {
     width: '85%',
@@ -164,6 +190,23 @@ const styles = StyleSheet.create({
   listItemText: {
     fontWeight: '600',
     color: theme.colors.ternary,
+  },
+  cartButton: {
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+    backgroundColor: theme.colors.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    marginLeft: 5,
+  },
+  scrollView: {
+    zIndex: 1, // Ensure the scroll view stays below the dropdown
   },
 });
 

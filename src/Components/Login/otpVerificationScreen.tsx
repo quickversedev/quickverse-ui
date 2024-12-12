@@ -68,21 +68,6 @@ const OtpVerificationScreen: React.FC = () => {
     }
   };
 
-  // const handleKeyPress = (index: number, key: string) => {
-  //   console.log('back:', key);
-  //   if (key === 'Backspace') {
-  //     const newOtp = [...otp];
-
-  //     if (otp[index]) {
-  //       newOtp[index] = '';
-  //       setOtp(newOtp);
-  //     } else if (index > 0) {
-  //       inputRefs.current[index - 1]?.focus();
-  //       newOtp[index - 1] = '';
-  //       setOtp(newOtp);
-  //     }
-  //   }
-  // };
   const handleKeyPress = (index: number, key: string) => {
     console.log('back', key);
     if (key === 'Backspace') {
@@ -204,6 +189,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 8,
     textAlign: 'center',
+    color: theme.colors.ternary,
     fontSize: 18,
     backgroundColor: theme.colors.primary,
   },

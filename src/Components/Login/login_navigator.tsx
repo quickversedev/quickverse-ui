@@ -5,7 +5,7 @@ import OtpVerificationScreen from './otpVerificationScreen';
 
 export type loginRootStackParamList = {
   LoginScreen1: undefined;
-  otpverify: {phoneNumber: string};
+  otpverify: {phoneNumber: string; verificationId: string};
 };
 
 const Stack = createStackNavigator<loginRootStackParamList>();

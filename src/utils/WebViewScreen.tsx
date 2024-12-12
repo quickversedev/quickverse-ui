@@ -127,7 +127,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
         setLoading(false);
       }
     };
-    if (configs?.configuration.cookieEnabled) {
+    if (configs?.configuration?.cookieEnabled) {
       setMultipleCookies();
     } else {
       deleteCookies();

@@ -46,7 +46,7 @@ export default function LoginDetails() {
   }, []);
   console.log('date', dob);
   // Validation functions
-  const validateName = (text: string) => /^[A-Za-z]+$/.test(text);
+  const validateName = (text: string) => /^[A-Za-z\s]+$/.test(text);
   const validateEmail = (text: string) =>
     /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(text);
   const validateDob = (selectedDob?: Date) =>
@@ -106,6 +106,7 @@ export default function LoginDetails() {
       setModalVisible(false); // Close modal after successful submission
       setCampus(campusId);
       setSelectedCampus(campusId);
+      setIsNewUser(false);
     } catch (error) {
       console.error('Sign-up error:', error);
       Alert.alert('Error', 'Unable to submit details. Please try again.');

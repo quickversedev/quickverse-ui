@@ -204,6 +204,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 8,
     textAlign: 'center',
+    color: theme.colors.ternary,
     fontSize: 18,
     backgroundColor: theme.colors.primary,
   },

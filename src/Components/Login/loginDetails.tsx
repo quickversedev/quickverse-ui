@@ -44,7 +44,7 @@ export default function LoginDetails() {
     };
     loadCampusData();
   }, []);
-  console.log('date', dob);
+
   // Validation functions
   const validateName = (text: string) => /^[A-Za-z\s]+$/.test(text);
   const validateEmail = (text: string) =>
@@ -145,7 +145,7 @@ export default function LoginDetails() {
               <TouchableOpacity
                 onPress={() => setShowDatePicker(true)}
                 style={styles.input}>
-                <Text>
+                <Text style={{color: theme.colors.ternary, fontWeight: 'bold'}}>
                   {dob ? dob.toDateString() : 'Enter your date of birth'}
                 </Text>
               </TouchableOpacity>
@@ -237,9 +237,11 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
+    fontWeight: 'bold',
     height: 50,
     borderWidth: 1,
     borderColor: 'black',
+    color: theme.colors.ternary,
     borderRadius: 10,
     marginBottom: 15,
     paddingHorizontal: 10,

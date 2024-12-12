@@ -15,7 +15,7 @@ import {useAuth} from '../../utils/AuthContext';
 import {Campus} from '../../utils/canonicalModel';
 import {fetchCampusIds} from '../../services/fetchCampusIds';
 import theme from '../../theme';
-import {setCampus} from '../../utils/Storage';
+import {setCampus, setIsNewUser} from '../../utils/Storage';
 
 export default function LoginDetails() {
   const [name, setName] = useState('');

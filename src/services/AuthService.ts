@@ -33,7 +33,7 @@ const sendOtp = async (phoneNumber: string): Promise<any> => {
     .post(
       `${globalConfig.apiBaseUrl}/v1/requestOtp`,
       {
-        mobile: '91' + phoneNumber,
+        mobile: phoneNumber,
       },
       {
         headers: {
@@ -41,6 +41,9 @@ const sendOtp = async (phoneNumber: string): Promise<any> => {
         },
       },
     )
+    .then(response => {
+      return response.data?.response?.verificationId;
+    })
     .catch(error => {
       if (error?.response) {
         // The request was made and the server responded with a status code
@@ -63,6 +66,7 @@ const sendOtp = async (phoneNumber: string): Promise<any> => {
 const VerifyOtp = async (
   phoneNumber: string,
   otp: string,
+  verificationId: string,
 ): Promise<AuthData> => {
   //*********************mock****************
   // return new Promise(resolve => {
@@ -83,8 +87,9 @@ const VerifyOtp = async (
     .post(
       `${globalConfig.apiBaseUrl}/v1/login`,
       {
-        mobile: '91' + phoneNumber,
+        mobile: phoneNumber,
         otp: otp,
+        verificationId: verificationId,
       },
       {
         headers: {

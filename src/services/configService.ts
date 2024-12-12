@@ -5,10 +5,10 @@ import {config} from '../utils/canonicalModel';
 import globalConfig from '../utils/GlobalConfig';
 import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 
-export const fetchConfigs = (): Promise<config> => {
-  const token = fetchToken();
+export const fetchConfigs = async (campus: string): Promise<config> => {
+  const token = await fetchToken();
   return axios
-    .get(`${globalConfig.apiBaseUrl}/v2/configuration`, {
+    .get(`${globalConfig.apiBaseUrl}/v1/campus/${campus}/configuration`, {
       headers: {
         Authorization: token,
       },

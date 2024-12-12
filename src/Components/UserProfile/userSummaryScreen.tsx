@@ -62,7 +62,9 @@ const ProfileScreen = () => {
               />
               <View style={styles.headerText}>
                 <Text style={styles.name}>{userDetails?.user?.userName}</Text>
-                <Text style={styles.phone}>+{userDetails?.user?.mobile}</Text>
+                <Text style={styles.phone}>
+                  +91-{userDetails?.user?.mobile}
+                </Text>
                 <Text style={styles.email}>{userDetails?.user?.emailId}</Text>
               </View>
             </View>
@@ -170,8 +172,8 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   profileImage: {
-    width: 150,
-    height: 150,
+    width: 100,
+    height: 100,
     alignItems: 'center',
   },
   headerText: {

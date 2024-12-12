@@ -12,36 +12,51 @@ import theme from '../../theme';
 import {useAuth} from '../../utils/AuthContext';
 
 type RootStackParamList = {
-  OtpVerification: {phoneNumber: string};
+  OtpVerification: {phoneNumber: string; verificationId: string};
+};
+
+// Timer Component
+const Timer: React.FC<{
+  initialTime: number;
+  onComplete: () => void;
+  key: number;
+  isButtonDisabled: boolean;
+}> = ({initialTime, onComplete, isButtonDisabled}) => {
+  const [time, setTime] = useState(initialTime);
+
+  useEffect(() => {
+    if (time <= 0) {
+      onComplete();
+      return;
+    }
+    const interval = setInterval(() => {
+      setTime(prevTime => prevTime - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [time, onComplete]);
+
+  return (
+    <Text
+      style={
+        isButtonDisabled ? styles.resendTextDisabled : styles.resendTextEnabled
+      }>
+      {time > 0 ? `Resend Code in ${time}s` : 'Resend Code'}
+    </Text>
+  );
 };
 
 const OtpVerificationScreen: React.FC = () => {
-  const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [error, setError] = useState<boolean>(false);
-  const inputRefs = useRef<(TextInput | null)[]>([]);
-
-  const route = useRoute<RouteProp<RootStackParamList, 'OtpVerification'>>();
-  const {phoneNumber} = route.params;
-
-  const [timer, setTimer] = useState<number>(30);
+  const [timerKey, setTimerKey] = useState<number>(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
+  const inputRefs = useRef<(TextInput | null)[]>([]);
+  const route = useRoute<RouteProp<RootStackParamList, 'OtpVerification'>>();
+  const {phoneNumber, verificationId} = route.params;
   const auth = useAuth();
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (timer > 0) {
-      interval = setInterval(() => {
-        setTimer(prevTimer => prevTimer - 1);
-      }, 1000);
-    } else {
-      setIsButtonDisabled(false);
-    }
 
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [timer]);
+  const [otpVerificationId, setOtpVerificationId] =
+    useState<string>(verificationId);
 
   const handleOtpChange = (index: number, value: string) => {
     const newOtp = [...otp];
@@ -53,7 +68,23 @@ const OtpVerificationScreen: React.FC = () => {
     }
   };
 
+  // const handleKeyPress = (index: number, key: string) => {
+  //   console.log('back:', key);
+  //   if (key === 'Backspace') {
+  //     const newOtp = [...otp];
+
+  //     if (otp[index]) {
+  //       newOtp[index] = '';
+  //       setOtp(newOtp);
+  //     } else if (index > 0) {
+  //       inputRefs.current[index - 1]?.focus();
+  //       newOtp[index - 1] = '';
+  //       setOtp(newOtp);
+  //     }
+  //   }
+  // };
   const handleKeyPress = (index: number, key: string) => {
+    console.log('back', key);
     if (key === 'Backspace') {
       const newOtp = [...otp];
 
@@ -61,7 +92,7 @@ const OtpVerificationScreen: React.FC = () => {
         newOtp[index] = '';
         setOtp(newOtp);
       } else if (index > 0) {
-        inputRefs.current[index - 1]?.focus();
+        inputRefs.current[index - 1]?.focus(); // Move focus to the previous input
         newOtp[index - 1] = '';
         setOtp(newOtp);
       }
@@ -70,22 +101,20 @@ const OtpVerificationScreen: React.FC = () => {
 
   const handleLoginPress = async () => {
     const finalOtp = otp.join('');
-    await auth.verifyOtp(phoneNumber, finalOtp).catch(() => {
+    await auth.verifyOtp(phoneNumber, finalOtp, otpVerificationId).catch(() => {
       setError(true);
     });
   };
 
   const handleResendPress = async () => {
-    await auth
-      .sendOtp(phoneNumber)
-      .then(() => {
-        // navigation.navigate('otpverify', {phoneNumber});
-      })
-      .catch(() => {
-        setError(true);
-      });
-    setTimer(60);
+    try {
+      const newVerificationId = await auth.sendOtp(phoneNumber);
+      setOtpVerificationId(newVerificationId);
+    } catch (err) {
+      setError(true);
+    }
     setIsButtonDisabled(true);
+    setTimerKey(prevVal => prevVal + 1);
   };
 
   return (
@@ -113,25 +142,27 @@ const OtpVerificationScreen: React.FC = () => {
         </View>
         <TouchableOpacity
           disabled={isButtonDisabled}
-          onPress={handleResendPress}>
-          <Text
-            style={
-              isButtonDisabled
-                ? styles.resendTextDisabled
-                : styles.resendTextEnabled
-            }>
-            Didn’t get the OTP?{' '}
-            {isButtonDisabled ? `Resend Code in ${timer}s` : 'Resend Code'}
-          </Text>
+          onPress={handleResendPress}
+          style={[
+            isButtonDisabled
+              ? styles.resendTextDisabled
+              : styles.resendTextEnabled,
+          ]}>
+          <Timer
+            initialTime={60}
+            key={timerKey}
+            isButtonDisabled={isButtonDisabled}
+            onComplete={() => setIsButtonDisabled(false)}
+          />
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        {error ? (
+        {error && (
           <Text style={styles.error}>
-            Error ocured while sending otp , please try again later
+            Error occurred while sending OTP, please try again later
           </Text>
-        ) : null}
+        )}
       </View>
     </SafeAreaView>
   );

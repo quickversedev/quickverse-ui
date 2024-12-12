@@ -51,15 +51,13 @@ const LoginScreen: React.FC = () => {
   const handleContinue = async () => {
     if (validate()) {
       setLoading(true);
-      await auth
-        .sendOtp(phoneNumber)
-        .then(() => {
-          navigation.navigate('otpverify', {phoneNumber});
-        })
-        .catch(errorr => {
-          setError(true);
-          console.log('error in phone,', errorr);
-        });
+      try {
+        const verificationId = await auth.sendOtp(phoneNumber);
+        navigation.navigate('otpverify', {phoneNumber, verificationId});
+      } catch (error) {
+        setError(true);
+        console.log('error in phone,', error);
+      }
 
       setLoading(false);
 

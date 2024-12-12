@@ -22,8 +22,12 @@ type AuthContextData = {
   skipLogin?: boolean;
   loading: boolean;
   configs: config | undefined;
-  sendOtp(phoneNumber: string): Promise<void>;
-  verifyOtp(phoneNumber: string, otp: string): Promise<void>;
+  sendOtp(phoneNumber: string): Promise<string>;
+  verifyOtp(
+    phoneNumber: string,
+    otp: string,
+    verificationId: string,
+  ): Promise<void>;
   signOut(): void;
   signUp(
     fullName: string,
@@ -64,15 +68,18 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       const authDataSerialized = storage.getString('@AuthData');
       const logindate = storage.getString('@loginDate');
       const campusId = getCampus();
+      let configData;
+      if (campusId) {
+        configData = await fetchConfigs(campusId);
+        if (configData) {
+          setConfigs(configData);
+        }
+      }
       const skipLoginFlow = getSkipLoginFlow();
       if (authDataSerialized && logindate) {
         const _authData = authDataSerialized;
         setAuthData(_authData);
         setLoggedInDate(logindate);
-        const configData = await fetchConfigs();
-        if (configData) {
-          setConfigs(configData);
-        }
       }
       setSkipLogin(skipLoginFlow);
       setSelectedCampus(campusId);
@@ -85,15 +92,24 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
   const sendOtp = async (_phoneNumber: string) => {
     try {
-      await authService.sendOtp(_phoneNumber);
+      return await authService.sendOtp(_phoneNumber);
     } catch (error) {
       throw error; // Rethrow the error to propagate it to the caller
     }
   };
-  const verifyOtp = async (_phoneNumber: string, otp: string) => {
+  const verifyOtp = async (
+    _phoneNumber: string,
+    otp: string,
+    verificationId: string,
+  ) => {
     try {
-      const _authData = await authService.VerifyOtp(_phoneNumber, otp);
+      const _authData = await authService.VerifyOtp(
+        _phoneNumber,
+        otp,
+        verificationId,
+      );
       const {campus, token, newUser} = _authData?.session;
+      console.log('authdata', _authData);
       if (_authData) {
         setAuthData(token);
         storage.set('@AuthData', token);

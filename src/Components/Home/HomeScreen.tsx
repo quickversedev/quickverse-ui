@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -14,19 +14,22 @@ import PromoDiscounts from './PromoAndDiscount/PromoDiscounts';
 import CampusBuzz from './campusBuzz/CampusBuzz';
 import FeaturedItems from './featuredItems/FeaturedItems';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { getCampus, getIsNewUser, setCampus } from '../../utils/Storage';
-import { fetchCampusIds } from '../../services/fetchCampusIds';
+import {getCampus, getIsNewUser, setCampus} from '../../utils/Storage';
+import {fetchCampusIds} from '../../services/fetchCampusIds';
 import LoginDetails from '../Login/loginDetails';
-import { useAuth } from '../../utils/AuthContext';
+import {useAuth} from '../../utils/AuthContext';
 import HomeButtons from './Homebuttons/HomeButtons';
 import SearchBarScreen from './Searchbar/SearchBarScreen';
+import AppNavigator from '../Cart/Cart_navigator';
 
 const HomeScreen: React.FC = () => {
-  const [selectedCampusId, setSelectedCampusId] = useState<string | undefined>();
+  const [selectedCampusId, setSelectedCampusId] = useState<
+    string | undefined
+  >();
   const [campusOptions, setCampusOptions] = useState<any>();
   const [clicked, setClicked] = useState(false);
   const isFirstTimeLogin = getIsNewUser();
-  const { selectedCampus } = useAuth();
+  const {selectedCampus} = useAuth();
 
   const fetchCampus = async () => {
     const response = await fetchCampusIds();
@@ -61,8 +64,7 @@ const HomeScreen: React.FC = () => {
             style={styles.touchableOpacity}
             onPress={() => {
               setClicked(!clicked);
-            }}
-          >
+            }}>
             <Text style={styles.touchableText}>
               {selectedCampusId === '' ? 'Select Campus' : selectedCampusId}
             </Text>
@@ -85,14 +87,13 @@ const HomeScreen: React.FC = () => {
               <FlatList
                 data={campusOptions}
                 keyExtractor={item => item.value}
-                renderItem={({ item }) => (
+                renderItem={({item}) => (
                   <TouchableOpacity
                     style={styles.listItem}
                     onPress={() => {
                       setSelectedCampusId(item.value);
                       setClicked(!clicked);
-                    }}
-                  >
+                    }}>
                     <Text style={styles.listItemText}>{item.value}</Text>
                   </TouchableOpacity>
                 )}
@@ -102,8 +103,16 @@ const HomeScreen: React.FC = () => {
         </View>
 
         {/* Cart Button */}
-        <TouchableOpacity style={styles.cartButton}>
-          <MaterialCommunityIcons name="cart-outline" size={24} color="#FFDC52" />
+        <TouchableOpacity
+          style={styles.cartButton}
+          onPress={() =>
+            navigation.navigate('CategoriesNavigator', {screen: 'Services'})
+          }>
+          <MaterialCommunityIcons
+            name="cart-outline"
+            size={24}
+            color="#FFDC52"
+          />
         </TouchableOpacity>
       </View>
 
@@ -200,7 +209,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 3,
     marginLeft: 5,

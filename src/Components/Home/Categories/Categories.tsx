@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
 import CartButton from './CartButton'; 
 import theme from '../../../theme';
+import SearchBarScreen from './SearchBarScreen';
 
 // Main Categories component
 const Categories = () => {
@@ -93,6 +94,8 @@ const Categories = () => {
     );
 
     return (
+        <View style={styles.main}>
+            <SearchBarScreen></SearchBarScreen>
         <View style={styles.container}>
             <View style={styles.container1}>
                 <Text style={styles.title}>Categories</Text>
@@ -114,10 +117,15 @@ const Categories = () => {
                 />
             </View>
         </View>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
+    main:{
+        flex: 1,
+        backgroundColor: theme.colors.primary,
+    },
     container: {
         flex: 1,
         flexDirection: 'row',

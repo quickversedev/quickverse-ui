@@ -3,11 +3,12 @@ import {WebView} from 'react-native-webview';
 import CookieManager from '@react-native-cookies/cookies';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, SafeAreaView} from 'react-native';
 import {Loading} from '../Components/util/Loading';
 import {useAuth} from './AuthContext';
 
 import ReloadButton from './RealoadButton';
+import theme from '../theme';
 
 interface WebViewScreenProps {
   url?: string;
@@ -58,6 +59,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
   navigation,
 }) => {
   const [loading, setLoading] = useState(true);
+  const [reloadCount, setReleadCount] = useState(0);
   const {authData, configs} = useAuth();
   const webViewRef = useRef<WebView>(null);
   const Url = url || route?.params?.url;
@@ -67,6 +69,8 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
         headerRight: () => <ReloadButton onPress={reloadWebView} />,
       });
     }
+  });
+  useEffect(() => {
     const effectiveurl = extractHostname(Url);
     const setMultipleCookies = async () => {
       if (authData && effectiveurl) {
@@ -132,7 +136,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
     } else {
       deleteCookies();
     }
-  }, [authData, Url, navigation, configs?.configuration]);
+  }, [authData, Url, navigation, configs?.configuration, reloadCount]);
 
   if (loading) {
     return <Loading />;
@@ -149,11 +153,25 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
 
   const reloadWebView = () => {
     if (webViewRef.current) {
+      setReleadCount(prev => prev + 1);
+      console.log('Reloading WebView...');
       webViewRef.current.reload();
+    } else {
+      console.log('WebView reference is null.');
     }
   };
   return (
-    <WebView ref={webViewRef} source={{uri: Url}} style={styles.webview} />
+    <SafeAreaView style={styles.safeArea}>
+      <WebView
+        ref={ref => {
+          if (ref) {
+            webViewRef.current = ref;
+          }
+        }}
+        source={{uri: Url}}
+        style={styles.webview}
+      />
+    </SafeAreaView>
   );
 };
 const retrieveAuthorizationCookie = async (
@@ -165,6 +183,12 @@ const retrieveAuthorizationCookie = async (
 const styles = StyleSheet.create({
   webview: {
     flex: 1,
+    marginTop: 10,
+    paddingTop: 10,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.primary,
   },
 });
 

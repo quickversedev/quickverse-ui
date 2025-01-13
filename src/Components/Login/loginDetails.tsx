@@ -268,6 +268,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
+    fontWeight: 'bold',
     height: 50,
     borderWidth: 1,
     borderColor: theme.colors.ternary,
@@ -276,7 +277,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     color: theme.colors.ternary,
     justifyContent: 'center',
-    fontWeight: 'bold',
   },
   modalOverlay: {
     flex: 1,

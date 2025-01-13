@@ -177,7 +177,8 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
 const retrieveAuthorizationCookie = async (
   effectiveUrl: string,
 ): Promise<void> => {
-  await getAuthorizationCookie(effectiveUrl);
+  const cookievalue = await getAuthorizationCookie(effectiveUrl);
+  console.log('cookievalue:', cookievalue);
 };
 const styles = StyleSheet.create({
   webview: {

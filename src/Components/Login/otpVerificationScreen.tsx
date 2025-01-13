@@ -6,10 +6,13 @@ import {
   TextInput,
   SafeAreaView,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import theme from '../../theme';
 import {useAuth} from '../../utils/AuthContext';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 type RootStackParamList = {
   OtpVerification: {phoneNumber: string; verificationId: string};
@@ -68,6 +71,21 @@ const OtpVerificationScreen: React.FC = () => {
     }
   };
 
+  // const handleKeyPress = (index: number, key: string) => {
+  //   console.log('back:', key);
+  //   if (key === 'Backspace') {
+  //     const newOtp = [...otp];
+
+  //     if (otp[index]) {
+  //       newOtp[index] = '';
+  //       setOtp(newOtp);
+  //     } else if (index > 0) {
+  //       inputRefs.current[index - 1]?.focus();
+  //       newOtp[index - 1] = '';
+  //       setOtp(newOtp);
+  //     }
+  //   }
+  // };
   const handleKeyPress = (index: number, key: string) => {
     console.log('back', key);
     if (key === 'Backspace') {
@@ -103,53 +121,57 @@ const OtpVerificationScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Text style={styles.header}>OTP Verification</Text>
-        <Text style={styles.subHeader}>
-          We have sent a verification code to {'\n'} +91-{phoneNumber}
-        </Text>
-        <View style={styles.otpContainer}>
-          {otp.map((digit, index) => (
-            <TextInput
-              key={index}
-              ref={el => (inputRefs.current[index] = el)}
-              style={styles.otpInput}
-              maxLength={1}
-              keyboardType="numeric"
-              value={digit}
-              onChangeText={value => handleOtpChange(index, value)}
-              onKeyPress={({nativeEvent}) =>
-                handleKeyPress(index, nativeEvent.key)
-              }
-            />
-          ))}
-        </View>
-        <TouchableOpacity
-          disabled={isButtonDisabled}
-          onPress={handleResendPress}
-          style={[
-            isButtonDisabled
-              ? styles.resendTextDisabled
-              : styles.resendTextEnabled,
-          ]}>
-          <Timer
-            initialTime={60}
-            key={timerKey}
-            isButtonDisabled={isButtonDisabled}
-            onComplete={() => setIsButtonDisabled(false)}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        {error && (
-          <Text style={styles.error}>
-            Error occurred while sending OTP, please try again later
-          </Text>
-        )}
-      </View>
-    </SafeAreaView>
+    <GestureHandlerRootView style={{flex: 1}}>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.container}>
+            <Text style={styles.header}>OTP Verification</Text>
+            <Text style={styles.subHeader}>
+              We have sent a verification code to {'\n'} +91-{phoneNumber}
+            </Text>
+            <View style={styles.otpContainer}>
+              {otp.map((digit, index) => (
+                <TextInput
+                  key={index}
+                  ref={el => (inputRefs.current[index] = el)}
+                  style={styles.otpInput}
+                  maxLength={1}
+                  keyboardType="numeric"
+                  value={digit}
+                  onChangeText={value => handleOtpChange(index, value)}
+                  onKeyPress={({nativeEvent}) =>
+                    handleKeyPress(index, nativeEvent.key)
+                  }
+                />
+              ))}
+            </View>
+            <TouchableOpacity
+              disabled={isButtonDisabled}
+              onPress={handleResendPress}
+              style={[
+                isButtonDisabled
+                  ? styles.resendTextDisabled
+                  : styles.resendTextEnabled,
+              ]}>
+              <Timer
+                initialTime={60}
+                key={timerKey}
+                isButtonDisabled={isButtonDisabled}
+                onComplete={() => setIsButtonDisabled(false)}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+            {error && (
+              <Text style={styles.error}>
+                Error occurred while sending OTP, please try again later
+              </Text>
+            )}
+          </View>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </GestureHandlerRootView>
   );
 };
 

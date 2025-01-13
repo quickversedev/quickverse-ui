@@ -9,6 +9,7 @@ import {
   FlatList,
   Alert,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {useAuth} from '../../utils/AuthContext';
@@ -19,7 +20,7 @@ import {setCampus, setIsNewUser} from '../../utils/Storage';
 
 export default function LoginDetails() {
   const [name, setName] = useState('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [dob, setDob] = useState<Date | undefined>();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [email, setEmail] = useState('');
@@ -28,7 +29,7 @@ export default function LoginDetails() {
   const [modalVisible, setModalVisible] = useState(true);
   const [campusModalVisible, setCampusModalVisible] = useState(false);
   const [fetchError, setFetchError] = useState(false);
-  const [campusLoading, setCampusLoading] = useState<boolean>(false);
+  const [campusLoading, setCampusLoading] = useState(false);
   const auth = useAuth();
   const {setSelectedCampus} = useAuth();
 
@@ -87,16 +88,6 @@ export default function LoginDetails() {
 
     const formattedDob = dob.toISOString().split('T')[0];
     setLoading(true);
-    console.log(
-      'name:' +
-        name +
-        ' camousId:' +
-        campusId +
-        ' email:' +
-        email +
-        ' dob:' +
-        formattedDob,
-    );
     try {
       await auth.signUp(name, campusId, email, formattedDob);
       Alert.alert('Success', 'Your details have been submitted successfully.');
@@ -136,49 +127,24 @@ export default function LoginDetails() {
             </Text>
           </TouchableOpacity>
           {showDatePicker && (
-            <Modal
-              transparent={true}
-              animationType="fade"
-              visible={showDatePicker}
-              onRequestClose={() => setShowDatePicker(false)} // Handle hardware back button on Android
-            >
-              <TouchableOpacity
-                style={styles.modalOverlay}
-                activeOpacity={1}
-                onPress={() => setShowDatePicker(false)} // Close on background press
-              >
-                <View style={styles.datePickerContainer}>
-                  <DateTimePicker
-                    value={dob || new Date()}
-                    mode="date"
-                    display="spinner" // iOS-friendly display
-                    onChange={(event, selectedDate) => {
-                      if (event.type !== 'dismissed') {
-                        setDob(selectedDate || dob); // Set selected date
-                      }
-                    }}
-                    maximumDate={new Date()}
-                  />
-                  <View style={styles.datePickerButtons}>
-                    <TouchableOpacity
-                      style={styles.datePickerButton}
-                      onPress={() => setShowDatePicker(false)} // Cancel without saving
-                    >
-                      <Text style={styles.datePickerButtonText}>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.datePickerButton}
-                      onPress={() => {
-                        setShowDatePicker(false); // Close modal
-                        // Finalize the selected date (already set via spinner)
-                      }}>
-                      <Text style={styles.datePickerButtonText}>Select</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </Modal>
+            <DateTimePicker
+              value={dob || new Date()}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={(event, selectedDate) => {
+                if (Platform.OS === 'android') {
+                  setShowDatePicker(false);
+                  if (event.type !== 'dismissed') {
+                    setDob(selectedDate || dob);
+                  }
+                } else {
+                  setDob(selectedDate || dob);
+                }
+              }}
+              maximumDate={new Date()}
+            />
           )}
+
           {/* Email Input */}
           <TextInput
             style={styles.input}
@@ -235,6 +201,7 @@ export default function LoginDetails() {
               <FlatList
                 data={campusList}
                 keyExtractor={item => item.campusId}
+                keyboardShouldPersistTaps="handled"
                 renderItem={({item}) => (
                   <TouchableOpacity
                     style={styles.campusOption}

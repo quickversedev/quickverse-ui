@@ -62,9 +62,7 @@ const ProfileScreen = () => {
               />
               <View style={styles.headerText}>
                 <Text style={styles.name}>{userDetails?.user?.userName}</Text>
-                <Text style={styles.phone}>
-                  +91-{userDetails?.user?.mobile}
-                </Text>
+                <Text style={styles.phone}>{userDetails?.user?.mobile}</Text>
                 <Text style={styles.email}>{userDetails?.user?.emailId}</Text>
               </View>
             </View>

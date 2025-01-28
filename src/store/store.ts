@@ -11,6 +11,8 @@ import cartSlice from '../services/cartSlice';
 // import laundryProducts from '../services/laundryProductsSlice';
 import laundryProductsReducer from '../services/laundryProductsSlice';
 import addressSlice from '../services/addressSclice';
+import categoriesSlice from '../services/categorySlice';
+import productsSlice from '../services/productSlice';
 
 const store = configureStore({
   reducer: {
@@ -22,6 +24,8 @@ const store = configureStore({
     cart: cartSlice,
     laundryProducts: laundryProductsReducer,
     address: addressSlice,
+    categories: categoriesSlice,
+    products: productsSlice,
   },
 });
 

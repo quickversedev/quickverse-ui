@@ -4,19 +4,18 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Provider as PaperProvider} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../theme';
-import OrderDetailsScreen from '../OrderSummary';
-import globalConfig from '../../utils/GlobalConfig';
 import VendorsNavigator from '../Vendors/VendorsNavigator';
 import HomeNavigation from '../Home/HomeNavigation';
 import ProfileNavigation from '../UserProfile/profileNavigation';
 import {Platform} from 'react-native';
 import Laundry from '../Laundry/Laundry';
 import {useAuth} from '../../utils/AuthContext';
+import OrdersNavigation from '../Orders/OrdersNavigator';
 // import PharmacyScreen from '../pharmacy/Pharmacy';
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
-  const {configs} = useAuth();
+  const {configs, authData} = useAuth();
   const laundryEnabled = configs?.configuration?.isLaundryEnabled;
   // const isPharmacyAvailable = configs?.configuration?.isLaundryEnabled;
   return (
@@ -47,25 +46,7 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
-        {globalConfig.OrderSummeryEnabled ? (
-          <Tab.Screen
-            name="Order Summary"
-            component={OrderDetailsScreen}
-            options={{
-              tabBarIcon: ({focused, color}) => (
-                <MaterialCommunityIcons
-                  name={
-                    focused ? 'food-takeout-box' : 'food-takeout-box-outline'
-                  }
-                  color={color}
-                  size={focused ? 36 : 26}
-                />
-              ),
-            }}
-          />
-        ) : (
-          <></>
-        )}
+
         <Tab.Screen
           name="Vendors"
           component={VendorsNavigator}
@@ -93,6 +74,26 @@ const LoggedIn: React.FC = () => {
               ),
             }}
           />
+        )}
+        {authData ? (
+          <Tab.Screen
+            name="Orders"
+            component={OrdersNavigation}
+            options={{
+              tabBarIcon: ({focused, color}) => (
+                <MaterialCommunityIcons
+                  name={
+                    focused ? 'food-takeout-box' : 'food-takeout-box-outline'
+                  }
+                  color={color}
+                  size={focused ? 36 : 26}
+                />
+              ),
+              tabBarLabel: 'Orders',
+            }}
+          />
+        ) : (
+          <></>
         )}
         {/* {isPharmacyAvailable && (
           <Tab.Screen

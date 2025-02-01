@@ -13,7 +13,6 @@ import laundryProductsReducer from '../services/laundryProductsSlice';
 import addressSlice from '../services/addressSclice';
 import categoriesSlice from '../services/categorySlice';
 import productsSlice from '../services/productSlice';
-
 import OrdersSlice from '../services/OrdersSlice';
 import productCartSlice from '../services/productCartSlice';
 const store = configureStore({

@@ -8,8 +8,27 @@ import {
   Image,
 } from 'react-native';
 
-const CartListScreen = ({cartItems, handleIncrement, handleDecrement}) => {
-  const renderItem = ({item}) => (
+interface CartItem {
+  id: string;
+  image: string;
+  name: string;
+  restaurant: string;
+  price: number;
+  quantity: number;
+}
+
+interface CartListScreenProps {
+  cartItems: CartItem[];
+  handleIncrement: (id: string) => void;
+  handleDecrement: (id: string) => void;
+}
+
+const CartListScreen: React.FC<CartListScreenProps> = ({
+  cartItems,
+  handleIncrement,
+  handleDecrement,
+}) => {
+  const renderItem = ({item}: {item: CartItem}) => (
     <View style={styles.itemContainer}>
       <Image source={{uri: item.image}} style={styles.itemImage} />
       <View style={styles.itemDetails}>
@@ -52,6 +71,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5, // For Android
   },
   itemImage: {
     width: 60,

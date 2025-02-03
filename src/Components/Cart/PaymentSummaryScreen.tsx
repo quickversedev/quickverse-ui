@@ -1,8 +1,15 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import CheckoutScreen from '../Checkout/CheckoutScreen';
+import theme from '../../theme';
 
-const PaymentSummaryScreen = ({getTotalPrice, navigation}) => {
+interface PaymentSummaryScreenProps {
+  getTotalPrice: () => number;
+}
+
+const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
+  getTotalPrice,
+}) => {
   return (
     <View style={styles.paymentSummary}>
       <Text style={styles.paymentSummaryText}>Payment Summary</Text>
@@ -10,7 +17,7 @@ const PaymentSummaryScreen = ({getTotalPrice, navigation}) => {
         <Text style={styles.paymentLabel}>Order Total</Text>
         <Text style={styles.paymentValue}>Rs.{getTotalPrice()}</Text>
       </View>
-      <View style={styles.paymentRow}>
+      {/* <View style={styles.paymentRow}>
         <Text style={styles.paymentLabel}>Items Discount</Text>
         <Text style={styles.paymentValue}>Rs.0</Text>
       </View>
@@ -21,7 +28,7 @@ const PaymentSummaryScreen = ({getTotalPrice, navigation}) => {
       <View style={styles.paymentRow}>
         <Text style={styles.paymentLabel}>Shipping</Text>
         <Text style={styles.paymentValue}>Rs.0</Text>
-      </View>
+      </View>*/}
       <View style={styles.totalRow}>
         <Text style={styles.totalLabel}>Total</Text>
         <Text style={styles.totalValue}>Rs.{getTotalPrice()}</Text>
@@ -36,12 +43,28 @@ const PaymentSummaryScreen = ({getTotalPrice, navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  // Add the styles used in the payment summary section here
   paymentSummary: {
-    backgroundColor: '#fcefb6',
+    backgroundColor: theme.colors.primary,
     padding: 20,
     borderRadius: 10,
     marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5, // For Android
+  },
+  placeOrderButton: {
+    backgroundColor: theme.colors.secondary,
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5, // For Android
   },
   paymentSummaryText: {
     fontSize: 20,
@@ -77,17 +100,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
   },
-  placeOrderButton: {
-    backgroundColor: 'lightgray',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-    alignItems: 'center',
-  },
+
   placeOrderButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'black',
+    color: theme.colors.primary,
   },
 });
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -7,6 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
   Text,
+  Animated,
 } from 'react-native';
 import theme from '../../theme';
 import HomeScreenVendors from './homeVendors/HomeScreenVendors';
@@ -20,7 +21,7 @@ import LoginDetails from '../Login/loginDetails';
 import {useAuth} from '../../utils/AuthContext';
 import HomeButtons from './Homebuttons/HomeButtons';
 import SearchBarScreen from './Searchbar/SearchBarScreen';
-import AppNavigator from '../Cart/Cart_navigator';
+import CartScreen from '../Cart/CartScreen';
 
 const HomeScreen: React.FC = () => {
   const [selectedCampusId, setSelectedCampusId] = useState<
@@ -28,9 +29,18 @@ const HomeScreen: React.FC = () => {
   >();
   const [campusOptions, setCampusOptions] = useState<any>();
   const [clicked, setClicked] = useState(false);
+  const [openCart, setOpenCart] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const isFirstTimeLogin = getIsNewUser();
   const {selectedCampus} = useAuth();
-
+  const animationValue = useRef(new Animated.Value(1000)).current;
+  const closeCartModal = () => {
+    Animated.timing(animationValue, {
+      toValue: 1000,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => setModalVisible(false));
+  };
   const fetchCampus = async () => {
     const response = await fetchCampusIds();
     const campusOption = response?.map(campus => ({
@@ -57,75 +67,78 @@ const HomeScreen: React.FC = () => {
   }, [selectedCampus]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <View style={styles.campusSelector}>
-          <TouchableOpacity
-            style={styles.touchableOpacity}
-            onPress={() => {
-              setClicked(!clicked);
-            }}>
-            <Text style={styles.touchableText}>
-              {selectedCampusId === '' ? 'Select Campus' : selectedCampusId}
-            </Text>
-            {clicked ? (
-              <MaterialCommunityIcons
-                name="chevron-up"
-                size={20}
-                color={theme.colors.ternary}
-              />
-            ) : (
-              <MaterialCommunityIcons
-                name="chevron-down"
-                size={20}
-                color={theme.colors.ternary}
-              />
-            )}
-          </TouchableOpacity>
-          {clicked && (
-            <View style={styles.dropdownContainer}>
-              <FlatList
-                data={campusOptions}
-                keyExtractor={item => item.value}
-                renderItem={({item}) => (
-                  <TouchableOpacity
-                    style={styles.listItem}
-                    onPress={() => {
-                      setSelectedCampusId(item.value);
-                      setClicked(!clicked);
-                    }}>
-                    <Text style={styles.listItemText}>{item.value}</Text>
-                  </TouchableOpacity>
+    <>
+      <SafeAreaView style={styles.container}>
+        <>
+          <View style={styles.headerContainer}>
+            <View style={styles.campusSelector}>
+              <TouchableOpacity
+                style={styles.touchableOpacity}
+                onPress={() => {
+                  setClicked(!clicked);
+                }}>
+                <Text style={styles.touchableText}>
+                  {selectedCampusId === '' ? 'Select Campus' : selectedCampusId}
+                </Text>
+                {clicked ? (
+                  <MaterialCommunityIcons
+                    name="chevron-up"
+                    size={20}
+                    color={theme.colors.ternary}
+                  />
+                ) : (
+                  <MaterialCommunityIcons
+                    name="chevron-down"
+                    size={20}
+                    color={theme.colors.ternary}
+                  />
                 )}
-              />
+              </TouchableOpacity>
+              {clicked && (
+                <View style={styles.dropdownContainer}>
+                  <FlatList
+                    data={campusOptions}
+                    keyExtractor={item => item.value}
+                    renderItem={({item}) => (
+                      <TouchableOpacity
+                        style={styles.listItem}
+                        onPress={() => {
+                          setSelectedCampusId(item.value);
+                          setClicked(!clicked);
+                        }}>
+                        <Text style={styles.listItemText}>{item.value}</Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+                </View>
+              )}
             </View>
-          )}
-        </View>
 
-        {/* Cart Button */}
-        <TouchableOpacity
-          style={styles.cartButton}
-          onPress={() =>
-            navigation.navigate('CategoriesNavigator', {screen: 'Services'})
-          }>
-          <MaterialCommunityIcons
-            name="cart-outline"
-            size={24}
-            color="#FFDC52"
-          />
-        </TouchableOpacity>
-      </View>
+            {/* Cart Button */}
+            <TouchableOpacity
+              style={styles.cartButton}
+              onPress={() => setModalVisible(true)}>
+              <MaterialCommunityIcons
+                name="cart-outline"
+                size={24}
+                color="#FFDC52"
+              />
+            </TouchableOpacity>
+          </View>
 
-      {isFirstTimeLogin && <LoginDetails />}
-      <ScrollView style={styles.scrollView}>
-        <SearchBarScreen />
-        <HomeButtons />
-        <PromoDiscounts campus={selectedCampusId} />
-        <FeaturedItems campus={selectedCampusId} />
-        <HomeScreenVendors campus={selectedCampusId} />
-        <CampusBuzz campus={selectedCampusId} />
-      </ScrollView>
-    </SafeAreaView>
+          {isFirstTimeLogin && <LoginDetails />}
+          <ScrollView style={styles.scrollView}>
+            <SearchBarScreen />
+            <HomeButtons />
+            <PromoDiscounts campus={selectedCampusId} />
+            <FeaturedItems campus={selectedCampusId} />
+            <HomeScreenVendors campus={selectedCampusId} />
+            <CampusBuzz campus={selectedCampusId} />
+          </ScrollView>
+        </>
+      </SafeAreaView>
+      <CartScreen modalVisible={modalVisible} closeCartModal={closeCartModal} />
+    </>
   );
 };
 

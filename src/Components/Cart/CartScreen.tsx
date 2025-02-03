@@ -1,44 +1,43 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Animated,
+  Modal,
+} from 'react-native';
 import CartListScreen from '../Cart/CartListScreen';
 import PaymentSummaryScreen from '../Cart/PaymentSummaryScreen';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import theme from '../../theme';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../../store/store';
+import {
+  decrementProductQuantity,
+  incrementProductQuantity,
+} from '../../services/productCartSlice';
 
-const initialCartItems = [
-  {
-    id: '1',
-    name: 'Hakka Noodles',
-    restaurant: 'Paaji Ki Rasoi',
-    price: 140,
-    quantity: 1,
-    image: 'https://via.placeholder.com/50', // Replace with actual image URL
-  },
-  {
-    id: '2',
-    name: 'Veg Biryani',
-    restaurant: 'Paaji Ki Rasoi',
-    price: 120,
-    quantity: 1,
-    image: 'https://via.placeholder.com/50', // Replace with actual image URL
-  },
-];
-
-const CartScreen = ({navigation}) => {
-  const [cartItems, setCartItems] = useState(initialCartItems);
-
+interface CartModalProps {
+  modalVisible: boolean;
+  closeCartModal: () => void;
+}
+const CartScreen: React.FC<CartModalProps> = ({
+  modalVisible,
+  closeCartModal,
+}) => {
+  const cartItems = useSelector(
+    (state: RootState) => state.productCart.productCart,
+  );
+  const animationValue = new Animated.Value(0); // Define animationValue
+  const dispatch = useDispatch<AppDispatch>();
   const handleIncrement = (itemId: string) => {
-    const updatedCartItems = cartItems.map(item =>
-      item.id === itemId ? {...item, quantity: item.quantity + 1} : item,
-    );
-    setCartItems(updatedCartItems);
+    dispatch(incrementProductQuantity({id: itemId}));
   };
 
   const handleDecrement = (itemId: string) => {
-    const updatedCartItems = cartItems
-      .map(item =>
-        item.id === itemId ? {...item, quantity: item.quantity - 1} : item,
-      )
-      .filter(item => item.quantity > 0);
-    setCartItems(updatedCartItems);
+    dispatch(decrementProductQuantity({id: itemId}));
   };
 
   const getTotalPrice = () => {
@@ -47,44 +46,55 @@ const CartScreen = ({navigation}) => {
       0,
     );
   };
-
+  console.log('cartItems', cartItems);
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Your Cart</Text>
-      <View style={styles.cartHeader}>
+    <Modal
+      transparent={true}
+      visible={modalVisible}
+      animationType="none"
+      onRequestClose={closeCartModal}>
+      <TouchableWithoutFeedback onPress={closeCartModal}>
+        <View style={styles.modalOverlay} />
+      </TouchableWithoutFeedback>
+      <Animated.View
+        style={[
+          styles.modalContent,
+          {
+            transform: [
+              {
+                translateY: animationValue,
+              },
+            ],
+          },
+        ]}>
+        <View style={styles.cartHeader}>
+          <Text style={styles.header}>Your Cart</Text>
+          <TouchableOpacity onPress={closeCartModal}>
+            <MaterialCommunityIcons name="close" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
         <Text style={styles.subHeader}>
           {cartItems.length} Items in your cart
         </Text>
-        <TouchableOpacity
-          style={styles.addMoreButton}
-          onPress={() => navigation.navigate('Home')}>
-          <Text style={styles.addMoreButtonText}>+ Add more</Text>
-        </TouchableOpacity>
-      </View>
-      <CartListScreen
-        cartItems={cartItems}
-        handleIncrement={handleIncrement}
-        handleDecrement={handleDecrement}
-      />
-      <PaymentSummaryScreen
-        getTotalPrice={getTotalPrice}
-        navigation={navigation}
-      />
-    </View>
+
+        <CartListScreen
+          cartItems={cartItems}
+          handleIncrement={handleIncrement}
+          handleDecrement={handleDecrement}
+        />
+        <PaymentSummaryScreen getTotalPrice={getTotalPrice} />
+      </Animated.View>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
   // Add the shared styles here
-  container: {
-    flex: 1,
-    backgroundColor: '#FFDC52',
-    padding: 20,
-  },
+
   header: {
     fontSize: 34,
     fontWeight: 'bold',
-    color: 'darkblue',
+    color: theme.colors.secondary,
     marginBottom: 5,
   },
   cartHeader: {
@@ -97,15 +107,24 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'darkblue',
   },
-  addMoreButton: {
-    backgroundColor: 'lightgray',
-    padding: 10,
-    borderRadius: 5,
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  addMoreButtonText: {
-    color: 'black',
-    fontWeight: 'bold',
-    fontSize: 16,
+  modalContent: {
+    width: '100%',
+    height: '90%',
+    backgroundColor: theme.colors.primary,
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
   },
 });
 

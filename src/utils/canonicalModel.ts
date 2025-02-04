@@ -88,3 +88,28 @@ export interface Address {
     concatenatedAddress: string;
   };
 }
+export interface OrderMetadata {
+  storeName: string;
+  productId: string;
+  estimatedDeliveryDate: string | number | Date;
+  deliverydate: string | number | Date;
+  orderId: string;
+  customerId: number;
+  customerName: string;
+  customerMobileNumber: number;
+  customerDeliveryAddress: string | null;
+  state: string;
+  totalOrderAmount: number;
+  totalItemCount: number;
+  totalProductCount: number;
+  totalInvoiceAmount: number;
+  fulfillmentOption: string;
+  creationTime: string;
+  productImageUrls: string[];
+  stateLabel: string;
+  orderDescription: string;
+  orderLink: string;
+}
+export interface OrdersResponse {
+  ordersMetadata: OrderMetadata[];
+}

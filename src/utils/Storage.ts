@@ -4,6 +4,18 @@ import {Address} from './canonicalModel';
 
 export const storage = new MMKV();
 
+export const saveCart = (cart: any[]) => {
+  storage.set('cart', JSON.stringify(cart));
+};
+
+export const getCart = (): any[] => {
+  const cartString = storage.getString('cart');
+  return cartString ? JSON.parse(cartString) : [];
+};
+
+export const clearCart = () => {
+  storage.delete('cart');
+};
 export const setIsNewUser = (newUser: boolean): void => {
   storage.set('@isNewUser', newUser);
 };

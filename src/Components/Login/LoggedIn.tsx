@@ -17,7 +17,7 @@ import Categories from '../Categories/Categories';
 const Tab = createBottomTabNavigator();
 
 const LoggedIn: React.FC = () => {
-  const {configs} = useAuth();
+  const {configs, authData} = useAuth();
   const laundryEnabled = configs?.configuration?.isLaundryEnabled;
   // const isPharmacyAvailable = configs?.configuration?.isLaundryEnabled;
   return (
@@ -94,6 +94,26 @@ const LoggedIn: React.FC = () => {
               ),
             }}
           />
+        )}
+        {authData ? (
+          <Tab.Screen
+            name="Orders"
+            component={OrdersNavigation}
+            options={{
+              tabBarIcon: ({focused, color}) => (
+                <MaterialCommunityIcons
+                  name={
+                    focused ? 'food-takeout-box' : 'food-takeout-box-outline'
+                  }
+                  color={color}
+                  size={focused ? 36 : 26}
+                />
+              ),
+              tabBarLabel: 'Orders',
+            }}
+          />
+        ) : (
+          <></>
         )}
         {/* {isPharmacyAvailable && (
           <Tab.Screen

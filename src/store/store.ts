@@ -14,6 +14,8 @@ import addressSlice from '../services/addressSclice';
 import categoriesSlice from '../services/categorySlice';
 import productsSlice from '../services/productSlice';
 
+import OrdersSlice from '../services/OrdersSlice';
+import productCartSlice from '../services/productCartSlice';
 const store = configureStore({
   reducer: {
     vendorList: VendorListSlice,
@@ -26,6 +28,8 @@ const store = configureStore({
     address: addressSlice,
     categories: categoriesSlice,
     products: productsSlice,
+    orders: OrdersSlice,
+    productCart: productCartSlice,
   },
 });
 
@@ -33,6 +37,3 @@ export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
 export default store;
-function addressReducer(state: unknown, action: UnknownAction): unknown {
-  throw new Error('Function not implemented.');
-}

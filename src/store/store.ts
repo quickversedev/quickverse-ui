@@ -12,7 +12,7 @@ import cartSlice from '../services/cartSlice';
 import laundryProductsReducer from '../services/laundryProductsSlice';
 import addressSlice from '../services/addressSclice';
 import OrdersSlice from '../services/OrdersSlice';
-
+import productCartSlice from '../services/productCartSlice';
 const store = configureStore({
   reducer: {
     vendorList: VendorListSlice,
@@ -24,6 +24,7 @@ const store = configureStore({
     laundryProducts: laundryProductsReducer,
     address: addressSlice,
     orders: OrdersSlice,
+    productCart: productCartSlice,
   },
 });
 

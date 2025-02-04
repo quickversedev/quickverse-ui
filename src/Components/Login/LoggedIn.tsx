@@ -60,7 +60,7 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
-        {true && (
+        {laundryEnabled && (
           <Tab.Screen
             name="Laundry"
             component={Laundry}
@@ -75,7 +75,7 @@ const LoggedIn: React.FC = () => {
             }}
           />
         )}
-        {true ? (
+        {authData ? (
           <Tab.Screen
             name="Orders"
             component={OrdersNavigation}

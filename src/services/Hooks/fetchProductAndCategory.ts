@@ -38,7 +38,7 @@ export const useFetchProductsAndCategories =
     // Combined loading and error states
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    console.log('products', products);
+    // console.log('products', products);
     useEffect(() => {
       // Dispatch both fetch actions
       const fetchData = async () => {

@@ -39,6 +39,7 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
           styles.placeOrderButton,
           {backgroundColor: isCartEmpty ? 'gray' : theme.colors.secondary},
         ]}
+        disabled={isCartEmpty}
         onPress={() => navigation.navigate('CheckoutScreen')}>
         <Text style={styles.placeOrderButtonText}>Place Order</Text>
       </TouchableOpacity>

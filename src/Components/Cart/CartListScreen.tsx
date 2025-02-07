@@ -7,6 +7,10 @@ import {
   FlatList,
   Image,
 } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import theme from '../../theme';
+import {ProductCartItems} from '../../utils/canonicalModel';
 
 interface CartItem {
   id: string;
@@ -18,15 +22,17 @@ interface CartItem {
 }
 
 interface CartListScreenProps {
-  cartItems: CartItem[];
+  cartItems: ProductCartItems[];
   handleIncrement: (id: string) => void;
   handleDecrement: (id: string) => void;
+  handleDelete: (id: string) => void;
 }
 
 const CartListScreen: React.FC<CartListScreenProps> = ({
   cartItems,
   handleIncrement,
   handleDecrement,
+  handleDelete,
 }) => {
   const renderItem = ({item}: {item: CartItem}) => (
     <View style={styles.itemContainer}>
@@ -49,6 +55,15 @@ const CartListScreen: React.FC<CartListScreenProps> = ({
           <Text style={styles.quantityButtonText}>+</Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => handleDelete(item.id)}>
+        <MaterialCommunityIcons
+          name="delete"
+          size={24}
+          color={theme.colors.secondary}
+        />
+      </TouchableOpacity>
     </View>
   );
 
@@ -63,7 +78,6 @@ const CartListScreen: React.FC<CartListScreenProps> = ({
 };
 
 const styles = StyleSheet.create({
-  // Add the styles used in the cart list section here
   itemContainer: {
     flexDirection: 'row',
     backgroundColor: '#fcefb6',
@@ -75,7 +89,8 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.2,
     shadowRadius: 5,
-    elevation: 5, // For Android
+    elevation: 5,
+    position: 'relative',
   },
   itemImage: {
     width: 60,
@@ -103,25 +118,26 @@ const styles = StyleSheet.create({
   },
   quantityContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    // alignItems: 'center',
+    marginTop: 35,
   },
   quantityButton: {
     borderRadius: 15,
-    width: 30,
-    height: 30,
+    width: 25,
+    height: 25,
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 5,
   },
   decrementButton: {
-    backgroundColor: 'red',
+    backgroundColor: theme.colors.secondary,
   },
   incrementButton: {
     backgroundColor: 'green',
   },
   quantityButtonText: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 16,
   },
   quantity: {
     color: 'black',
@@ -130,6 +146,11 @@ const styles = StyleSheet.create({
   },
   cartList: {
     marginVertical: 20,
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
 });
 

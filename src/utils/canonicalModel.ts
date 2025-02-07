@@ -113,3 +113,11 @@ export interface OrderMetadata {
 export interface OrdersResponse {
   ordersMetadata: OrderMetadata[];
 }
+export interface ProductCartItems {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  shopId: string; // Ensure each item has a shopId
+}

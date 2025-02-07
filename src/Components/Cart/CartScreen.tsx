@@ -17,6 +17,8 @@ import {AppDispatch, RootState} from '../../store/store';
 import {
   decrementProductQuantity,
   incrementProductQuantity,
+  removeFromProductCart,
+  selectShopId,
 } from '../../services/productCartSlice';
 
 interface CartModalProps {
@@ -30,6 +32,9 @@ const CartScreen: React.FC<CartModalProps> = ({
   const cartItems = useSelector(
     (state: RootState) => state.productCart.productCart,
   );
+
+  const shopId = useSelector(selectShopId);
+  console.log('shopId', shopId + 'cartItems', cartItems);
   const animationValue = new Animated.Value(0); // Define animationValue
   const dispatch = useDispatch<AppDispatch>();
   const handleIncrement = (itemId: string) => {
@@ -39,14 +44,16 @@ const CartScreen: React.FC<CartModalProps> = ({
   const handleDecrement = (itemId: string) => {
     dispatch(decrementProductQuantity({id: itemId}));
   };
-
+  const handleDelete = (itemId: string) => {
+    dispatch(removeFromProductCart({id: itemId}));
+  };
   const getTotalPrice = () => {
     return cartItems.reduce(
       (total, item) => total + item.price * item.quantity,
       0,
     );
   };
-  console.log('cartItems', cartItems);
+  console.log('cartItems from cart', cartItems);
   return (
     <Modal
       transparent={true}
@@ -81,6 +88,7 @@ const CartScreen: React.FC<CartModalProps> = ({
           cartItems={cartItems}
           handleIncrement={handleIncrement}
           handleDecrement={handleDecrement}
+          handleDelete={handleDelete}
         />
         <PaymentSummaryScreen getTotalPrice={getTotalPrice} />
       </Animated.View>

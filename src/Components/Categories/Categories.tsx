@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,19 +6,62 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  Animated,
+  Platform,
+  SafeAreaView,
 } from 'react-native';
 
 import CartButton from './CartButton';
 import theme from '../../theme';
 import {useFetchProductsAndCategories} from '../../services/Hooks/fetchProductAndCategory';
-// import SearchBarScreen from './SearchBarScreen';
+import {ProductCartItems} from '../../utils/canonicalModel';
+import {Product} from '../../data/mockProductData';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  addToProductCart,
+  decrementProductQuantity,
+  incrementProductQuantity,
+  selectCart,
+  selectShopId,
+} from '../../services/productCartSlice';
+import {Category} from '../../data/mockCategoriesData';
+import CartScreen from '../Cart/CartScreen';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// Main Categories component
 const Categories = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [cartCounts, setCartCounts] = useState<{[key: string]: number}>({});
   const {products, categories, loading, error} =
     useFetchProductsAndCategories();
+  const dispatch = useDispatch();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    categories[0]?.id,
+  );
+  const [cartItems, setCartItems] = useState<{[key: string]: ProductCartItems}>(
+    {},
+  );
+  const [modalVisible, setModalVisible] = useState(false);
+  const animationValue = useRef(new Animated.Value(1000)).current;
+  const closeCartModal = () => {
+    Animated.timing(animationValue, {
+      toValue: 1000,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => setModalVisible(false));
+  };
+  const cart = useSelector(selectCart);
+  const shopId = useSelector(selectShopId);
+
+  useEffect(() => {
+    setCartItems(
+      cart.reduce<{[key: string]: ProductCartItems}>((acc, item) => {
+        acc[item.id] = item;
+        return acc;
+      }, {}),
+    );
+  }, [cart]);
+
+  useEffect(() => {
+    setSelectedCategory(categories[0]?.id);
+  }, [categories]);
 
   if (error) {
     return (
@@ -35,109 +78,124 @@ const Categories = () => {
       </View>
     );
   }
+
   const handleCategoryPress = (categoryId: string) => {
     setSelectedCategory(categoryId);
   };
-  console.log('selected categories', selectedCategory);
-  // Add a product to the cart
-  const handleAddToCart = (productId: string) => {
-    setCartCounts(prevCounts => ({
-      ...prevCounts,
-      [productId]: (prevCounts[productId] || 0) + 1,
+
+  const handleAddToCart = (product: ProductCartItems) => {
+    setCartItems(prevItems => ({
+      ...prevItems,
+      [product.id]: {
+        ...product,
+        quantity: (prevItems[product.id]?.quantity || 0) + 1,
+      },
     }));
+    dispatch(
+      addToProductCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        image: product.image,
+        shopId: product.shopId,
+      }),
+    );
   };
 
-  // Increase product quantity in the cart
   const handleIncreaseQuantity = (productId: string) => {
-    setCartCounts(prevCounts => ({
-      ...prevCounts,
-      [productId]: (prevCounts[productId] || 0) + 1,
-    }));
+    dispatch(incrementProductQuantity({id: productId}));
   };
 
-  // Decrease product quantity in the cart
   const handleDecreaseQuantity = (productId: string) => {
-    setCartCounts(prevCounts => {
-      const newCount = Math.max((prevCounts[productId] || 0) - 1, 0);
-      return {
-        ...prevCounts,
-        [productId]: newCount,
-      };
-    });
+    dispatch(decrementProductQuantity({id: productId}));
   };
 
-  // Filter products by selected category
   const filteredProducts = selectedCategory
     ? products.filter(product => product.category === selectedCategory)
     : products;
-  // console.log('filtered products', products);
-  // Render a single category item
-  const renderCategoryItem = ({
-    item,
-  }: {
-    item: {id: string; name: string; imageURLs: string[]};
-  }) => (
-    <TouchableOpacity
-      style={styles.categoryContainer}
-      onPress={() => handleCategoryPress(item.id)}>
-      <Image
-        source={{uri: item?.imageURLs[0]}}
-        style={styles.categoryImage}
-        resizeMode="cover"
-      />
-      <Text style={styles.categoryName}>{item.name}</Text>
-    </TouchableOpacity>
-  );
 
-  // Render a single product item
-  const renderProductItem = ({
-    item,
-  }: {
-    item: {
-      sku: string;
-      name: string;
-      productImageUrl: string;
-      sellingPrice: number;
-      category: string;
+  const renderCategoryItem = ({item}: {item: Category}) => {
+    const isSelected = item.id === selectedCategory;
+
+    return (
+      <TouchableOpacity
+        style={[
+          styles.categoryContainer,
+          isSelected && styles.selectedCategoryContainer, // Apply selected style
+        ]}
+        onPress={() => handleCategoryPress(item.id)}>
+        <Image
+          source={{uri: item.imageURLs[0]}}
+          style={styles.categoryImage}
+          resizeMode="cover"
+        />
+        <Text style={styles.categoryName}>{item.name}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderProductItem = ({item}: {item: Product}) => {
+    const product: ProductCartItems = {
+      id: item.sku,
+      name: item.name,
+      price: item.sellingPrice,
+      quantity: cartItems[item.sku]?.quantity || 0,
+      image: item.productImageUrl,
+      shopId: item.shopId,
     };
-  }) => (
-    <View style={styles.productContainer}>
-      <Image
-        source={{uri: item.productImageUrl}}
-        style={styles.productImage}
-        resizeMode="cover"
-      />
-      <View style={styles.productDetails}>
-        <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productPrice}>₹{item.sellingPrice}</Text>
-        <Text style={styles.productRating}>R: N/A</Text>
-      </View>
 
-      <CartButton
-        quantity={cartCounts[item.sku] || 0}
-        onIncrease={() => handleIncreaseQuantity(item.sku)}
-        onDecrease={() => handleDecreaseQuantity(item.sku)}
-        onAdd={() => handleAddToCart(item.sku)}
-        added={cartCounts[item.sku] > 0}
-      />
-    </View>
-  );
-  // console.log('categories', filteredProducts);
+    return (
+      <View style={styles.productContainer}>
+        <Image
+          source={{uri: product.image}}
+          style={styles.productImage}
+          resizeMode="cover"
+        />
+        <View style={styles.productDetails}>
+          <Text style={styles.productName}>{product.name}</Text>
+          <Text style={styles.productPrice}>₹{product.price}</Text>
+          <Text style={styles.productRating}>R: N/A</Text>
+        </View>
+        <CartButton
+          quantity={product.quantity}
+          onIncrease={() => handleIncreaseQuantity(product.id)}
+          onDecrease={() => handleDecreaseQuantity(product.id)}
+          onAdd={() => handleAddToCart(product)}
+          added={product.quantity > 0}
+        />
+      </View>
+    );
+  };
+
   return (
-    <View style={styles.main}>
-      {/* <SearchBarScreen></SearchBarScreen>  */}
+    <SafeAreaView style={styles.main}>
+      <CartScreen modalVisible={modalVisible} closeCartModal={closeCartModal} />
+
       <View style={styles.container}>
         <View style={styles.container1}>
-          <Text style={styles.title}>Categories</Text>
           <FlatList
             data={categories}
             renderItem={renderCategoryItem}
             keyExtractor={item => item.id}
-            showsVerticalScrollIndicator={false}
           />
         </View>
-        <View style={styles.line}></View>
+        <View style={styles.line} />
         <View style={styles.container2}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View style={styles.shopHeader}>
+              <Text style={styles.shopName}>Paaji Ki Rasoi</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.cartButton}
+              onPress={() => setModalVisible(true)}>
+              <MaterialCommunityIcons
+                name="cart-outline"
+                size={24}
+                color="#FFDC52"
+              />
+            </TouchableOpacity>
+          </View>
           <FlatList
             data={filteredProducts}
             renderItem={renderProductItem}
@@ -147,7 +205,7 @@ const Categories = () => {
           />
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -155,6 +213,7 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     backgroundColor: theme.colors.primary,
+    paddingTop: Platform.OS === 'ios' ? 0 : 20, // Account for iOS notch and status bar
   },
   container: {
     flex: 1,
@@ -166,10 +225,12 @@ const styles = StyleSheet.create({
     width: 1,
     backgroundColor: 'black',
     marginLeft: 5,
+    marginVertical: 22,
   },
   container1: {
     width: '27%',
     flexShrink: 1,
+    paddingTop: 60,
   },
   container2: {
     flex: 1,
@@ -197,6 +258,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#F3C200',
     flexShrink: 1,
+    backgroundColor: theme.colors.primary,
+  },
+  selectedCategoryContainer: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.ternary,
+    shadowColor: '#000',
+    shadowOffset: {width: 3, height: 3},
+    shadowOpacity: 0.6,
+    shadowRadius: 4,
+    elevation: 6,
   },
   categoryImage: {
     width: 50,
@@ -217,19 +288,22 @@ const styles = StyleSheet.create({
     margin: 7,
     borderRadius: 30,
     overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: '#F3C200',
     alignItems: 'center',
     padding: 5,
     flexDirection: 'row',
     width: 260,
     height: 95,
+    backgroundColor: theme.colors.primary,
+    shadowColor: '#000',
+    shadowOffset: {width: 2, height: 2},
+    shadowOpacity: 0.7,
+    shadowRadius: 7,
+    elevation: 10,
   },
   productImage: {
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
     borderRadius: 35,
-    overflow: 'hidden',
   },
   productDetails: {
     flex: 1,
@@ -263,6 +337,39 @@ const styles = StyleSheet.create({
   loaderText: {
     fontSize: 18,
     color: theme.colors.secondary,
+  },
+  cartButton: {
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+    backgroundColor: theme.colors.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    marginLeft: 10,
+  },
+  shopHeader: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: theme.colors.ternary,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+  },
+  shopName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#8F1413',
+    textTransform: 'uppercase',
   },
 });
 

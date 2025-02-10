@@ -12,6 +12,7 @@ import ProfileNavigation from '../UserProfile/profileNavigation';
 import {Platform} from 'react-native';
 import Laundry from '../Laundry/Laundry';
 import {useAuth} from '../../utils/AuthContext';
+import Audit from '../audit/audit';
 // import PharmacyScreen from '../pharmacy/Pharmacy';
 const Tab = createBottomTabNavigator();
 
@@ -111,7 +112,7 @@ const LoggedIn: React.FC = () => {
         )} */}
         <Tab.Screen
           name="User Profile"
-          component={ProfileNavigation}
+          component={Audit}
           options={{
             tabBarIcon: ({focused, color}) => (
               <MaterialCommunityIcons

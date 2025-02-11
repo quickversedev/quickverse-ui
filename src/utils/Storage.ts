@@ -16,6 +16,15 @@ export const getCart = (): any[] => {
 export const clearCart = () => {
   storage.delete('cart');
 };
+// Save the shopId to storage
+export const saveShopId = (shopId: string) => {
+  storage.set('shopId', shopId);
+};
+
+// Retrieve the shopId from storage
+export const getShopId = (): string => {
+  return storage.getString('shopId') || '';
+};
 export const setIsNewUser = (newUser: boolean): void => {
   storage.set('@isNewUser', newUser);
 };

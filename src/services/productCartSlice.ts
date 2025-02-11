@@ -1,6 +1,6 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {RootState} from '../store/store';
-import {getCart, saveCart} from '../utils/Storage';
+import {getCart, getShopId, saveCart, saveShopId} from '../utils/Storage';
 import {ProductCartItems} from '../utils/canonicalModel';
 
 interface ProductCartState {
@@ -9,7 +9,7 @@ interface ProductCartState {
 }
 
 const initialState: ProductCartState = {
-  shopId: 'shop-101',
+  shopId: getShopId(),
   productCart: getCart(),
   // productCart: [
   //   {
@@ -71,6 +71,7 @@ const productCartSlice = createSlice({
       ) {
         if (state.productCart.length === 0) {
           state.shopId = action.payload.shopId;
+          saveShopId(state.shopId);
         }
         state.productCart.push(action.payload);
         saveCart(state.productCart);
@@ -86,6 +87,7 @@ const productCartSlice = createSlice({
       );
       if (state.productCart.length === 0) {
         state.shopId = '';
+        saveShopId(state.shopId);
       }
       saveCart(state.productCart);
     },
@@ -114,12 +116,14 @@ const productCartSlice = createSlice({
       );
       if (state.productCart.length === 0) {
         state.shopId = '';
+        saveShopId(state.shopId);
       }
       saveCart(state.productCart);
     },
     clearCart: state => {
       state.productCart = [];
       state.shopId = '';
+      saveShopId(state.shopId);
       saveCart(state.productCart);
     },
   },

@@ -124,19 +124,6 @@ const LoggedIn: React.FC = () => {
             ),
           }}
         />
-        <Tab.Screen
-          name="User Profil"
-          component={Categories}
-          options={{
-            tabBarIcon: ({focused, color}) => (
-              <MaterialCommunityIcons
-                name={focused ? 'account-circle' : 'account-circle-outline'}
-                color={color}
-                size={focused ? 36 : 26}
-              />
-            ),
-          }}
-        />
       </Tab.Navigator>
     </PaperProvider>
   );

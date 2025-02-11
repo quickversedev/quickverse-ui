@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 30,
     width: 50,
-    marginTop: 50,
     marginRight: 27,
   },
   addButton: {

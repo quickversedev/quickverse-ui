@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   cartButton: {
     height: 50,
     width: 50,
-    borderRadius: 25,
+    borderRadius: 15,
     backgroundColor: theme.colors.secondary,
     justifyContent: 'center',
     alignItems: 'center',

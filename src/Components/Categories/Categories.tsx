@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,29 +6,38 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
-  Animated,
-  Platform,
   SafeAreaView,
+  ScrollView,
+  Platform,
 } from 'react-native';
-
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CartButton from './CartButton';
 import theme from '../../theme';
 import {useFetchProductsAndCategories} from '../../services/Hooks/fetchProductAndCategory';
-import {ProductCartItems} from '../../utils/canonicalModel';
+import {ProductCartItems, Vendor} from '../../utils/canonicalModel';
 import {Product} from '../../data/mockProductData';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   addToProductCart,
+  clearCart,
   decrementProductQuantity,
   incrementProductQuantity,
   selectCart,
-  selectShopId,
 } from '../../services/productCartSlice';
 import {Category} from '../../data/mockCategoriesData';
 import CartScreen from '../Cart/CartScreen';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import VendorDetails from './venderHeader';
+import {RouteProp} from '@react-navigation/native';
+import {RootStackParamList} from '../Vendors/VendorsNavigator';
+import {Loading} from '../util/Loading';
+import CustomConfirmationModal from '../Cart/CustomConfirmationModal';
 
-const Categories = () => {
+type CategoriesScreenProps = {
+  route: RouteProp<RootStackParamList, 'Categories'>;
+};
+
+const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
+  const vendor: Vendor = route.params.vendor;
   const {products, categories, loading, error} =
     useFetchProductsAndCategories();
   const dispatch = useDispatch();
@@ -39,16 +48,12 @@ const Categories = () => {
     {},
   );
   const [modalVisible, setModalVisible] = useState(false);
-  const animationValue = useRef(new Animated.Value(1000)).current;
-  const closeCartModal = () => {
-    Animated.timing(animationValue, {
-      toValue: 1000,
-      duration: 300,
-      useNativeDriver: true,
-    }).start(() => setModalVisible(false));
-  };
+  const [isConfirmationModalVisible, setConfirmationModalVisible] =
+    useState(false);
+  const [productToAdd, setProductToAdd] = useState<ProductCartItems | null>(
+    null,
+  );
   const cart = useSelector(selectCart);
-  const shopId = useSelector(selectShopId);
 
   useEffect(() => {
     setCartItems(
@@ -71,36 +76,49 @@ const Categories = () => {
     );
   }
 
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <Text style={styles.loaderText}>Loading...</Text>
-      </View>
-    );
-  }
-
   const handleCategoryPress = (categoryId: string) => {
     setSelectedCategory(categoryId);
   };
 
   const handleAddToCart = (product: ProductCartItems) => {
-    setCartItems(prevItems => ({
-      ...prevItems,
-      [product.id]: {
-        ...product,
-        quantity: (prevItems[product.id]?.quantity || 0) + 1,
-      },
-    }));
-    dispatch(
-      addToProductCart({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        image: product.image,
-        shopId: product.shopId,
-      }),
-    );
+    if (cart.length > 0 && cart[0].shopId !== product.shopId) {
+      setProductToAdd(product);
+      setConfirmationModalVisible(true);
+    } else {
+      dispatch(
+        addToProductCart({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          quantity: 1,
+          image: product.image,
+          shopId: product.shopId,
+        }),
+      );
+    }
+  };
+
+  const handleConfirmAddToCart = () => {
+    if (productToAdd) {
+      dispatch(clearCart()); // Clear the existing cart
+      dispatch(
+        addToProductCart({
+          id: productToAdd.id,
+          name: productToAdd.name,
+          price: productToAdd.price,
+          quantity: 1,
+          image: productToAdd.image,
+          shopId: productToAdd.shopId,
+        }),
+      );
+      setConfirmationModalVisible(false);
+      setProductToAdd(null);
+    }
+  };
+
+  const handleCancelAddToCart = () => {
+    setConfirmationModalVisible(false);
+    setProductToAdd(null);
   };
 
   const handleIncreaseQuantity = (productId: string) => {
@@ -122,7 +140,7 @@ const Categories = () => {
       <TouchableOpacity
         style={[
           styles.categoryContainer,
-          isSelected && styles.selectedCategoryContainer, // Apply selected style
+          isSelected && styles.selectedCategoryContainer,
         ]}
         onPress={() => handleCategoryPress(item.id)}>
         <Image
@@ -147,64 +165,81 @@ const Categories = () => {
 
     return (
       <View style={styles.productContainer}>
-        <Image
-          source={{uri: product.image}}
-          style={styles.productImage}
-          resizeMode="cover"
-        />
+        <View>
+          <Image
+            source={{uri: product.image}}
+            style={styles.productImage}
+            resizeMode="cover"
+          />
+          <Text style={styles.productRating}>R: N/A</Text>
+        </View>
         <View style={styles.productDetails}>
           <Text style={styles.productName}>{product.name}</Text>
           <Text style={styles.productPrice}>₹{product.price}</Text>
-          <Text style={styles.productRating}>R: N/A</Text>
+          <CartButton
+            quantity={product.quantity}
+            onIncrease={() => handleIncreaseQuantity(product.id)}
+            onDecrease={() => handleDecreaseQuantity(product.id)}
+            onAdd={() => handleAddToCart(product)}
+            added={product.quantity > 0}
+          />
         </View>
-        <CartButton
-          quantity={product.quantity}
-          onIncrease={() => handleIncreaseQuantity(product.id)}
-          onDecrease={() => handleDecreaseQuantity(product.id)}
-          onAdd={() => handleAddToCart(product)}
-          added={product.quantity > 0}
-        />
       </View>
     );
   };
 
   return (
     <SafeAreaView style={styles.main}>
-      <CartScreen modalVisible={modalVisible} closeCartModal={closeCartModal} />
-
-      <View style={styles.container}>
-        <View style={styles.container1}>
-          <FlatList
-            data={categories}
-            renderItem={renderCategoryItem}
-            keyExtractor={item => item.id}
-          />
+      {/* Header Section */}
+      <View style={styles.header}>
+        <View style={styles.shopHeader}>
+          <Text style={styles.shopName}>{vendor?.vendorName}</Text>
         </View>
-        <View style={styles.line} />
-        <View style={styles.container2}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <View style={styles.shopHeader}>
-              <Text style={styles.shopName}>Paaji Ki Rasoi</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.cartButton}
-              onPress={() => setModalVisible(true)}>
-              <MaterialCommunityIcons
-                name="cart-outline"
-                size={24}
-                color="#FFDC52"
-              />
-            </TouchableOpacity>
-          </View>
-          <FlatList
-            data={filteredProducts}
-            renderItem={renderProductItem}
-            keyExtractor={item => item.sku}
-            numColumns={1}
-            contentContainerStyle={styles.productList}
+        <TouchableOpacity
+          style={styles.cartButton}
+          onPress={() => setModalVisible(true)}>
+          <MaterialCommunityIcons
+            name="cart-outline"
+            size={24}
+            color="#FFDC52"
           />
-        </View>
+        </TouchableOpacity>
       </View>
+      <ScrollView style={styles.productsContainer}>
+        <VendorDetails vendor={vendor} />
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <FlatList
+              data={categories}
+              renderItem={renderCategoryItem}
+              keyExtractor={item => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            />
+            <ScrollView style={styles.productsContainer}>
+              <FlatList
+                data={filteredProducts}
+                renderItem={renderProductItem}
+                keyExtractor={item => item.sku}
+                numColumns={2}
+                scrollEnabled={false}
+                contentContainerStyle={styles.productList}
+              />
+            </ScrollView>
+          </>
+        )}
+        <CartScreen
+          modalVisible={modalVisible}
+          closeCartModal={() => setModalVisible(false)}
+        />
+        <CustomConfirmationModal
+          isVisible={isConfirmationModalVisible}
+          onConfirm={handleConfirmAddToCart}
+          onCancel={handleCancelAddToCart}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -213,66 +248,79 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     backgroundColor: theme.colors.primary,
-    paddingTop: Platform.OS === 'ios' ? 0 : 20, // Account for iOS notch and status bar
+    paddingTop: Platform.OS === 'ios' ? 40 : 10, // Adjust padding for iOS notch
   },
-  container: {
-    flex: 1,
+  header: {
     flexDirection: 'row',
-    backgroundColor: theme.colors.primary,
-    padding: 10,
+    justifyContent: 'space-between',
+    marginHorizontal: 10,
+    marginTop: Platform.OS === 'ios' ? 0 : 10, // Adjust margin for iOS
   },
-  line: {
-    width: 1,
-    backgroundColor: 'black',
-    marginLeft: 5,
-    marginVertical: 22,
+  shopHeader: {
+    backgroundColor: theme.colors.ternary,
+    padding: 8,
+    borderRadius: 15,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: theme.colors.ternary,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
-  container1: {
-    width: '27%',
-    flexShrink: 1,
-    paddingTop: 60,
-  },
-  container2: {
-    flex: 1,
-  },
-  title: {
-    width: '100%',
-    height: 50,
-    fontSize: 14,
+  shopName: {
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 20,
     color: theme.colors.primary,
+    textTransform: 'uppercase',
+  },
+  cartButton: {
+    height: 50,
+    width: 50,
+    borderRadius: 15,
     backgroundColor: theme.colors.secondary,
-    borderRadius: 100,
-    padding: 15,
-    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  categoriesContainer: {
+    height: 120,
+    paddingVertical: 10,
   },
   categoryContainer: {
-    height: 100,
-    width: 95,
-    padding: 5,
-    marginBottom: 10,
-    borderRadius: 35,
+    width: 100,
+    padding: 8,
+    margin: 8,
+    borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#F3C200',
-    flexShrink: 1,
     backgroundColor: theme.colors.primary,
   },
   selectedCategoryContainer: {
-    backgroundColor: theme.colors.primary,
     borderColor: theme.colors.ternary,
-    shadowColor: '#000',
-    shadowOffset: {width: 3, height: 3},
-    shadowOpacity: 0.6,
-    shadowRadius: 4,
-    elevation: 6,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 3, height: 3},
+        shadowOpacity: 0.6,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
   },
   categoryImage: {
     width: 50,
     height: 50,
-    marginRight: 10,
   },
   categoryName: {
     fontSize: 13,
@@ -280,48 +328,55 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     flexWrap: 'wrap',
-    width: '100%',
-    paddingHorizontal: 5,
+  },
+  productsContainer: {
+    flex: 1,
   },
   productContainer: {
     flex: 1,
     margin: 7,
-    borderRadius: 30,
-    overflow: 'hidden',
+    borderRadius: 15,
     alignItems: 'center',
     padding: 5,
     flexDirection: 'row',
-    width: 260,
-    height: 95,
     backgroundColor: theme.colors.primary,
-    shadowColor: '#000',
-    shadowOffset: {width: 2, height: 2},
-    shadowOpacity: 0.7,
-    shadowRadius: 7,
-    elevation: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 2, height: 2},
+        shadowOpacity: 0.7,
+        shadowRadius: 7,
+      },
+      android: {
+        elevation: 10,
+      },
+    }),
   },
   productImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 35,
+    width: 70,
+    height: 75,
+    borderRadius: 25,
   },
   productDetails: {
     flex: 1,
+    marginVertical: 15,
     paddingLeft: 7,
     justifyContent: 'center',
   },
   productName: {
-    fontSize: 17,
+    fontSize: 14,
     color: '#103E60',
     fontWeight: '900',
   },
   productPrice: {
     fontSize: 18,
     color: '#8F1413',
+    marginVertical: 5,
     fontWeight: '900',
   },
   productRating: {
     fontSize: 14,
+    marginLeft: 5,
     color: '#8F1413',
     fontWeight: '900',
   },
@@ -337,39 +392,6 @@ const styles = StyleSheet.create({
   loaderText: {
     fontSize: 18,
     color: theme.colors.secondary,
-  },
-  cartButton: {
-    height: 50,
-    width: 50,
-    borderRadius: 25,
-    backgroundColor: theme.colors.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 20,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    marginLeft: 10,
-  },
-  shopHeader: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 20,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.ternary,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-  shopName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#8F1413',
-    textTransform: 'uppercase',
   },
 });
 

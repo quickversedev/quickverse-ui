@@ -2,7 +2,7 @@ export interface Vendor {
   vendorId: string;
   vendorName: string;
   vendorBanner: string; //base64
-  description: string;
+  storeDescription: string;
   distance: string;
   vendorEndPoint: string;
   storeEnabled: boolean;
@@ -10,6 +10,7 @@ export interface Vendor {
   vendorPhone: string;
   storeOpeningTime: string;
   storeClosingTime: string;
+  storeCategory: string;
 }
 export interface Promo {
   promoId: string;

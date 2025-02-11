@@ -18,7 +18,6 @@ import {
   decrementProductQuantity,
   incrementProductQuantity,
   removeFromProductCart,
-  selectShopId,
 } from '../../services/productCartSlice';
 
 interface CartModalProps {
@@ -33,8 +32,6 @@ const CartScreen: React.FC<CartModalProps> = ({
     (state: RootState) => state.productCart.productCart,
   );
 
-  const shopId = useSelector(selectShopId);
-  console.log('shopId', shopId + 'cartItems', cartItems);
   const animationValue = new Animated.Value(0); // Define animationValue
   const dispatch = useDispatch<AppDispatch>();
   const handleIncrement = (itemId: string) => {
@@ -53,7 +50,7 @@ const CartScreen: React.FC<CartModalProps> = ({
       0,
     );
   };
-  console.log('cartItems from cart', cartItems);
+
   return (
     <Modal
       transparent={true}
@@ -97,8 +94,6 @@ const CartScreen: React.FC<CartModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-  // Add the shared styles here
-
   header: {
     fontSize: 34,
     fontWeight: 'bold',

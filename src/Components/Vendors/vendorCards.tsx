@@ -10,13 +10,14 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from './VendorsNavigator';
 import {useNavigation} from '@react-navigation/native';
 import {getCampus} from '../../utils/Storage';
+import {Vendor} from '../../utils/canonicalModel';
 
 const {width} = Dimensions.get('window');
 const SPACING: number = 4;
 const ITEM_SIZE: number = (width - SPACING * 6) / 2;
 type VendorCardsNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'WebView'
+  'Categories'
 >;
 const VendorCards: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -31,9 +32,9 @@ const VendorCards: React.FC = () => {
   if (loading) {
     return <Loading />;
   }
-  const handleCardPress = (url: string) => {
+  const handleCardPress = (vendor: Vendor) => {
     navigation.removeListener;
-    navigation.navigate('WebView', {url});
+    navigation.navigate('Categories', {vendor});
   };
 
   return (
@@ -47,7 +48,7 @@ const VendorCards: React.FC = () => {
                 name={item.vendorName}
                 distance={item.distance}
                 image={{uri: `${item.vendorBanner}.jpg`}}
-                onPress={() => handleCardPress(item.vendorEndPoint)}
+                onPress={() => handleCardPress(item)}
               />
             </View>
           ))}

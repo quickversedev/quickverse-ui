@@ -82,7 +82,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '835458c624d81702043422',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
   {
     sku: '835458c624d81702422',
@@ -122,7 +122,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '835458c624d81702043422',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
   {
     sku: '83545824d81702043422',
@@ -162,7 +162,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '835458c624d81702043422',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
   {
     sku: '8358c624d81702043422',
@@ -202,7 +202,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '835458c624d81702043422',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
   {
     sku: '835458c624d8143422',
@@ -242,7 +242,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '835458c624d81702043422',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
   {
     sku: '835458c1702043422',
@@ -282,7 +282,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '835458c624d81702043422',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
   {
     sku: '835458c6242043422',
@@ -322,7 +322,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '835458c624d81702043422',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
   {
     sku: '8354acc62c641766',
@@ -362,7 +362,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '8354acc62c641702296566',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
   {
     sku: '83541ec84835612',
@@ -402,7 +402,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '83541ec848fa1720435612',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
   {
     sku: '8358fa1720435610',
@@ -442,7 +442,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '83541ec848fa1720435610',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
   {
     sku: '83541fa1720435611',
@@ -482,7 +482,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '83541ec848fa1720435611',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
   {
     sku: '83541ec848fa1720435619',
@@ -522,7 +522,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '83541ec848fa1720435619',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
   {
     sku: '83541ec848fa1720435613',
@@ -562,7 +562,7 @@ export const mockProductData: Product[] = [
     currentStock: null,
     primaryProductId: '83541ec848fa1720435613',
     variantsDimensions: [],
-    shopId: 'shop-101',
+    shopId: 'shop-102',
   },
 
   // Add more products as needed

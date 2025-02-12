@@ -11,13 +11,13 @@ import theme from '../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {RootStackParamList} from '../Vendors/VendorsNavigator';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../store/store';
-import {selectVendorEndpointById} from '../../services/VendorListSlice';
-import {selectShopId} from '../../services/productCartSlice';
+import {Vendor} from '../../utils/canonicalModel';
 
 interface PaymentSummaryScreenProps {
   getTotalPrice: () => number;
+  vendor: Vendor | undefined;
+  isStoreOpened?: boolean;
+  isCartEmpty: boolean;
 }
 
 type VendorCardsNavigationProp = StackNavigationProp<
@@ -27,15 +27,15 @@ type VendorCardsNavigationProp = StackNavigationProp<
 
 const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
   getTotalPrice,
+  vendor,
+  isStoreOpened,
+  isCartEmpty,
 }) => {
-  const shopId = useSelector(selectShopId);
-  const vendorEndpoint = useSelector((state: RootState) =>
-    selectVendorEndpointById(state, shopId),
-  );
-  const webUrl = vendorEndpoint ? `${vendorEndpoint}/cart` : '';
-  const isCartEmpty = getTotalPrice() === 0;
+  const {vendorEndPoint} = vendor || {};
+  const webUrl = vendorEndPoint ? `${vendorEndPoint}/cart` : '';
   const navigation = useNavigation<VendorCardsNavigationProp>();
-
+  const isPlaceOrderButtonDisabled =
+    isCartEmpty || !vendorEndPoint || !isStoreOpened;
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.paymentSummary}>
@@ -51,9 +51,13 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
         <TouchableOpacity
           style={[
             styles.placeOrderButton,
-            {backgroundColor: isCartEmpty ? 'gray' : theme.colors.secondary},
+            {
+              backgroundColor: isPlaceOrderButtonDisabled
+                ? 'gray'
+                : theme.colors.secondary,
+            },
           ]}
-          disabled={isCartEmpty && !vendorEndpoint}
+          disabled={isPlaceOrderButtonDisabled}
           onPress={() => navigation.navigate('WebView', {url: webUrl})}>
           <Text style={styles.placeOrderButtonText}>Place Order</Text>
         </TouchableOpacity>
@@ -65,10 +69,11 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    marginBottom: 20,
+    // backgroundColor: theme.colors.background,
   },
   paymentSummary: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
     marginTop: 20,
@@ -87,7 +92,7 @@ const styles = StyleSheet.create({
   },
   placeOrderButton: {
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 15,
     marginTop: 20,
     alignItems: 'center',
     ...Platform.select({

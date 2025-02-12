@@ -34,12 +34,11 @@ const CartListScreen: React.FC<CartListScreenProps> = ({
   handleDecrement,
   handleDelete,
 }) => {
-  const renderItem = ({item}: {item: CartItem}) => (
+  const renderItem = ({item}: {item: ProductCartItems}) => (
     <View style={styles.itemContainer}>
       <Image source={{uri: item.image}} style={styles.itemImage} />
       <View style={styles.itemDetails}>
         <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemRestaurant}>{item.restaurant}</Text>
         <Text style={styles.itemPrice}>Rs.{item.price}</Text>
       </View>
       <View style={styles.quantityContainer}>
@@ -72,7 +71,9 @@ const CartListScreen: React.FC<CartListScreenProps> = ({
       data={cartItems}
       renderItem={renderItem}
       keyExtractor={item => item.id}
+      scrollEnabled={false}
       style={styles.cartList}
+      nestedScrollEnabled={false}
     />
   );
 };

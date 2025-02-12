@@ -58,5 +58,10 @@ export const selectVendorEndpointById = createSelector(
     return vendor ? vendor.vendorEndPoint : null;
   },
 );
-
+export const selectVendorDetailsByShopId = createSelector(
+  [selectVendorList, (state: RootState, vendorId: string) => vendorId],
+  (vendors, vendorId) => {
+    return vendors.find(v => v.vendorId === vendorId);
+  },
+);
 export default vendorListSlice.reducer;

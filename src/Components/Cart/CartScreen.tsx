@@ -15,10 +15,16 @@ import theme from '../../theme';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../store/store';
 import {
+  clearCart,
   decrementProductQuantity,
   incrementProductQuantity,
   removeFromProductCart,
+  selectShopId,
 } from '../../services/productCartSlice';
+import {ScrollView} from 'react-native-gesture-handler';
+import {Vendor} from '../../utils/canonicalModel';
+import {selectVendorDetailsByShopId} from '../../services/VendorListSlice';
+import {isStoreOpen} from '../util/vendorUtil';
 
 interface CartModalProps {
   modalVisible: boolean;
@@ -31,8 +37,12 @@ const CartScreen: React.FC<CartModalProps> = ({
   const cartItems = useSelector(
     (state: RootState) => state.productCart.productCart,
   );
-
-  const animationValue = new Animated.Value(0); // Define animationValue
+  const shopId = useSelector(selectShopId);
+  console.log('shopId1232423', shopId);
+  const vendor: Vendor | undefined = useSelector((state: RootState) =>
+    selectVendorDetailsByShopId(state, shopId),
+  );
+  const animationValue = new Animated.Value(0);
   const dispatch = useDispatch<AppDispatch>();
   const handleIncrement = (itemId: string) => {
     dispatch(incrementProductQuantity({id: itemId}));
@@ -44,12 +54,20 @@ const CartScreen: React.FC<CartModalProps> = ({
   const handleDelete = (itemId: string) => {
     dispatch(removeFromProductCart({id: itemId}));
   };
+  const handleClearCart = () => {
+    dispatch(clearCart());
+  };
   const getTotalPrice = () => {
     return cartItems.reduce(
       (total, item) => total + item.price * item.quantity,
       0,
     );
   };
+  const isStoreOpened =
+    vendor && isStoreOpen(vendor.storeOpeningTime, vendor.storeClosingTime);
+  console.log('isStoreOpened', vendor);
+  const isCartEmpty = cartItems.length === 0;
+  console.log('isCartEmpty', isCartEmpty);
 
   return (
     <Modal
@@ -78,16 +96,35 @@ const CartScreen: React.FC<CartModalProps> = ({
           </TouchableOpacity>
         </View>
         <Text style={styles.subHeader}>
-          {cartItems.length} Items in your cart
+          {cartItems.length} Items in your cart from
         </Text>
-
-        <CartListScreen
-          cartItems={cartItems}
-          handleIncrement={handleIncrement}
-          handleDecrement={handleDecrement}
-          handleDelete={handleDelete}
-        />
-        <PaymentSummaryScreen getTotalPrice={getTotalPrice} />
+        <Text style={styles.vendorName}>{vendor?.vendorName}</Text>
+        {!isCartEmpty && !isStoreOpened && (
+          <View style={styles.storeClosedCard}>
+            <Text style={styles.storeClosedText}>
+              Store is Closed, Can't Place the Order
+            </Text>
+            <TouchableOpacity
+              style={styles.clearCartButton}
+              onPress={handleClearCart}>
+              <Text style={styles.clearCartButtonText}>Clear Cart</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        <ScrollView>
+          <CartListScreen
+            cartItems={cartItems}
+            handleIncrement={handleIncrement}
+            handleDecrement={handleDecrement}
+            handleDelete={handleDelete}
+          />
+          <PaymentSummaryScreen
+            getTotalPrice={getTotalPrice}
+            vendor={vendor}
+            isStoreOpened={isStoreOpened}
+            isCartEmpty={isCartEmpty}
+          />
+        </ScrollView>
       </Animated.View>
     </Modal>
   );
@@ -95,10 +132,22 @@ const CartScreen: React.FC<CartModalProps> = ({
 
 const styles = StyleSheet.create({
   header: {
-    fontSize: 34,
+    fontSize: 24,
     fontWeight: 'bold',
     color: theme.colors.secondary,
     marginBottom: 5,
+  },
+  clearCartButton: {
+    backgroundColor: theme.colors.error,
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  clearCartButtonText: {
+    color: theme.colors.primary,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   cartHeader: {
     flexDirection: 'row',
@@ -108,9 +157,13 @@ const styles = StyleSheet.create({
   },
   subHeader: {
     fontSize: 18,
-    color: 'darkblue',
+    color: theme.colors.ternary,
   },
-
+  vendorName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.ternary,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -130,6 +183,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  storeClosedCard: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  storeClosedText: {
+    fontSize: 16,
+    color: theme.colors.error,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
 });
 

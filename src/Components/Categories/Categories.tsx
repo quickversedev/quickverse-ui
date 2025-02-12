@@ -31,6 +31,7 @@ import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from '../Vendors/VendorsNavigator';
 import {Loading} from '../util/Loading';
 import CustomConfirmationModal from '../Cart/CustomConfirmationModal';
+import {isStoreOpen} from '../util/vendorUtil';
 
 type CategoriesScreenProps = {
   route: RouteProp<RootStackParamList, 'Categories'>;
@@ -55,6 +56,11 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   );
   const cart = useSelector(selectCart);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [storeOpen, setStoreOpen] = useState(
+    isStoreOpen(vendor.storeOpeningTime, vendor.storeClosingTime),
+  );
+
   useEffect(() => {
     setCartItems(
       cart.reduce<{[key: string]: ProductCartItems}>((acc, item) => {
@@ -77,24 +83,28 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   }
 
   const handleCategoryPress = (categoryId: string) => {
-    setSelectedCategory(categoryId);
+    if (storeOpen) {
+      setSelectedCategory(categoryId);
+    }
   };
-
+  console.log('shopId', cart[0]?.shopId);
   const handleAddToCart = (product: ProductCartItems) => {
-    if (cart.length > 0 && cart[0].shopId !== product.shopId) {
-      setProductToAdd(product);
-      setConfirmationModalVisible(true);
-    } else {
-      dispatch(
-        addToProductCart({
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          quantity: 1,
-          image: product.image,
-          shopId: product.shopId,
-        }),
-      );
+    if (storeOpen) {
+      if (cart.length > 0 && cart[0].shopId !== product.shopId) {
+        setProductToAdd(product);
+        setConfirmationModalVisible(true);
+      } else {
+        dispatch(
+          addToProductCart({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            quantity: 1,
+            image: product.image,
+            shopId: product.shopId,
+          }),
+        );
+      }
     }
   };
 
@@ -122,11 +132,15 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   };
 
   const handleIncreaseQuantity = (productId: string) => {
-    dispatch(incrementProductQuantity({id: productId}));
+    if (storeOpen) {
+      dispatch(incrementProductQuantity({id: productId}));
+    }
   };
 
   const handleDecreaseQuantity = (productId: string) => {
-    dispatch(decrementProductQuantity({id: productId}));
+    if (storeOpen) {
+      dispatch(decrementProductQuantity({id: productId}));
+    }
   };
 
   const filteredProducts = selectedCategory
@@ -141,8 +155,11 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         style={[
           styles.categoryContainer,
           isSelected && styles.selectedCategoryContainer,
+          !storeOpen && styles.disabledCategoryContainer, // Disabled style
         ]}
-        onPress={() => handleCategoryPress(item.id)}>
+        onPress={() => handleCategoryPress(item.id)}
+        disabled={!storeOpen} // Disable touch if store is closed
+      >
         <Image
           source={{uri: item.imageURLs[0]}}
           style={styles.categoryImage}
@@ -164,7 +181,11 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     };
 
     return (
-      <View style={styles.productContainer}>
+      <View
+        style={[
+          styles.productContainer,
+          !storeOpen && styles.disabledProductContainer,
+        ]}>
         <View>
           <Image
             source={{uri: product.image}}
@@ -182,6 +203,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             onDecrease={() => handleDecreaseQuantity(product.id)}
             onAdd={() => handleAddToCart(product)}
             added={product.quantity > 0}
+            // disabled={!storeOpen} // Disable button if store is closed
           />
         </View>
       </View>
@@ -194,10 +216,15 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       <View style={styles.header}>
         <View style={styles.shopHeader}>
           <Text style={styles.shopName}>{vendor?.vendorName}</Text>
+          {!storeOpen && (
+            <Text style={styles.storeClosedText}>Store is Closed</Text>
+          )}
         </View>
         <TouchableOpacity
           style={styles.cartButton}
-          onPress={() => setModalVisible(true)}>
+          onPress={() => setModalVisible(true)}
+          // disabled={!storeOpen} // Disable cart button if store is closed
+        >
           <MaterialCommunityIcons
             name="cart-outline"
             size={24}
@@ -248,13 +275,13 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     backgroundColor: theme.colors.primary,
-    paddingTop: Platform.OS === 'ios' ? 40 : 10, // Adjust padding for iOS notch
+    paddingTop: Platform.OS === 'ios' ? 40 : 10,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 10,
-    marginTop: Platform.OS === 'ios' ? 0 : 10, // Adjust margin for iOS
+    marginTop: Platform.OS === 'ios' ? 0 : 10,
   },
   shopHeader: {
     backgroundColor: theme.colors.ternary,
@@ -280,6 +307,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: theme.colors.primary,
     textTransform: 'uppercase',
+  },
+  storeClosedText: {
+    fontSize: 14,
+    color: 'red',
+    fontWeight: 'bold',
+    marginTop: 5,
   },
   cartButton: {
     height: 50,
@@ -318,6 +351,9 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  disabledCategoryContainer: {
+    opacity: 0.5, // Reduce opacity for disabled state
+  },
   categoryImage: {
     width: 50,
     height: 50,
@@ -351,6 +387,9 @@ const styles = StyleSheet.create({
         elevation: 10,
       },
     }),
+  },
+  disabledProductContainer: {
+    opacity: 0.5, // Reduce opacity for disabled state
   },
   productImage: {
     width: 70,

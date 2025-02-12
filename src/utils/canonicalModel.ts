@@ -2,7 +2,7 @@ export interface Vendor {
   vendorId: string;
   vendorName: string;
   vendorBanner: string; //base64
-  description: string;
+  storeDescription: string;
   distance: string;
   vendorEndPoint: string;
   storeEnabled: boolean;
@@ -10,6 +10,7 @@ export interface Vendor {
   vendorPhone: string;
   storeOpeningTime: string;
   storeClosingTime: string;
+  storeCategory: string;
 }
 export interface Promo {
   promoId: string;
@@ -87,4 +88,37 @@ export interface Address {
     phone: string;
     concatenatedAddress: string;
   };
+}
+export interface OrderMetadata {
+  storeName: string;
+  productId: string;
+  estimatedDeliveryDate: string | number | Date;
+  deliverydate: string | number | Date;
+  orderId: string;
+  customerId: number;
+  customerName: string;
+  customerMobileNumber: number;
+  customerDeliveryAddress: string | null;
+  state: string;
+  totalOrderAmount: number;
+  totalItemCount: number;
+  totalProductCount: number;
+  totalInvoiceAmount: number;
+  fulfillmentOption: string;
+  creationTime: string;
+  productImageUrls: string[];
+  stateLabel: string;
+  orderDescription: string;
+  orderLink: string;
+}
+export interface OrdersResponse {
+  ordersMetadata: OrderMetadata[];
+}
+export interface ProductCartItems {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  shopId: string; // Ensure each item has a shopId
 }

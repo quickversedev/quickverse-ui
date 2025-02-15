@@ -27,6 +27,7 @@ const CardItem: React.FC<CardItemProps> = ({
   image,
   onPress,
 }) => {
+  console.log('name:', image);
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
       <Card.Cover source={image} style={styles.posterImage} />
@@ -34,7 +35,7 @@ const CardItem: React.FC<CardItemProps> = ({
         <Text style={styles.title} numberOfLines={2}>
           {name}
         </Text>
-        {distance && (
+        {/* {distance && (
           <View style={styles.distanceContainer}>
             <MaterialCommunityIcons
               name="timer-outline"
@@ -46,7 +47,7 @@ const CardItem: React.FC<CardItemProps> = ({
               {distance}
             </Text>
           </View>
-        )}
+        )} */}
       </Card.Content>
     </TouchableOpacity>
   );
@@ -55,23 +56,23 @@ const CardItem: React.FC<CardItemProps> = ({
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    marginHorizontal: SPACING,
-    padding: SPACING * 2,
+    marginHorizontal: 1,
+    padding: 5,
     alignItems: 'center',
-    borderRadius: 34,
+    borderRadius: 15,
   },
   posterImage: {
-    width: '100%',
-    height: ITEM_SIZE * 0.8,
+    width: '90%',
+    height: ITEM_SIZE * 0.5,
     resizeMode: 'cover',
-    borderRadius: 24,
+    borderRadius: 15,
     marginBottom: 10,
   },
   title: {
-    fontSize: 18,
+    fontSize: 14,
     textAlign: 'center',
     color: theme.colors.ternary,
-    fontWeight: 'bold',
+    // fontWeight: 'bold',/
   },
   distance: {
     fontSize: 14,

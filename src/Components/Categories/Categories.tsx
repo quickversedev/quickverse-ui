@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   ScrollView,
   Platform,
+  Alert,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CartButton from './CartButton';
@@ -18,12 +19,12 @@ import {ProductCartItems, Vendor} from '../../utils/canonicalModel';
 import {Product} from '../../data/mockProductData';
 import {useDispatch, useSelector} from 'react-redux';
 import {
-  addToProductCart,
+  addToCart,
   clearCart,
-  decrementProductQuantity,
-  incrementProductQuantity,
+  decrementQuantity,
+  incrementQuantity,
   selectCart,
-} from '../../services/productCartSlice';
+} from '../../services/cart/productCartSlice';
 import {Category} from '../../data/mockCategoriesData';
 import CartScreen from '../Cart/CartScreen';
 import VendorDetails from './venderHeader';
@@ -32,16 +33,21 @@ import {RootStackParamList} from '../Vendors/VendorsNavigator';
 import {Loading} from '../util/Loading';
 import CustomConfirmationModal from '../Cart/CustomConfirmationModal';
 import {isStoreOpen} from '../util/vendorUtil';
+import {useAuth} from '../../utils/AuthContext';
+import {setSkipLoginFlow} from '../../utils/Storage';
+import {AppDispatch} from '../../store/store';
+import {debounce} from 'lodash';
 
 type CategoriesScreenProps = {
   route: RouteProp<RootStackParamList, 'Categories'>;
 };
 
 const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
+  const {authData, setSkipLogin} = useAuth();
   const vendor: Vendor = route.params.vendor;
   const {products, categories, loading, error} =
     useFetchProductsAndCategories();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     categories[0]?.id,
   );
@@ -60,7 +66,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const [storeOpen, setStoreOpen] = useState(
     isStoreOpen(vendor.storeOpeningTime, vendor.storeClosingTime),
   );
-
+  const categoriesWithProducts = categories.filter(category =>
+    products.some(product => product.category === category.id),
+  );
   useEffect(() => {
     setCartItems(
       cart.reduce<{[key: string]: ProductCartItems}>((acc, item) => {
@@ -87,40 +95,64 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       setSelectedCategory(categoryId);
     }
   };
-  console.log('shopId', cart[0]?.shopId);
-  const handleAddToCart = (product: ProductCartItems) => {
+  const handleClick = () => {
+    if (!authData) {
+      setSkipLogin(false);
+      setSkipLoginFlow(false);
+    }
+  };
+  const handleAddToCart = debounce((product: ProductCartItems) => {
+    if (!authData) {
+      Alert.alert(
+        'Login Required',
+        'Please log in to add products to your cart.',
+        [
+          {text: 'Cancel', style: 'cancel'},
+          {text: 'Login', onPress: () => handleClick()},
+        ],
+      );
+      return;
+    }
     if (storeOpen) {
       if (cart.length > 0 && cart[0].shopId !== product.shopId) {
         setProductToAdd(product);
         setConfirmationModalVisible(true);
       } else {
         dispatch(
-          addToProductCart({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            quantity: 1,
-            image: product.image,
-            shopId: product.shopId,
-          }),
+          addToCart(
+            {
+              id: product.id,
+              name: product.name,
+              price: product.price,
+              quantity: 1,
+              image: product.image,
+              shopId: product.shopId,
+            },
+            authData,
+          ),
         );
       }
     }
-  };
+  }, 300);
 
   const handleConfirmAddToCart = () => {
     if (productToAdd) {
-      dispatch(clearCart()); // Clear the existing cart
-      dispatch(
-        addToProductCart({
-          id: productToAdd.id,
-          name: productToAdd.name,
-          price: productToAdd.price,
-          quantity: 1,
-          image: productToAdd.image,
-          shopId: productToAdd.shopId,
-        }),
-      );
+      dispatch(clearCart());
+      if (authData) {
+        dispatch(
+          addToCart(
+            {
+              id: productToAdd.id,
+              name: productToAdd.name,
+              price: productToAdd.price,
+              quantity: 1,
+              image: productToAdd.image,
+              shopId: productToAdd.shopId,
+            },
+            authData,
+          ),
+        );
+      }
       setConfirmationModalVisible(false);
       setProductToAdd(null);
     }
@@ -131,17 +163,21 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     setProductToAdd(null);
   };
 
-  const handleIncreaseQuantity = (productId: string) => {
+  const handleIncreaseQuantity = debounce((productId: string) => {
     if (storeOpen) {
-      dispatch(incrementProductQuantity({id: productId}));
+      if (authData) {
+        dispatch(incrementQuantity(productId, authData));
+      }
     }
-  };
+  }, 300);
 
-  const handleDecreaseQuantity = (productId: string) => {
+  const handleDecreaseQuantity = debounce((productId: string) => {
     if (storeOpen) {
-      dispatch(decrementProductQuantity({id: productId}));
+      if (authData) {
+        dispatch(decrementQuantity(productId, authData));
+      }
     }
-  };
+  }, 300);
 
   const filteredProducts = selectedCategory
     ? products.filter(product => product.category === selectedCategory)
@@ -203,7 +239,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             onDecrease={() => handleDecreaseQuantity(product.id)}
             onAdd={() => handleAddToCart(product)}
             added={product.quantity > 0}
-            // disabled={!storeOpen} // Disable button if store is closed
+            disabled={!storeOpen} // Disable button if store is closed
           />
         </View>
       </View>
@@ -239,7 +275,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         ) : (
           <>
             <FlatList
-              data={categories}
+              data={categoriesWithProducts}
               renderItem={renderCategoryItem}
               keyExtractor={item => item.id}
               horizontal

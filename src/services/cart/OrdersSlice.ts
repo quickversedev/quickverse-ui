@@ -1,8 +1,8 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {OrderMetadata} from '../utils/canonicalModel';
+import {OrderMetadata} from '../../utils/canonicalModel';
 import axios from 'axios';
-import globalConfig from '../utils/GlobalConfig';
-import {fetchToken} from '../utils/KeychainStore/keychainUtil';
+import globalConfig from '../../utils/GlobalConfig';
+import {fetchToken} from '../../utils/KeychainStore/keychainUtil';
 // import mockOrdersResponse from '../data/orders';
 
 export const fetchOrders = createAsyncThunk<OrderMetadata[]>(

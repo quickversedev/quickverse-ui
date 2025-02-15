@@ -1,5 +1,5 @@
 // src/redux/store.ts
-import {configureStore} from '@reduxjs/toolkit';
+import {configureStore, ThunkAction, Action} from '@reduxjs/toolkit';
 // import vendorListReducer from './slices/vendorListSlice';
 // import VendorsSlice from '../services/VendorListSlice';
 import VendorListSlice from '../services/VendorListSlice';
@@ -13,8 +13,8 @@ import laundryProductsReducer from '../services/laundryProductsSlice';
 import addressSlice from '../services/addressSclice';
 import categoriesSlice from '../services/categorySlice';
 import productsSlice from '../services/productSlice';
-import OrdersSlice from '../services/OrdersSlice';
-import productCartSlice from '../services/productCartSlice';
+import OrdersSlice from '../services/cart/OrdersSlice';
+import productCartSlice from '../services/cart/productCartSlice';
 const store = configureStore({
   reducer: {
     vendorList: VendorListSlice,
@@ -31,7 +31,12 @@ const store = configureStore({
     productCart: productCartSlice,
   },
 });
-
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 

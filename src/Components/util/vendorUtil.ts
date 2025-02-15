@@ -24,6 +24,6 @@ export const isStoreOpen = (
     closingMinutes += 24 * 60;
     if (currentTime < openingMinutes) currentTime += 24 * 60;
   }
-  console.log(currentTime >= openingMinutes && currentTime <= closingMinutes);
+
   return currentTime >= openingMinutes && currentTime <= closingMinutes;
 };

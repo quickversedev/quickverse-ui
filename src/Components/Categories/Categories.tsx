@@ -10,6 +10,7 @@ import {
   ScrollView,
   Platform,
   Alert,
+  TextInput, // Added for search bar
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CartButton from './CartButton';
@@ -60,8 +61,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   );
   const cart = useSelector(selectCart);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [storeOpen, setStoreOpen] = useState(
+  const [storeOpen] = useState(
     isStoreOpen(vendor.storeOpeningTime, vendor.storeClosingTime),
   );
   const categoriesWithProducts = categories.filter(category =>
@@ -70,6 +70,10 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     categoriesWithProducts[0]?.name,
   );
+
+  // State for search query
+  const [searchQuery, setSearchQuery] = useState('');
+
   useEffect(() => {
     setCartItems(
       cart.reduce<{[key: string]: ProductCartItems}>((acc, item) => {
@@ -83,6 +87,18 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     setSelectedCategory(categories[0]?.name);
   }, [categories]);
 
+  // Filter categories and products based on search query
+  const filteredCategories = categoriesWithProducts.filter(category =>
+    category.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const filteredProducts = searchQuery
+    ? products.filter(product =>
+        product.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : selectedCategory
+    ? products.filter(product => product.category === selectedCategory)
+    : products;
   if (error) {
     return (
       <View style={styles.loaderContainer}>
@@ -92,16 +108,16 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   }
 
   const handleCategoryPress = (categoryName: string) => {
-    if (storeOpen) {
-      setSelectedCategory(categoryName);
-    }
+    setSelectedCategory(categoryName);
   };
+
   const handleClick = () => {
     if (!authData) {
       setSkipLogin(false);
       setSkipLoginFlow(false);
     }
   };
+
   const handleAddToCart = debounce((product: ProductCartItems) => {
     if (!authData) {
       Alert.alert(
@@ -182,10 +198,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     }
   }, 300);
 
-  const filteredProducts = selectedCategory
-    ? products.filter(product => product.category === selectedCategory)
-    : products;
-
   const renderCategoryItem = ({item}: {item: Category}) => {
     const isSelected = item.name === selectedCategory;
 
@@ -194,11 +206,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         style={[
           styles.categoryContainer,
           isSelected && styles.selectedCategoryContainer,
-          !storeOpen && styles.disabledCategoryContainer, // Disabled style
+          !storeOpen && styles.disabledCategoryContainer,
         ]}
-        onPress={() => handleCategoryPress(item.name)}
-        // disabled={!storeOpen} // Disable touch if store is closed
-      >
+        onPress={() => handleCategoryPress(item.name)}>
         <Image
           source={{uri: item.imageURLs[0]}}
           style={styles.categoryImage}
@@ -253,7 +263,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             onDecrease={() => handleDecreaseQuantity(product.id)}
             onAdd={() => handleAddToCart(product)}
             added={product.quantity > 0}
-            disabled={!storeOpen || isOutOfStock} // Disable button if store is closed or out of stock
+            disabled={!storeOpen || isOutOfStock}
           />
         </View>
       </View>
@@ -272,9 +282,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         </View>
         <TouchableOpacity
           style={styles.cartButton}
-          onPress={() => setModalVisible(true)}
-          // disabled={!storeOpen} // Disable cart button if store is closed
-        >
+          onPress={() => setModalVisible(true)}>
           <MaterialCommunityIcons
             name="cart-outline"
             size={24}
@@ -282,6 +290,23 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           />
         </TouchableOpacity>
       </View>
+
+      <View style={styles.searchContainer}>
+        <MaterialCommunityIcons
+          name="magnify"
+          size={24}
+          color={theme.colors.ternary}
+          style={styles.searchIcon}
+        />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by vendor or category"
+          placeholderTextColor={theme.colors.ternary}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
+
       <ScrollView style={styles.productsContainer}>
         <VendorDetails vendor={vendor} />
         {loading ? (
@@ -289,7 +314,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         ) : (
           <>
             <FlatList
-              data={categoriesWithProducts}
+              data={filteredCategories}
               renderItem={renderCategoryItem}
               keyExtractor={item => item.id}
               horizontal
@@ -372,6 +397,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    borderRadius: 15,
+    marginVertical: 5,
+    marginHorizontal: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  searchIcon: {
+    marginRight: 5,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: theme.colors.secondary,
+  },
   categoriesContainer: {
     height: 120,
     paddingVertical: 10,
@@ -402,7 +449,7 @@ const styles = StyleSheet.create({
     }),
   },
   disabledCategoryContainer: {
-    opacity: 0.5, // Reduce opacity for disabled state
+    opacity: 0.5,
   },
   categoryImage: {
     width: 50,
@@ -439,7 +486,7 @@ const styles = StyleSheet.create({
     }),
   },
   disabledProductContainer: {
-    opacity: 0.5, // Reduce opacity for disabled state
+    opacity: 0.5,
   },
   productImage: {
     width: 70,
@@ -485,16 +532,16 @@ const styles = StyleSheet.create({
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexShrink: 1, // Prevents text overflow
-    flexWrap: 'wrap', // Ensures text wraps inside container
-    maxWidth: '100%', // Keeps content within bounds
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    maxWidth: '100%',
     marginVertical: 5,
   },
   originalPrice: {
     textDecorationLine: 'line-through',
     color: 'gray',
     fontSize: 12,
-    marginRight: 8, // Adds space between prices
+    marginRight: 8,
   },
   salePrice: {
     fontSize: 14,
@@ -507,7 +554,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -515,6 +561,9 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  searchIcon: {
+    marginRight: 5,
   },
 });
 

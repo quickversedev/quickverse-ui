@@ -9,6 +9,7 @@ import {
   TextInput,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {fetchVendorList} from '../../services/VendorListSlice';
 import {AppDispatch, RootState} from '../../store/store';
 import CardItem from '../util/CardItem';
@@ -88,13 +89,21 @@ const VendorCards: React.FC = () => {
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}>
       {/* Search Bar */}
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search by vendor or category"
-        placeholderTextColor={theme.colors.ternary}
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
+      <View style={styles.searchContainer}>
+        <MaterialCommunityIcons
+          name="magnify"
+          size={24}
+          color={theme.colors.ternary}
+          style={styles.searchIcon}
+        />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by vendor or category"
+          placeholderTextColor={theme.colors.ternary}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
 
       {Object.entries(filteredVendors).map(([category, categoryVendors]) => (
         <View key={category} style={styles.categorySection}>
@@ -128,11 +137,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING / 4,
     backgroundColor: theme.colors.primary,
   },
-  searchInput: {
+
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 8,
-    fontSize: 16,
+
+    paddingHorizontal: 12,
+    borderRadius: 15,
     marginBottom: SPACING,
     marginHorizontal: SPACING,
     shadowColor: '#000',
@@ -140,6 +152,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  searchIcon: {
+    marginRight: 5,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: theme.colors.secondary,
   },
   categorySection: {
     marginBottom: SPACING,

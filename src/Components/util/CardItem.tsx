@@ -20,14 +20,7 @@ interface CardItemProps {
   onPress: () => void;
 }
 const ITEM_SIZE: any = width * 0.76;
-const SPACING: any = 4;
-const CardItem: React.FC<CardItemProps> = ({
-  name,
-  distance,
-  image,
-  onPress,
-}) => {
-  console.log('name:', image);
+const CardItem: React.FC<CardItemProps> = ({name, image, onPress}) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
       <Card.Cover source={image} style={styles.posterImage} />
@@ -35,19 +28,6 @@ const CardItem: React.FC<CardItemProps> = ({
         <Text style={styles.title} numberOfLines={2}>
           {name}
         </Text>
-        {/* {distance && (
-          <View style={styles.distanceContainer}>
-            <MaterialCommunityIcons
-              name="timer-outline"
-              size={20}
-              color={theme.colors.secondary}
-              style={styles.icon}
-            />
-            <Text style={styles.distance} numberOfLines={1}>
-              {distance}
-            </Text>
-          </View>
-        )} */}
       </Card.Content>
     </TouchableOpacity>
   );

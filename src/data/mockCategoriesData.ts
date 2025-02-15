@@ -14,7 +14,7 @@ export interface Category {
 export const mockCategoriesData: Category[] = [
   {
     id: 'c1',
-    name: 'Other Food and Grocery',
+    name: 'Mobile Phones',
     description: '|',
     imageURLs: [
       'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/Icons-09.png',
@@ -25,7 +25,7 @@ export const mockCategoriesData: Category[] = [
   },
   {
     id: 'c2',
-    name: 'Bakery',
+    name: 'Electronics',
     description: '|',
     imageURLs: [
       'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/New_Bakery.png',
@@ -36,7 +36,7 @@ export const mockCategoriesData: Category[] = [
   },
   {
     id: 'c3',
-    name: 'Instant Food',
+    name: 'Laptops',
     description: '|',
     imageURLs: [
       'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/icons_New_Instant_Food.png',
@@ -47,7 +47,7 @@ export const mockCategoriesData: Category[] = [
   },
   {
     id: 'c4',
-    name: 'Gourmet Food',
+    name: 'Wearables',
     description: '|',
     imageURLs: [
       'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/icons_New_Gourmet_Food.png',
@@ -58,7 +58,7 @@ export const mockCategoriesData: Category[] = [
   },
   {
     id: 'c5',
-    name: 'Beverages',
+    name: 'Computer Accessories',
     description: '|',
     imageURLs: [
       'https://m.media-amazon.com/images/G/31/CONSTELLATION/Product_category_images/icons_New_Beverages.png',

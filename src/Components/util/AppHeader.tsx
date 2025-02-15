@@ -38,7 +38,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({headerText, subHeaderText}) => {
 const styles = StyleSheet.create({
   headerContainer: {
     width: width,
-    paddingBottom: 15,
+    paddingBottom: 20,
     backgroundColor: theme.colors.primary,
     shadowColor: theme.colors.ternary,
     shadowOffset: {
@@ -54,7 +54,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: theme.colors.ternary,
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'left',
+    marginLeft: 10,
   },
   subHeaderText: {
     fontSize: 16,

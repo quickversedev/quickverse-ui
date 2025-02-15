@@ -62,14 +62,32 @@ const CartScreen: React.FC<CartModalProps> = ({
   };
   const getTotalPrice = () => {
     return cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
+      (total, item) => total + Number(item.productPrice) * item.quantity,
       0,
     );
   };
+  const getTotalDiscount = () => {
+    return cartItems.reduce((total, product) => {
+      return (
+        total +
+        (Number(product.productPrice) - Number(product.salePrice)) *
+          product.quantity
+      );
+    }, 0);
+  };
+
+  const getFinalPrice = () => {
+    return getTotalPrice() - getTotalDiscount();
+  };
   const isStoreOpened =
     vendor && isStoreOpen(vendor.storeOpeningTime, vendor.storeClosingTime);
-  console.log('isStoreOpened', vendor);
+
   const isCartEmpty = cartItems.length === 0;
+  const pricesObject = {
+    productPriceTotal: getTotalPrice(),
+    totalDiscount: getTotalDiscount(),
+    finalTotal: getFinalPrice(),
+  };
 
   return (
     <Modal
@@ -122,7 +140,7 @@ const CartScreen: React.FC<CartModalProps> = ({
               handleDelete={handleDelete}
             />
             <PaymentSummaryScreen
-              getTotalPrice={getTotalPrice}
+              getTotalPrice={pricesObject}
               vendor={vendor}
               isStoreOpened={isStoreOpened}
               isCartEmpty={isCartEmpty}

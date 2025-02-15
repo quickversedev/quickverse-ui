@@ -48,9 +48,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const {products, categories, loading, error} =
     useFetchProductsAndCategories();
   const dispatch = useDispatch<AppDispatch>();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    categories[0]?.id,
-  );
+
   const [cartItems, setCartItems] = useState<{[key: string]: ProductCartItems}>(
     {},
   );
@@ -67,7 +65,10 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     isStoreOpen(vendor.storeOpeningTime, vendor.storeClosingTime),
   );
   const categoriesWithProducts = categories.filter(category =>
-    products.some(product => product.category === category.id),
+    products.some(product => product.category === category.name),
+  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    categoriesWithProducts[0]?.name,
   );
   useEffect(() => {
     setCartItems(
@@ -79,7 +80,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   }, [cart]);
 
   useEffect(() => {
-    setSelectedCategory(categories[0]?.id);
+    setSelectedCategory(categories[0]?.name);
   }, [categories]);
 
   if (error) {
@@ -90,9 +91,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     );
   }
 
-  const handleCategoryPress = (categoryId: string) => {
+  const handleCategoryPress = (categoryName: string) => {
     if (storeOpen) {
-      setSelectedCategory(categoryId);
+      setSelectedCategory(categoryName);
     }
   };
   const handleClick = () => {
@@ -123,7 +124,8 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             {
               id: product.id,
               name: product.name,
-              price: product.price,
+              productPrice: product.productPrice,
+              salePrice: product.salePrice,
               quantity: 1,
               image: product.image,
               shopId: product.shopId,
@@ -144,7 +146,8 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             {
               id: productToAdd.id,
               name: productToAdd.name,
-              price: productToAdd.price,
+              productPrice: productToAdd.productPrice,
+              salePrice: productToAdd.salePrice,
               quantity: 1,
               image: productToAdd.image,
               shopId: productToAdd.shopId,
@@ -184,7 +187,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     : products;
 
   const renderCategoryItem = ({item}: {item: Category}) => {
-    const isSelected = item.id === selectedCategory;
+    const isSelected = item.name === selectedCategory;
 
     return (
       <TouchableOpacity
@@ -193,8 +196,8 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           isSelected && styles.selectedCategoryContainer,
           !storeOpen && styles.disabledCategoryContainer, // Disabled style
         ]}
-        onPress={() => handleCategoryPress(item.id)}
-        disabled={!storeOpen} // Disable touch if store is closed
+        onPress={() => handleCategoryPress(item.name)}
+        // disabled={!storeOpen} // Disable touch if store is closed
       >
         <Image
           source={{uri: item.imageURLs[0]}}
@@ -207,12 +210,15 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   };
 
   const renderProductItem = ({item}: {item: Product}) => {
+    const isOutOfStock = item.availability === 'Out of Stock';
+
     const product: ProductCartItems = {
-      id: item.sku,
-      name: item.name,
-      price: item.sellingPrice,
-      quantity: cartItems[item.sku]?.quantity || 0,
-      image: item.productImageUrl,
+      id: item.productId,
+      name: item.title,
+      productPrice: item.productPrice,
+      salePrice: item.productSalePrice,
+      quantity: cartItems[item.productId]?.quantity || 0,
+      image: item.productImageLink,
       shopId: item.shopId,
     };
 
@@ -220,7 +226,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       <View
         style={[
           styles.productContainer,
-          !storeOpen && styles.disabledProductContainer,
+          (!storeOpen || isOutOfStock) && styles.disabledProductContainer,
         ]}>
         <View>
           <Image
@@ -228,18 +234,26 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             style={styles.productImage}
             resizeMode="cover"
           />
+          {isOutOfStock && (
+            <View style={styles.outOfStockOverlay}>
+              <Text style={styles.outOfStockText}>Out of Stock</Text>
+            </View>
+          )}
           <Text style={styles.productRating}>R: N/A</Text>
         </View>
         <View style={styles.productDetails}>
           <Text style={styles.productName}>{product.name}</Text>
-          <Text style={styles.productPrice}>₹{product.price}</Text>
+          <View style={styles.priceContainer}>
+            <Text style={styles.originalPrice}>₹{product.productPrice}</Text>
+            <Text style={styles.salePrice}> ₹{product.salePrice}</Text>
+          </View>
           <CartButton
             quantity={product.quantity}
             onIncrease={() => handleIncreaseQuantity(product.id)}
             onDecrease={() => handleDecreaseQuantity(product.id)}
             onAdd={() => handleAddToCart(product)}
             added={product.quantity > 0}
-            disabled={!storeOpen} // Disable button if store is closed
+            disabled={!storeOpen || isOutOfStock} // Disable button if store is closed or out of stock
           />
         </View>
       </View>
@@ -285,7 +299,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
               <FlatList
                 data={filteredProducts}
                 renderItem={renderProductItem}
-                keyExtractor={item => item.sku}
+                keyExtractor={item => item.productId}
                 numColumns={2}
                 scrollEnabled={false}
                 contentContainerStyle={styles.productList}
@@ -467,6 +481,40 @@ const styles = StyleSheet.create({
   loaderText: {
     fontSize: 18,
     color: theme.colors.secondary,
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1, // Prevents text overflow
+    flexWrap: 'wrap', // Ensures text wraps inside container
+    maxWidth: '100%', // Keeps content within bounds
+    marginVertical: 5,
+  },
+  originalPrice: {
+    textDecorationLine: 'line-through',
+    color: 'gray',
+    fontSize: 12,
+    marginRight: 8, // Adds space between prices
+  },
+  salePrice: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: theme.colors.ternary,
+  },
+  outOfStockOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  outOfStockText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 

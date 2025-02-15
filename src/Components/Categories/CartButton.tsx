@@ -10,6 +10,7 @@ interface CartButtonProps {
   onDecrease: () => void;
   onAdd: () => void;
   added: boolean;
+  disabled: boolean;
 }
 
 const CartButton: React.FC<CartButtonProps> = ({
@@ -18,12 +19,16 @@ const CartButton: React.FC<CartButtonProps> = ({
   onDecrease,
   onAdd,
   added,
+  disabled,
 }) => {
   return (
     <View style={styles.cartButtonContainer}>
       {added ? (
         <View style={styles.quantityContainer}>
-          <Pressable onPress={onDecrease} style={styles.iconButton}>
+          <Pressable
+            onPress={onDecrease}
+            style={styles.iconButton}
+            disabled={disabled}>
             <MaterialCommunityIcons
               name="minus"
               size={20}
@@ -31,7 +36,10 @@ const CartButton: React.FC<CartButtonProps> = ({
             />
           </Pressable>
           <Text style={styles.quantityText}>{quantity}</Text>
-          <Pressable onPress={onIncrease} style={styles.iconButton}>
+          <Pressable
+            onPress={onIncrease}
+            style={styles.iconButton}
+            disabled={disabled}>
             <MaterialCommunityIcons
               name="plus"
               size={20}
@@ -40,7 +48,7 @@ const CartButton: React.FC<CartButtonProps> = ({
           </Pressable>
         </View>
       ) : (
-        <Pressable onPress={onAdd} style={styles.addButton}>
+        <Pressable onPress={onAdd} style={styles.addButton} disabled={disabled}>
           <Text style={styles.addButtonText}>ADD</Text>
         </Pressable>
       )}

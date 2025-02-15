@@ -10,7 +10,7 @@ import {
 import {Card, Text} from 'react-native-paper';
 const {width} = Dimensions.get('window');
 import {FoodItem} from '../../../utils/canonicalModel';
-import theme from '../../../theme';
+
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamListHome} from '../HomeNavigation';

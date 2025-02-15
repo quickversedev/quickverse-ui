@@ -13,7 +13,7 @@ import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../store/store';
-import {fetchOrders} from '../../services/OrdersSlice';
+import {fetchOrders} from '../../services/cart/OrdersSlice';
 import ZeroOrdersState from './ZeroOrderState';
 import {Loading} from '../util/Loading';
 import {OrderMetadata} from '../../utils/canonicalModel';

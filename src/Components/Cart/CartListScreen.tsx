@@ -39,7 +39,10 @@ const CartListScreen: React.FC<CartListScreenProps> = ({
       <Image source={{uri: item.image}} style={styles.itemImage} />
       <View style={styles.itemDetails}>
         <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemPrice}>Rs.{item.price}</Text>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <Text style={styles.originalPrice}>₹{item.productPrice}</Text>
+          <Text style={styles.salePrice}> ₹{item.salePrice}</Text>
+        </View>
       </View>
       <View style={styles.quantityContainer}>
         <TouchableOpacity
@@ -152,6 +155,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
+  },
+  originalPrice: {
+    textDecorationLine: 'line-through', // Adds a strikethrough effect
+    color: 'gray',
+    marginRight: 5,
+  },
+  salePrice: {
+    color: 'black', // Adjust color as needed
+    fontWeight: 'bold',
   },
 });
 

@@ -20,11 +20,13 @@ import {
   incrementProductQuantity,
   removeFromProductCart,
   selectShopId,
-} from '../../services/productCartSlice';
+} from '../../services/cart/productCartSlice';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Vendor} from '../../utils/canonicalModel';
 import {selectVendorDetailsByShopId} from '../../services/VendorListSlice';
 import {isStoreOpen} from '../util/vendorUtil';
+import LoginCard from '../util/MandatoryLoginButton';
+import {useAuth} from '../../utils/AuthContext';
 
 interface CartModalProps {
   modalVisible: boolean;
@@ -34,11 +36,12 @@ const CartScreen: React.FC<CartModalProps> = ({
   modalVisible,
   closeCartModal,
 }) => {
+  const {authData} = useAuth();
   const cartItems = useSelector(
     (state: RootState) => state.productCart.productCart,
   );
   const shopId = useSelector(selectShopId);
-  console.log('shopId1232423', shopId);
+
   const vendor: Vendor | undefined = useSelector((state: RootState) =>
     selectVendorDetailsByShopId(state, shopId),
   );
@@ -59,15 +62,32 @@ const CartScreen: React.FC<CartModalProps> = ({
   };
   const getTotalPrice = () => {
     return cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
+      (total, item) => total + Number(item.productPrice) * item.quantity,
       0,
     );
   };
+  const getTotalDiscount = () => {
+    return cartItems.reduce((total, product) => {
+      return (
+        total +
+        (Number(product.productPrice) - Number(product.salePrice)) *
+          product.quantity
+      );
+    }, 0);
+  };
+
+  const getFinalPrice = () => {
+    return getTotalPrice() - getTotalDiscount();
+  };
   const isStoreOpened =
     vendor && isStoreOpen(vendor.storeOpeningTime, vendor.storeClosingTime);
-  console.log('isStoreOpened', vendor);
+
   const isCartEmpty = cartItems.length === 0;
-  console.log('isCartEmpty', isCartEmpty);
+  const pricesObject = {
+    productPriceTotal: getTotalPrice(),
+    totalDiscount: getTotalDiscount(),
+    finalTotal: getFinalPrice(),
+  };
 
   return (
     <Modal
@@ -111,20 +131,24 @@ const CartScreen: React.FC<CartModalProps> = ({
             </TouchableOpacity>
           </View>
         )}
-        <ScrollView>
-          <CartListScreen
-            cartItems={cartItems}
-            handleIncrement={handleIncrement}
-            handleDecrement={handleDecrement}
-            handleDelete={handleDelete}
-          />
-          <PaymentSummaryScreen
-            getTotalPrice={getTotalPrice}
-            vendor={vendor}
-            isStoreOpened={isStoreOpened}
-            isCartEmpty={isCartEmpty}
-          />
-        </ScrollView>
+        {authData ? (
+          <ScrollView>
+            <CartListScreen
+              cartItems={cartItems}
+              handleIncrement={handleIncrement}
+              handleDecrement={handleDecrement}
+              handleDelete={handleDelete}
+            />
+            <PaymentSummaryScreen
+              getTotalPrice={pricesObject}
+              vendor={vendor}
+              isStoreOpened={isStoreOpened}
+              isCartEmpty={isCartEmpty}
+            />
+          </ScrollView>
+        ) : (
+          <LoginCard feature="Cart" />
+        )}
       </Animated.View>
     </Modal>
   );

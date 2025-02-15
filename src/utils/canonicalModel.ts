@@ -117,7 +117,8 @@ export interface OrdersResponse {
 export interface ProductCartItems {
   id: string;
   name: string;
-  price: number;
+  productPrice: string;
+  salePrice: string;
   quantity: number;
   image: string;
   shopId: string; // Ensure each item has a shopId

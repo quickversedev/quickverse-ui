@@ -21,12 +21,9 @@ export const isStoreOpen = (
 
   // Handle overnight closing time (e.g., 6:30 PM - 2:30 AM)
   if (closingMinutes < openingMinutes) {
-    closingMinutes += 24 * 60; // Extend closing time to next day
-    if (currentTime < openingMinutes) currentTime += 24 * 60; // Adjust current time if past midnight
+    closingMinutes += 24 * 60;
+    if (currentTime < openingMinutes) currentTime += 24 * 60;
   }
-  console.log(
-    'currentTime',
-    currentTime >= openingMinutes && currentTime <= closingMinutes,
-  );
+
   return currentTime >= openingMinutes && currentTime <= closingMinutes;
 };

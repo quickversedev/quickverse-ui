@@ -9,6 +9,8 @@ import {
   SafeAreaView,
   ScrollView,
   Platform,
+  Alert,
+  TextInput, // Added for search bar
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CartButton from './CartButton';
@@ -18,12 +20,12 @@ import {ProductCartItems, Vendor} from '../../utils/canonicalModel';
 import {Product} from '../../data/mockProductData';
 import {useDispatch, useSelector} from 'react-redux';
 import {
-  addToProductCart,
+  addToCart,
   clearCart,
-  decrementProductQuantity,
-  incrementProductQuantity,
+  decrementQuantity,
+  incrementQuantity,
   selectCart,
-} from '../../services/productCartSlice';
+} from '../../services/cart/productCartSlice';
 import {Category} from '../../data/mockCategoriesData';
 import CartScreen from '../Cart/CartScreen';
 import VendorDetails from './venderHeader';
@@ -32,19 +34,22 @@ import {RootStackParamList} from '../Vendors/VendorsNavigator';
 import {Loading} from '../util/Loading';
 import CustomConfirmationModal from '../Cart/CustomConfirmationModal';
 import {isStoreOpen} from '../util/vendorUtil';
+import {useAuth} from '../../utils/AuthContext';
+import {setSkipLoginFlow} from '../../utils/Storage';
+import {AppDispatch} from '../../store/store';
+import {debounce} from 'lodash';
 
 type CategoriesScreenProps = {
   route: RouteProp<RootStackParamList, 'Categories'>;
 };
 
 const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
+  const {authData, setSkipLogin} = useAuth();
   const vendor: Vendor = route.params.vendor;
   const {products, categories, loading, error} =
     useFetchProductsAndCategories();
-  const dispatch = useDispatch();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    categories[0]?.id,
-  );
+  const dispatch = useDispatch<AppDispatch>();
+
   const [cartItems, setCartItems] = useState<{[key: string]: ProductCartItems}>(
     {},
   );
@@ -56,10 +61,18 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   );
   const cart = useSelector(selectCart);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [storeOpen, setStoreOpen] = useState(
+  const [storeOpen] = useState(
     isStoreOpen(vendor.storeOpeningTime, vendor.storeClosingTime),
   );
+  const categoriesWithProducts = categories.filter(category =>
+    products.some(product => product.category === category.name),
+  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    categoriesWithProducts[0]?.name,
+  );
+
+  // State for search query
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     setCartItems(
@@ -71,9 +84,21 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   }, [cart]);
 
   useEffect(() => {
-    setSelectedCategory(categories[0]?.id);
+    setSelectedCategory(categories[0]?.name);
   }, [categories]);
 
+  // Filter categories and products based on search query
+  const filteredCategories = categoriesWithProducts.filter(category =>
+    category.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const filteredProducts = searchQuery
+    ? products.filter(product =>
+        product.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : selectedCategory
+    ? products.filter(product => product.category === selectedCategory)
+    : products;
   if (error) {
     return (
       <View style={styles.loaderContainer}>
@@ -82,45 +107,71 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     );
   }
 
-  const handleCategoryPress = (categoryId: string) => {
-    if (storeOpen) {
-      setSelectedCategory(categoryId);
+  const handleCategoryPress = (categoryName: string) => {
+    setSelectedCategory(categoryName);
+  };
+
+  const handleClick = () => {
+    if (!authData) {
+      setSkipLogin(false);
+      setSkipLoginFlow(false);
     }
   };
-  console.log('shopId', cart[0]?.shopId);
-  const handleAddToCart = (product: ProductCartItems) => {
+
+  const handleAddToCart = debounce((product: ProductCartItems) => {
+    if (!authData) {
+      Alert.alert(
+        'Login Required',
+        'Please log in to add products to your cart.',
+        [
+          {text: 'Cancel', style: 'cancel'},
+          {text: 'Login', onPress: () => handleClick()},
+        ],
+      );
+      return;
+    }
     if (storeOpen) {
       if (cart.length > 0 && cart[0].shopId !== product.shopId) {
         setProductToAdd(product);
         setConfirmationModalVisible(true);
       } else {
         dispatch(
-          addToProductCart({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            quantity: 1,
-            image: product.image,
-            shopId: product.shopId,
-          }),
+          addToCart(
+            {
+              id: product.id,
+              name: product.name,
+              productPrice: product.productPrice,
+              salePrice: product.salePrice,
+              quantity: 1,
+              image: product.image,
+              shopId: product.shopId,
+            },
+            authData,
+          ),
         );
       }
     }
-  };
+  }, 300);
 
   const handleConfirmAddToCart = () => {
     if (productToAdd) {
-      dispatch(clearCart()); // Clear the existing cart
-      dispatch(
-        addToProductCart({
-          id: productToAdd.id,
-          name: productToAdd.name,
-          price: productToAdd.price,
-          quantity: 1,
-          image: productToAdd.image,
-          shopId: productToAdd.shopId,
-        }),
-      );
+      dispatch(clearCart());
+      if (authData) {
+        dispatch(
+          addToCart(
+            {
+              id: productToAdd.id,
+              name: productToAdd.name,
+              productPrice: productToAdd.productPrice,
+              salePrice: productToAdd.salePrice,
+              quantity: 1,
+              image: productToAdd.image,
+              shopId: productToAdd.shopId,
+            },
+            authData,
+          ),
+        );
+      }
       setConfirmationModalVisible(false);
       setProductToAdd(null);
     }
@@ -131,35 +182,33 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     setProductToAdd(null);
   };
 
-  const handleIncreaseQuantity = (productId: string) => {
+  const handleIncreaseQuantity = debounce((productId: string) => {
     if (storeOpen) {
-      dispatch(incrementProductQuantity({id: productId}));
+      if (authData) {
+        dispatch(incrementQuantity(productId, authData));
+      }
     }
-  };
+  }, 300);
 
-  const handleDecreaseQuantity = (productId: string) => {
+  const handleDecreaseQuantity = debounce((productId: string) => {
     if (storeOpen) {
-      dispatch(decrementProductQuantity({id: productId}));
+      if (authData) {
+        dispatch(decrementQuantity(productId, authData));
+      }
     }
-  };
-
-  const filteredProducts = selectedCategory
-    ? products.filter(product => product.category === selectedCategory)
-    : products;
+  }, 300);
 
   const renderCategoryItem = ({item}: {item: Category}) => {
-    const isSelected = item.id === selectedCategory;
+    const isSelected = item.name === selectedCategory;
 
     return (
       <TouchableOpacity
         style={[
           styles.categoryContainer,
           isSelected && styles.selectedCategoryContainer,
-          !storeOpen && styles.disabledCategoryContainer, // Disabled style
+          !storeOpen && styles.disabledCategoryContainer,
         ]}
-        onPress={() => handleCategoryPress(item.id)}
-        disabled={!storeOpen} // Disable touch if store is closed
-      >
+        onPress={() => handleCategoryPress(item.name)}>
         <Image
           source={{uri: item.imageURLs[0]}}
           style={styles.categoryImage}
@@ -171,12 +220,15 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   };
 
   const renderProductItem = ({item}: {item: Product}) => {
+    const isOutOfStock = item.availability === 'Out of Stock';
+
     const product: ProductCartItems = {
-      id: item.sku,
-      name: item.name,
-      price: item.sellingPrice,
-      quantity: cartItems[item.sku]?.quantity || 0,
-      image: item.productImageUrl,
+      id: item.productId,
+      name: item.title,
+      productPrice: item.productPrice,
+      salePrice: item.productSalePrice,
+      quantity: cartItems[item.productId]?.quantity || 0,
+      image: item.productImageLink,
       shopId: item.shopId,
     };
 
@@ -184,7 +236,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       <View
         style={[
           styles.productContainer,
-          !storeOpen && styles.disabledProductContainer,
+          (!storeOpen || isOutOfStock) && styles.disabledProductContainer,
         ]}>
         <View>
           <Image
@@ -192,18 +244,26 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             style={styles.productImage}
             resizeMode="cover"
           />
+          {isOutOfStock && (
+            <View style={styles.outOfStockOverlay}>
+              <Text style={styles.outOfStockText}>Out of Stock</Text>
+            </View>
+          )}
           <Text style={styles.productRating}>R: N/A</Text>
         </View>
         <View style={styles.productDetails}>
           <Text style={styles.productName}>{product.name}</Text>
-          <Text style={styles.productPrice}>₹{product.price}</Text>
+          <View style={styles.priceContainer}>
+            <Text style={styles.originalPrice}>₹{product.productPrice}</Text>
+            <Text style={styles.salePrice}> ₹{product.salePrice}</Text>
+          </View>
           <CartButton
             quantity={product.quantity}
             onIncrease={() => handleIncreaseQuantity(product.id)}
             onDecrease={() => handleDecreaseQuantity(product.id)}
             onAdd={() => handleAddToCart(product)}
             added={product.quantity > 0}
-            // disabled={!storeOpen} // Disable button if store is closed
+            disabled={!storeOpen || isOutOfStock}
           />
         </View>
       </View>
@@ -222,9 +282,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         </View>
         <TouchableOpacity
           style={styles.cartButton}
-          onPress={() => setModalVisible(true)}
-          // disabled={!storeOpen} // Disable cart button if store is closed
-        >
+          onPress={() => setModalVisible(true)}>
           <MaterialCommunityIcons
             name="cart-outline"
             size={24}
@@ -232,6 +290,23 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           />
         </TouchableOpacity>
       </View>
+
+      <View style={styles.searchContainer}>
+        <MaterialCommunityIcons
+          name="magnify"
+          size={24}
+          color={theme.colors.ternary}
+          style={styles.searchIcon}
+        />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by vendor or category"
+          placeholderTextColor={theme.colors.ternary}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
+
       <ScrollView style={styles.productsContainer}>
         <VendorDetails vendor={vendor} />
         {loading ? (
@@ -239,7 +314,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         ) : (
           <>
             <FlatList
-              data={categories}
+              data={filteredCategories}
               renderItem={renderCategoryItem}
               keyExtractor={item => item.id}
               horizontal
@@ -249,7 +324,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
               <FlatList
                 data={filteredProducts}
                 renderItem={renderProductItem}
-                keyExtractor={item => item.sku}
+                keyExtractor={item => item.productId}
                 numColumns={2}
                 scrollEnabled={false}
                 contentContainerStyle={styles.productList}
@@ -322,6 +397,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    borderRadius: 15,
+    marginVertical: 5,
+    marginHorizontal: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  searchIcon: {
+    marginRight: 5,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: theme.colors.secondary,
+  },
   categoriesContainer: {
     height: 120,
     paddingVertical: 10,
@@ -352,7 +449,7 @@ const styles = StyleSheet.create({
     }),
   },
   disabledCategoryContainer: {
-    opacity: 0.5, // Reduce opacity for disabled state
+    opacity: 0.5,
   },
   categoryImage: {
     width: 50,
@@ -389,7 +486,7 @@ const styles = StyleSheet.create({
     }),
   },
   disabledProductContainer: {
-    opacity: 0.5, // Reduce opacity for disabled state
+    opacity: 0.5,
   },
   productImage: {
     width: 70,
@@ -431,6 +528,42 @@ const styles = StyleSheet.create({
   loaderText: {
     fontSize: 18,
     color: theme.colors.secondary,
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    maxWidth: '100%',
+    marginVertical: 5,
+  },
+  originalPrice: {
+    textDecorationLine: 'line-through',
+    color: 'gray',
+    fontSize: 12,
+    marginRight: 8,
+  },
+  salePrice: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: theme.colors.ternary,
+  },
+  outOfStockOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  outOfStockText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  searchIcon: {
+    marginRight: 5,
   },
 });
 

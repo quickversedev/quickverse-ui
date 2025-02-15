@@ -14,7 +14,11 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {Vendor} from '../../utils/canonicalModel';
 
 interface PaymentSummaryScreenProps {
-  getTotalPrice: () => number;
+  getTotalPrice: {
+    productPriceTotal: number;
+    totalDiscount: number;
+    finalTotal: number;
+  };
   vendor: Vendor | undefined;
   isStoreOpened?: boolean;
   isCartEmpty: boolean;
@@ -42,11 +46,19 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
         <Text style={styles.paymentSummaryText}>Payment Summary</Text>
         <View style={styles.paymentRow}>
           <Text style={styles.paymentLabel}>Order Total</Text>
-          <Text style={styles.paymentValue}>Rs.{getTotalPrice()}</Text>
+          <Text style={styles.paymentValue}>
+            Rs.{getTotalPrice.productPriceTotal}
+          </Text>
+        </View>
+        <View style={styles.paymentRow}>
+          <Text style={styles.paymentLabel}>Order Discount</Text>
+          <Text style={styles.paymentValue}>
+            - Rs.{getTotalPrice.totalDiscount}
+          </Text>
         </View>
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>Total</Text>
-          <Text style={styles.totalValue}>Rs.{getTotalPrice()}</Text>
+          <Text style={styles.totalValue}>Rs.{getTotalPrice.finalTotal}</Text>
         </View>
         <TouchableOpacity
           style={[

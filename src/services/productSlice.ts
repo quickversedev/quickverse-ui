@@ -1,6 +1,9 @@
 import {createSlice, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
 import {RootState} from '../store/store';
 import {mockProductData, Product} from '../data/mockProductData';
+import axios from 'axios';
+import globalConfig from '../utils/GlobalConfig';
+import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 
 // Define the state interface
 interface ProductState {
@@ -19,35 +22,39 @@ const initialState: ProductState = {
 // Async thunk to fetch products from an API with a 1-second delay
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
-  async () => {
+  async (vendorId: string) => {
     return new Promise<Product[]>(resolve => {
       setTimeout(() => {
+        console.log('vendorId to fetch Product mock:', vendorId);
         resolve(mockProductData);
       }, 1000);
     });
   },
 );
-// createAsyncThunk(
-//   'products/fetchProducts',
-//   async (_, {rejectWithValue}) => {
-//     try {
-//       // Add a 1-second delay
-//       console.log('Fetching products...');
+// const API_BASE_URL = `${globalConfig.apiBaseUrl}/v2/campus`;
 
-//       const response = await fetch('https://api.example.com/products');
-//       if (!response.ok) {
-//         throw new Error('Failed to fetch products');
-//       }
-//       const data: Product[] = await response.json();
-//       return data;
+// Async thunk to fetch products using Axios with campusId as a path param
+// export const fetchProducts = createAsyncThunk(
+//   'products/fetchProducts',
+//   async ({vendorId}: {vendorId: string}, {rejectWithValue}) => {
+//     try {
+//       const token = await fetchToken();
+//       const response = await axios.get<Product[]>(
+//         `${API_BASE_URL}/${vendorId}/products`,
+//         {
+//           headers: {
+//             Authorization: token,
+//           },
+//         },
+//       );
+//       return response.data;
 //     } catch (error) {
-//       console.log('Failed to fetch products');
+//       console.error('Failed to fetch products:', error);
 //       return rejectWithValue('Failed to fetch products');
 //     }
 //   },
 // );
 
-// Product slice
 export const productSlice = createSlice({
   name: 'products',
   initialState,
@@ -76,7 +83,6 @@ export const productSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectProducts = (state: RootState) => state.products.products;
 export const selectProductLoading = (state: RootState) =>
   state.products.loading;

@@ -20,6 +20,8 @@ import {fetchCampusIds} from '../../services/fetchCampusIds';
 import LoginDetails from '../Login/loginDetails';
 import {useAuth} from '../../utils/AuthContext';
 import CartScreen from '../Cart/CartScreen';
+import {useSelector} from 'react-redux';
+import {selectCart} from '../../services/cart/productCartSlice';
 const HomeScreen: React.FC = () => {
   const [selectedCampusId, setSelectedCampusId] = useState<
     string | undefined
@@ -59,6 +61,8 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     selectedCampus && setSelectedCampusId(selectedCampus);
   }, [selectedCampus]);
+  const cart = useSelector(selectCart);
+  const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -104,6 +108,11 @@ const HomeScreen: React.FC = () => {
                 size={24}
                 color="#FFDC52"
               />
+              {totalCartItems > 0 && (
+                <View style={styles.cartBadge}>
+                  <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -196,6 +205,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3,
     marginLeft: 10, // Adds spacing between dropdown and cart button
+  },
+  cartBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cartBadgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });
 

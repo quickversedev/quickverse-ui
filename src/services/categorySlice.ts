@@ -1,6 +1,9 @@
 import {createSlice, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
 import {RootState} from '../store/store';
 import mockCategoriesData, {Category} from '../data/mockCategoriesData';
+import axios from 'axios';
+import globalConfig from '../utils/GlobalConfig';
+import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 
 // Define the state interface
 interface CategoryState {
@@ -19,35 +22,38 @@ const initialState: CategoryState = {
 // Async thunk to fetch categories from an API with a 1-second delay
 export const fetchCategories = createAsyncThunk(
   'categories/fetchCategories',
-  async () => {
+  async (vendorId: string) => {
     return new Promise<Category[]>(resolve => {
       setTimeout(() => {
+        console.log('vendorId to fetch Categories mock:', vendorId);
         resolve(mockCategoriesData);
       }, 1000);
     });
   },
 );
-// createAsyncThunk(
-//   'categories/fetchCategories',
-//   async (_, {rejectWithValue}) => {
-//     try {
-//       // Add a 1-second delay
-//       console.log('Fetching categories...');
+// const API_BASE_URL = `${globalConfig.apiBaseUrl}/v2/campus`;
 
-//       const response = await fetch('https://api.example.com/categories');
-//       if (!response.ok) {
-//         throw new Error('Failed to fetch categories');
-//       }
-//       const data: Category[] = await response.json();
-//       return data;
+// export const fetchCategories = createAsyncThunk(
+//   'categories/fetchCategories',
+//   async ({vendorId}: {vendorId: string}, {rejectWithValue}) => {
+//     try {
+//       const token = await fetchToken();
+//       const response = await axios.get<Category[]>(
+//         `${API_BASE_URL}/${vendorId}/categories`,
+//         {
+//           headers: {
+//             Authorization: token,
+//           },
+//         },
+//       );
+//       return response.data;
 //     } catch (error) {
-//       console.log('Failed to fetch categories');
-//       return rejectWithValue('Failed to fetch categories');
+//       console.error('Failed to fetch products:', error);
+//       return rejectWithValue('Failed to fetch products');
 //     }
 //   },
 // );
 
-// Category slice
 export const categorySlice = createSlice({
   name: 'categories',
   initialState,
@@ -76,7 +82,6 @@ export const categorySlice = createSlice({
   },
 });
 
-// Selectors
 export const selectCategories = (state: RootState) =>
   state.categories.categories;
 export const selectCategoryLoading = (state: RootState) =>

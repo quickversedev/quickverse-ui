@@ -23,48 +23,47 @@ interface UseFetchProductsAndCategoriesReturn {
   error: string | null;
 }
 
-export const useFetchProductsAndCategories =
-  (): UseFetchProductsAndCategoriesReturn => {
-    const dispatch = useDispatch<AppDispatch>();
+export const useFetchProductsAndCategories = (
+  vendorId: string,
+): UseFetchProductsAndCategoriesReturn => {
+  const dispatch = useDispatch<AppDispatch>();
 
-    // Fetch selectors
-    const products = useSelector(selectProducts);
-    const categories = useSelector(selectCategories);
-    const productLoading = useSelector(selectProductLoading);
-    const categoryLoading = useSelector(selectCategoryLoading);
-    const productError = useSelector(selectProductError);
-    const categoryError = useSelector(selectCategoryError);
+  const products = useSelector(selectProducts);
+  const categories = useSelector(selectCategories);
+  const productLoading = useSelector(selectProductLoading);
+  const categoryLoading = useSelector(selectCategoryLoading);
+  const productError = useSelector(selectProductError);
+  const categoryError = useSelector(selectCategoryError);
 
-    // Combined loading and error states
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
-    // console.log('products', products);
-    useEffect(() => {
-      // Dispatch both fetch actions
-      const fetchData = async () => {
-        setLoading(true);
-        await Promise.all([
-          dispatch(fetchProducts()),
-          dispatch(fetchCategories()),
-        ]);
-        setLoading(false);
-      };
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-      fetchData().catch(() => setError('Failed to fetch data.'));
-    }, [dispatch]);
-
-    useEffect(() => {
-      // Check for errors from either API
-      if (productError || categoryError) {
-        setError(productError || categoryError);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!vendorId) {
+        return;
       }
-    }, [productError, categoryError]);
-
-    return {
-      products,
-      categories,
-      loading: loading || productLoading || categoryLoading,
-      error,
+      setLoading(true);
+      await Promise.all([
+        dispatch(fetchProducts(vendorId)),
+        dispatch(fetchCategories(vendorId)),
+      ]);
+      setLoading(false);
     };
+
+    fetchData().catch(() => setError('Failed to fetch data.'));
+  }, [dispatch, vendorId]);
+
+  useEffect(() => {
+    if (productError || categoryError) {
+      setError(productError || categoryError);
+    }
+  }, [productError, categoryError]);
+
+  return {
+    products,
+    categories,
+    loading: loading || productLoading || categoryLoading,
+    error,
   };
-// Remove these placeholder functions as the actual implementations are imported from the store
+};

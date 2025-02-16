@@ -637,7 +637,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
   const categoriesWithProducts = (categories || []).filter(category =>
     (products || []).some(product => product.category === category.name),
-
   );
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     categoriesWithProducts[0]?.name,
@@ -670,7 +669,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     : selectedCategory
     ? (products || []).filter(product => product.category === selectedCategory)
     : products || [];
-
 
   if (error) {
     return (
@@ -995,28 +993,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     fontWeight: 'bold',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    borderRadius: 15,
-    marginVertical: 5,
-    marginHorizontal: 5,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  searchIcon: {
-    marginRight: 5,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: theme.colors.secondary,
   },
   searchContainer: {
     flexDirection: 'row',

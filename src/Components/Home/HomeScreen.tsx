@@ -136,19 +136,19 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   headerContainer: {
-    flexDirection: 'row', // Aligns items in a row
-    alignItems: 'center', // Ensures proper vertical alignment
+    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 10, // Ensures proper spacing
-    paddingHorizontal: 10, // Add some padding for spacing
-    zIndex: 1000, // Ensure the dropdown is above other elements
+    marginVertical: 10,
+    paddingHorizontal: 10,
+    zIndex: 1000,
   },
   campusSelector: {
-    flex: 1, // Takes most of the available space
+    flex: 1,
     zIndex: 2,
   },
   touchableOpacity: {
-    width: '100%', // Take full width of the parent (campusSelector)
+    width: '100%',
     height: 50,
     borderRadius: 10,
     borderWidth: 0.9,
@@ -165,14 +165,14 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     elevation: 5,
     marginTop: 10,
-    maxHeight: 500, // Limit the height of the dropdown
+    maxHeight: 500,
     alignSelf: 'center',
     width: '90%',
     borderWidth: 0.9,
     backgroundColor: theme.colors.primary,
     borderRadius: 10,
     position: 'absolute',
-    top: 60, // Adjust as needed to position below the button
+    top: 60,
     zIndex: 10,
     overflow: 'scroll',
   },

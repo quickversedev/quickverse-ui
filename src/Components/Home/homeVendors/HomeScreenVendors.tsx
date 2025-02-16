@@ -33,9 +33,9 @@ const HomeScreenVendors: React.FC<HomeScreenVendorsProps> = ({campus}) => {
       <View style={styles.lineContainer}>
         <View style={styles.line} />
         <Text variant="titleLarge" style={styles.heading}>
-          Stores Near You!
+          Stores Near You..!
         </Text>
-        <View style={styles.line} />
+        <View style={styles.invisibleLine} />
       </View>
       <HorizontalCardList vendors={enabledVendors} />
     </View>
@@ -65,6 +65,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
+  },
+  invisibleLine: {
+    flex: 1,
+    height: 3, // Thicker line
+    backgroundColor: theme.colors.primary,
+    marginHorizontal: 8,
   },
   heading: {
     fontSize: 30,

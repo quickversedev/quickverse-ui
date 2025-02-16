@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     color: theme.colors.ternary,
-    fontWeight: 'bold',
+    // fontWeight: 'bold',/
   },
   distance: {
     fontSize: 14,

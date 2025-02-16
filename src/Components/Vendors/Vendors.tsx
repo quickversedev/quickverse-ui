@@ -20,6 +20,7 @@ const Vendors: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const cart = useSelector(selectCart);
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
+
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.container}>
@@ -40,6 +41,7 @@ const Vendors: React.FC = () => {
                 <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
               </View>
             )}
+
           </TouchableOpacity>
         </View>
 

@@ -12,9 +12,8 @@ import {
   selectCategoryLoading,
   selectCategoryError,
 } from '../categorySlice';
-import {Category} from '../../data/mockCategoriesData';
-import {Product} from '../../data/mockProductData';
 import {AppDispatch} from '../../store/store';
+import {Category, Product} from '../../utils/canonicalModel';
 
 interface UseFetchProductsAndCategoriesReturn {
   products: Product[];

@@ -3,7 +3,6 @@ import React, {useState} from 'react';
 import {
   View,
   StyleSheet,
-  Dimensions,
   SafeAreaView,
   TouchableOpacity,
   Text,
@@ -41,7 +40,6 @@ const Vendors: React.FC = () => {
                 <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
               </View>
             )}
-
           </TouchableOpacity>
         </View>
 
@@ -65,6 +63,7 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: theme.colors.primary,
+    marginBottom: 45,
   },
   headerContainer: {
     flexDirection: 'row',

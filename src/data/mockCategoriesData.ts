@@ -1,14 +1,6 @@
 // data/mockCategoriesData.ts
 
-export interface Category {
-  id: string;
-  name: string;
-  description: string;
-  imageURLs: string[];
-  type: string;
-  parentCategory: string | null;
-  countOfSkus: number;
-}
+import {Category} from '../utils/canonicalModel';
 
 // Mock categories data
 export const mockCategoriesData: Category[] = [

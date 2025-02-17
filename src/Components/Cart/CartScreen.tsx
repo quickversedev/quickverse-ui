@@ -118,7 +118,16 @@ const CartScreen: React.FC<CartModalProps> = ({
         <Text style={styles.subHeader}>
           {cartItems.length} Items in your cart from
         </Text>
-        <Text style={styles.vendorName}>{vendor?.vendorName}</Text>
+        <View style={styles.vendorRow}>
+          <Text style={styles.vendorName}>{vendor?.vendorName}</Text>
+          {!isCartEmpty && (
+            <TouchableOpacity
+              style={styles.clearCartButton}
+              onPress={handleClearCart}>
+              <Text style={styles.clearCartButtonText}>Clear Cart</Text>
+            </TouchableOpacity>
+          )}
+        </View>
         {!isCartEmpty && !isStoreOpened && (
           <View style={styles.storeClosedCard}>
             <Text style={styles.storeClosedText}>
@@ -219,6 +228,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: theme.colors.error,
     fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  vendorRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 10,
   },
 });

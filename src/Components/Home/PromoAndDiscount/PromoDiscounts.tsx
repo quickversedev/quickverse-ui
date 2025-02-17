@@ -30,9 +30,9 @@ const PromoDiscounts: React.FC<PromoDiscountsProps> = ({campus}) => {
       <View style={styles.lineContainer}>
         <View style={styles.line} />
         <Text variant="titleLarge" style={styles.heading}>
-          Promo & Discounts!
+          Promo & Discounts..!
         </Text>
-        <View style={styles.line} />
+        <View style={styles.invisibleLine} />
       </View>
       <PromoScroll promoItemsList={promoItemsList} />
     </View>
@@ -62,6 +62,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
+  },
+  invisibleLine: {
+    flex: 1,
+    height: 3, // Thicker line
+    backgroundColor: theme.colors.primary,
+    marginHorizontal: 8,
   },
   heading: {
     fontSize: 30,

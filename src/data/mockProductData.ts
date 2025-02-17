@@ -597,7 +597,8 @@ export const mockProductData: Product[] = [
     productPrice: '120.00',
     productSalePrice: '100.00',
     productLink: 'https://example.com/product/P12345',
-    productImageLink: 'https://example.com/images/product/P12345.jpg',
+    productImageLink:
+      'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'AudioPro',
     productSize: 'Medium',
     category: 'Electronics',
@@ -605,7 +606,7 @@ export const mockProductData: Product[] = [
   {
     productId: 'P67890',
     vendorId: 'V001',
-    shopId: 'S001',
+    shopId: 'S002',
     title: 'Smartphone XYZ',
     description:
       'Latest model with high-performance features and sleek design.',
@@ -614,7 +615,8 @@ export const mockProductData: Product[] = [
     productPrice: '799.00',
     productSalePrice: '699.00',
     productLink: 'https://example.com/product/P67890',
-    productImageLink: 'https://example.com/images/product/P67890.jpg',
+    productImageLink:
+      'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'TechBrand',
     productSize: '6.5-inch',
     category: 'Mobile Phones',
@@ -631,7 +633,8 @@ export const mockProductData: Product[] = [
     productPrice: '1500.00',
     productSalePrice: '1350.00',
     productLink: 'https://example.com/product/P54321',
-    productImageLink: 'https://example.com/images/product/P54321.jpg',
+    productImageLink:
+      'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'GamePro',
     productSize: '15.6-inch',
     category: 'Laptops',
@@ -648,7 +651,8 @@ export const mockProductData: Product[] = [
     productPrice: '199.00',
     productSalePrice: '179.00',
     productLink: 'https://example.com/product/P78901',
-    productImageLink: 'https://example.com/images/product/P78901.jpg',
+    productImageLink:
+      'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'WatchTech',
     productSize: 'One Size',
     category: 'Wearables',
@@ -665,7 +669,8 @@ export const mockProductData: Product[] = [
     productPrice: '59.00',
     productSalePrice: '49.00',
     productLink: 'https://example.com/product/P65432',
-    productImageLink: 'https://example.com/images/product/P65432.jpg',
+    productImageLink:
+      'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'PeriTech',
     productSize: 'Standard',
     category: 'Computer Accessories',
@@ -681,7 +686,8 @@ export const mockProductData: Product[] = [
     productPrice: '149.00',
     productSalePrice: '129.00',
     productLink: 'https://example.com/product/P98765',
-    productImageLink: 'https://example.com/images/product/P98765.jpg',
+    productImageLink:
+      'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'SoundElite',
     productSize: 'Small',
     category: 'Computer Accessories',
@@ -698,7 +704,8 @@ export const mockProductData: Product[] = [
     productPrice: '1200.00',
     productSalePrice: '999.00',
     productLink: 'https://example.com/product/P45678',
-    productImageLink: 'https://example.com/images/product/P45678.jpg',
+    productImageLink:
+      'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'VisionX',
     productSize: '55-inch',
     category: 'Computer Accessories',
@@ -714,7 +721,8 @@ export const mockProductData: Product[] = [
     productPrice: '79.00',
     productSalePrice: '69.00',
     productLink: 'https://example.com/product/P32109',
-    productImageLink: 'https://example.com/images/product/P32109.jpg',
+    productImageLink:
+      'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'BoomBox',
     productSize: 'Small',
     category: 'Computer Accessories',

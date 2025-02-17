@@ -83,24 +83,6 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
     setActiveIndex(index);
   };
 
-  const renderDotIndicators = () => {
-    return promoItemsList.map((_, index) => {
-      return (
-        <View
-          key={index}
-          style={[
-            styles.dot,
-            {
-              backgroundColor:
-                activeIndex === index
-                  ? theme.colors.secondary
-                  : theme.colors.ternary,
-            },
-          ]}
-        />
-      );
-    });
-  };
   return (
     <View style={styles.container}>
       <FlatList
@@ -120,8 +102,6 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
         contentContainerStyle={{paddingHorizontal: itemSpacing}}
         ItemSeparatorComponent={() => <View style={{width: itemSpacing}} />}
       />
-
-      <View style={styles.dotContainer}>{renderDotIndicators()}</View>
     </View>
   );
 };

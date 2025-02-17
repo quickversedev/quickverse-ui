@@ -7,13 +7,13 @@ import {useNavigation} from '@react-navigation/native';
 import {Vendor} from '../../../utils/canonicalModel';
 
 const {width} = Dimensions.get('window');
-const SPACING: any = 3;
-const ITEM_SIZE: any = width * 0.46;
+const SPACING: any = 10;
+const ITEM_SIZE: any = width * 0.3;
 // const EMPTY_ITEM_SIZE: any = width - ITEM_SIZE * 2.5;
 
 type HomeNavigationProp = StackNavigationProp<
   RootStackParamListHome,
-  'WebView'
+  'Categories'
 >;
 interface Props {
   vendors: Vendor[];
@@ -21,9 +21,9 @@ interface Props {
 const HorizontalCardList: React.FC<Props> = ({vendors}) => {
   const navigation = useNavigation<HomeNavigationProp>();
 
-  const handleCardPress = (url: string) => {
+  const handleCardPress = (vendor: Vendor) => {
     navigation.removeListener;
-    navigation.navigate('WebView', {url});
+    navigation.navigate('Categories', {vendor});
   };
 
   return (
@@ -43,12 +43,12 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
         scrollEventThrottle={16}
         renderItem={({item, index}) => {
           return (
-            <View key={index} style={{width: ITEM_SIZE, margin: SPACING * 2}}>
+            <View key={index} style={styles.cardContainer}>
               <CardItem
                 name={item.vendorName}
                 distance={item.distance}
                 image={{uri: `${item.vendorBanner}.jpg`}}
-                onPress={() => handleCardPress(item.vendorEndPoint)}
+                onPress={() => handleCardPress(item)}
               />
             </View>
           );
@@ -61,7 +61,18 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: SPACING * 8,
+    paddingTop: 5,
+  },
+  cardContainer: {
+    width: ITEM_SIZE,
+    margin: SPACING,
+    borderRadius: 15,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });
 

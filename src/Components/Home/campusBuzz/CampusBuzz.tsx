@@ -30,9 +30,9 @@ const CampusBuzz: React.FC<PCampusBuzzProps> = ({campus}) => {
       <View style={styles.lineContainer}>
         <View style={styles.line} />
         <Text variant="titleLarge" style={styles.heading}>
-          Campus Buzzzz..!!
+          Campus Buzzzz..!
         </Text>
-        <View style={styles.line} />
+        <View style={styles.invisibleLine} />
       </View>
       <CampusBuzzList buzzData={campusBuzz} />
     </View>
@@ -61,6 +61,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
+  },
+  invisibleLine: {
+    flex: 1,
+    height: 3,
+    backgroundColor: theme.colors.primary,
+    marginHorizontal: 8,
   },
   heading: {
     fontSize: 30,

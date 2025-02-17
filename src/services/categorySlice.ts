@@ -1,9 +1,11 @@
 import {createSlice, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
 import {RootState} from '../store/store';
-import mockCategoriesData, {Category} from '../data/mockCategoriesData';
+
 import axios from 'axios';
 import globalConfig from '../utils/GlobalConfig';
 import {fetchToken} from '../utils/KeychainStore/keychainUtil';
+import {Category} from '../utils/canonicalModel';
+import {mockCategoriesData} from '../data/mockCategoriesData';
 
 // Define the state interface
 interface CategoryState {

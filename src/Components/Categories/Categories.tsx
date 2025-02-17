@@ -72,10 +72,10 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   );
 
   const categoriesWithProducts = (categories || []).filter(category =>
-    (products || []).some(product => product.category === category.name),
+    (products || []).some(product => product.category === category.id),
   );
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    categoriesWithProducts[0]?.name,
+    categoriesWithProducts[0]?.id,
   );
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,7 +90,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   }, [cart]);
 
   useEffect(() => {
-    setSelectedCategory(categories[0]?.name);
+    setSelectedCategory(categories[0]?.id);
   }, [categories]);
 
   // Filter categories and products based on search query
@@ -114,8 +114,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     );
   }
 
-  const handleCategoryPress = (categoryName: string) => {
-    setSelectedCategory(categoryName);
+  const handleCategoryPress = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    setSearchQuery('');
   };
 
   const handleClick = () => {
@@ -206,7 +207,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   }, 300);
 
   const renderCategoryItem = ({item}: {item: Category}) => {
-    const isSelected = item.name === selectedCategory;
+    const isSelected = item.id === selectedCategory;
 
     return (
       <TouchableOpacity
@@ -215,7 +216,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           isSelected && styles.selectedCategoryContainer,
           !storeOpen && styles.disabledCategoryContainer,
         ]}
-        onPress={() => handleCategoryPress(item.name)}>
+        onPress={() => handleCategoryPress(item.id)}>
         <Image
           source={{uri: item.imageURLs[0]}}
           style={styles.categoryImage}
@@ -227,7 +228,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   };
 
   const renderProductItem = ({item}: {item: Product}) => {
-    const isOutOfStock = item.availability === 'Out of Stock';
+    const isInStock = item.availability;
 
     const product: ProductCartItems = {
       id: item.productId,
@@ -243,7 +244,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       <View
         style={[
           styles.productContainer,
-          (!storeOpen || isOutOfStock) && styles.disabledProductContainer,
+          (!storeOpen || !isInStock) && styles.disabledProductContainer,
         ]}>
         <View>
           <Image
@@ -251,7 +252,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             style={styles.productImage}
             resizeMode="cover"
           />
-          {isOutOfStock && (
+          {!isInStock && (
             <View style={styles.outOfStockOverlay}>
               <Text style={styles.outOfStockText}>Out of Stock</Text>
             </View>
@@ -270,7 +271,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             onDecrease={() => handleDecreaseQuantity(product.id)}
             onAdd={() => handleAddToCart(product)}
             added={product.quantity > 0}
-            disabled={!storeOpen || isOutOfStock}
+            disabled={!storeOpen || !isInStock}
           />
         </View>
       </View>

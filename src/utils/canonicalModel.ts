@@ -142,6 +142,7 @@ export interface Product {
   productBrand: string;
   productSize: string;
   category: string;
+  isBestSeller: boolean;
 }
 export interface Category {
   id: string;

@@ -11,7 +11,6 @@ const CustomConfirmationModal: React.FC<CustomConfirmationModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  console.log('render');
   return (
     <Modal
       visible={isVisible}

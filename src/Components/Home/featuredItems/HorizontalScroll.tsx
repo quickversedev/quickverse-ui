@@ -35,9 +35,7 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
   const dispatch = useDispatch<AppDispatch>();
   const {authData, setSkipLogin} = useAuth();
   const cartItems = useSelector(selectCart);
-  const inStock = featuredItems.filter(
-    item => item.availability !== 'Out of Stock',
-  );
+  const inStock = featuredItems.filter(item => item.availability);
   const handleClick = () => {
     if (!authData) {
       setSkipLogin(false);

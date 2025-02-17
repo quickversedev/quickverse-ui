@@ -4,6 +4,7 @@ import axios from 'axios';
 import {getCampus} from '../utils/Storage';
 import globalConfig from '../utils/GlobalConfig';
 import {fetchToken} from '../utils/KeychainStore/keychainUtil';
+import {mockPromoData} from '../data/Promo';
 
 export const fetchPromoItems = createAsyncThunk<Promo[], string>(
   'promoItems/fetchPromoItems',
@@ -25,6 +26,17 @@ export const fetchPromoItems = createAsyncThunk<Promo[], string>(
     }
   },
 );
+// export const fetchPromoItems = createAsyncThunk(
+//   'promoItems/fetchPromoItems',
+//   async () => {
+//     return new Promise<Promo[]>(resolve => {
+//       setTimeout(() => {
+//         console.log('Promo to fetch promo mock:');
+//         resolve(mockPromoData);
+//       }, 1000);
+//     });
+//   },
+// );
 const PromoItemsSlice = createSlice({
   name: 'promoItems',
   initialState: {

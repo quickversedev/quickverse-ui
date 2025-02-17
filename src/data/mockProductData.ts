@@ -589,7 +589,7 @@ export const mockProductData: Product[] = [
   {
     productId: 'P12345',
     vendorId: 'V001',
-    shopId: 'S001',
+    shopId: 'IIMU-010',
     title: 'Wireless Bluetooth Headphones',
     description: 'High-quality sound, noise-canceling, comfortable ear cups.',
     availability: 'In Stock',
@@ -606,7 +606,7 @@ export const mockProductData: Product[] = [
   {
     productId: 'P67890',
     vendorId: 'V001',
-    shopId: 'S002',
+    shopId: 'IIMU-010',
     title: 'Smartphone XYZ',
     description:
       'Latest model with high-performance features and sleek design.',
@@ -624,7 +624,7 @@ export const mockProductData: Product[] = [
   {
     productId: 'P54321',
     vendorId: 'V001',
-    shopId: 'S001',
+    shopId: 'IIMU-010',
     title: 'Gaming Laptop G15',
     description:
       'Powerful gaming laptop with RTX graphics and high refresh rate display.',
@@ -642,7 +642,7 @@ export const mockProductData: Product[] = [
   {
     productId: 'P78901',
     vendorId: 'V001',
-    shopId: 'S001',
+    shopId: 'IIMU-010',
     title: 'Smartwatch X-Series',
     description:
       'Stylish smartwatch with fitness tracking and notification features.',
@@ -660,7 +660,7 @@ export const mockProductData: Product[] = [
   {
     productId: 'P65432',
     vendorId: 'V001',
-    shopId: 'S001',
+    shopId: 'IIMU-010',
     title: 'Wireless Keyboard & Mouse Combo',
     description:
       'Ergonomic design, long battery life, and seamless connectivity.',
@@ -678,7 +678,7 @@ export const mockProductData: Product[] = [
   {
     productId: 'P98765',
     vendorId: 'V001',
-    shopId: 'S001',
+    shopId: 'IIMU-010',
     title: 'Noise-Canceling Earbuds',
     description: 'Compact, high-quality sound with active noise cancelation.',
     availability: 'In Stock',
@@ -695,7 +695,7 @@ export const mockProductData: Product[] = [
   {
     productId: 'P45678',
     vendorId: 'V001',
-    shopId: 'S001',
+    shopId: 'IIMU-010',
     title: 'Ultra-HD 4K TV',
     description:
       'Smart TV with crisp visuals, HDR, and built-in streaming apps.',
@@ -713,7 +713,7 @@ export const mockProductData: Product[] = [
   {
     productId: 'P32109',
     vendorId: 'V001',
-    shopId: 'S001',
+    shopId: 'IIMU-010',
     title: 'Portable Bluetooth Speaker',
     description: 'Waterproof, high-bass, and 10-hour battery life.',
     availability: 'Out of Stock',

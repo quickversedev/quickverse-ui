@@ -12,12 +12,6 @@ export interface Vendor {
   storeClosingTime: string;
   storeCategory: string;
 }
-export interface Promo {
-  promoId: string;
-  promoName: string;
-  promoImage: any; //base64
-  promoLink: string;
-}
 export interface Order {
   id: string;
   date: string;
@@ -121,5 +115,40 @@ export interface ProductCartItems {
   salePrice: string;
   quantity: number;
   image: string;
-  shopId: string; // Ensure each item has a shopId
+  shopId: string;
+}
+
+export interface Promo {
+  vendorId: string;
+  campusId: string;
+  promoId: number;
+  promoImage: string;
+  promoLink: string;
+  promoName: string;
+}
+
+export interface Product {
+  productId: string;
+  vendorId: string;
+  shopId: string;
+  title: string;
+  description: string;
+  availability: string;
+  condition: string;
+  productPrice: string;
+  productSalePrice: string;
+  productLink: string;
+  productImageLink: string;
+  productBrand: string;
+  productSize: string;
+  category: string;
+}
+export interface Category {
+  id: string;
+  name: string;
+  description: string;
+  imageURLs: string[];
+  type: string;
+  parentCategory: string | null;
+  countOfSkus: number;
 }

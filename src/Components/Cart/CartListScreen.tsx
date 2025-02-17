@@ -12,15 +12,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import theme from '../../theme';
 import {ProductCartItems} from '../../utils/canonicalModel';
 
-interface CartItem {
-  id: string;
-  image: string;
-  name: string;
-  restaurant: string;
-  price: number;
-  quantity: number;
-}
-
 interface CartListScreenProps {
   cartItems: ProductCartItems[];
   handleIncrement: (id: string) => void;

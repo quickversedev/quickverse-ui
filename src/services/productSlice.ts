@@ -39,7 +39,7 @@ export const fetchProducts = createAsyncThunk(
 //   async ({vendorId}: {vendorId: string}, {rejectWithValue}) => {
 //     try {
 //       const token = await fetchToken();
-//       const response = await axios.get<Product[]>(
+//       const response = await axios.post<Product[]>(
 //         `${API_BASE_URL}/${vendorId}/products`,
 //         {
 //           headers: {

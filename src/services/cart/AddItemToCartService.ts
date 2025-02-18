@@ -7,11 +7,14 @@ export const addItemToCart = async (
   AuthData: string,
 ): Promise<any> => {
   try {
-    const url = `${globalConfig.apiBaseUrl}/v2/addCart?vendorId=${vendorId}&productId=${productId}`;
+    const url = `${globalConfig.apiBaseUrl}/v2/addCart`;
 
     const response = await axios.post(
       url,
-      {},
+      {
+        shopId: vendorId,
+        sku: productId,
+      },
       {
         headers: {
           SessionKey: AuthData,

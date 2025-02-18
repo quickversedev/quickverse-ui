@@ -11,7 +11,7 @@ export const mockProductData: Product[] = [
     condition: 'New',
     productPrice: '120.00',
     productSalePrice: '100.00',
-    productLink: 'https://example.com/product/P12345',
+
     productImageLink:
       'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'AudioPro',
@@ -30,7 +30,6 @@ export const mockProductData: Product[] = [
     condition: 'New',
     productPrice: '799.00',
     productSalePrice: '699.00',
-    productLink: 'https://example.com/product/P67890',
     productImageLink:
       'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'TechBrand',
@@ -49,7 +48,6 @@ export const mockProductData: Product[] = [
     condition: 'New',
     productPrice: '1500.00',
     productSalePrice: '1350.00',
-    productLink: 'https://example.com/product/P54321',
     productImageLink:
       'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'GamePro',
@@ -60,7 +58,7 @@ export const mockProductData: Product[] = [
   {
     productId: 'P78901',
     vendorId: 'V001',
-    shopId: 'IIMU-010',
+    shopId: 'IIMU-001',
     title: 'Smartwatch X-Series',
     description:
       'Stylish smartwatch with fitness tracking and notification features.',
@@ -68,7 +66,6 @@ export const mockProductData: Product[] = [
     condition: 'New',
     productPrice: '199.00',
     productSalePrice: '179.00',
-    productLink: 'https://example.com/product/P78901',
     productImageLink:
       'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'WatchTech',
@@ -87,7 +84,6 @@ export const mockProductData: Product[] = [
     condition: 'New',
     productPrice: '59.00',
     productSalePrice: '49.00',
-    productLink: 'https://example.com/product/P65432',
     productImageLink:
       'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'PeriTech',
@@ -105,7 +101,6 @@ export const mockProductData: Product[] = [
     condition: 'New',
     productPrice: '149.00',
     productSalePrice: '129.00',
-    productLink: 'https://example.com/product/P98765',
     productImageLink:
       'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'SoundElite',
@@ -116,7 +111,7 @@ export const mockProductData: Product[] = [
   {
     productId: 'P45678',
     vendorId: 'V001',
-    shopId: 'IIMU-010',
+    shopId: 'IIMU-001',
     title: 'Ultra-HD 4K TV',
     description:
       'Smart TV with crisp visuals, HDR, and built-in streaming apps.',
@@ -124,7 +119,6 @@ export const mockProductData: Product[] = [
     condition: 'New',
     productPrice: '1200.00',
     productSalePrice: '999.00',
-    productLink: 'https://example.com/product/P45678',
     productImageLink:
       'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'VisionX',
@@ -142,7 +136,6 @@ export const mockProductData: Product[] = [
     condition: 'New',
     productPrice: '79.00',
     productSalePrice: '69.00',
-    productLink: 'https://example.com/product/P32109',
     productImageLink:
       'https://m.media-amazon.com/images/X/bxt1/M/Nbxt1RAImJCQ$CY.jpg',
     productBrand: 'BoomBox',

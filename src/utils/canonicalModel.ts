@@ -83,15 +83,12 @@ export interface Address {
     concatenatedAddress: string;
   };
 }
+// Define the OrderMetadata interface
 export interface OrderMetadata {
-  storeName: string;
-  productId: string;
-  estimatedDeliveryDate: string | number | Date;
-  deliverydate: string | number | Date;
   orderId: string;
-  customerId: number;
+  customerId: string;
   customerName: string;
-  customerMobileNumber: number;
+  customerMobileNumber: string;
   customerDeliveryAddress: string | null;
   state: string;
   totalOrderAmount: number;
@@ -105,8 +102,18 @@ export interface OrderMetadata {
   orderDescription: string;
   orderLink: string;
 }
+
+// Define the Cursor interface
+export interface Cursor {
+  orderId: string;
+  customerId: string;
+  platform: string;
+}
+
+// Define the OrdersResponse interface
 export interface OrdersResponse {
   ordersMetadata: OrderMetadata[];
+  cursor: Cursor | null;
 }
 export interface ProductCartItems {
   id: string;
@@ -133,11 +140,10 @@ export interface Product {
   shopId: string;
   title: string;
   description: string;
-  availability: string;
+  availability: boolean;
   condition: string;
   productPrice: string;
   productSalePrice: string;
-  productLink: string;
   productImageLink: string;
   productBrand: string;
   productSize: string;

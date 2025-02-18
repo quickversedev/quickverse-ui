@@ -41,7 +41,7 @@ export const fetchCategories = createAsyncThunk(
 //     try {
 //       const token = await fetchToken();
 //       const response = await axios.get<Category[]>(
-//         `${API_BASE_URL}/${vendorId}/categories`,
+//         `${API_BASE_URL}/${vendorId}/category`,
 //         {
 //           headers: {
 //             Authorization: token,

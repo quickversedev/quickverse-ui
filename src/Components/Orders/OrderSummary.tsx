@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
@@ -15,7 +16,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../store/store';
 import {fetchOrders} from '../../services/cart/OrdersSlice';
 import ZeroOrdersState from './ZeroOrderState';
-import {Loading} from '../util/Loading';
 import {OrderMetadata} from '../../utils/canonicalModel';
 import {OrderStackParamList} from './OrdersNavigator';
 
@@ -27,20 +27,26 @@ type OrderStackNavigationProp = StackNavigationProp<
 const MyOrdersScreen: React.FC = () => {
   const navigation = useNavigation<OrderStackNavigationProp>();
   const dispatch = useDispatch<AppDispatch>();
-  const {orders, loading, error} = useSelector(
+  const {orders, loading, cursor, error} = useSelector(
     (state: RootState) => state.orders,
   );
 
   const [refreshing, setRefreshing] = useState(false);
-  console.log('loading', loading);
+
   useEffect(() => {
-    dispatch(fetchOrders());
+    dispatch(fetchOrders(null)); // Fetch initial orders
   }, [dispatch]);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await dispatch(fetchOrders());
+    await dispatch(fetchOrders(null)); // Refresh orders
     setRefreshing(false);
+  };
+
+  const handleLoadMore = () => {
+    if (cursor && !loading) {
+      dispatch(fetchOrders(cursor)); // Fetch next page using the cursor
+    }
   };
 
   const handleCardPress = (order: OrderMetadata) => {
@@ -50,7 +56,7 @@ const MyOrdersScreen: React.FC = () => {
       navigation.navigate('WebView', {url: order.orderLink});
     }
   };
-
+  const hasZeroOrders = orders.length === 0 && !loading && !error;
   const renderOrderItem = ({item}: {item: OrderMetadata}) => (
     <TouchableOpacity
       style={styles.orderContainer}
@@ -84,13 +90,28 @@ const MyOrdersScreen: React.FC = () => {
     </TouchableOpacity>
   );
 
-  if (loading && !refreshing) {
-    return (
-      <View style={styles.loaderContainer}>
-        <Loading />
-      </View>
-    );
-  }
+  const renderFooter = () => {
+    if (loading) {
+      return (
+        <ActivityIndicator
+          size="small"
+          color="#8B0000"
+          style={styles.footerLoader}
+        />
+      );
+    }
+    if (cursor) {
+      return (
+        <TouchableOpacity
+          style={styles.loadMoreButton}
+          onPress={handleLoadMore}
+          disabled={loading}>
+          <Text style={styles.loadMoreText}>Load More</Text>
+        </TouchableOpacity>
+      );
+    }
+    return null;
+  };
 
   if (error) {
     return (
@@ -115,7 +136,7 @@ const MyOrdersScreen: React.FC = () => {
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>My Orders</Text>
       </View>
-      {orders.length === 0 ? (
+      {hasZeroOrders ? (
         <ZeroOrdersState />
       ) : (
         <FlatList
@@ -125,6 +146,7 @@ const MyOrdersScreen: React.FC = () => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
+          ListFooterComponent={renderFooter} // Render footer at the end of the list
         />
       )}
     </View>
@@ -180,6 +202,20 @@ const styles = StyleSheet.create({
   retryText: {
     color: '#FFF',
     fontWeight: 'bold',
+  },
+  loadMoreButton: {
+    padding: 10,
+    backgroundColor: '#8B0000',
+    borderRadius: 5,
+    alignItems: 'center',
+    margin: 16,
+  },
+  loadMoreText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+  },
+  footerLoader: {
+    marginVertical: 16, // Add margin to the loader
   },
 });
 

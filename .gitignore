@@ -34,6 +34,9 @@ local.properties
 *.keystore
 !debug.keystore
 
+# Ignore keystore file
+android/app/my-release-key.keystore
+
 # node.js
 #
 node_modules/

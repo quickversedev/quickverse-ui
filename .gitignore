@@ -35,7 +35,7 @@ local.properties
 !debug.keystore
 
 # Ignore keystore file
-android/app/my-release-key.keystore
+android/app/release-1.2.1.keystore
 
 # node.js
 #

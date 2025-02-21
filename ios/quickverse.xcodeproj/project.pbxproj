@@ -11,10 +11,10 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		4FFE64E3B0BC170142E99A15 /* libPods-QuickVerse-quickverseTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F45752A2FBF1E439596375A9 /* libPods-QuickVerse-quickverseTests.a */; };
-		6B6A7E0BDC7B4A35776136E0 /* libPods-QuickVerse.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 918789D4D6D1E0EBBA81091A /* libPods-QuickVerse.a */; };
 		7AD53A13AE1F3EEF3ED3670F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B73F2CEE001CBCA53F1287D0 /* PrivacyInfo.xcprivacy */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		83CB05D9AF8BABB51C10C572 /* libPods-QuickVerse-quickverseTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CB623B143434BBBFB828A86 /* libPods-QuickVerse-quickverseTests.a */; };
+		A37563CA9794B3F0DF9062EA /* libPods-QuickVerse.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA03BBF6CB4CE1821437A7F7 /* libPods-QuickVerse.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,7 +31,6 @@
 		00E356EE1AD99517003FC87E /* quickverseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = quickverseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* quickverseTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = quickverseTests.m; sourceTree = "<group>"; };
-		0117923D427290D26A93559F /* Pods-QuickVerse.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuickVerse.release.xcconfig"; path = "Target Support Files/Pods-QuickVerse/Pods-QuickVerse.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* quickverse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = quickverse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = quickverse/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = quickverse/AppDelegate.mm; sourceTree = "<group>"; };
@@ -39,18 +38,15 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = quickverse/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = quickverse/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = quickverse/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		208F5C29FDC23A4C6447A0A1 /* Pods-QuickVerse-quickverseTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuickVerse-quickverseTests.release.xcconfig"; path = "Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests.release.xcconfig"; sourceTree = "<group>"; };
-		2CA5A6A71B462EA7E078978F /* Pods-QuickVerse-quickverseTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuickVerse-quickverseTests.debug.xcconfig"; path = "Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests.debug.xcconfig"; sourceTree = "<group>"; };
-		3B4392A12AC88292D35C810B /* Pods-quickverse.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-quickverse.debug.xcconfig"; path = "Target Support Files/Pods-quickverse/Pods-quickverse.debug.xcconfig"; sourceTree = "<group>"; };
-		5709B34CF0A7D63546082F79 /* Pods-quickverse.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-quickverse.release.xcconfig"; path = "Target Support Files/Pods-quickverse/Pods-quickverse.release.xcconfig"; sourceTree = "<group>"; };
-		5B7EB9410499542E8C5724F5 /* Pods-quickverse-quickverseTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-quickverse-quickverseTests.debug.xcconfig"; path = "Target Support Files/Pods-quickverse-quickverseTests/Pods-quickverse-quickverseTests.debug.xcconfig"; sourceTree = "<group>"; };
-		5F3A683A790451F4EF8E5AF4 /* Pods-QuickVerse.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuickVerse.debug.xcconfig"; path = "Target Support Files/Pods-QuickVerse/Pods-QuickVerse.debug.xcconfig"; sourceTree = "<group>"; };
+		1CB623B143434BBBFB828A86 /* libPods-QuickVerse-quickverseTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-QuickVerse-quickverseTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6303E4883E981F6F8D61A6F5 /* Pods-QuickVerse-quickverseTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuickVerse-quickverseTests.release.xcconfig"; path = "Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests.release.xcconfig"; sourceTree = "<group>"; };
+		742DBBA192A68B92B27F815F /* Pods-QuickVerse.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuickVerse.release.xcconfig"; path = "Target Support Files/Pods-QuickVerse/Pods-QuickVerse.release.xcconfig"; sourceTree = "<group>"; };
+		7BA8506539459CB5E3A29CD3 /* Pods-QuickVerse-quickverseTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuickVerse-quickverseTests.debug.xcconfig"; path = "Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = quickverse/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		89C6BE57DB24E9ADA2F236DE /* Pods-quickverse-quickverseTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-quickverse-quickverseTests.release.xcconfig"; path = "Target Support Files/Pods-quickverse-quickverseTests/Pods-quickverse-quickverseTests.release.xcconfig"; sourceTree = "<group>"; };
-		918789D4D6D1E0EBBA81091A /* libPods-QuickVerse.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-QuickVerse.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B73F2CEE001CBCA53F1287D0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = quickverse/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		E28755D688AD788483D86DB8 /* Pods-QuickVerse.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuickVerse.debug.xcconfig"; path = "Target Support Files/Pods-QuickVerse/Pods-QuickVerse.debug.xcconfig"; sourceTree = "<group>"; };
+		EA03BBF6CB4CE1821437A7F7 /* libPods-QuickVerse.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-QuickVerse.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F45752A2FBF1E439596375A9 /* libPods-QuickVerse-quickverseTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-QuickVerse-quickverseTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,7 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4FFE64E3B0BC170142E99A15 /* libPods-QuickVerse-quickverseTests.a in Frameworks */,
+				83CB05D9AF8BABB51C10C572 /* libPods-QuickVerse-quickverseTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,7 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B6A7E0BDC7B4A35776136E0 /* libPods-QuickVerse.a in Frameworks */,
+				A37563CA9794B3F0DF9062EA /* libPods-QuickVerse.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,8 +105,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				918789D4D6D1E0EBBA81091A /* libPods-QuickVerse.a */,
-				F45752A2FBF1E439596375A9 /* libPods-QuickVerse-quickverseTests.a */,
+				EA03BBF6CB4CE1821437A7F7 /* libPods-QuickVerse.a */,
+				1CB623B143434BBBFB828A86 /* libPods-QuickVerse-quickverseTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -149,14 +145,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3B4392A12AC88292D35C810B /* Pods-quickverse.debug.xcconfig */,
-				5709B34CF0A7D63546082F79 /* Pods-quickverse.release.xcconfig */,
-				5B7EB9410499542E8C5724F5 /* Pods-quickverse-quickverseTests.debug.xcconfig */,
-				89C6BE57DB24E9ADA2F236DE /* Pods-quickverse-quickverseTests.release.xcconfig */,
-				5F3A683A790451F4EF8E5AF4 /* Pods-QuickVerse.debug.xcconfig */,
-				0117923D427290D26A93559F /* Pods-QuickVerse.release.xcconfig */,
-				2CA5A6A71B462EA7E078978F /* Pods-QuickVerse-quickverseTests.debug.xcconfig */,
-				208F5C29FDC23A4C6447A0A1 /* Pods-QuickVerse-quickverseTests.release.xcconfig */,
+				E28755D688AD788483D86DB8 /* Pods-QuickVerse.debug.xcconfig */,
+				742DBBA192A68B92B27F815F /* Pods-QuickVerse.release.xcconfig */,
+				7BA8506539459CB5E3A29CD3 /* Pods-QuickVerse-quickverseTests.debug.xcconfig */,
+				6303E4883E981F6F8D61A6F5 /* Pods-QuickVerse-quickverseTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -168,12 +160,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "quickverseTests" */;
 			buildPhases = (
-				A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */,
+				1132B3BC5D6E6731B63660A5 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */,
-				F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */,
+				3A6FDD07A02707CC402DE20A /* [CP] Embed Pods Frameworks */,
+				0D438BD6BAE486CF18D3E474 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -189,13 +181,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "QuickVerse" */;
 			buildPhases = (
-				C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */,
+				8781E65777C28875A9D952B7 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
-				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				CC48587BC1795F45C5F1B9F6 /* [CP] Embed Pods Frameworks */,
+				550B59FD2EF24E6325B9BC1C /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -279,24 +271,24 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */ = {
+		0D438BD6BAE486CF18D3E474 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse/Pods-QuickVerse-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Embed Pods Frameworks";
+			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse/Pods-QuickVerse-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-QuickVerse/Pods-QuickVerse-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
+		1132B3BC5D6E6731B63660A5 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -318,7 +310,41 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
+		3A6FDD07A02707CC402DE20A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		550B59FD2EF24E6325B9BC1C /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse/Pods-QuickVerse-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse/Pods-QuickVerse-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-QuickVerse/Pods-QuickVerse-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8781E65777C28875A9D952B7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -340,55 +366,21 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */ = {
+		CC48587BC1795F45C5F1B9F6 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse/Pods-QuickVerse-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse/Pods-QuickVerse-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse/Pods-QuickVerse-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse/Pods-QuickVerse-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-QuickVerse/Pods-QuickVerse-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-QuickVerse-quickverseTests/Pods-QuickVerse-quickverseTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-QuickVerse/Pods-QuickVerse-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -424,7 +416,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2CA5A6A71B462EA7E078978F /* Pods-QuickVerse-quickverseTests.debug.xcconfig */;
+			baseConfigurationReference = 7BA8506539459CB5E3A29CD3 /* Pods-QuickVerse-quickverseTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -451,7 +443,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 208F5C29FDC23A4C6447A0A1 /* Pods-QuickVerse-quickverseTests.release.xcconfig */;
+			baseConfigurationReference = 6303E4883E981F6F8D61A6F5 /* Pods-QuickVerse-quickverseTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -475,7 +467,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5F3A683A790451F4EF8E5AF4 /* Pods-QuickVerse.debug.xcconfig */;
+			baseConfigurationReference = E28755D688AD788483D86DB8 /* Pods-QuickVerse.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -492,7 +484,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.2.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -514,7 +506,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0117923D427290D26A93559F /* Pods-QuickVerse.release.xcconfig */;
+			baseConfigurationReference = 742DBBA192A68B92B27F815F /* Pods-QuickVerse.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -530,7 +522,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.2.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -551,7 +543,6 @@
 		};
 		83CBBA201A601CBA00E9B192 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-quickverse.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CC = "";
@@ -632,7 +623,6 @@
 		};
 		83CBBA211A601CBA00E9B192 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-quickverse.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CC = "";

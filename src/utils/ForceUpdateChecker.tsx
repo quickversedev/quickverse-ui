@@ -9,7 +9,7 @@ import {
   StyleSheet,
   Modal,
 } from 'react-native';
-import VersionCheck from 'react-native-version-check';
+import VersionInfo from 'react-native-version-info';
 import theme from '../theme';
 import useFetchUpdateData from '../services/fetchVersions';
 // import useFetchUpdateData from '../hooks/useFetchUpdateData'; // Import the custom hook
@@ -31,13 +31,13 @@ const ForceUpdateChecker: React.FC<{children: React.ReactNode}> = ({
 
   const checkForUpdate = async () => {
     try {
-      const currentVersion = await VersionCheck.getCurrentVersion();
+      const currentVersion = VersionInfo.appVersion;
       console.log('currentVersion:', currentVersion);
 
       // Compare versions
       if (currentVersion < updateData.min_required_version) {
         setIsUpdateRequired(true);
-        setIsModalVisible(true); // Show the custom modal
+        setIsModalVisible(true);
       }
     } catch (err) {
       console.error('Error checking for updates:', err);

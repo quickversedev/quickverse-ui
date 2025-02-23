@@ -4,11 +4,11 @@ import globalConfig from '../../utils/GlobalConfig';
 export const addItemToCart = async (
   vendorId: string,
   productId: string,
-  AuthData: string,
+  authData: string,
 ): Promise<any> => {
   try {
     const url = `${globalConfig.apiBaseUrl}/v2/addCart`;
-
+    console.log('add to card:', authData);
     const response = await axios.post(
       url,
       {
@@ -17,7 +17,7 @@ export const addItemToCart = async (
       },
       {
         headers: {
-          SessionKey: AuthData,
+          SessionKey: authData,
           'Content-Type': 'application/json',
         },
       },

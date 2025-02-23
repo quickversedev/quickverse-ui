@@ -22,39 +22,39 @@ const initialState: CategoryState = {
 };
 
 // Async thunk to fetch categories from an API with a 1-second delay
-export const fetchCategories = createAsyncThunk(
-  'categories/fetchCategories',
-  async (vendorId: string) => {
-    return new Promise<Category[]>(resolve => {
-      setTimeout(() => {
-        console.log('vendorId to fetch Categories mock:', vendorId);
-        resolve(mockCategoriesData);
-      }, 1000);
-    });
-  },
-);
-// const API_BASE_URL = `${globalConfig.apiBaseUrl}/v2/campus`;
-
 // export const fetchCategories = createAsyncThunk(
 //   'categories/fetchCategories',
-//   async ({vendorId}: {vendorId: string}, {rejectWithValue}) => {
-//     try {
-//       const token = await fetchToken();
-//       const response = await axios.get<Category[]>(
-//         `${API_BASE_URL}/${vendorId}/category`,
-//         {
-//           headers: {
-//             Authorization: token,
-//           },
-//         },
-//       );
-//       return response.data;
-//     } catch (error) {
-//       console.error('Failed to fetch products:', error);
-//       return rejectWithValue('Failed to fetch products');
-//     }
+//   async (vendorId: string) => {
+//     return new Promise<Category[]>(resolve => {
+//       setTimeout(() => {
+//         console.log('vendorId to fetch Categories mock:', vendorId);
+//         resolve(mockCategoriesData);
+//       }, 1000);
+//     });
 //   },
 // );
+const API_BASE_URL = `${globalConfig.apiBaseUrl}/v2/campus`;
+
+export const fetchCategories = createAsyncThunk(
+  'categories/fetchCategories',
+  async ({vendorId}: {vendorId: string}, {rejectWithValue}) => {
+    try {
+      const token = await fetchToken();
+      const response = await axios.get<any>(
+        `${API_BASE_URL}/${vendorId}/category`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      return response.data?.categories;
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+      return rejectWithValue('Failed to fetch products');
+    }
+  },
+);
 
 export const categorySlice = createSlice({
   name: 'categories',

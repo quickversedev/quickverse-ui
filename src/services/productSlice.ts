@@ -42,7 +42,7 @@ export const fetchProducts = createAsyncThunk(
       console.log('toeknsss:', token);
       console.log('url:', `${API_BASE_URL}/${vendorId}/products`);
       const response = await axios.post<any>(
-        `${API_BASE_URL}/5833/products`,
+        `${API_BASE_URL}/${vendorId}/products`,
         {},
         {
           headers: {

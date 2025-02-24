@@ -25,40 +25,46 @@ const CartListScreen: React.FC<CartListScreenProps> = ({
   handleDecrement,
   handleDelete,
 }) => {
-  const renderItem = ({item}: {item: ProductCartItems}) => (
-    <View style={styles.itemContainer}>
-      <Image source={{uri: item.image}} style={styles.itemImage} />
-      <View style={styles.itemDetails}>
-        <Text style={styles.itemName}>{item.name}</Text>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Text style={styles.originalPrice}>₹{item.productPrice}</Text>
-          <Text style={styles.salePrice}> ₹{item.salePrice}</Text>
+  const renderItem = ({item}: {item: ProductCartItems}) => {
+    const isProductOnSale =
+      item.salePrice && item.salePrice !== item.productPrice;
+    return (
+      <View style={styles.itemContainer}>
+        <Image source={{uri: item.image}} style={styles.itemImage} />
+        <View style={styles.itemDetails}>
+          <Text style={styles.itemName}>{item.name}</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            {isProductOnSale && (
+              <Text style={styles.originalPrice}>₹{item.productPrice}</Text>
+            )}
+            <Text style={styles.salePrice}> ₹{item.salePrice}</Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.quantityContainer}>
+        <View style={styles.quantityContainer}>
+          <TouchableOpacity
+            style={[styles.quantityButton, styles.decrementButton]}
+            onPress={() => handleDecrement(item.id)}>
+            <Text style={styles.quantityButtonText}>-</Text>
+          </TouchableOpacity>
+          <Text style={styles.quantity}>{item.quantity}</Text>
+          <TouchableOpacity
+            style={[styles.quantityButton, styles.incrementButton]}
+            onPress={() => handleIncrement(item.id)}>
+            <Text style={styles.quantityButtonText}>+</Text>
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity
-          style={[styles.quantityButton, styles.decrementButton]}
-          onPress={() => handleDecrement(item.id)}>
-          <Text style={styles.quantityButtonText}>-</Text>
-        </TouchableOpacity>
-        <Text style={styles.quantity}>{item.quantity}</Text>
-        <TouchableOpacity
-          style={[styles.quantityButton, styles.incrementButton]}
-          onPress={() => handleIncrement(item.id)}>
-          <Text style={styles.quantityButtonText}>+</Text>
+          style={styles.deleteButton}
+          onPress={() => handleDelete(item.id)}>
+          <MaterialCommunityIcons
+            name="delete"
+            size={24}
+            color={theme.colors.secondary}
+          />
         </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => handleDelete(item.id)}>
-        <MaterialCommunityIcons
-          name="delete"
-          size={24}
-          color={theme.colors.secondary}
-        />
-      </TouchableOpacity>
-    </View>
-  );
+    );
+  };
 
   return (
     <FlatList

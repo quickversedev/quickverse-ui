@@ -80,18 +80,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     parentCategory: null,
     countOfSkus: 0,
   };
-  // const categoriesWithProducts = (categories || []).filter(category =>
-  //   (products || []).some(product => product.category === category.id),
-  // );
-  // const productsWithoutCategory = (products || []).filter(
-  //   product => !categoriesWithProducts.some(cat => cat.id === product.category),
-  // );
-
-  // if (productsWithoutCategory.length > 0) {
-  //   categoriesWithProducts.push(otherCategory);
-  // }
-  // Combine existing categories with the "Other" category
-  // Check if there are products without a category
   const categoriesWithProducts = (categories || []).filter(category =>
     (products || []).some(product => product.category === category.id),
   );
@@ -99,24 +87,13 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     product => !categoriesWithProducts.some(cat => cat.id === product.category),
   );
 
-  // Include the "Other" category if there are products without a category
   if (productsWithoutCategory.length > 0) {
     categoriesWithProducts.push(otherCategory);
   }
 
-  // const [selectedCategory, setSelectedCategory] = useState<string | null>(
-  //   categoriesWithProducts[0]?.id,
-  // );
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     categoriesWithProducts[0]?.id,
   );
-  // const [selectedCategory, setSelectedCategory] = useState<string | null>(
-  //   categoriesWithProducts[0]?.id,
-  // );
-  // const categoriesWithProducts = (categoriesWithProducts || []).filter(
-  //   category =>
-  //     (products || []).some(product => product.category === category.id),
-  // );
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -132,7 +109,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     setSelectedCategory(categories[0]?.id);
   }, [categories]);
 
-  // Filter categories and products based on search query
   const filteredCategories = categoriesWithProducts.filter(category =>
     category.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
@@ -282,7 +258,8 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       image: item.productImageLink,
       vendorId: item.vendorId,
     };
-
+    const isProductOnSale =
+      item.productSalePrice && item.productSalePrice !== item.productPrice;
     return (
       <View
         style={[
@@ -305,7 +282,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         <View style={styles.productDetails}>
           <Text style={styles.productName}>{product.name}</Text>
           <View style={styles.priceContainer}>
-            <Text style={styles.originalPrice}>₹{product.productPrice}</Text>
+            {isProductOnSale && (
+              <Text style={styles.originalPrice}>₹{product.productPrice}</Text>
+            )}
             <Text style={styles.salePrice}> ₹{product.salePrice}</Text>
           </View>
           <CartButton
@@ -360,7 +339,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by vendor or category"
+          placeholder="Search by Category or Product"
           placeholderTextColor={theme.colors.ternary}
           value={searchQuery}
           onChangeText={setSearchQuery}

@@ -4,7 +4,7 @@ import {getCart, getShopId, saveCart, saveShopId} from '../../utils/Storage';
 import {ProductCartItems} from '../../utils/canonicalModel';
 import {addItemToCart} from './AddItemToCartService';
 import {deleteItemFromCart} from './DeleteItemFromCart';
-import {AppThunk} from '../../store/store'; // Assuming you have a Thunk type
+import {AppThunk} from '../../store/store';
 
 interface ProductCartState {
   shopId: string;
@@ -21,9 +21,9 @@ const productCartSlice = createSlice({
   initialState,
   reducers: {
     addToProductCart: (state, action: PayloadAction<ProductCartItems>) => {
-      const {shopId} = action.payload;
-
-      if (state.productCart.length > 0 && state.shopId !== shopId) {
+      const {vendorId} = action.payload;
+      console.log('[25]', action.payload);
+      if (state.productCart.length > 0 && state.shopId !== vendorId) {
         console.warn(
           'Cart contains items from another shop. Clear the cart before adding.',
         );
@@ -31,11 +31,13 @@ const productCartSlice = createSlice({
       }
 
       if (state.productCart.length === 0) {
-        state.shopId = shopId;
-        saveShopId(shopId);
+        state.shopId = vendorId;
+        console.log('[35]', vendorId);
+        saveShopId(vendorId);
       }
 
       state.productCart.push(action.payload);
+      console.log('[40]', typeof state.productCart);
       saveCart(state.productCart);
     },
     removeFromProductCart: (state, action: PayloadAction<{id: string}>) => {
@@ -88,52 +90,48 @@ const productCartSlice = createSlice({
   },
 });
 
-// Thunk for adding an item to the cart
 export const addToCart =
   (item: ProductCartItems, authData: string): AppThunk =>
   async dispatch => {
     try {
+      await addItemToCart(item.vendorId, item.id, authData);
       dispatch(productCartSlice.actions.addToProductCart(item));
-      await addItemToCart(item.shopId, item.id, authData); // Replace '1234' with a dynamic value
     } catch (error) {
       console.error('Failed to add item to cart:', error);
     }
   };
 
-// Thunk for removing an item from the cart
 export const removeFromCart =
   (id: string, authData: string): AppThunk =>
   async (dispatch, getState) => {
     const {shopId} = getState().productCart;
     try {
+      await deleteItemFromCart(shopId, id, true, authData);
       dispatch(productCartSlice.actions.removeFromProductCart({id}));
-      await deleteItemFromCart(shopId, id, true, authData); // Replace '1234' with a dynamic value
     } catch (error) {
       console.error('Failed to remove item from cart:', error);
     }
   };
 
-// Thunk for incrementing product quantity
 export const incrementQuantity =
   (id: string, authData: string): AppThunk =>
   async (dispatch, getState) => {
     const {shopId} = getState().productCart;
     try {
+      await addItemToCart(shopId, id, authData);
       dispatch(productCartSlice.actions.incrementProductQuantity({id}));
-      await addItemToCart(shopId, id, authData); // Replace '1234' with a dynamic value
     } catch (error) {
       console.error('Failed to increment product quantity:', error);
     }
   };
 
-// Thunk for decrementing product quantity
 export const decrementQuantity =
   (id: string, authData: string): AppThunk =>
   async (dispatch, getState) => {
     const {shopId} = getState().productCart;
     try {
+      await deleteItemFromCart(shopId, id, false, authData);
       dispatch(productCartSlice.actions.decrementProductQuantity({id}));
-      await deleteItemFromCart(shopId, id, false, authData); // Replace '1234' with a dynamic value
     } catch (error) {
       console.error('Failed to decrement product quantity:', error);
     }

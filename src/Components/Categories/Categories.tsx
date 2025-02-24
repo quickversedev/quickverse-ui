@@ -70,14 +70,30 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const [storeOpen] = useState(
     isStoreOpen(vendor.storeOpeningTime, vendor.storeClosingTime),
   );
-
+  // Create an "Other" category for products without a category
+  const otherCategory: Category = {
+    id: 'other',
+    name: 'Other',
+    imageURLs: ['https://via.placeholder.com/150'],
+    description: 'other',
+    type: '',
+    parentCategory: null,
+    countOfSkus: 0,
+  };
   const categoriesWithProducts = (categories || []).filter(category =>
     (products || []).some(product => product.category === category.id),
   );
+  const productsWithoutCategory = (products || []).filter(
+    product => !categoriesWithProducts.some(cat => cat.id === product.category),
+  );
+
+  if (productsWithoutCategory.length > 0) {
+    categoriesWithProducts.push(otherCategory);
+  }
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     categoriesWithProducts[0]?.id,
   );
-
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -93,7 +109,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     setSelectedCategory(categories[0]?.id);
   }, [categories]);
 
-  // Filter categories and products based on search query
   const filteredCategories = categoriesWithProducts.filter(category =>
     category.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
@@ -103,7 +118,11 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         product.title.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     : selectedCategory
-    ? (products || []).filter(product => product.category === selectedCategory)
+    ? (products || []).filter(product =>
+        selectedCategory === 'other'
+          ? !categoriesWithProducts.some(cat => cat.id === product.category)
+          : product.category === selectedCategory,
+      )
     : products || [];
 
   if (error) {
@@ -139,10 +158,11 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       return;
     }
     if (storeOpen) {
-      if (cart.length > 0 && cart[0].shopId !== product.shopId) {
+      if (cart.length > 0 && cart[0].vendorId !== product.vendorId) {
         setProductToAdd(product);
         setConfirmationModalVisible(true);
       } else {
+        console.log('[189 categories:]', product);
         dispatch(
           addToCart(
             {
@@ -152,7 +172,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
               salePrice: product.salePrice,
               quantity: 1,
               image: product.image,
-              shopId: product.shopId,
+              vendorId: product.vendorId,
             },
             authData,
           ),
@@ -174,7 +194,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
               salePrice: productToAdd.salePrice,
               quantity: 1,
               image: productToAdd.image,
-              shopId: productToAdd.shopId,
+              vendorId: productToAdd.vendorId,
             },
             authData,
           ),
@@ -208,7 +228,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
   const renderCategoryItem = ({item}: {item: Category}) => {
     const isSelected = item.id === selectedCategory;
-
     return (
       <TouchableOpacity
         style={[
@@ -218,7 +237,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         ]}
         onPress={() => handleCategoryPress(item.id)}>
         <Image
-          source={{uri: item.imageURLs[0]}}
+          source={{uri: item?.imageURLs?.[0]}}
           style={styles.categoryImage}
           resizeMode="cover"
         />
@@ -237,9 +256,10 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       salePrice: item.productSalePrice,
       quantity: cartItems[item.productId]?.quantity || 0,
       image: item.productImageLink,
-      shopId: item.shopId,
+      vendorId: item.vendorId,
     };
-
+    const isProductOnSale =
+      item.productSalePrice && item.productSalePrice !== item.productPrice;
     return (
       <View
         style={[
@@ -262,7 +282,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         <View style={styles.productDetails}>
           <Text style={styles.productName}>{product.name}</Text>
           <View style={styles.priceContainer}>
-            <Text style={styles.originalPrice}>₹{product.productPrice}</Text>
+            {isProductOnSale && (
+              <Text style={styles.originalPrice}>₹{product.productPrice}</Text>
+            )}
             <Text style={styles.salePrice}> ₹{product.salePrice}</Text>
           </View>
           <CartButton
@@ -317,7 +339,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by vendor or category"
+          placeholder="Search by Category or Product"
           placeholderTextColor={theme.colors.ternary}
           value={searchQuery}
           onChangeText={setSearchQuery}

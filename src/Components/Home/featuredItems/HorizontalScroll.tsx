@@ -16,10 +16,9 @@ import {
   incrementQuantity,
   selectCart,
 } from '../../../services/cart/productCartSlice';
-import {Product} from '../../../data/mockProductData';
 import theme from '../../../theme';
 import CustomConfirmationModal from '../../Cart/CustomConfirmationModal';
-import {ProductCartItems} from '../../../utils/canonicalModel';
+import {Product, ProductCartItems} from '../../../utils/canonicalModel';
 import {AppDispatch} from '../../../store/store';
 import {useAuth} from '../../../utils/AuthContext';
 import {debounce} from 'lodash';
@@ -57,7 +56,7 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
       return;
     }
 
-    if (cart.length > 0 && cart[0].shopId !== product.shopId) {
+    if (cart.length > 0 && cart[0].vendorId !== product.vendorId) {
       setProductToAdd(product);
       setConfirmationModalVisible(true);
     } else {
@@ -70,7 +69,7 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
             salePrice: product.salePrice,
             quantity: 1,
             image: product.image,
-            shopId: product.shopId,
+            vendorId: product.vendorId,
           },
           authData,
         ),
@@ -95,7 +94,7 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
               salePrice: productToAdd.salePrice,
               quantity: 1,
               image: productToAdd.image,
-              shopId: productToAdd.shopId,
+              vendorId: productToAdd.vendorId,
             },
             authData,
           ),
@@ -137,7 +136,7 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
       salePrice: item.productSalePrice,
       quantity: 1,
       image: item.productImageLink,
-      shopId: item.shopId,
+      vendorId: item.vendorId,
     };
     return (
       <View style={styles.cardContainer}>
@@ -251,7 +250,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     paddingVertical: 6,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     backgroundColor: '#8B0000',
     borderRadius: 15,
     // width: '80%',
@@ -260,7 +259,7 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 12,
   },
   quantityContainer: {
     flexDirection: 'row',

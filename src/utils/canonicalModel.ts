@@ -122,7 +122,7 @@ export interface ProductCartItems {
   salePrice: string;
   quantity: number;
   image: string;
-  shopId: string;
+  vendorId: string;
 }
 
 export interface Promo {

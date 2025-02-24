@@ -44,8 +44,8 @@ export const useFetchProductsAndCategories = (
       }
       setLoading(true);
       await Promise.all([
-        dispatch(fetchProducts(vendorId)),
-        dispatch(fetchCategories(vendorId)),
+        dispatch(fetchProducts({vendorId})),
+        dispatch(fetchCategories({vendorId})),
       ]);
       setLoading(false);
     };

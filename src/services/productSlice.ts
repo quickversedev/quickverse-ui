@@ -20,40 +20,44 @@ const initialState: ProductState = {
 };
 
 // Async thunk to fetch products from an API with a 1-second delay
-export const fetchProducts = createAsyncThunk(
-  'products/fetchProducts',
-  async (vendorId: string) => {
-    return new Promise<Product[]>(resolve => {
-      setTimeout(() => {
-        console.log('vendorId to fetch Product mock:', vendorId);
-        resolve(mockProductData);
-      }, 1000);
-    });
-  },
-);
-// const API_BASE_URL = `${globalConfig.apiBaseUrl}/v2/campus`;
-
-// Async thunk to fetch products using Axios with campusId as a path param
 // export const fetchProducts = createAsyncThunk(
 //   'products/fetchProducts',
-//   async ({vendorId}: {vendorId: string}, {rejectWithValue}) => {
-//     try {
-//       const token = await fetchToken();
-//       const response = await axios.post<Product[]>(
-//         `${API_BASE_URL}/${vendorId}/products`,
-//         {
-//           headers: {
-//             Authorization: token,
-//           },
-//         },
-//       );
-//       return response.data;
-//     } catch (error) {
-//       console.error('Failed to fetch products:', error);
-//       return rejectWithValue('Failed to fetch products');
-//     }
+//   async (vendorId: string) => {
+//     return new Promise<Product[]>(resolve => {
+//       setTimeout(() => {
+//         console.log('vendorId to fetch Product mock:', vendorId);
+//         resolve(mockProductData);
+//       }, 1000);
+//     });
 //   },
 // );
+const API_BASE_URL = `${globalConfig.apiBaseUrl}/v2/campus`;
+
+// Async thunk to fetch products using Axios with campusId as a path param
+export const fetchProducts = createAsyncThunk(
+  'products/fetchProducts',
+  async ({vendorId}: {vendorId: string}, {rejectWithValue}) => {
+    try {
+      const token = await fetchToken();
+      console.log('toeknsss:', token);
+      console.log('url:', `${API_BASE_URL}/${vendorId}/products`);
+      const response = await axios.post<any>(
+        `${API_BASE_URL}/${vendorId}/products`,
+        {},
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+
+      return response.data?.products.product;
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+      return rejectWithValue('Failed to fetch products');
+    }
+  },
+);
 
 export const productSlice = createSlice({
   name: 'products',

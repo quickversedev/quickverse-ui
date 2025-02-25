@@ -8335,6 +8335,7 @@ __metadata:
     prettier: 2.8.8
     react: 18.2.0
     react-native: 0.74.1
+    react-native-device-info: ^14.0.4
     react-native-gesture-handler: ^2.16.2
     react-native-keychain: ^9.1.0
     react-native-linear-gradient: ^2.8.3
@@ -8401,6 +8402,15 @@ __metadata:
   version: 17.0.2
   resolution: "react-is@npm:17.0.2"
   checksum: 9d6d111d8990dc98bc5402c1266a808b0459b5d54830bbea24c12d908b536df7883f268a7868cfaedde3dd9d4e0d574db456f84d2e6df9c4526f99bb4b5344d8
+  languageName: node
+  linkType: hard
+
+"react-native-device-info@npm:^14.0.4":
+  version: 14.0.4
+  resolution: "react-native-device-info@npm:14.0.4"
+  peerDependencies:
+    react-native: "*"
+  checksum: aa839dbe7df1246a4b5f9bcfeb3d4cc4be585f13a0d3ff6a03f57a0c2cfe7590291ac292dda4c51fd8765f94c870857676463e8e2f1660b057f3ae2b4335db29
   languageName: node
   linkType: hard
 

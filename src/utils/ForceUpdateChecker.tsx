@@ -9,7 +9,7 @@ import {
   StyleSheet,
   Modal,
 } from 'react-native';
-import VersionInfo from 'react-native-version-info';
+import DeviceInfo from 'react-native-device-info';
 import theme from '../theme';
 import useFetchUpdateData from '../services/fetchVersions';
 // import useFetchUpdateData from '../hooks/useFetchUpdateData'; // Import the custom hook
@@ -31,7 +31,7 @@ const ForceUpdateChecker: React.FC<{children: React.ReactNode}> = ({
 
   const checkForUpdate = async () => {
     try {
-      const currentVersion = VersionInfo.appVersion;
+      const currentVersion = DeviceInfo.getVersion();
       console.log('currentVersion:', currentVersion);
 
       // Compare versions

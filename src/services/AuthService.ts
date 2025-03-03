@@ -2,6 +2,7 @@ import axios from 'axios';
 import globalConfig from '../utils/GlobalConfig';
 import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 import {getJWT} from '../utils/Storage';
+import { getFCMToken } from '../utils/notificationUtil.ts';
 
 export type AuthData = {
   session: {
@@ -83,6 +84,7 @@ const VerifyOtp = async (
   //   }, 1000);
   // });
   const token = await fetchToken();
+  const fcmToken = await getFCMToken();
   return axios
     .post(
       `${globalConfig.apiBaseUrl}/v1/login`,
@@ -90,6 +92,7 @@ const VerifyOtp = async (
         mobile: phoneNumber,
         otp: otp,
         verificationId: verificationId,
+        fcmToken: fcmToken,
       },
       {
         headers: {

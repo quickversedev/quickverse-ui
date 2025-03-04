@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "617908662840",
+    "project_id": "quickverse-app",
+    "storage_bucket": "quickverse-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:617908662840:android:33bc8a0488124a54e26ccd",
+        "android_client_info": {
+          "package_name": "com.quickverse"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8ITcKIaS2ZYCBo1SLwibr1PIyfgPrCIE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

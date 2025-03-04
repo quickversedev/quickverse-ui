@@ -4,19 +4,23 @@
 // const Stack = createStackNavigator();
 import React, { useEffect } from 'react';
 import LoggedIn from '../Components/Login/LoggedIn';
-import { initializeNotificationService, startForegroundNotificationListener, setBackgroundMessageHandler } from '../utils/notificationUtil.ts';
+import {
+  initializeNotificationChannel,
+  initializeForegroundMessageHandler,
+  initializeBackgroundMessageHandler,
+} from '../utils/notificationUtil';
 
 export const AppStack = () => {
   useEffect(() => {
-    const setupNotifications = async () => {
-      await initializeNotificationService();
-      setBackgroundMessageHandler();
+    const initializeNotifications = async () => {
+      await initializeNotificationChannel();
+      const unsubscribe = initializeForegroundMessageHandler();
+      initializeBackgroundMessageHandler();
+
+      return () => unsubscribe();
     };
 
-    setupNotifications();
-    const unsubscribe = startForegroundNotificationListener();
-
-    return () => unsubscribe();
+    initializeNotifications();
   }, []);
 
   return <LoggedIn />;

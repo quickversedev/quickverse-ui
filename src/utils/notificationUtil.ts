@@ -1,65 +1,56 @@
-import { Platform, PermissionsAndroid } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import notifee, { AndroidImportance, AndroidStyle } from '@notifee/react-native';
+import { Platform, PermissionsAndroid } from 'react-native';
 
-const CHANNEL_ID = 'default';
-
-export const requestNotificationPermission = async () => {
+export const initializeNotificationChannel = async () => {
   if (Platform.OS === 'android' && Platform.Version >= 33) {
     const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-    return granted === PermissionsAndroid.RESULTS.GRANTED;
+    if (granted !== PermissionsAndroid.RESULTS.GRANTED) return;
   }
-  return true;
-};
-
-export const initializeNotificationService = async () => {
-  const hasPermission = await requestNotificationPermission();
-  if (!hasPermission) return;
 
   await notifee.createChannel({
-    id: CHANNEL_ID,
+    id: 'default',
     name: 'Default Channel',
     importance: AndroidImportance.HIGH,
   });
 };
 
-export const getFCMToken = async (): Promise<string | null> => {
+export const displayNotification = async (remoteMessage: any) => {
   try {
-    return await messaging().getToken();
+    await notifee.displayNotification({
+      title: remoteMessage.notification?.title || 'No title',
+      body: remoteMessage.notification?.body || 'No body',
+      android: {
+        channelId: 'default',
+        importance: AndroidImportance.HIGH,
+        largeIcon: 'qv_blue',
+        color: '#8B8000',
+        style: {
+          type: AndroidStyle.BIGTEXT,
+          text: remoteMessage.notification?.body || 'No body',
+        },
+        showTimestamp: true,
+      },
+    });
   } catch (error) {
-    console.error('Error fetching FCM Token:', error);
-    return null;
+    console.error("Error displaying notification:", error);
   }
 };
 
-export const handleForegroundNotification = async (remoteMessage: any) => {
-  if (!remoteMessage?.notification) return;
-
-  await notifee.displayNotification({
-    title: remoteMessage.notification.title || 'No title',
-    body: remoteMessage.notification.body || 'No body',
-    android: {
-      channelId: CHANNEL_ID,
-      importance: AndroidImportance.HIGH,
-      largeIcon: 'qv_blue',
-      color: '#8B8000',
-      style: {
-        type: AndroidStyle.BIGTEXT,
-        text: remoteMessage.notification.body || 'No body',
-      },
-      showTimestamp: true,
-    },
+export const initializeForegroundMessageHandler = () => {
+  return messaging().onMessage(async remoteMessage => {
+    await displayNotification(remoteMessage);
   });
 };
 
-export const setBackgroundMessageHandler = () => {
-  messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-    await handleForegroundNotification(remoteMessage);
+export const initializeBackgroundMessageHandler = () => {
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('Message handled in the background!', remoteMessage);
+    await displayNotification(remoteMessage);
   });
 };
 
-export const startForegroundNotificationListener = () => {
-  return messaging().onMessage(async (remoteMessage) => {
-    await handleForegroundNotification(remoteMessage);
-  });
+export const getFCMToken = async () => {
+  const token = await messaging().getToken();
+  return token;
 };

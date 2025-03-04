@@ -29,7 +29,7 @@ const PromoDiscounts: React.FC<PromoDiscountsProps> = ({campus}) => {
     <View style={styles.headingContainer}>
       <View style={styles.lineContainer}>
         <View style={styles.line} />
-        <Text variant="titleLarge" style={styles.heading}>
+        <Text variant="titleSmall" style={styles.heading}>
           Promo & Discounts..!
         </Text>
         <View style={styles.invisibleLine} />
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   heading: {
-    fontSize: 30,
+    fontSize: 25,
     padding: 5,
     fontWeight: 'bold',
     color: theme.colors.ternary,

@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     marginTop: Platform.OS === 'ios' ? 0 : 10,
   },
   shopHeader: {
-    backgroundColor: theme.colors.ternary,
+    backgroundColor: theme.colors.secondary,
     padding: 8,
     borderRadius: 15,
     alignItems: 'center',

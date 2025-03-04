@@ -18,6 +18,7 @@ import {fetchOrders} from '../../services/cart/OrdersSlice';
 import ZeroOrdersState from './ZeroOrderState';
 import {OrderMetadata} from '../../utils/canonicalModel';
 import {OrderStackParamList} from './OrdersNavigator';
+import {useAuth} from '../../utils/AuthContext';
 
 type OrderStackNavigationProp = StackNavigationProp<
   OrderStackParamList,
@@ -30,22 +31,22 @@ const MyOrdersScreen: React.FC = () => {
   const {orders, loading, cursor, error} = useSelector(
     (state: RootState) => state.orders,
   );
-
+  const {authData} = useAuth();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchOrders(null)); // Fetch initial orders
-  }, [dispatch]);
+    dispatch(fetchOrders({cursor: null, authData})); // Fetch initial orders
+  }, [authData, dispatch]);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await dispatch(fetchOrders(null)); // Refresh orders
+    await dispatch(fetchOrders({cursor: null, authData})); // Refresh orders
     setRefreshing(false);
   };
 
   const handleLoadMore = () => {
     if (cursor && !loading) {
-      dispatch(fetchOrders(cursor)); // Fetch next page using the cursor
+      dispatch(fetchOrders({cursor, authData})); // Fetch next page using the cursor
     }
   };
 

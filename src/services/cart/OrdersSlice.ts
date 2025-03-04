@@ -83,45 +83,45 @@ interface OrdersState {
 }
 
 // // Define the fetchOrders thunk with cursor handling
-// export const fetchOrders = createAsyncThunk<FetchOrdersPayload, Cursor | null>(
-//   'orders/fetchOrders',
-//   async (cursor, {rejectWithValue}) => {
-//     try {
-//       const token = await fetchToken();
-//       const response = await axios.post<OrdersResponse>(
-//         `${globalConfig.apiBaseUrl}/v2/getSMZBIZOrders?pageSize=1`,
-//         {
-//           cursor,
-//         },
-//         {
-//           headers: {
-//             Authorization: token,
-//             'Content-Type': 'application/json',
-//           },
-//         },
-//       );
+export const fetchOrders = createAsyncThunk<
+  OrdersResponse,
+  {cursor: Cursor | null; authData: string | undefined}
+>('orders/fetchOrders', async ({cursor, authData}, {rejectWithValue}) => {
+  try {
+    console.log('fetchOrders', cursor);
+    const response = await axios.post<OrdersResponse>(
+      `${globalConfig.apiBaseUrl}/v2/getSMZBIZOrders?pageSize=1`,
+      {
+        cursor,
+      },
+      {
+        headers: {
+          SessionKey: authData,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
 
-//       return {
-//         orders: response.data.ordersMetadata,
-//         cursor: response.data.cursor,
-//       };
-//     } catch (error) {
-//       console.log('error', error);
-//       return rejectWithValue('Failed to fetch Orders');
-//     }
+    return {
+      ordersMetadata: response.data.ordersMetadata,
+      cursor: response.data.cursor,
+    };
+  } catch (error) {
+    console.log('error', error);
+    return rejectWithValue('Failed to fetch Orders');
+  }
+});
+// export const fetchOrders = createAsyncThunk<OrdersResponse, Cursor | null>(
+//   'orders/fetchOrders',
+//   async (_cursor: Cursor | null) => {
+//     console.log('fetchOrders');
+//     return new Promise<OrdersResponse>(resolve => {
+//       setTimeout(() => {
+//         resolve(mockOrdersResponse);
+//       }, 1000);
+//     });
 //   },
 // );
-export const fetchOrders = createAsyncThunk<OrdersResponse, Cursor | null>(
-  'orders/fetchOrders',
-  async (_cursor: Cursor | null) => {
-    console.log('fetchOrders');
-    return new Promise<OrdersResponse>(resolve => {
-      setTimeout(() => {
-        resolve(mockOrdersResponse);
-      }, 1000);
-    });
-  },
-);
 // Define the initial state
 const initialState: OrdersState = {
   orders: [],

@@ -39,8 +39,6 @@ export const fetchProducts = createAsyncThunk(
   async ({vendorId}: {vendorId: string}, {rejectWithValue}) => {
     try {
       const token = await fetchToken();
-      console.log('toeknsss:', token);
-      console.log('url:', `${API_BASE_URL}/${vendorId}/products`);
       const response = await axios.post<any>(
         `${API_BASE_URL}/${vendorId}/products`,
         {},

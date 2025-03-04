@@ -170,6 +170,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
         }}
         source={{uri: Url}}
         style={styles.webview}
+        sharedCookiesEnabled={true}
       />
     </SafeAreaView>
   );

@@ -71,7 +71,7 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
           ]}
           disabled={isPlaceOrderButtonDisabled}
           onPress={() => navigation.navigate('WebView', {url: webUrl})}>
-          <Text style={styles.placeOrderButtonText}>Place Order</Text>
+          <Text style={styles.placeOrderButtonText}>Proceed To Checkout</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

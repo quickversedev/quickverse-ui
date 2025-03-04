@@ -134,6 +134,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   };
 
   const signOut = async () => {
+    await authService.signOut();
     console.log('signing out');
     setAuthData(undefined);
     storage.delete('@AuthData');

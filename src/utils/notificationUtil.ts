@@ -1,7 +1,17 @@
-import messaging from '@react-native-firebase/messaging';
+import messaging, {
+  FirebaseMessagingTypes,
+  getMessaging,
+  getToken,
+  hasPermission,
+  onMessage,
+  setBackgroundMessageHandler,
+} from '@react-native-firebase/messaging';
 import notifee, {AndroidImportance, AndroidStyle} from '@notifee/react-native';
 import {Platform, PermissionsAndroid} from 'react-native';
 
+/**
+ * Initialize the notification channel for Android.
+ */
 export const initializeNotificationChannel = async () => {
   if (Platform.OS === 'android' && Platform.Version >= 33) {
     const granted = await PermissionsAndroid.request(
@@ -19,7 +29,12 @@ export const initializeNotificationChannel = async () => {
   });
 };
 
-export const displayNotification = async (remoteMessage: any) => {
+/**
+ * Display a notification using Notifee.
+ */
+export const displayNotification = async (
+  remoteMessage: FirebaseMessagingTypes.RemoteMessage,
+) => {
   try {
     await notifee.displayNotification({
       title: remoteMessage.notification?.title || 'No title',
@@ -41,20 +56,68 @@ export const displayNotification = async (remoteMessage: any) => {
   }
 };
 
+/**
+ * Initialize the foreground message handler.
+ */
 export const initializeForegroundMessageHandler = () => {
-  return messaging().onMessage(async remoteMessage => {
+  const message = getMessaging();
+  return onMessage(message, async remoteMessage => {
     await displayNotification(remoteMessage);
   });
 };
 
+/**
+ * Initialize the background message handler.
+ */
 export const initializeBackgroundMessageHandler = () => {
-  messaging().setBackgroundMessageHandler(async remoteMessage => {
+  const message = getMessaging();
+  setBackgroundMessageHandler(message, async remoteMessage => {
     console.log('Message handled in the background!', remoteMessage);
     await displayNotification(remoteMessage);
   });
 };
 
-export const getFCMToken = async () => {
-  const token = await messaging().getToken();
+/**
+ * Get the FCM token for the device.
+ */
+export const getFCMToken = async (): Promise<string> => {
+  const message = messaging();
+  const token = await getToken(message);
+  console.log('FCM Token:', token);
   return token;
+};
+
+/**
+ * Request notification permissions (required for iOS).
+ */
+export const requestNotificationPermissions = async () => {
+  if (Platform.OS === 'ios') {
+    const message = getMessaging();
+    const authStatus = await hasPermission(message);
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      console.log('Notification permissions granted.');
+    } else {
+      console.log('Notification permissions denied.');
+    }
+  }
+};
+
+/**
+ * Check if the app has notification permissions.
+ */
+export const checkNotificationPermissions = async (): Promise<boolean> => {
+  if (Platform.OS === 'ios') {
+    const message = getMessaging();
+    const authStatus = await hasPermission(message);
+    return (
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL
+    );
+  } else {
+    return true;
+  }
 };

@@ -34,7 +34,6 @@ const ForceUpdateChecker: React.FC<{children: React.ReactNode}> = ({
   const checkForUpdate = async () => {
     try {
       const currentVersion = DeviceInfo.getVersion();
-      console.log('currentVersion:', currentVersion);
 
       // Compare versions
       if (currentVersion < updateData.min_required_version) {

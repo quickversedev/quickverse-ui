@@ -37,7 +37,6 @@ const useFetchUpdateData = () => {
       //     latestVersion: '4',
       //   },
       // };
-      console.log('Fetched update data:', response.data);
       setUpdateData({
         min_required_version: response.data.minVersion,
         ios_url: response.data.appStoreURL,

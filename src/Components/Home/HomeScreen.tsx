@@ -93,7 +93,7 @@ const HomeScreen: React.FC = () => {
                           setSelectedCampusId(item.value);
                           setClicked(!clicked);
                         }}>
-                        <Text style={styles.listItemText}>{item.value}</Text>
+                        <Text style={styles.listItemText}>{item.label}</Text>
                       </TouchableOpacity>
                     )}
                   />

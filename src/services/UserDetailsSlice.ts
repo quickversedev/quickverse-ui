@@ -7,8 +7,6 @@ export const fetchUserDetails = createAsyncThunk<User, string>(
   'userDetails/fetchUserDetails',
   async (token, {rejectWithValue}) => {
     try {
-      console.log('user details token', token);
-
       const response = await axios.get(
         `${globalConfig.apiBaseUrl}/v1/campus/user`,
         {
@@ -17,7 +15,6 @@ export const fetchUserDetails = createAsyncThunk<User, string>(
           },
         },
       );
-      // console.log('userResponse:', response);
       return response.data;
     } catch (error) {
       console.log('error while ferching the user data:', error);

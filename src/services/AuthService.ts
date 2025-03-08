@@ -2,6 +2,7 @@ import axios from 'axios';
 import globalConfig from '../utils/GlobalConfig';
 import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 import {getJWT} from '../utils/Storage';
+import {getFCMToken} from '../utils/notificationUtil.ts';
 
 export type AuthData = {
   session: {
@@ -82,7 +83,14 @@ const VerifyOtp = async (
   //     });
   //   }, 1000);
   // });
-  const token = await fetchToken();
+  let token;
+  let fcmToken = '';
+  try {
+    token = await fetchToken();
+    fcmToken = await getFCMToken();
+  } catch (error) {
+    console.log('getToken Error:', error);
+  }
   return axios
     .post(
       `${globalConfig.apiBaseUrl}/v1/login`,
@@ -90,6 +98,7 @@ const VerifyOtp = async (
         mobile: phoneNumber,
         otp: otp,
         verificationId: verificationId,
+        fcmToken: fcmToken,
       },
       {
         headers: {
@@ -192,8 +201,9 @@ const signOut = async () => {
   //   }, 1000);
   // });
   const token = getJWT();
+  const fcmToken = await getFCMToken();
   return axios
-    .delete(`${globalConfig.apiBaseUrl}/v1/logout?fcmToken=${token}`, {
+    .delete(`${globalConfig.apiBaseUrl}/v1/logout?fcmToken=${fcmToken}`, {
       headers: {
         SessionKey: token,
       },

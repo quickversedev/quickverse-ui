@@ -162,7 +162,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         setProductToAdd(product);
         setConfirmationModalVisible(true);
       } else {
-        console.log('[189 categories:]', product);
         dispatch(
           addToCart(
             {

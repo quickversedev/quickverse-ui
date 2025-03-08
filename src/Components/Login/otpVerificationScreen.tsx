@@ -87,7 +87,6 @@ const OtpVerificationScreen: React.FC = () => {
   //   }
   // };
   const handleKeyPress = (index: number, key: string) => {
-    console.log('back', key);
     if (key === 'Backspace') {
       const newOtp = [...otp];
 

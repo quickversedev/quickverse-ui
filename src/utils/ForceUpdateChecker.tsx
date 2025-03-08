@@ -12,7 +12,7 @@ import {
 import DeviceInfo from 'react-native-device-info';
 import theme from '../theme';
 
-import useFetchUpdateData from '../services/fetchVersions';
+import useFetchUpdateData from '../services/InitialConfigs';
 
 // import useFetchUpdateData from '../hooks/useFetchUpdateData'; // Import the custom hook
 

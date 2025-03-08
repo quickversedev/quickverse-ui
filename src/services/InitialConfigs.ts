@@ -1,6 +1,8 @@
 // src/hooks/useFetchUpdateData.js
 import {useState, useEffect} from 'react';
 import axios from 'axios';
+import globalConfig from '../utils/GlobalConfig';
+import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 
 const useFetchUpdateData = () => {
   const [updateData, setUpdateData] = useState({
@@ -10,28 +12,37 @@ const useFetchUpdateData = () => {
     latest_version: '',
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<any>(null);
   const [retryCount, setRetryCount] = useState(0); // Track retry attempts
 
   const fetchUpdateData = async () => {
     setLoading(true);
     setError(null);
+    const token = await fetchToken();
 
     try {
-      // const response = await axios.get('https://your-server.com/api/version'); // Replace with your API endpoint
-      const response = {
-        data: {
-          min_required_version: '1',
-          ios_url: 'http://www.google.com',
-          android_url: 'http://www.facebook.com',
-          latest_version: '4',
+      const response = await axios.get(
+        `${globalConfig.apiBaseUrl}/v1/initialConfig`,
+        {
+          headers: {
+            Authorization: token,
+          },
         },
-      };
+      ); // Replace with your API endpoint
+      // const response = {
+      //   data: {
+      //     minVersion: '1',
+      //     appStoreURL: 'http://www.google.com',
+      //     playStoreURL: 'http://www.facebook.com',
+      //     latestVersion: '4',
+      //   },
+      // };
+      console.log('Fetched update data:', response.data);
       setUpdateData({
-        min_required_version: response.data.min_required_version,
-        ios_url: response.data.ios_url,
-        android_url: response.data.android_url,
-        latest_version: response.data.latest_version,
+        min_required_version: response.data.minVersion,
+        ios_url: response.data.appStoreURL,
+        android_url: response.data.playStoreURL,
+        latest_version: response.data.latestVersion,
       });
     } catch (err) {
       setError(err);

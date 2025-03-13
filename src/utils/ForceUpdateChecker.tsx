@@ -70,7 +70,7 @@ const ForceUpdateChecker: React.FC<{children: React.ReactNode}> = ({
     );
   }
 
-  if (isUpdateRequired) {
+  if (!isUpdateRequired) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <Modal visible={isModalVisible} transparent={true} animationType="fade">

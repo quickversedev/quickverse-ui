@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     display: 'flex',
     justifyContent: 'flex-start',
-    paddingTop: 25,
+    // paddingTop: 20,
   },
   lineContainer: {
     flexDirection: 'row',
@@ -54,11 +54,11 @@ const styles = StyleSheet.create({
   },
   line: {
     flex: 1,
-    height: 3, // Thicker line
+    height: 2, // Thicker line
     backgroundColor: theme.colors.ternary,
     marginHorizontal: 8,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,

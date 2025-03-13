@@ -6,7 +6,11 @@ import messaging, {
   onMessage,
   setBackgroundMessageHandler,
 } from '@react-native-firebase/messaging';
-import notifee, {AndroidImportance, AndroidStyle} from '@notifee/react-native';
+import notifee, {
+  AndroidImportance,
+  AndroidStyle,
+  AndroidBadgeIconType,
+} from '@notifee/react-native';
 import {Platform, PermissionsAndroid} from 'react-native';
 
 /**
@@ -29,33 +33,36 @@ export const initializeNotificationChannel = async () => {
   });
 };
 
-/**
- * Display a notification using Notifee.
- */
 export const displayNotification = async (
   remoteMessage: FirebaseMessagingTypes.RemoteMessage,
 ) => {
   try {
-    await notifee.displayNotification({
-      title: remoteMessage.notification?.title || 'No title',
-      body: remoteMessage.notification?.body || 'No body',
-      android: {
-        channelId: 'default',
-        importance: AndroidImportance.HIGH,
-        largeIcon: 'qv_blue',
-        color: '#8B8000',
-        style: {
-          type: AndroidStyle.BIGTEXT,
-          text: remoteMessage.notification?.body || 'No body',
+    // Check if the notification object is present
+    if (remoteMessage.notification) {
+      await notifee.displayNotification({
+        title: remoteMessage.notification.title || 'No title',
+        body: remoteMessage.notification.body || 'No body',
+        android: {
+          channelId: 'default',
+          importance: AndroidImportance.HIGH,
+          badgeIconType: AndroidBadgeIconType.LARGE,
+          smallIcon: 'qv_blue', // Ensure this resource exists in your app
+          largeIcon: 'qv_blue', // Ensure this resource exists in your app
+          color: '#8B8000',
+          style: {
+            type: AndroidStyle.BIGTEXT,
+            text: remoteMessage.notification.body || 'No body',
+          },
+          showTimestamp: true,
         },
-        showTimestamp: true,
-      },
-    });
+      });
+    } else {
+      console.log('Notification is undefined. Skipping display.');
+    }
   } catch (error) {
     console.error('Error displaying notification:', error);
   }
 };
-
 /**
  * Initialize the foreground message handler.
  */

@@ -4,6 +4,7 @@ import {
   ScrollView,
   SafeAreaView,
   View,
+  TextInput,
   FlatList,
   TouchableOpacity,
   Text,
@@ -22,6 +23,7 @@ import {useAuth} from '../../utils/AuthContext';
 import CartScreen from '../Cart/CartScreen';
 import {useSelector} from 'react-redux';
 import {selectCart} from '../../services/cart/productCartSlice';
+
 const HomeScreen: React.FC = () => {
   const [selectedCampusId, setSelectedCampusId] = useState<
     string | undefined
@@ -32,6 +34,9 @@ const HomeScreen: React.FC = () => {
   const isFirstTimeLogin = getIsNewUser();
   const {selectedCampus} = useAuth();
   const animationValue = useRef(new Animated.Value(1000)).current;
+
+  const [searchText, setSearchText] = useState('');
+
   const closeCartModal = () => {
     Animated.timing(animationValue, {
       toValue: 1000,
@@ -67,31 +72,56 @@ const HomeScreen: React.FC = () => {
     <>
       <SafeAreaView style={styles.container}>
         <>
+          {/* campus_selection */}
           <View style={styles.headerContainer}>
             <View style={styles.campusSelector}>
               <TouchableOpacity
                 style={styles.touchableOpacity}
                 onPress={() => setClicked(!clicked)}>
-                <Text style={styles.touchableText}>
-                  {selectedCampusId === '' ? 'Select Campus' : selectedCampusId}
-                </Text>
+                {/*  */}
                 <MaterialCommunityIcons
-                  name={clicked ? 'chevron-up' : 'chevron-down'}
-                  size={20}
+                  name={'navigation-variant'}
+                  size={18}
                   color={theme.colors.ternary}
+                  style={{marginRight: 5, marginTop: 4}}
+                />
+                <View>
+                  <Text style={styles.touchableText}>
+                    {selectedCampusId === ''
+                      ? 'Select Campus'
+                      : selectedCampusId}
+                  </Text>
+                  <Text>{'address'}</Text>
+                </View>
+                <MaterialCommunityIcons
+                  name={clicked ? 'menu-up' : 'menu-down'}
+                  size={28}
+                  color={theme.colors.ternary}
+                  style={{marginTop: -2}}
                 />
               </TouchableOpacity>
               {clicked && (
                 <View style={styles.dropdownContainer}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search campus..."
+                    value={searchText}
+                    onChangeText={text => setSearchText(text)}
+                  />
                   <FlatList
-                    data={campusOptions}
+                    data={campusOptions.filter(item =>
+                      item.value
+                        .toLowerCase()
+                        .includes(searchText.toLowerCase()),
+                    )}
                     keyExtractor={item => item.value}
                     renderItem={({item}) => (
                       <TouchableOpacity
                         style={styles.listItem}
                         onPress={() => {
                           setSelectedCampusId(item.value);
-                          setClicked(!clicked);
+                          setClicked(false);
+                          setSearchText(''); // Reset search on selection
                         }}>
                         <Text style={styles.listItemText}>{item.value}</Text>
                       </TouchableOpacity>
@@ -151,15 +181,16 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     borderRadius: 10,
-    borderWidth: 0.9,
+    // borderWidth: 0.9,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    // justifyContent: 'space-between',
+    // alignItems: 'center',
     paddingHorizontal: 15,
     backgroundColor: theme.colors.primary,
   },
   touchableText: {
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: 'bold',
     color: theme.colors.ternary,
   },
   dropdownContainer: {
@@ -195,7 +226,7 @@ const styles = StyleSheet.create({
   cartButton: {
     height: 50,
     width: 50,
-    borderRadius: 15,
+    borderRadius: 25,
     backgroundColor: theme.colors.secondary,
     justifyContent: 'center',
     alignItems: 'center',
@@ -221,6 +252,30 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+
+  // searchBar
+  searchContainer: {
+    alignItems: 'center',
+    padding: 10,
+  },
+  searchBox: {
+    width: '95%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 0.9,
+    borderRadius: 10,
+    height: 45,
+    paddingHorizontal: 10,
+  },
+  input: {
+    flex: 1,
+    height: '100%',
+    paddingLeft: 10,
+  },
+  icon: {
+    position: 'absolute',
+    right: 10,
   },
 });
 

@@ -43,14 +43,12 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
         scrollEventThrottle={16}
         renderItem={({item, index}) => {
           return (
-            <View key={index} style={styles.cardContainer}>
-              <CardItem
-                name={item.vendorName}
-                distance={item.distance}
-                image={{uri: `${item.vendorBanner}.jpg`}}
-                onPress={() => handleCardPress(item)}
-              />
-            </View>
+            <CardItem
+              name={item.vendorName}
+              distance={item.distance}
+              image={{uri: `${item.vendorBanner}.jpg`}}
+              onPress={() => handleCardPress(item)}
+            />
           );
         }}
       />
@@ -62,6 +60,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 5,
+    paddingHorizontal: 12,
   },
   cardContainer: {
     width: ITEM_SIZE,

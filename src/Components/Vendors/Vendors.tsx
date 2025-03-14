@@ -5,6 +5,7 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  Platform,
   Text,
 } from 'react-native';
 import AppHeader from '../util/AppHeader';
@@ -25,7 +26,12 @@ const Vendors: React.FC = () => {
       <View style={styles.container}>
         {/* Header with Cart Icon */}
         <View style={styles.headerContainer}>
-          <AppHeader headerText="Vendors" />
+          {/* <AppHeader headerText="Vendors" /> */}
+
+          <View style={styles.shopHeader}>
+            <Text style={styles.shopName}>Vendors</Text>
+          </View>
+
           <TouchableOpacity
             style={styles.cartButton}
             onPress={() => setModalVisible(true)}>
@@ -61,22 +67,51 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.primary,
   },
+
   container: {
     backgroundColor: theme.colors.primary,
     marginBottom: 45,
   },
+
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 18,
+    paddingHorizontal: 10,
   },
+
+  // Header Styles
+  shopHeader: {
+    backgroundColor: theme.colors.secondary,
+    padding: 8,
+    borderRadius: 15,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: theme.colors.ternary,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  shopName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.primary,
+    textTransform: 'uppercase',
+  },
+
   cartButton: {
-    position: 'absolute',
-    right: 10,
-    top: 10,
     height: 50,
     width: 50,
-    borderRadius: 15,
+    borderRadius: 25,
     backgroundColor: theme.colors.secondary,
     justifyContent: 'center',
     alignItems: 'center',

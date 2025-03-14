@@ -107,24 +107,44 @@ const VendorCards: React.FC = () => {
 
       {Object.entries(filteredVendors).map(([category, categoryVendors]) => (
         <View key={category} style={styles.categorySection}>
-          <Text style={styles.categoryTitle}>{category}</Text>
+          <Text
+            style={[
+              styles.categoryTitle,
+              {
+                borderWidth: 1.2,
+                borderColor: theme.colors.secondary,
+                marginHorizontal: 'auto',
+                borderRadius: 12,
+                paddingHorizontal: 26,
+                paddingVertical: 2,
+              },
+            ]}>
+            {category}
+          </Text>
+
           <FlatList
             data={categoryVendors}
             keyExtractor={item => item.vendorId.toString()}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
             renderItem={({item}) => (
-              <View style={styles.cardContainer}>
-                <CardItem
-                  name={item.vendorName}
-                  distance={item.distance}
-                  image={{uri: `${item.vendorBanner}.jpg`}}
-                  onPress={() => handleCardPress(item)}
-                />
-              </View>
+              <CardItem
+                name={item.vendorName}
+                distance={item.distance}
+                image={{uri: `${item.vendorBanner}.jpg`}}
+                onPress={() => handleCardPress(item)}
+              />
             )}
             contentContainerStyle={styles.flatListContent}
           />
+
+          <View
+            style={{
+              borderWidth: 0.5,
+              borderColor: theme.colors.secondary,
+              marginTop: 12,
+              marginHorizontal: 16,
+            }}></View>
         </View>
       ))}
     </ScrollView>
@@ -167,11 +187,11 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
     borderRadius: 15,
     backgroundColor: theme.colors.primary,
-    shadowColor: theme.colors.ternary,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
+    // shadowColor: theme.colors.ternary,
+    // shadowOffset: {width: 0, height: 2},
+    // shadowOpacity: 0.1,
+    // shadowRadius: 4,
+    // elevation: 4,
   },
   categoryTitle: {
     fontSize: 20,
@@ -183,17 +203,17 @@ const styles = StyleSheet.create({
   flatListContent: {
     paddingHorizontal: SPACING / 2,
   },
-  cardContainer: {
-    width: ITEM_SIZE,
-    marginRight: SPACING,
-    borderRadius: 15,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+  // cardContainer: {
+  //   width: ITEM_SIZE,
+  //   marginRight: SPACING,
+  //   borderRadius: 15,
+  //   backgroundColor: '#fff',
+  //   shadowColor: '#000',
+  //   shadowOffset: {width: 0, height: 2},
+  //   shadowOpacity: 0.1,
+  //   shadowRadius: 4,
+  //   elevation: 3,
+  // },
 });
 
 export default VendorCards;

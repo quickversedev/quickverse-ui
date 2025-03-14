@@ -24,13 +24,23 @@ const VendorDetails: React.FC<VendorDetailsProps> = ({vendor}) => {
           style={styles.banner}
         />
         <View style={styles.infoContainer}>
-          <Text style={styles.description}>{vendor.storeDescription}</Text>
-          <Text style={styles.category}> {vendor.storeCategory}</Text>
+          <Text style={styles.name} numberOfLines={1}>
+            {vendor?.vendorName}
+          </Text>
+          <Text style={styles.description} numberOfLines={1}>
+            {vendor.storeDescription}
+          </Text>
+          <Text style={styles.category} numberOfLines={1}>
+            {' '}
+            {vendor.storeCategory}
+          </Text>
           <Text style={styles.info}>
             🕒 {vendor.storeOpeningTime} - {vendor.storeClosingTime}
           </Text>
           <Text style={styles.info}>📍 {vendor.distance}</Text>
-          <Text style={styles.info}>👤 {vendor.vendorOwner}</Text>
+          <Text style={styles.info} numberOfLines={1}>
+            👤 {vendor.vendorOwner}
+          </Text>
           <TouchableOpacity
             onPress={() => Linking.openURL(`tel:${vendor.vendorPhone}`)}>
             <Text style={styles.phone}>📞 {vendor.vendorPhone}</Text>
@@ -72,12 +82,12 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   name: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
   description: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#666',
     marginVertical: 5,
   },

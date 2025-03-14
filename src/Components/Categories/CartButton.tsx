@@ -50,6 +50,11 @@ const CartButton: React.FC<CartButtonProps> = ({
       ) : (
         <Pressable onPress={onAdd} style={styles.addButton} disabled={disabled}>
           <Text style={styles.addButtonText}>ADD</Text>
+          <MaterialCommunityIcons
+            name="plus-circle-outline"
+            size={20}
+            color={'white'}
+          />
         </Pressable>
       )}
     </View>
@@ -65,10 +70,12 @@ const styles = StyleSheet.create({
     marginRight: 27,
   },
   addButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     backgroundColor: theme.colors.secondary,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 8,
+    borderRadius: 16,
     alignItems: 'center',
     height: 30,
     width: 70,

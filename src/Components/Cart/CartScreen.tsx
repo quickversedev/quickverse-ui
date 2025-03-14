@@ -115,11 +115,13 @@ const CartScreen: React.FC<CartModalProps> = ({
             <MaterialCommunityIcons name="close" size={24} color="black" />
           </TouchableOpacity>
         </View>
+
         <Text style={styles.subHeader}>
           {cartItems.length} Items in your cart from
         </Text>
         <View style={styles.vendorRow}>
           <Text style={styles.vendorName}>{vendor?.vendorName}</Text>
+
           {!isCartEmpty && (
             <TouchableOpacity
               style={styles.clearCartButton}
@@ -128,6 +130,7 @@ const CartScreen: React.FC<CartModalProps> = ({
             </TouchableOpacity>
           )}
         </View>
+
         {!isCartEmpty && !isStoreOpened && (
           <View style={styles.storeClosedCard}>
             <Text style={styles.storeClosedText}>
@@ -140,6 +143,7 @@ const CartScreen: React.FC<CartModalProps> = ({
             </TouchableOpacity>
           </View>
         )}
+
         {authData ? (
           <ScrollView>
             <CartListScreen
@@ -148,12 +152,26 @@ const CartScreen: React.FC<CartModalProps> = ({
               handleDecrement={handleDecrement}
               handleDelete={handleDelete}
             />
-            <PaymentSummaryScreen
-              getTotalPrice={pricesObject}
-              vendor={vendor}
-              isStoreOpened={isStoreOpened}
-              isCartEmpty={isCartEmpty}
-            />
+            {!isCartEmpty ? (
+              <PaymentSummaryScreen
+                getTotalPrice={pricesObject}
+                vendor={vendor}
+                isStoreOpened={isStoreOpened}
+                isCartEmpty={isCartEmpty}
+              />
+            ) : (
+              <View>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    color: 'black',
+                    marginTop: 'auto',
+                    marginBottom: 50,
+                  }}>
+                  Please add items to cart to order
+                </Text>
+              </View>
+            )}
           </ScrollView>
         ) : (
           <LoginCard feature="Cart" />

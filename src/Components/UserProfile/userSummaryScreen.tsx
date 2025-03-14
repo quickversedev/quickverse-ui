@@ -48,7 +48,6 @@ const ProfileScreen = () => {
   if (loading) {
     return <Loading />;
   }
-  console.log('userDetails,', userDetails.user);
 
   return (
     <SafeAreaView style={styles.safeArea}>

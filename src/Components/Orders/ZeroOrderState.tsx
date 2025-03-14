@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {OrderStackParamList} from './OrdersNavigator';
 import theme from '../../theme';
@@ -15,12 +15,11 @@ const ZeroOrdersState: React.FC = () => {
 
   const handleStartOrdering = () => {
     navigation.navigate('HomeScreen'); // Replace with your actual order screen route
-    console.log('Start ordering');
   };
 
   return (
     <View style={styles.container}>
-      <Icon
+      <MaterialCommunityIcons
         name="calendar-text-outline"
         size={80}
         color={theme.colors.ternary}

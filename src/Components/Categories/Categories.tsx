@@ -317,17 +317,16 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             <Text style={styles.originalPrice}>₹{product.productPrice}</Text>
           )}
           <Text style={styles.salePrice}> ₹{product.salePrice}</Text>
-
-          <View style={{position: 'absolute', bottom: 0, right: 0}}>
-            <CartButton
-              quantity={product.quantity}
-              onIncrease={() => handleIncreaseQuantity(product.id)}
-              onDecrease={() => handleDecreaseQuantity(product.id)}
-              onAdd={() => handleAddToCart(product)}
-              added={product.quantity > 0}
-              disabled={!storeOpen || !isInStock}
-            />
-          </View>
+        </View>
+        <View style={{position: 'absolute', bottom: 8, right: 0}}>
+          <CartButton
+            quantity={product.quantity}
+            onIncrease={() => handleIncreaseQuantity(product.id)}
+            onDecrease={() => handleDecreaseQuantity(product.id)}
+            onAdd={() => handleAddToCart(product)}
+            added={product.quantity > 0}
+            disabled={!storeOpen || !isInStock}
+          />
         </View>
       </View>
     );
@@ -445,7 +444,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
               keyExtractor={item => item.productId}
               showsHorizontalScrollIndicator={false} // Hides horizontal scrollbar
               showsVerticalScrollIndicator={false} // Hides vertical scrollbar
-              contentContainerStyle={{padding: 10, height: '100%'}}
+              contentContainerStyle={{}}
               onScroll={handleScroll}
               scrollEventThrottle={100}
             />
@@ -591,6 +590,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   productContainer: {
+    marginHorizontal: 12,
+    height: 85,
     borderWidth: 2,
     borderColor: 'red',
     flexDirection: 'row',
@@ -598,7 +599,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 15,
     padding: 5,
-    marginBottom: 10,
+    marginTop: 10,
     backgroundColor: theme.colors.primary,
     ...Platform.select({
       ios: {

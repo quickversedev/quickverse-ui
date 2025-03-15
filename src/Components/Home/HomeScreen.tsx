@@ -123,7 +123,7 @@ const HomeScreen: React.FC = () => {
                           setClicked(false);
                           setSearchText(''); // Reset search on selection
                         }}>
-                        <Text style={styles.listItemText}>{item.value}</Text>
+                        <Text style={styles.listItemText}>{item.label}</Text>
                       </TouchableOpacity>
                     )}
                   />

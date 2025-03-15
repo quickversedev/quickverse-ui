@@ -22,7 +22,6 @@ const productCartSlice = createSlice({
   reducers: {
     addToProductCart: (state, action: PayloadAction<ProductCartItems>) => {
       const {vendorId} = action.payload;
-      console.log('[25]', action.payload);
       if (state.productCart.length > 0 && state.shopId !== vendorId) {
         console.warn(
           'Cart contains items from another shop. Clear the cart before adding.',
@@ -32,12 +31,10 @@ const productCartSlice = createSlice({
 
       if (state.productCart.length === 0) {
         state.shopId = vendorId;
-        console.log('[35]', vendorId);
         saveShopId(vendorId);
       }
 
       state.productCart.push(action.payload);
-      console.log('[40]', typeof state.productCart);
       saveCart(state.productCart);
     },
     removeFromProductCart: (state, action: PayloadAction<{id: string}>) => {

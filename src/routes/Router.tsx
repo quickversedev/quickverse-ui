@@ -1,17 +1,13 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {AppStack} from './AppStack';
 import {AuthStack} from './AuthStack';
 import {useAuth} from '../utils/AuthContext';
 import {Loading} from '../Components/util/Loading';
-import {saveToken} from '../utils/KeychainStore/keychainUtil';
+import ForceUpdateChecker from '../utils/ForceUpdateChecker';
 
 export const Router = () => {
   const {authData, loading, skipLogin} = useAuth();
-  console.log('token', authData);
-  useEffect(() => {
-    saveToken();
-  }, []);
 
   if (loading) {
     return <Loading />;
@@ -19,7 +15,9 @@ export const Router = () => {
 
   return (
     <NavigationContainer>
-      {authData || skipLogin ? <AppStack /> : <AuthStack />}
+      <ForceUpdateChecker>
+        {authData || skipLogin ? <AppStack /> : <AuthStack />}
+      </ForceUpdateChecker>
     </NavigationContainer>
   );
 };

@@ -18,7 +18,6 @@ export const fetchFoodItems = createAsyncThunk<Product[], string>(
           },
         },
       );
-      console.log('featured Items:', response.data);
       return response.data;
     } catch (error) {
       console.log('error', error);

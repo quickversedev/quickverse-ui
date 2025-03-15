@@ -88,7 +88,6 @@ export const fetchOrders = createAsyncThunk<
   {cursor: Cursor | null; authData: string | undefined}
 >('orders/fetchOrders', async ({cursor, authData}, {rejectWithValue}) => {
   try {
-    console.log('fetchOrders', cursor);
     const response = await axios.post<OrdersResponse>(
       `${globalConfig.apiBaseUrl}/v2/getSMZBIZOrders?pageSize=1`,
       {

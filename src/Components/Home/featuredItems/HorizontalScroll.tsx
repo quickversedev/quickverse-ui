@@ -167,7 +167,7 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
                 <TouchableOpacity
                   style={styles.addButton}
                   onPress={() => handleAddToCart(product)}>
-                  <Text style={styles.addButtonText}>Add to Cart</Text>
+                  <Text style={styles.addButtonText}>Order Now</Text>
                 </TouchableOpacity>
               ) : (
                 <View style={styles.quantityContainer}>

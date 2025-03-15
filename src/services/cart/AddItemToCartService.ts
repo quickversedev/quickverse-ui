@@ -8,7 +8,6 @@ export const addItemToCart = async (
 ): Promise<any> => {
   try {
     const url = `${globalConfig.apiBaseUrl}/v2/addCart`;
-    console.log('add to card:', authData);
     const response = await axios.post(
       url,
       {

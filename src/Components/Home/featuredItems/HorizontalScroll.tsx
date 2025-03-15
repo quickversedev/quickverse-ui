@@ -11,7 +11,7 @@ import {Card, Text} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   addToCart,
-  clearCart,
+  clearFromCart,
   decrementQuantity,
   incrementQuantity,
   selectCart,
@@ -83,8 +83,8 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
   );
   const handleConfirmAddToCart = () => {
     if (productToAdd) {
-      dispatch(clearCart());
       if (authData) {
+        dispatch(clearFromCart(authData));
         dispatch(
           addToCart(
             {

@@ -5,6 +5,7 @@ import {ProductCartItems} from '../../utils/canonicalModel';
 import {addItemToCart} from './AddItemToCartService';
 import {deleteItemFromCart} from './DeleteItemFromCart';
 import {AppThunk} from '../../store/store';
+import {clearItemsFromCart} from './ClearCart';
 
 interface ProductCartState {
   shopId: string;
@@ -89,7 +90,14 @@ const productCartSlice = createSlice({
 
 export const addToCart =
   (item: ProductCartItems, authData: string): AppThunk =>
-  async dispatch => {
+  async (dispatch, getState) => {
+    const {productCart} = getState().productCart;
+
+    //clear the remote cart before addin gthe product to the cart
+    if (productCart.length === 0) {
+      await clearItemsFromCart(item.vendorId, authData);
+    }
+
     try {
       await addItemToCart(item.vendorId, item.id, authData);
       dispatch(productCartSlice.actions.addToProductCart(item));
@@ -107,6 +115,18 @@ export const removeFromCart =
       dispatch(productCartSlice.actions.removeFromProductCart({id}));
     } catch (error) {
       console.error('Failed to remove item from cart:', error);
+    }
+  };
+
+export const clearFromCart =
+  (authData: string): AppThunk =>
+  async (dispatch, getState) => {
+    const {shopId} = getState().productCart;
+    try {
+      await clearItemsFromCart(shopId, authData);
+      dispatch(productCartSlice.actions.clearCart());
+    } catch (error) {
+      console.error('Failed to clear the cart:', error);
     }
   };
 

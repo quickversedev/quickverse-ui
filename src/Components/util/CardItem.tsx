@@ -22,8 +22,6 @@ interface CardItemProps {
 }
 const ITEM_SIZE: any = width * 0.76;
 const CardItem: React.FC<CardItemProps> = ({name, image, onPress}) => {
-  console.log('image:', image.uri); //  image: https://imgur.com/VZKKW28.jpg
-
   const modifiedUri =
     image && 'uri' in image && image.uri
       ? image.uri.replace('https://imgur.com/', 'https://i.imgur.com/')

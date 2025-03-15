@@ -27,7 +27,7 @@ import {
 import {useDispatch, useSelector} from 'react-redux';
 import {
   addToCart,
-  clearCart,
+  clearFromCart,
   decrementQuantity,
   incrementQuantity,
   selectCart,
@@ -37,7 +37,6 @@ import CartScreen from '../Cart/CartScreen';
 import VendorDetails from './venderHeader';
 import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from '../Vendors/VendorsNavigator';
-import {Loading} from '../util/Loading';
 import CustomConfirmationModal from '../Cart/CustomConfirmationModal';
 import {isStoreOpen} from '../util/vendorUtil';
 import {useAuth} from '../../utils/AuthContext';
@@ -207,8 +206,8 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
   const handleConfirmAddToCart = () => {
     if (productToAdd) {
-      dispatch(clearCart());
       if (authData) {
+        dispatch(clearFromCart(authData));
         dispatch(
           addToCart(
             {

@@ -15,10 +15,10 @@ import theme from '../../theme';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../store/store';
 import {
-  clearCart,
-  decrementProductQuantity,
-  incrementProductQuantity,
-  removeFromProductCart,
+  clearFromCart,
+  decrementQuantity,
+  incrementQuantity,
+  removeFromCart,
   selectShopId,
 } from '../../services/cart/productCartSlice';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -48,17 +48,17 @@ const CartScreen: React.FC<CartModalProps> = ({
   const animationValue = new Animated.Value(0);
   const dispatch = useDispatch<AppDispatch>();
   const handleIncrement = (itemId: string) => {
-    dispatch(incrementProductQuantity({id: itemId}));
+    authData && dispatch(incrementQuantity(itemId, authData));
   };
 
   const handleDecrement = (itemId: string) => {
-    dispatch(decrementProductQuantity({id: itemId}));
+    authData && dispatch(decrementQuantity(itemId, authData));
   };
   const handleDelete = (itemId: string) => {
-    dispatch(removeFromProductCart({id: itemId}));
+    authData && dispatch(removeFromCart(itemId, authData));
   };
   const handleClearCart = () => {
-    dispatch(clearCart());
+    authData && dispatch(clearFromCart(authData));
   };
   const getTotalPrice = () => {
     return cartItems.reduce(

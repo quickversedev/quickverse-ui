@@ -1,5 +1,12 @@
 import React from 'react';
-import {View, StyleSheet, FlatList, Dimensions, Image} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Dimensions,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import CardItem from '../../util/CardItem';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamListHome} from '../HomeNavigation';
@@ -42,17 +49,15 @@ const CampusBuzzList: React.FC<Props> = ({buzzData}) => {
         bounces={false}
         scrollEventThrottle={16}
         renderItem={({item}) => (
-          <View style={[styles.cardContainer, {marginHorizontal: itemSpacing}]}>
+          <TouchableOpacity
+            onPress={() => handleCardPress(item?.buzzUrl)}
+            style={[styles.cardContainer, {marginHorizontal: itemSpacing}]}>
             <Image
               source={{uri: `${item?.buzzImage}.jpg`}}
               style={styles.image}
               resizeMode="cover"
             />
-            <CardItem
-              onPress={() => handleCardPress(item?.buzzUrl)}
-              image={0}
-            />
-          </View>
+          </TouchableOpacity>
         )}
       />
     </View>

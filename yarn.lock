@@ -9075,6 +9075,7 @@ __metadata:
     react-native-linear-gradient: ^2.8.3
     react-native-mmkv: ^2.12.2
     react-native-paper: ^5.12.3
+    react-native-permissions: ^5.2.6
     react-native-picker-select: ^9.2.0
     react-native-reanimated: ^3.12.0
     react-native-safe-area-context: ^4.10.4
@@ -9208,6 +9209,20 @@ __metadata:
     react-native-safe-area-context: "*"
     react-native-vector-icons: "*"
   checksum: ef16fbb57986f09f2080e98ddb7977c494d6accb36767101de32199849bba8764e2bcd528a5d1c08940f4430cb86dabb6baaf5b33a539670221cbbfcc01f2d5e
+  languageName: node
+  linkType: hard
+
+"react-native-permissions@npm:^5.2.6":
+  version: 5.3.0
+  resolution: "react-native-permissions@npm:5.3.0"
+  peerDependencies:
+    react: ">=18.1.0"
+    react-native: ">=0.70.0"
+    react-native-windows: ">=0.70.0"
+  peerDependenciesMeta:
+    react-native-windows:
+      optional: true
+  checksum: 0896ed6919062a57b79c54d3de0d14a515ada9be87b5f65295e728ee23706430d99d45e48b8d45caad2d8f5eb42d1bd53cb213ff645ebec2117c94aadd35bfe8
   languageName: node
   linkType: hard
 

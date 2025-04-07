@@ -17,7 +17,7 @@ interface CardItemProps {
   name?: string;
   distance?: string;
   // image: ImageSourcePropType;
-  image?: ImageSource | number;
+  image?: ImageSource;
   onPress: () => void;
 }
 

@@ -1,4 +1,3 @@
-// src/components/CardItem.tsx
 import React from 'react';
 import {
   StyleSheet,
@@ -6,38 +5,42 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
-  ImageSourcePropType,
   View,
 } from 'react-native';
-import {Card} from 'react-native-paper';
 import theme from '../../theme';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 const {width} = Dimensions.get('window');
 
+interface ImageSource {
+  uri?: string;
+}
 interface CardItemProps {
   name?: string;
   distance?: string;
-  image: ImageSourcePropType;
+  // image: ImageSourcePropType;
+  image?: ImageSource;
   onPress: () => void;
 }
+
 const ITEM_SIZE: any = width * 0.76;
+
 const CardItem: React.FC<CardItemProps> = ({name, image, onPress}) => {
-  const modifiedUri =
-    image && 'uri' in image && image.uri
-      ? image.uri.replace('https://imgur.com/', 'https://i.imgur.com/')
-      : null;
+  // Handle different image source types
+  const imageSource = React.useMemo(() => {
+    if (image && typeof image === 'object' && 'uri' in image) {
+      const modifiedUri = (image.uri as string)?.replace(
+        'https://imgur.com/',
+        'https://i.imgur.com/',
+      );
+      return modifiedUri ? {uri: modifiedUri} : undefined;
+    }
+    return image;
+  }, [image]);
 
   return (
     <TouchableOpacity onPress={onPress}>
-      {/* <Card.Cover source={image} style={styles.posterImage} />
-      <Card.Content style={{alignItems: 'center'}}>
-        <Text style={styles.title} numberOfLines={2}>
-          {name}
-        </Text>
-      </Card.Content> */}
       <View style={styles.card}>
         <Image
-          source={{uri: modifiedUri}}
+          source={imageSource}
           style={{
             width: '100%',
             height: '80%',
@@ -63,9 +66,6 @@ const CardItem: React.FC<CardItemProps> = ({name, image, onPress}) => {
 
 const styles = StyleSheet.create({
   card: {
-    // flex: 1,
-    // marginHorizontal: 1,
-    // padding: 5,
     overflow: 'hidden',
     width: ITEM_SIZE * 0.4,
     height: ITEM_SIZE * 0.6,
@@ -74,7 +74,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: theme.colors.primary,
 
-    // borderEndWidth: 5,
     borderColor: theme.colors.secondary,
 
     paddingVertical: 10,
@@ -102,7 +101,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     color: theme.colors.ternary,
-    // fontWeight: 'bold',/
   },
   distance: {
     fontSize: 14,

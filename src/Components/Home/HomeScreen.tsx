@@ -91,7 +91,7 @@ const HomeScreen: React.FC = () => {
                       ? 'Select Campus'
                       : selectedCampusId}
                   </Text>
-                  <Text>{'address'}</Text>
+                  <Text style={{display: 'none'}}>{'campus address'}</Text>
                 </View>
                 <MaterialCommunityIcons
                   name={clicked ? 'menu-up' : 'menu-down'}

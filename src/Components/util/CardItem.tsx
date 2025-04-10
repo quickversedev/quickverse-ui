@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
 
     borderColor: theme.colors.secondary,
 
-    paddingVertical: 10,
+    // paddingVertical: 10,
     marginTop: 10,
     marginBottom: 22,
     marginRight: 12,

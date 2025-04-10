@@ -28,14 +28,14 @@ const CampusBuzz: React.FC<PCampusBuzzProps> = ({campus}) => {
   return campusBuzz?.length > 0 ? (
     <View style={styles.buzzContainer}>
       <View style={styles.headContainer}>
-        <View style={styles.line} />
+        {/* <View style={styles.line} /> */}
+        <Text variant="titleLarge" style={styles.heading}>
+          Campus Buzzzz
+        </Text>
         <Image
           style={styles.buzz_logo}
           source={require('../../../data/images/campus_logo.png')}
         />
-        <Text variant="titleLarge" style={styles.heading}>
-          Campus Buzzzz
-        </Text>
       </View>
       <CampusBuzzList buzzData={campusBuzz} />
     </View>
@@ -63,11 +63,12 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   heading: {
-    fontSize: 25,
-    fontWeight: 'condensedBold',
+    fontSize: 24,
+    fontWeight: 'bold',
     color: theme.colors.ternary,
+    marginLeft: 12,
   },
-  buzz_logo: {width: 24, height: 24, marginRight: 8},
+  buzz_logo: {width: 24, height: 24, marginHorizontal: 8},
 });
 
 export default CampusBuzz;

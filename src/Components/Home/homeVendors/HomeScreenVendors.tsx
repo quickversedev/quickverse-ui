@@ -31,14 +31,14 @@ const HomeScreenVendors: React.FC<HomeScreenVendorsProps> = ({campus}) => {
   return enabledVendors?.length > 0 ? (
     <View style={styles.vendorsContainer}>
       <View style={styles.headContainer}>
-        <View style={styles.line} />
+        {/* <View style={styles.line} /> */}
+        <Text variant="titleLarge" style={styles.heading}>
+          Stores Near You
+        </Text>
         <Image
           style={styles.store_logo}
           source={require('../../../data/images/store_logo.png')}
         />
-        <Text variant="titleLarge" style={styles.heading}>
-          Stores Near You
-        </Text>
       </View>
       <HorizontalCardList vendors={enabledVendors} />
     </View>
@@ -68,11 +68,12 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   heading: {
-    fontSize: 25,
-    fontWeight: 'condensedBold',
+    fontSize: 24,
+    fontWeight: 'bold',
     color: theme.colors.ternary,
+    marginLeft: 12,
   },
-  store_logo: {width: 24, height: 24, marginRight: 8},
+  store_logo: {width: 24, height: 24, marginHorizontal: 8},
 });
 
 export default HomeScreenVendors;

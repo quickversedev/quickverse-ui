@@ -26,7 +26,7 @@ const PromoDiscounts: React.FC<PromoDiscountsProps> = ({campus}) => {
   return promoItemsList.length > 0 ? (
     <View style={styles.promoContainer}>
       <View style={styles.headContainer}>
-        <View style={styles.line} />
+        {/* <View style={styles.line} /> */}
         <Text style={styles.heading}>Promotions</Text>
         <Image
           style={styles.promo_logo}
@@ -60,11 +60,12 @@ const styles = StyleSheet.create({
   },
 
   heading: {
-    fontSize: 25,
-    fontWeight: 'condensedBold',
+    fontSize: 24,
+    fontWeight: 'bold',
     color: theme.colors.ternary,
+    marginLeft: 12,
   },
-  promo_logo: {width: 40, height: 40, marginLeft: 8},
+  promo_logo: {width: 40, height: 40, marginHorizontal: 8},
 });
 
 export default PromoDiscounts;

@@ -1,6 +1,6 @@
 // src/components/Heading.tsx
 import React, {useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, Image, StyleSheet} from 'react-native';
 import {Text} from 'react-native-paper';
 import HorizontalCardList from './HorizontalCardList';
 
@@ -29,13 +29,16 @@ const HomeScreenVendors: React.FC<HomeScreenVendorsProps> = ({campus}) => {
   const enabledVendors =
     vendors && vendors.filter(vendor => vendor.storeEnabled);
   return enabledVendors?.length > 0 ? (
-    <View style={styles.headingContainer}>
-      <View style={styles.lineContainer}>
+    <View style={styles.vendorsContainer}>
+      <View style={styles.headContainer}>
         <View style={styles.line} />
+        <Image
+          style={styles.store_logo}
+          source={require('../../../data/images/store_logo.png')}
+        />
         <Text variant="titleLarge" style={styles.heading}>
-          Stores Near You..!
+          Stores Near You
         </Text>
-        <View style={styles.invisibleLine} />
       </View>
       <HorizontalCardList vendors={enabledVendors} />
     </View>
@@ -45,40 +48,31 @@ const HomeScreenVendors: React.FC<HomeScreenVendorsProps> = ({campus}) => {
 };
 
 const styles = StyleSheet.create({
-  headingContainer: {
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'flex-start',
-    paddingTop: 40,
-    paddingBottom: 20,
+  vendorsContainer: {
+    marginTop: 15,
   },
-  lineContainer: {
+  headContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   line: {
-    flex: 1,
-    height: 2, // Thicker line
-    backgroundColor: '#333',
-    marginHorizontal: 8,
+    borderWidth: 1,
+    width: '10%',
+    borderColor: theme.colors.ternary,
+    marginRight: 1,
+    // shadow
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
   },
-  invisibleLine: {
-    flex: 1,
-    height: 3, // Thicker line
-    backgroundColor: theme.colors.primary,
-    marginHorizontal: 8,
-  },
   heading: {
-    fontSize: 30,
-    padding: 5,
-    fontWeight: 'bold',
+    fontSize: 25,
+    fontWeight: 'condensedBold',
     color: theme.colors.ternary,
   },
+  store_logo: {width: 24, height: 24, marginRight: 8},
 });
 
 export default HomeScreenVendors;

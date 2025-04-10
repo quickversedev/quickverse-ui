@@ -57,22 +57,7 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 5,
-    paddingHorizontal: 12,
-  },
-  cardContainer: {
-    width: ITEM_SIZE,
-    margin: SPACING,
-    borderRadius: 15,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+  container: {},
 });
 
 export default HorizontalCardList;

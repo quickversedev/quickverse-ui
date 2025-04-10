@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, Image, StyleSheet} from 'react-native';
 import {Text} from 'react-native-paper';
 import CampusBuzzList from './CampusBuzzList';
 import {useDispatch, useSelector} from 'react-redux';
@@ -26,13 +26,16 @@ const CampusBuzz: React.FC<PCampusBuzzProps> = ({campus}) => {
     return <Loading />;
   }
   return campusBuzz?.length > 0 ? (
-    <View style={styles.headingContainer}>
-      <View style={styles.lineContainer}>
+    <View style={styles.buzzContainer}>
+      <View style={styles.headContainer}>
         <View style={styles.line} />
+        <Image
+          style={styles.buzz_logo}
+          source={require('../../../data/images/campus_logo.png')}
+        />
         <Text variant="titleLarge" style={styles.heading}>
-          Campus Buzzzz..!
+          Campus Buzzzz
         </Text>
-        <View style={styles.invisibleLine} />
       </View>
       <CampusBuzzList buzzData={campusBuzz} />
     </View>
@@ -42,38 +45,29 @@ const CampusBuzz: React.FC<PCampusBuzzProps> = ({campus}) => {
 };
 
 const styles = StyleSheet.create({
-  headingContainer: {
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'flex-start',
-  },
-  lineContainer: {
+  buzzContainer: {},
+  headContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   line: {
-    flex: 1,
-    height: 3, // Thicker line
-    backgroundColor: theme.colors.ternary,
-    marginHorizontal: 8,
+    borderWidth: 1,
+    width: '10%',
+    borderColor: theme.colors.ternary,
+    marginRight: 1,
+    // shadow
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
   },
-  invisibleLine: {
-    flex: 1,
-    height: 3,
-    backgroundColor: theme.colors.primary,
-    marginHorizontal: 8,
-  },
   heading: {
-    fontSize: 30,
-    padding: 5,
-    fontWeight: 'bold',
+    fontSize: 25,
+    fontWeight: 'condensedBold',
     color: theme.colors.ternary,
   },
+  buzz_logo: {width: 24, height: 24, marginRight: 8},
 });
 
 export default CampusBuzz;

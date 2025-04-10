@@ -83,7 +83,7 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 30,
+    // marginTop: 30,
   },
   imageContainer: {
     borderRadius: 10,

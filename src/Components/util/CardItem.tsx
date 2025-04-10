@@ -77,17 +77,18 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.secondary,
 
     paddingVertical: 10,
-    marginVertical: 15,
+    marginTop: 10,
+    marginBottom: 22,
     marginRight: 12,
     marginLeft: 8,
 
-    shadowColor: '#000000',
-    shadowOffset: {
-      width: 0,
-      height: 9,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 9.22,
+    // shadowColor: '#000000',
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 9,
+    // },
+    // shadowOpacity: 0.22,
+    // shadowRadius: 9.22,
     elevation: 12,
   },
   posterImage: {

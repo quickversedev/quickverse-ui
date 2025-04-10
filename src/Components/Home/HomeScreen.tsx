@@ -105,6 +105,7 @@ const HomeScreen: React.FC = () => {
                   <TextInput
                     style={styles.searchInput}
                     placeholder="Search campus..."
+                    placeholderTextColor={'black'}
                     value={searchText}
                     onChangeText={text => setSearchText(text)}
                   />

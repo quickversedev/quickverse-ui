@@ -66,10 +66,11 @@ const CampusBuzzList: React.FC<Props> = ({buzzData}) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingTop: itemSpacing * 2,
-    paddingBottom: itemSpacing * 2,
+    // flex: 1,
+    // paddingTop: itemSpacing * 2,
+    // paddingBottom: itemSpacing * 2,
     // backgroundColor: '#FFDC52', // Match with user background preference
+    marginTop: 15,
   },
   cardContainer: {
     width: bannerWidth,
@@ -78,6 +79,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'black',
+    marginBottom: 10,
   },
   image: {
     width: '100%',

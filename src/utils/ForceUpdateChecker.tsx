@@ -11,10 +11,7 @@ import {
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import theme from '../theme';
-
 import useFetchUpdateData from '../services/InitialConfigs';
-
-// import useFetchUpdateData from '../hooks/useFetchUpdateData'; // Import the custom hook
 
 const ForceUpdateChecker: React.FC<{children: React.ReactNode}> = ({
   children,
@@ -70,7 +67,7 @@ const ForceUpdateChecker: React.FC<{children: React.ReactNode}> = ({
     );
   }
 
-  if (!isUpdateRequired) {
+  if (isUpdateRequired) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <Modal visible={isModalVisible} transparent={true} animationType="fade">

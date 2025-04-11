@@ -39,6 +39,9 @@ export interface Campus {
   campusId: string;
   campusName: string;
   location: string;
+  longitude: number;
+  latitude: number;
+  displayName: string;
   vendors?: {} | undefined;
 }
 export interface User {

@@ -1,6 +1,6 @@
 // src/components/Heading.tsx
 import React, {useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, Image, StyleSheet} from 'react-native';
 import {Text} from 'react-native-paper';
 import HorizontalScroll from './HorizontalScroll';
 
@@ -28,13 +28,13 @@ const FeaturedItems: React.FC<FeaturedItemsProps> = ({campus}) => {
   }
 
   return foodItemsList?.length > 0 ? (
-    <View style={styles.headingContainer}>
-      <View style={styles.lineContainer}>
-        <View style={styles.line} />
-        <Text variant="titleLarge" style={styles.heading}>
-          Best Sellers..!
-        </Text>
-        <View style={styles.invisibleLine} />
+    <View style={styles.featuredContainer}>
+      <View style={styles.headContainer}>
+        <Text style={styles.heading}>Best Sellers</Text>
+        <Image
+          style={styles.logo}
+          source={require('../../../data/images/featured_logo_color.png')}
+        />
       </View>
       <HorizontalScroll featuredItems={foodItemsList} />
     </View>
@@ -44,41 +44,18 @@ const FeaturedItems: React.FC<FeaturedItemsProps> = ({campus}) => {
 };
 
 const styles = StyleSheet.create({
-  headingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'flex-start',
-    paddingTop: 25,
-    // paddingBottom: 10,
-  },
-  lineContainer: {
+  featuredContainer: {marginTop: 5},
+  headContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  line: {
-    flex: 1,
-    height: 3, // Thicker line
-    backgroundColor: theme.colors.ternary,
-    marginHorizontal: 8,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
-  },
-  invisibleLine: {
-    flex: 1,
-    height: 3, // Thicker line
-    backgroundColor: theme.colors.primary,
-    marginHorizontal: 8,
-  },
   heading: {
-    fontSize: 30,
-    paddingTop: 5,
+    fontSize: 24,
     fontWeight: 'bold',
     color: theme.colors.ternary,
+    marginLeft: 12,
   },
+  logo: {width: 30, height: 30, marginHorizontal: 8},
 });
 
 export default FeaturedItems;

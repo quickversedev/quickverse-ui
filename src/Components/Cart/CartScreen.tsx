@@ -183,6 +183,7 @@ const CartScreen: React.FC<CartModalProps> = ({
                   vendor={vendor}
                   isStoreOpened={isStoreOpened}
                   isCartEmpty={isCartEmpty}
+                  closeCartModal={closeCartModal}
                 />
               ) : (
                 <View style={styles.emptyCartContainer}>

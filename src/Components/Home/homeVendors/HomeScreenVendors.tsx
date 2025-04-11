@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
   emptyContainer: {
     height: 0,
   },
+  store_logo: {width: 30, height: 30, marginHorizontal: 8},
 });
 
 export default HomeScreenVendors;

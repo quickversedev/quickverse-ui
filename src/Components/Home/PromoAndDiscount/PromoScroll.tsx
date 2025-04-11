@@ -93,6 +93,14 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  imageContainer: {
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
 });
 
 export default PromoScroll;

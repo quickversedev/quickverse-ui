@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -8,20 +8,20 @@ import {
   FlatList,
   TextInput,
 } from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {fetchVendorList} from '../../services/VendorListSlice';
-import {AppDispatch, RootState} from '../../store/store';
+import { fetchVendorList } from '../../services/VendorListSlice';
+import { AppDispatch, RootState } from '../../store/store';
 import CardItem from '../util/CardItem';
-import {Loading} from '../util/Loading';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from './VendorsNavigator';
-import {useNavigation} from '@react-navigation/native';
-import {getCampus} from '../../utils/Storage';
-import {Vendor} from '../../utils/canonicalModel';
+import { Loading } from '../util/Loading';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from './VendorsNavigator';
+import { useNavigation } from '@react-navigation/native';
+import { getCampus } from '../../utils/Storage';
+import { Vendor } from '../../utils/canonicalModel';
 import theme from '../../theme';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const SPACING: number = 16;
 const ITEM_SIZE: number = (width - SPACING * 3) / 3;
 
@@ -33,7 +33,7 @@ type VendorCardsNavigationProp = StackNavigationProp<
 const VendorCards: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation<VendorCardsNavigationProp>();
-  const {vendors, loading} = useSelector(
+  const { vendors, loading } = useSelector(
     (state: RootState) => state.vendorList,
   );
 
@@ -81,7 +81,7 @@ const VendorCards: React.FC = () => {
   }
 
   const handleCardPress = (vendor: Vendor) => {
-    navigation.navigate('Categories', {vendor});
+    navigation.navigate('Categories', { vendor });
   };
 
   return (
@@ -127,11 +127,11 @@ const VendorCards: React.FC = () => {
             keyExtractor={item => item.vendorId.toString()}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
-            renderItem={({item}) => (
+            renderItem={({ item }) => (
               <CardItem
                 name={item.vendorName}
                 distance={item.distance}
-                image={{uri: `${item.vendorBanner}.jpg`}}
+                image={{ uri: `${item.vendorBanner}.jpg` }}
                 onPress={() => handleCardPress(item)}
               />
             )}
@@ -161,26 +161,56 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-
-    paddingHorizontal: 12,
-    borderRadius: 15,
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 16,
+    borderRadius: 25,
     marginBottom: SPACING,
     marginHorizontal: SPACING,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        borderWidth: 1,
+        borderColor: theme.colors.secondary,
+        paddingVertical: 8,
+      },
+      android: {
+        elevation: 3,
+        borderWidth: 0.5,
+        borderColor: theme.colors.secondary,
+        paddingVertical: 4,
+      },
+    }),
   },
   searchIcon: {
-    marginRight: 5,
+    marginRight: 8,
+    color: theme.colors.ternary,
+    ...Platform.select({
+      ios: {
+        marginTop: 2, // Slight vertical adjustment for iOS
+      },
+    }),
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
     color: theme.colors.secondary,
+    ...Platform.select({
+      ios: {
+        paddingVertical: 8,
+        fontWeight: '500',
+        fontFamily: 'System',
+      },
+      android: {
+        paddingVertical: 4,
+        fontWeight: 'normal',
+        includeFontPadding: false, // Remove extra padding on Android
+      },
+    }),
   },
+
   categorySection: {
     marginBottom: SPACING,
     padding: SPACING / 2,

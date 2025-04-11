@@ -211,8 +211,8 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 10,
-    height: 200, // Fixed height for the container to ensure consistent card size
+    paddingTop: 10,
+    height: 200,
   },
   cardContainer: {
     width: width * 0.3,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 10,
   },
   quantityContainer: {
     flexDirection: 'row',

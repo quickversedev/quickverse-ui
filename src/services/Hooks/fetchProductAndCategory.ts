@@ -19,7 +19,7 @@ interface UseFetchProductsAndCategoriesReturn {
   products: Product[];
   categories: Category[];
   loading: boolean;
-  error: string | null;
+  error: boolean;
 }
 
 export const useFetchProductsAndCategories = (
@@ -35,7 +35,7 @@ export const useFetchProductsAndCategories = (
   const categoryError = useSelector(selectCategoryError);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +43,7 @@ export const useFetchProductsAndCategories = (
         return;
       }
       setLoading(true);
+      setError(false);
       await Promise.all([
         dispatch(fetchProducts({vendorId})),
         dispatch(fetchCategories({vendorId})),
@@ -50,12 +51,12 @@ export const useFetchProductsAndCategories = (
       setLoading(false);
     };
 
-    fetchData().catch(() => setError('Failed to fetch data.'));
+    fetchData().catch(() => setError(true));
   }, [dispatch, vendorId]);
 
   useEffect(() => {
     if (productError || categoryError) {
-      setError(productError || categoryError);
+      setError(true);
     }
   }, [productError, categoryError]);
 

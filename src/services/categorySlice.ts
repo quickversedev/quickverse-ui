@@ -50,8 +50,8 @@ export const fetchCategories = createAsyncThunk(
       );
       return response.data?.categories;
     } catch (error) {
-      console.error('Failed to fetch products:', error);
-      return rejectWithValue('Failed to fetch products');
+      console.error('Failed to fetch categories:', error);
+      return rejectWithValue('Failed to fetch categories');
     }
   },
 );

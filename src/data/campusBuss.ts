@@ -1,4 +1,4 @@
-import { CampusBuzz } from "../utils/canonicalModel";
+import {CampusBuzz} from '../utils/canonicalModel';
 
 export const campusBuzzMockData: CampusBuzz[] = [
   {

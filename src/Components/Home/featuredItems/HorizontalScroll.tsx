@@ -155,7 +155,7 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
             )}
           </View>
           <Card.Content style={styles.cardContent}>
-            <Text style={styles.itemName} numberOfLines={1}>
+            <Text style={styles.itemName} numberOfLines={2}>
               {item.title}
             </Text>
             <View style={styles.priceContainer}>
@@ -211,20 +211,19 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 10,
-    height: 200, // Fixed height for the container to ensure consistent card size
+    paddingVertical: 6,
   },
   cardContainer: {
     width: width * 0.3,
     marginHorizontal: 10,
+    paddingVertical: 5,
     alignItems: 'center',
-    height: '100%',
   },
   card: {
     borderRadius: 15,
-    overflow: 'hidden',
-    width: '100%',
-    height: 180,
+    borderWidth: 1,
+    borderColor: '#ffb632',
+    backgroundColor: '#FFEA98',
   },
   image: {
     height: 100,
@@ -232,20 +231,14 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     alignItems: 'center',
-    padding: 6,
   },
   itemName: {
     fontSize: 14,
     fontWeight: 'bold',
-    // marginTop: 5,
     textAlign: 'center',
-    // numberOfLines: 2, // Limit the title to 2 lines
-    // ellipsizeMode: 'tail',
   },
 
   buttonContainer: {
-    width: '100%',
-    alignItems: 'center',
     marginTop: 5,
   },
   addButton: {
@@ -259,7 +252,7 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 10,
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -285,11 +278,7 @@ const styles = StyleSheet.create({
   },
   priceContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    flexShrink: 1,
-    flexWrap: 'wrap',
-    maxWidth: '100%',
-    // marginVertical: 2,
+    justifyContent: 'space-between',
   },
   originalPrice: {
     textDecorationLine: 'line-through',

@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, FlatList, Dimensions} from 'react-native';
+import {View, StyleSheet, FlatList, Dimensions, Platform} from 'react-native';
 import CardItem from '../../util/CardItem';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamListHome} from '../HomeNavigation';
@@ -7,9 +7,8 @@ import {useNavigation} from '@react-navigation/native';
 import {Vendor} from '../../../utils/canonicalModel';
 
 const {width} = Dimensions.get('window');
-const SPACING: any = 10;
-const ITEM_SIZE: any = width * 0.3;
-// const EMPTY_ITEM_SIZE: any = width - ITEM_SIZE * 2.5;
+const SPACING = 10;
+const ITEM_SIZE = width * 0.3;
 
 type HomeNavigationProp = StackNavigationProp<
   RootStackParamListHome,
@@ -31,26 +30,24 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
       <FlatList
         showsHorizontalScrollIndicator={false}
         data={vendors}
-        keyExtractor={(item, index) => {
-          return index.toString();
-        }}
+        keyExtractor={(item, index) => index.toString()}
         horizontal
-        // contentContainerStyle={{alignItems: 'center'}}
-        snapToInterval={ITEM_SIZE}
-        decelerationRate={0.98}
+        contentContainerStyle={styles.listContent}
+        snapToInterval={ITEM_SIZE + SPACING * 2}
+        decelerationRate={Platform.select({ios: 0.98, android: 0.95})}
         snapToAlignment="start"
         bounces={false}
         scrollEventThrottle={16}
-        renderItem={({item, index}) => {
-          return (
+        renderItem={({item}) => (
+          <View style={styles.cardWrapper}>
             <CardItem
               name={item.vendorName}
               distance={item.distance}
               image={{uri: `${item.vendorBanner}.jpg`}}
               onPress={() => handleCardPress(item)}
             />
-          );
-        }}
+          </View>
+        )}
       />
     </View>
   );
@@ -59,19 +56,32 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 5,
-    paddingHorizontal: 12,
+    marginVertical: Platform.select({
+      ios: 15,
+      android: 10,
+    }),
   },
-  cardContainer: {
+  listContent: {
+    paddingHorizontal: Platform.select({
+      ios: SPACING,
+      android: SPACING / 2,
+    }),
+  },
+  cardWrapper: {
     width: ITEM_SIZE,
-    margin: SPACING,
-    borderRadius: 15,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginHorizontal: SPACING,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+        overflow: 'hidden',
+      },
+    }),
   },
 });
 

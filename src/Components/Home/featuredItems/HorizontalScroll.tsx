@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 10,
   },
   quantityContainer: {
     flexDirection: 'row',

@@ -1062,6 +1062,8 @@ PODS:
     - React-debug
   - react-native-cookies (6.2.1):
     - React-Core
+  - react-native-geolocation-service (5.3.1):
+    - React
   - react-native-mmkv (2.12.2):
     - DoubleConversion
     - glog
@@ -1400,6 +1402,8 @@ PODS:
     - RNNotifee/NotifeeCore (= 9.1.8)
   - RNNotifee/NotifeeCore (9.1.8):
     - React-Core
+  - RNPermissions (5.3.0):
+    - React-Core
   - RNReanimated (3.16.1):
     - DoubleConversion
     - glog
@@ -1572,6 +1576,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - "react-native-cookies (from `../node_modules/@react-native-cookies/cookies`)"
+  - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - react-native-mmkv (from `../node_modules/react-native-mmkv`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-webview (from `../node_modules/react-native-webview`)
@@ -1607,6 +1612,7 @@ DEPENDENCIES:
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
+  - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -1697,6 +1703,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   react-native-cookies:
     :path: "../node_modules/@react-native-cookies/cookies"
+  react-native-geolocation-service:
+    :path: "../node_modules/react-native-geolocation-service"
   react-native-mmkv:
     :path: "../node_modules/react-native-mmkv"
   react-native-safe-area-context:
@@ -1767,6 +1775,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-keychain"
   RNNotifee:
     :path: "../node_modules/@notifee/react-native"
+  RNPermissions:
+    :path: "../node_modules/react-native-permissions"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -1799,7 +1809,7 @@ SPEC CHECKSUMS:
   MMKVCore: 9e2e5fd529b64a9fe15f1a7afb3d73b2e27b4db9
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  RCT-Folly: 5dc73daec3476616d19e8a53f0156176f7b55461
+  RCT-Folly: 02617c592a293bd6d418e0a88ff4ee1f88329b47
   RCTDeprecation: efb313d8126259e9294dc4ee0002f44a6f676aba
   RCTRequired: f49ea29cece52aee20db633ae7edc4b271435562
   RCTTypeSafety: a11979ff0570d230d74de9f604f7d19692157bc4
@@ -1813,20 +1823,21 @@ SPEC CHECKSUMS:
   React-Fabric: 37f29709a9caefd2a9fece6f695bc88a0af77f40
   React-FabricImage: 9c3f6125b2f5908a2e7d0947cfb74022c1a0b294
   React-featureflags: 2eb79dd9df4095bff519379f2a4c915069e330bb
-  React-graphics: d0b9a0a174fb86bfed50bf4fb7c835183a546ab5
-  React-hermes: 06e8316213d56ab914afb9a829763123fcfacf22
-  React-ImageManager: 821a1182139cc986598868d0e9a00b3a021feddb
-  React-jserrorhandler: 1dd2a75b24dd9a318ee88fa6792e98524879af24
-  React-jsi: e381545475da5ea77777e7b5513031a434ced04b
-  React-jsiexecutor: ce91dde1a61efd519a5ff7ac0f64b61a14217072
-  React-jsinspector: 627ac44b1d090fc6a8039b1df723677bc7d86fe4
-  React-jsitracing: dd0e541a34027b3ab668ad94cf268482ad6f82fb
-  React-logger: 6070f362a1657bb53335eb1fc903d3f49fd79842
-  React-Mapbuffer: 2c95cbabc3d75a17747452381e998c35208ea3ee
-  react-native-cookies: d648ab7025833b977c0b19e142503034f5f29411
-  react-native-mmkv: f8155c2efbe795cb0c7586d00ff484b1c9388af0
-  react-native-safe-area-context: b13be9714d9771fbde0120bc519c963484de3a71
-  react-native-webview: 30ea03c5df89c651c2cbbd0f7202762ba784eb5f
+  React-graphics: 82a482a3aa5d9659b74cdf2c8b57faf67eaa10fb
+  React-hermes: d93936b02de2fd7e67c11e92c16d4278a14d0134
+  React-ImageManager: ebb3c4812e2c5acba5a89728c2d77729471329ad
+  React-jserrorhandler: a08e0adcf1612900dde82b8bf8e93e7d2ad953b3
+  React-jsi: f46d09ee5079a4f3b637d30d0e59b8ea6470632c
+  React-jsiexecutor: e73579560957aa3ca9dc02ab90e163454279d48c
+  React-jsinspector: e8ba20dde269c7c1d45784b858fa1cf4383f0bbb
+  React-jsitracing: 233d1a798fe0ff33b8e630b8f00f62c4a8115fbc
+  React-logger: 7e7403a2b14c97f847d90763af76b84b152b6fce
+  React-Mapbuffer: 11029dcd47c5c9e057a4092ab9c2a8d10a496a33
+  react-native-cookies: f54fcded06bb0cda05c11d86788020b43528a26c
+  react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
+  react-native-mmkv: 8c9a677e64a1ac89b0c6cf240feea528318b3074
+  react-native-safe-area-context: 4532f1a0c5d34a46b9324ccaaedcb5582a302b7d
+  react-native-webview: 445e447f227f775d8dd2b4823bca55c458d4eff7
   React-nativeconfig: b0073a590774e8b35192fead188a36d1dca23dec
   React-NativeModulesApple: 61b07ab32af3ea4910ba553932c0a779e853c082
   React-perflogger: 3d31e0d1e8ad891e43a09ac70b7b17a79773003a
@@ -1846,24 +1857,25 @@ SPEC CHECKSUMS:
   React-RuntimeApple: 97d0a5c655467c57b88076434427ec32413e7802
   React-RuntimeCore: a55443ddb73e6666b441963d8951a16ba5cfc223
   React-runtimeexecutor: a278d4249921853d4a3f24e4d6e0ff30688f3c16
-  React-RuntimeHermes: 6273f0755fef304453fc3c356b25abf17e915b83
-  React-runtimescheduler: 87b14969bb0b10538014fb8407d472f9904bc8cd
-  React-utils: 67574b07bff4429fd6c4d43a7fad8254d814ee20
-  ReactCommon: 64c64f4ae1f2debe3fab1800e00cb8466a4477b7
-  RNCCheckbox: 450ce156f3e29e25efa0315c96cfbabe5a39ded1
-  RNCPicker: 0e683a85cae99a8a739e97a49f269a4630de0a01
-  RNDateTimePicker: 818460dc31b0dc5ec58289003e27dd8d022fb79c
-  RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
-  RNFBApp: 5e27e8311042d41fa8350f1751ab42e042c39d52
-  RNFBMessaging: 72cf5cca8a14ef9dc66b82b75b5cca1091f169e5
-  RNGestureHandler: 4c50b5e4ca199cf497511d44e3fe45d54d62e279
-  RNKeychain: cf7a3c0d5a464d84cd2f1ab636f5667c1697a709
-  RNNotifee: 5e3b271e8ea7456a36eec994085543c9adca9168
-  RNReanimated: cb3c4fff2228af59972b299d09e1fc15922418fe
-  RNScreens: 8a3ba045e7e8b5dd1b9a7764496430e17d00dfed
-  RNVectorIcons: 6c795cacc9276decc31d8e1a139b9cc6fc0479ca
+  React-RuntimeHermes: 44c628568ce8feedc3acfbd48fc07b7f0f6d2731
+  React-runtimescheduler: e2152ed146b6a35c07386fc2ac4827b27e6aad12
+  React-utils: 3285151c9d1e3a28a9586571fc81d521678c196d
+  ReactCommon: f42444e384d82ab89184aed5d6f3142748b54768
+  RNCCheckbox: a3ca9978cb0846b981d28da4e9914bd437403d77
+  RNCPicker: f963e01f78e546a93b98aa201501713dbda14e94
+  RNDateTimePicker: 40ffda97d071a98a10fdca4fa97e3977102ccd14
+  RNDeviceInfo: feea80a690d2bde1fe51461cf548039258bd03f2
+  RNFBApp: 7cf039683867cbf8514bc3aafd756e6c5fb18898
+  RNFBMessaging: bacd21eaeee19974b39972e65540f12322d098fe
+  RNGestureHandler: 4d82e79c24b18e83040ed9d6f1a178267c5c6aa8
+  RNKeychain: 95a325506750dd120c71fbf9ba5de01c36294ba5
+  RNNotifee: 4a6ee5c7deaf00e005050052d73ee6315dff7ec9
+  RNPermissions: 8bccf82d4caa70a90ca6cf7f419c75f8c8c725c9
+  RNReanimated: af4e059a8fd0fb7a9cdf5ad35ead4699598a9447
+  RNScreens: 6b641f232990a9d505a6d139fd18c3c759c9d290
+  RNVectorIcons: 845eda5c7819bd29699cafd0fc98c9d4afe28c96
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  Yoga: 348f8b538c3ed4423eb58a8e5730feec50bce372
+  Yoga: b9a182ab00cf25926e7f79657d08c5d23c2d03b0
 
 PODFILE CHECKSUM: 7a681f9cc0fcdea6dc303568005d316c2f9cf157
 

@@ -441,7 +441,6 @@ const HomeScreen: React.FC = () => {
   const isFirstTimeLogin = getIsNewUser();
   const {selectedCampus} = useAuth();
   const animationValue = useRef(new Animated.Value(1000)).current;
-  const [searchText, setSearchText] = useState('');
   const cart = useSelector(selectCart);
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
 
@@ -627,9 +626,6 @@ const HomeScreen: React.FC = () => {
     selectedCampus && setSelectedCampusId(selectedCampus);
   }, [selectedCampus]);
 
-  const cart = useSelector(selectCart);
-  const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
-
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -732,7 +728,7 @@ const HomeScreen: React.FC = () => {
         </ScrollView>
       </SafeAreaView>
       <CartScreen modalVisible={modalVisible} closeCartModal={closeCartModal} />
-    </SafeAreaView>
+    </>
   );
 };
 

@@ -42,6 +42,7 @@ const HomeScreen: React.FC = () => {
   const isFirstTimeLogin = getIsNewUser();
   const {selectedCampus} = useAuth();
   const animationValue = useRef(new Animated.Value(1000)).current;
+  const [searchText, setSearchText] = useState('');
   const cart = useSelector(selectCart);
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
 
@@ -192,6 +193,7 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     selectedCampus && setSelectedCampusId(selectedCampus);
   }, [selectedCampus]);
+
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>

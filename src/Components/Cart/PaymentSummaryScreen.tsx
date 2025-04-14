@@ -12,6 +12,7 @@ import {useNavigation} from '@react-navigation/native';
 import {RootStackParamList} from '../Vendors/VendorsNavigator';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Vendor} from '../../utils/canonicalModel';
+import {clearCart} from '../../services/cart/productCartSlice';
 
 interface PaymentSummaryScreenProps {
   getTotalPrice: {
@@ -46,6 +47,7 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
   const handleProceedToCheckout = () => {
     navigation.navigate('WebView', {url: webUrl});
     closeCartModal();
+    clearCart();
   };
   return (
     <SafeAreaView style={styles.safeArea}>

@@ -90,14 +90,7 @@ const productCartSlice = createSlice({
 
 export const addToCart =
   (item: ProductCartItems, authData: string): AppThunk =>
-  async (dispatch, getState) => {
-    const {productCart} = getState().productCart;
-
-    //clear the remote cart before addin gthe product to the cart
-    if (productCart.length === 0) {
-      await clearItemsFromCart(item.vendorId, authData);
-    }
-
+  async dispatch => {
     try {
       await addItemToCart(item.vendorId, item.id, authData);
       dispatch(productCartSlice.actions.addToProductCart(item));

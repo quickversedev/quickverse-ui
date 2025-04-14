@@ -10,6 +10,9 @@ import {
   Text,
   Animated,
   Platform,
+  Alert,
+  PermissionsAndroid,
+  Linking,
 } from 'react-native';
 import theme from '../../theme';
 import HomeScreenVendors from './homeVendors/HomeScreenVendors';
@@ -17,25 +20,30 @@ import PromoDiscounts from './PromoAndDiscount/PromoDiscounts';
 import CampusBuzz from './campusBuzz/CampusBuzz';
 import FeaturedItems from './featuredItems/FeaturedItems';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {getCampus, getIsNewUser, setCampus} from '../../utils/Storage';
+import {getIsNewUser, setCampus} from '../../utils/Storage';
 import {fetchCampusIds} from '../../services/fetchCampusIds';
 import LoginDetails from '../Login/loginDetails';
 import {useAuth} from '../../utils/AuthContext';
 import CartScreen from '../Cart/CartScreen';
 import {useSelector} from 'react-redux';
 import {selectCart} from '../../services/cart/productCartSlice';
+import {autoSelectCampus} from '../util/locationUtil';
+import Geolocation from 'react-native-geolocation-service';
 
 const HomeScreen: React.FC = () => {
   const [selectedCampusId, setSelectedCampusId] = useState<
     string | undefined
   >();
   const [modalVisible, setModalVisible] = useState(false);
-  const [campusOptions, setCampusOptions] = useState<any>();
+  const [campusOptions, setCampusOptions] = useState<any>([]);
   const [clicked, setClicked] = useState(false);
+  const [loading, setLoading] = useState(false); // Proper loading state
   const isFirstTimeLogin = getIsNewUser();
   const {selectedCampus} = useAuth();
   const animationValue = useRef(new Animated.Value(1000)).current;
   const [searchText, setSearchText] = useState('');
+  const cart = useSelector(selectCart);
+  const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
 
   const closeCartModal = () => {
     Animated.timing(animationValue, {
@@ -46,21 +54,136 @@ const HomeScreen: React.FC = () => {
   };
 
   const fetchCampus = async () => {
-    const response = await fetchCampusIds();
-    const campusOption = response?.map(campus => ({
-      label: campus.campusName,
-      value: campus.campusId,
-    }));
-    setCampusOptions(campusOption);
+    setLoading(true); // Start loading
+    try {
+      const response = await fetchCampusIds();
+      const campusOption = response?.map(campus => ({
+        label: campus.campusName,
+        value: campus.campusId,
+        displayName: campus.displayName,
+        longitude: campus.longitude,
+        latitude: campus.latitude,
+      }));
+      setCampusOptions(campusOption);
+      console.log('campusFetched');
+      await getDeviceLocation(campusOption); // Pass campus options to getDeviceLocation
+    } catch (error) {
+      console.error('Error fetching campuses:', error);
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
+
+  const requestLocationPermissionAndroid = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Location Permission',
+          message:
+            'This app needs access to your location to find nearby campuses.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.error('Error requesting location permission:', err);
+      return false;
+    }
+  };
+
+  const requestLocationPermissionIOS = async () => {
+    try {
+      const status = await Geolocation.requestAuthorization('whenInUse');
+      return status === 'granted';
+    } catch (err) {
+      console.error('Error requesting location permission:', err);
+      return false;
+    }
+  };
+
+  const checkAndRequestLocationPermission = async () => {
+    let hasPermission = false;
+
+    if (Platform.OS === 'android') {
+      hasPermission = await requestLocationPermissionAndroid();
+    } else if (Platform.OS === 'ios') {
+      hasPermission = await requestLocationPermissionIOS();
+    }
+
+    if (!hasPermission) {
+      Alert.alert(
+        'Permission Required',
+        'Please enable location permissions in settings to use this feature.',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Open Settings',
+            onPress: () => Linking.openSettings(),
+          },
+        ],
+      );
+    }
+
+    return hasPermission;
+  };
+
+  const getDeviceLocation = async (campuses: any[]) => {
+    const startTime = new Date();
+    const hasPermission = await checkAndRequestLocationPermission();
+
+    if (!hasPermission) {
+      Alert.alert(
+        'Permission Denied',
+        'Location permission is required to find nearby campuses.',
+      );
+      setSelectedCampusId('IIMU-313001'); // Fallback to default campus
+      setCampus('IIMU-313001'); // Save default campus to storage
+      return;
+    }
+
+    Geolocation.getCurrentPosition(
+      position => {
+        const {latitude, longitude} = position.coords;
+        console.log('Device location:', latitude, longitude);
+
+        const campusId = autoSelectCampus(latitude, longitude, campuses);
+        if (campusId) {
+          setSelectedCampusId(campusId);
+          setCampus(campusId); // Save selected campus to storage
+        } else {
+          setSelectedCampusId('IIMU-313001'); // Default campus
+          setCampus('IIMU-313001'); // Save default campus to storage
+          console.log('No campus found within 5km radius.');
+        }
+
+        const endTime = new Date();
+        const elapsedTime = endTime.getTime() - startTime.getTime();
+        console.log(`Time taken to complete: ${elapsedTime}ms`);
+      },
+      error => {
+        console.error('Error fetching location:', error);
+        Alert.alert(
+          'Error',
+          'Unable to fetch your location. Please try again later.',
+        );
+        setSelectedCampusId('IIMU-313001');
+        setCampus('IIMU-313001');
+      },
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+    );
   };
 
   useEffect(() => {
     fetchCampus();
-    setTimeout(() => {
-      const camp = getCampus();
-      camp ? setSelectedCampusId(camp) : setSelectedCampusId('IIMU-313001');
-    }, 1000);
+  }, []);
 
+  useEffect(() => {
     if (selectedCampusId) {
       setCampus(selectedCampusId);
     }
@@ -70,9 +193,13 @@ const HomeScreen: React.FC = () => {
     selectedCampus && setSelectedCampusId(selectedCampus);
   }, [selectedCampus]);
 
-  const cart = useSelector(selectCart);
-  const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
-
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <Text style={{color: theme.colors.ternary}}>Loading campuses...</Text>
+      </SafeAreaView>
+    );
+  }
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -150,7 +277,6 @@ const HomeScreen: React.FC = () => {
               </View>
             )}
           </View>
-
           <TouchableOpacity
             style={styles.cartButton}
             onPress={() => setModalVisible(true)}>
@@ -166,6 +292,21 @@ const HomeScreen: React.FC = () => {
             )}
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity
+          style={styles.cartButton}
+          onPress={() => setModalVisible(true)}>
+          <MaterialCommunityIcons
+            name="cart-outline"
+            size={24}
+            color="#FFDC52"
+          />
+          {totalCartItems > 0 && (
+            <View style={styles.cartBadge}>
+              <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
         {isFirstTimeLogin && <LoginDetails />}
         <ScrollView style={styles.scrollView}>
@@ -184,6 +325,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.primary,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerContainer: {
     flexDirection: 'row',

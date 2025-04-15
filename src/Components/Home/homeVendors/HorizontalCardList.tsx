@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
       },
       android: {
         elevation: 4,
-        overflow: 'hidden',
+        // overflow: 'hidden',
       },
     }),
   },

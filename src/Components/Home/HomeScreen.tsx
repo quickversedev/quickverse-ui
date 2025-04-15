@@ -38,7 +38,6 @@ const HomeScreen: React.FC = () => {
   const [campusOptions, setCampusOptions] = useState<any>([]);
   const [clicked, setClicked] = useState(false);
   const [loading, setLoading] = useState(false); // Proper loading state
-  const [searchText, setSearchText] = useState('');
   const isFirstTimeLogin = getIsNewUser();
   const {selectedCampus} = useAuth();
   const animationValue = useRef(new Animated.Value(1000)).current;
@@ -292,6 +291,21 @@ const HomeScreen: React.FC = () => {
             )}
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity
+          style={styles.cartButton}
+          onPress={() => setModalVisible(true)}>
+          <MaterialCommunityIcons
+            name="cart-outline"
+            size={24}
+            color="#FFDC52"
+          />
+          {totalCartItems > 0 && (
+            <View style={styles.cartBadge}>
+              <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
         {isFirstTimeLogin && <LoginDetails />}
         <ScrollView style={styles.scrollView}>

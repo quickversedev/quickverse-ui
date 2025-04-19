@@ -71,7 +71,7 @@ export const AppStack = () => {
 
     initializeNotifications();
   }, []);
-  console.log('hasNotificationPermission:', hasNotificationPermission);
+  // console.log('hasNotificationPermission:', hasNotificationPermission);
   // Show loading indicator while checking permissions
   if (hasNotificationPermission === null) {
     return (

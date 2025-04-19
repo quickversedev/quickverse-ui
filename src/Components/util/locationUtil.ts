@@ -47,7 +47,7 @@ export const autoSelectCampus = (
       campus.latitude,
       campus.longitude,
     );
-    console.log(`Distance to ${campus.value}:`, distance);
+    // console.log(`Distance to ${campus.value}:`, distance);
     // Check if the campus is within the radius and closer than the current closest
     if (distance <= radiusKm && distance < nearestCampus.distance) {
       nearestCampus = {campus, distance};

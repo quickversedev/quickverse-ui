@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#007BFF',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 25,
+    borderRadius: 15,
     alignSelf: 'flex-start',
   },
   buttonText: {

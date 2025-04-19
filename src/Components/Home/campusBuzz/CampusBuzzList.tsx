@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   cardContainer: {
     width: bannerWidth,
     height: bannerHeight,
-    borderRadius: 10,
+    borderRadius: 15,
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',

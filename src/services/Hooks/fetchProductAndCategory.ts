@@ -1,11 +1,11 @@
 import {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux'; // Ensure these hooks are set up for your Redux store
+import {useDispatch, useSelector} from 'react-redux';
 import {
   fetchProducts,
   selectProducts,
   selectProductLoading,
   selectProductError,
-} from '../productSlice'; // Update paths as necessary
+} from '../productSlice';
 import {
   fetchCategories,
   selectCategories,
@@ -42,16 +42,24 @@ export const useFetchProductsAndCategories = (
       if (!vendorId) {
         return;
       }
+
       setLoading(true);
       setError(false);
-      await Promise.all([
-        dispatch(fetchProducts({vendorId})),
-        dispatch(fetchCategories({vendorId})),
-      ]);
-      setLoading(false);
+
+      try {
+        await Promise.all([
+          dispatch(fetchProducts({vendorId})),
+          dispatch(fetchCategories({vendorId})),
+        ]);
+      } catch (err) {
+        console.error('Error while fetching products or categories:', err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchData().catch(() => setError(true));
+    fetchData();
   }, [dispatch, vendorId]);
 
   useEffect(() => {

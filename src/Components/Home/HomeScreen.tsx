@@ -65,7 +65,6 @@ const HomeScreen: React.FC = () => {
         latitude: campus.latitude,
       }));
       setCampusOptions(campusOption);
-      console.log('campusFetched');
       await getDeviceLocation(campusOption); // Pass campus options to getDeviceLocation
     } catch (error) {
       console.error('Error fetching campuses:', error);
@@ -150,7 +149,7 @@ const HomeScreen: React.FC = () => {
     Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
-        console.log('Device location:', latitude, longitude);
+        // console.log('Device location:', latitude, longitude);
 
         const campusId = autoSelectCampus(latitude, longitude, campuses);
         if (campusId) {
@@ -159,12 +158,12 @@ const HomeScreen: React.FC = () => {
         } else {
           setSelectedCampusId('IIMU-313001'); // Default campus
           setCampus('IIMU-313001'); // Save default campus to storage
-          console.log('No campus found within 5km radius.');
+          // console.log('No campus found within 5km radius.');
         }
 
-        const endTime = new Date();
-        const elapsedTime = endTime.getTime() - startTime.getTime();
-        console.log(`Time taken to complete: ${elapsedTime}ms`);
+        // const endTime = new Date();
+        // const elapsedTime = endTime.getTime() - startTime.getTime();
+        // console.log(`Time taken to complete: ${elapsedTime}ms`);
       },
       error => {
         console.error('Error fetching location:', error);
@@ -331,7 +330,7 @@ const styles = StyleSheet.create({
   touchableOpacity: {
     width: '100%',
     height: 50,
-    borderRadius: 10,
+    borderRadius: 15,
     flexDirection: 'row',
     paddingHorizontal: 15,
     backgroundColor: theme.colors.primary,
@@ -350,7 +349,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderWidth: 0.9,
     backgroundColor: theme.colors.primary,
-    borderRadius: 10,
+    borderRadius: 15,
     position: 'absolute',
     top: 60,
     zIndex: 10,
@@ -373,7 +372,7 @@ const styles = StyleSheet.create({
   cartButton: {
     height: 50,
     width: 50,
-    borderRadius: 25,
+    borderRadius: 15,
     backgroundColor: theme.colors.secondary,
     justifyContent: 'center',
     alignItems: 'center',
@@ -389,7 +388,7 @@ const styles = StyleSheet.create({
     top: -5,
     right: -5,
     backgroundColor: 'red',
-    borderRadius: 10,
+    borderRadius: 15,
     width: 20,
     height: 20,
     justifyContent: 'center',
@@ -434,8 +433,8 @@ const styles = StyleSheet.create({
     }),
     borderColor: theme.colors.ternary,
     borderRadius: Platform.select({
-      ios: 10,
-      android: 8,
+      ios: 15,
+      android: 15,
     }),
     backgroundColor: theme.colors.primary,
     fontSize: Platform.select({

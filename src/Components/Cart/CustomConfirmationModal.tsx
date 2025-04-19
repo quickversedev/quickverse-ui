@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     width: '80%',
     backgroundColor: 'white',
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 15,
     alignItems: 'center',
   },
   modalTitle: {
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   },
   button: {
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 15,
     alignItems: 'center',
     flex: 1,
     marginHorizontal: 5,

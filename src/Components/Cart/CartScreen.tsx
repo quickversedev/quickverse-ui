@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.error,
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 6,
+    borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
     ...Platform.select({
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   storeClosedCard: {
     backgroundColor: theme.colors.errorBackground,
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 15,
     marginBottom: 16,
     alignItems: 'center',
     ...Platform.select({

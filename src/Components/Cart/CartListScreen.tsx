@@ -82,9 +82,9 @@ const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     backgroundColor: '#fcefb6',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
+    padding: 5,
+    borderRadius: 15,
+    marginBottom: 10,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 4},
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   itemImage: {
     width: 60,
     height: 60,
-    borderRadius: 30,
+    borderRadius: 15,
     marginRight: 15,
   },
   itemDetails: {

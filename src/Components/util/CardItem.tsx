@@ -49,8 +49,8 @@ const styles = StyleSheet.create({
   card: {
     overflow: 'hidden',
     width: ITEM_SIZE * 0.4,
-    height: ITEM_SIZE * 0.7,
-    justifyContent: 'center',
+    height: ITEM_SIZE * 0.6,
+    justifyContent: 'flex-start',
     alignItems: 'center',
     borderRadius: 12,
     backgroundColor: theme.colors.primary,

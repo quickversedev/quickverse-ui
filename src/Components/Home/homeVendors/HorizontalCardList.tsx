@@ -8,7 +8,7 @@ import {Vendor} from '../../../utils/canonicalModel';
 
 const {width} = Dimensions.get('window');
 const SPACING = 10;
-const ITEM_SIZE = width * 0.3;
+const ITEM_SIZE = width;
 
 type HomeNavigationProp = StackNavigationProp<
   RootStackParamListHome,
@@ -62,14 +62,15 @@ const styles = StyleSheet.create({
     }),
   },
   listContent: {
-    paddingHorizontal: Platform.select({
-      ios: SPACING,
-      android: SPACING / 2,
-    }),
+    // paddingHorizontal: Platform.select({
+    //   ios: SPACING,
+    //   android: SPACING,
+    // }),
   },
   cardWrapper: {
-    width: ITEM_SIZE,
+    width: ITEM_SIZE * 0.35,
     marginHorizontal: SPACING,
+    // backgroundColor: 'white',//
     ...Platform.select({
       ios: {
         shadowColor: '#000',

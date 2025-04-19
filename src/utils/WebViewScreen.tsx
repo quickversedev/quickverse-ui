@@ -9,6 +9,8 @@ import {useAuth} from './AuthContext';
 
 import ReloadButton from './RealoadButton';
 import theme from '../theme';
+import {clearCart} from '../services/cart/productCartSlice';
+import {useDispatch} from 'react-redux';
 
 interface WebViewScreenProps {
   url?: string;
@@ -58,6 +60,7 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
   url,
   navigation,
 }) => {
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [reloadCount, setReleadCount] = useState(0);
   const {authData, configs} = useAuth();
@@ -171,6 +174,23 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
         source={{uri: Url}}
         style={styles.webview}
         sharedCookiesEnabled={true}
+        injectedJavaScript={`
+          (function() {
+            window.addEventListener("close-webview", function() {
+              window.ReactNativeWebView.postMessage("close-webview");
+            });
+          })();
+          true; // required for Android
+        `}
+        onMessage={event => {
+          if (event.nativeEvent.data === 'close-webview') {
+            console.log("Received 'close-webview' event");
+            dispatch(clearCart());
+            if (navigation?.goBack) {
+              navigation.goBack(); // or navigation.pop(), depending on your stack
+            }
+          }
+        }}
       />
     </SafeAreaView>
   );

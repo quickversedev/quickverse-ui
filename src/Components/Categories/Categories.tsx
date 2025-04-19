@@ -815,6 +815,11 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     categoriesWithProducts[0]?.id,
   );
   const [searchQuery, setSearchQuery] = useState('');
+  useEffect(() => {
+    if (categoriesWithProducts.length > 0) {
+      setSelectedCategory(categoriesWithProducts[0]?.id);
+    }
+  });
 
   useEffect(() => {
     setCartItems(
@@ -824,12 +829,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       }, {}),
     );
   }, [cart]);
-
-  useEffect(() => {
-    if (categoriesWithProducts.length > 0) {
-      setSelectedCategory(categoriesWithProducts[0]?.id);
-    }
-  }, [categoriesWithProducts]);
 
   const filteredCategories = categoriesWithProducts.filter(category =>
     category.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -998,7 +997,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         </View>
 
         <View style={styles.productDetails}>
-          <Text style={styles.productName}>{product.name}</Text>
+          <Text style={styles.productName} numberOfLines={2}>
+            {product.name}
+          </Text>
           {isProductOnSale && (
             <Text style={styles.originalPrice}>₹{product.productPrice}</Text>
           )}
@@ -1270,7 +1271,7 @@ const styles = StyleSheet.create({
   cartButton: {
     width: 50,
     height: 50,
-    borderRadius: 25,
+    borderRadius: 15,
     backgroundColor: theme.colors.secondary,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1285,7 +1286,7 @@ const styles = StyleSheet.create({
     top: -5,
     right: -5,
     backgroundColor: 'red',
-    borderRadius: 10,
+    borderRadius: 15,
     width: 20,
     height: 20,
     justifyContent: 'center',
@@ -1405,7 +1406,7 @@ const styles = StyleSheet.create({
   productImage: {
     width: 70,
     height: 70,
-    borderRadius: 50,
+    borderRadius: 15,
   },
   productDetails: {
     flex: 1,

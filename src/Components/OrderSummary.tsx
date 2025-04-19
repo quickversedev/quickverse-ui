@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
   card: {
     marginBottom: 16,
-    borderRadius: 8,
+    borderRadius: 15,
     backgroundColor: theme.colors.secondary,
   },
   header: {

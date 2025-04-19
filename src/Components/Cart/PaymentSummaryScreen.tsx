@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   paymentSummary: {
     backgroundColor: 'white',
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 15,
     marginTop: 20,
     marginHorizontal: 15,
     ...Platform.select({

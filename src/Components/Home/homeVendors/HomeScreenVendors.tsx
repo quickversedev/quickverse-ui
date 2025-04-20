@@ -35,9 +35,9 @@ const HomeScreenVendors: React.FC<HomeScreenVendorsProps> = ({campus}) => {
   return enabledVendors?.length > 0 ? (
     <View style={styles.vendorsContainer}>
       <View style={styles.headContainer}>
-        <View style={styles.shadowContainer}>
+        {/* <View style={styles.shadowContainer}>
           <View style={styles.line} />
-        </View>
+        </View> */}
         <View style={styles.textContainer}>
           <Text variant="titleLarge" style={styles.heading}>
             Stores Near You

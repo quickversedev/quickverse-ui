@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING / 2,
   },
   cardWrapper: {
-    width: ITEM_SIZE * 0.3,
+    width: ITEM_SIZE * 0.35,
     marginHorizontal: 10,
     ...Platform.select({
       ios: {

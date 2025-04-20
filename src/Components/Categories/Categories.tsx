@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -17,7 +17,7 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CartButton from './CartButton';
 import theme from '../../theme';
-import {useFetchProductsAndCategories} from '../../services/Hooks/fetchProductAndCategory';
+import { useFetchProductsAndCategories } from '../../services/Hooks/fetchProductAndCategory';
 import {
   Category,
   Product,
@@ -25,7 +25,7 @@ import {
   Vendor,
 } from '../../utils/canonicalModel';
 
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   addToCart,
   clearFromCart,
@@ -36,28 +36,28 @@ import {
 
 import CartScreen from '../Cart/CartScreen';
 import VendorDetails from './venderHeader';
-import {RouteProp} from '@react-navigation/native';
-import {RootStackParamList} from '../Vendors/VendorsNavigator';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from '../Vendors/VendorsNavigator';
 import CustomConfirmationModal from '../Cart/CustomConfirmationModal';
-import {isStoreOpen} from '../util/vendorUtil';
-import {useAuth} from '../../utils/AuthContext';
-import {setSkipLoginFlow} from '../../utils/Storage';
-import {AppDispatch} from '../../store/store';
-import {debounce} from 'lodash';
+import { isStoreOpen } from '../util/vendorUtil';
+import { useAuth } from '../../utils/AuthContext';
+import { setSkipLoginFlow } from '../../utils/Storage';
+import { AppDispatch } from '../../store/store';
+import { debounce } from 'lodash';
 
 type CategoriesScreenProps = {
   route: RouteProp<RootStackParamList, 'Categories'>;
 };
 
-const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
-  const {authData, setSkipLogin} = useAuth();
+const Categories: React.FC<CategoriesScreenProps> = ({ route }) => {
+  const { authData, setSkipLogin } = useAuth();
   const vendor: Vendor = route.params.vendor;
-  const {products, categories, loading, error} = useFetchProductsAndCategories(
+  const { products, categories, loading, error } = useFetchProductsAndCategories(
     vendor.vendorId,
   );
   const dispatch = useDispatch<AppDispatch>();
 
-  const [cartItems, setCartItems] = useState<{[key: string]: ProductCartItems}>(
+  const [cartItems, setCartItems] = useState<{ [key: string]: ProductCartItems }>(
     {},
   );
   const [modalVisible, setModalVisible] = useState(false);
@@ -107,50 +107,63 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     countOfSkus: 0,
   };
 
-  const categoriesWithProducts = (categories || []).filter(category =>
-    (products || []).some(product => product.category === category.id),
-  );
-  const productsWithoutCategory = (products || []).filter(
-    product => !categoriesWithProducts.some(cat => cat.id === product.category),
-  );
+  const categoriesWithProducts = useMemo(() => {
+    const baseCategories = (categories || []).filter(category =>
+      (products || []).some(product => product.category === category.id)
+    );
+    
+    const productsWithoutCategory = (products || []).filter(
+      product => !baseCategories.some(cat => cat.id === product.category)
+    );
 
-  if (productsWithoutCategory.length > 0) {
-    categoriesWithProducts.push(otherCategory);
-  }
+    if (productsWithoutCategory.length > 0) {
+      return [...baseCategories, {
+        id: 'other',
+        name: 'Other',
+        imageURLs: ['https://via.placeholder.com/150'],
+        description: 'other',
+        type: '',
+        parentCategory: null,
+        countOfSkus: 0,
+      }];
+    }
+    
+    return baseCategories;
+  }, [categories, products]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
 
+  );
   const [searchQuery, setSearchQuery] = useState('');
-  // useEffect(() => {
-  //   if (categoriesWithProducts.length > 0) {
-  //     setSelectedCategory(categoriesWithProducts[0]?.id);
-  //   }
-  // });
+
 
   useEffect(() => {
     setCartItems(
-      cart.reduce<{[key: string]: ProductCartItems}>((acc, item) => {
+      cart.reduce<{ [key: string]: ProductCartItems }>((acc, item) => {
         acc[item.id] = item;
         return acc;
       }, {}),
     );
   }, [cart]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    categoriesWithProducts[0]?.id,
-  );
+
   const filteredCategories = categoriesWithProducts.filter(category =>
     category.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-
+  useEffect(() => {
+    if (categoriesWithProducts.length > 0) {
+      setSelectedCategory(categoriesWithProducts[0]?.id);
+    }
+  }, [categoriesWithProducts]);
   const filteredProducts = searchQuery
     ? (products || []).filter(product =>
-        product.title.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
+      product.title.toLowerCase().includes(searchQuery.toLowerCase()),
+    )
     : selectedCategory
-    ? (products || []).filter(product =>
+      ? (products || []).filter(product =>
         selectedCategory === 'other'
           ? !categoriesWithProducts.some(cat => cat.id === product.category)
           : product.category === selectedCategory,
       )
-    : products || [];
+      : products || [];
 
   const handleCategoryPress = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -170,8 +183,8 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         'Login Required',
         'Please log in to add products to your cart.',
         [
-          {text: 'Cancel', style: 'cancel'},
-          {text: 'Login', onPress: () => handleClick()},
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Login', onPress: () => handleClick() },
         ],
       );
       return;
@@ -244,7 +257,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     }
   }, 300);
 
-  const renderCategoryItem = ({item}: {item: Category}) => {
+  const renderCategoryItem = ({ item }: { item: Category }) => {
     const isSelected = item.id === selectedCategory;
     return (
       <TouchableOpacity
@@ -256,7 +269,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         onPress={() => handleCategoryPress(item.id)}
         disabled={loading || error}>
         <Image
-          source={{uri: item?.imageURLs?.[0]}}
+          source={{ uri: item?.imageURLs?.[0] }}
           style={styles.categoryImage}
           resizeMode="cover"
         />
@@ -265,7 +278,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     );
   };
 
-  const renderProductItem = ({item}: {item: Product}) => {
+  const renderProductItem = ({ item }: { item: Product }) => {
     const isInStock = item.availability;
 
     const product: ProductCartItems = {
@@ -291,7 +304,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             alignItems: 'center',
           }}>
           <Image
-            source={{uri: product.image}}
+            source={{ uri: product.image }}
             style={styles.productImage}
             resizeMode="cover"
           />
@@ -311,7 +324,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           )}
           <Text style={styles.salePrice}> ₹{product.salePrice}</Text>
         </View>
-        <View style={{position: 'absolute', bottom: 8, right: 0}}>
+        <View style={{ position: 'absolute', bottom: 8, right: 0 }}>
           <CartButton
             quantity={product.quantity}
             onIncrease={() => handleIncreaseQuantity(product.id)}
@@ -395,10 +408,10 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         </TouchableOpacity>
       </View>
 
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         {/* vendor-banner */}
         {showBanner && (
-          <Animated.View style={{transform: [{translateY: bannerTranslateY}]}}>
+          <Animated.View style={{ transform: [{ translateY: bannerTranslateY }] }}>
             <VendorDetails vendor={vendor} />
           </Animated.View>
         )}
@@ -534,7 +547,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: {width: 0, height: 2},
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
         borderWidth: 1,
@@ -647,7 +660,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: {width: 2, height: 2},
+        shadowOffset: { width: 2, height: 2 },
         shadowOpacity: 0.7,
         shadowRadius: 7,
       },
@@ -661,7 +674,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: {width: 3, height: 3},
+        shadowOffset: { width: 3, height: 3 },
         shadowOpacity: 0.6,
         shadowRadius: 4,
       },
@@ -676,6 +689,7 @@ const styles = StyleSheet.create({
   categoryImage: {
     width: 50,
     height: 50,
+    borderRadius: 20,
   },
   categoryName: {
     fontSize: 13,
@@ -699,7 +713,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: {width: 2, height: 2},
+        shadowOffset: { width: 2, height: 2 },
         shadowOpacity: 0.7,
         shadowRadius: 7,
       },

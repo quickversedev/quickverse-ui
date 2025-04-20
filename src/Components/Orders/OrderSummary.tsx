@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
+  SafeAreaView,
+  Platform,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
@@ -116,46 +118,58 @@ const MyOrdersScreen: React.FC = () => {
 
   if (error) {
     return (
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>My Orders</Text>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerText}>My Orders</Text>
+          </View>
+          <View style={styles.loaderContainer}>
+            <Text style={styles.loaderText}>
+              Failed to fetch the order, please try again later..!
+            </Text>
+            <TouchableOpacity style={styles.retryButton} onPress={onRefresh}>
+              <Text style={styles.retryText}>Retry</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={styles.loaderContainer}>
-          <Text style={styles.loaderText}>
-            Failed to fetch the order, please try again later..!
-          </Text>
-          <TouchableOpacity style={styles.retryButton} onPress={onRefresh}>
-            <Text style={styles.retryText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>My Orders</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerText}>My Orders</Text>
+        </View>
+        {hasZeroOrders ? (
+          <ZeroOrdersState />
+        ) : (
+          <FlatList
+            data={orders}
+            renderItem={renderOrderItem}
+            keyExtractor={item => item.orderId.toString()}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            ListFooterComponent={renderFooter}
+          />
+        )}
       </View>
-      {hasZeroOrders ? (
-        <ZeroOrdersState />
-      ) : (
-        <FlatList
-          data={orders}
-          renderItem={renderOrderItem}
-          keyExtractor={item => item.orderId.toString()}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          ListFooterComponent={renderFooter} // Render footer at the end of the list
-        />
-      )}
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#FFDC52'},
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFDC52',
+    paddingTop: Platform.OS === 'android' ? 25 : 0, // Additional padding for Android status bar
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#FFDC52',
+  },
   headerContainer: {
     backgroundColor: '#FFDC52',
     paddingVertical: 20,
@@ -216,7 +230,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   footerLoader: {
-    marginVertical: 16, // Add margin to the loader
+    marginVertical: 16,
   },
 });
 

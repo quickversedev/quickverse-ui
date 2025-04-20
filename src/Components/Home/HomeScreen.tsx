@@ -133,7 +133,6 @@ const HomeScreen: React.FC = () => {
   };
 
   const getDeviceLocation = async (campuses: any[]) => {
-    const startTime = new Date();
     const hasPermission = await checkAndRequestLocationPermission();
 
     if (!hasPermission) {
@@ -257,9 +256,16 @@ const HomeScreen: React.FC = () => {
                   )}
                 </View>
                 <FlatList
-                  data={campusOptions?.filter(item =>
-                    item.value.toLowerCase().includes(searchText.toLowerCase()),
-                  )}
+                  data={campusOptions?.filter(item => {
+                    const searchTerm = searchText.toLowerCase();
+                    return (
+                      item.value.toLowerCase().includes(searchTerm) ||
+                      (item.displayName &&
+                        item.displayName.toLowerCase().includes(searchTerm)) ||
+                      (item.label &&
+                        item.label.toLowerCase().includes(searchTerm))
+                    );
+                  })}
                   keyExtractor={item => item.value}
                   renderItem={({item}) => (
                     <TouchableOpacity
@@ -269,7 +275,9 @@ const HomeScreen: React.FC = () => {
                         setClicked(false);
                         setSearchText('');
                       }}>
-                      <Text style={styles.listItemText}>{item.label}</Text>
+                      <Text style={styles.listItemText}>
+                        {item.displayName}
+                      </Text>
                     </TouchableOpacity>
                   )}
                 />

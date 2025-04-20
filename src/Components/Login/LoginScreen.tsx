@@ -10,6 +10,8 @@ import {
   Keyboard,
   SafeAreaView,
   ActivityIndicator,
+  Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -75,68 +77,73 @@ const LoginScreen: React.FC = () => {
     <GestureHandlerRootView style={{flex: 1}}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <SafeAreaView style={styles.safeArea}>
-          <View style={styles.container}>
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.scrollContainer}>
-              <Image
-                source={require('../../data/images/qv-blue.png')}
-                style={styles.logo}
-              />
-              <Text style={styles.header}>Log in</Text>
-
-              <View style={styles.inputContainer}>
-                <MaterialCommunityIcons
-                  name="phone"
-                  size={24}
-                  color={theme.colors.secondary}
-                  style={styles.icon}
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.keyboardAvoidingView}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}>
+            <View style={styles.container}>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContainer}>
+                <Image
+                  source={require('../../data/images/qv-blue.png')}
+                  style={styles.logo}
                 />
-                <Text style={styles.countryCode}>+91</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter Mobile Number"
-                  value={phoneNumber}
-                  onChangeText={text => {
-                    setPhoneError('');
-                    setPhoneNumber(text);
-                    setError(false);
-                  }}
-                  placeholderTextColor={theme.colors.secondary}
-                  keyboardType="phone-pad"
-                />
-              </View>
+                <Text style={styles.header}>Log in</Text>
 
-              {phoneError ? (
-                <Text style={styles.error}>{phoneError}</Text>
-              ) : null}
-              {error ? (
-                <Text style={styles.error}>
-                  Error ocured while sending otp , please try again later
-                </Text>
-              ) : null}
+                <View style={styles.inputContainer}>
+                  <MaterialCommunityIcons
+                    name="phone"
+                    size={24}
+                    color={theme.colors.secondary}
+                    style={styles.icon}
+                  />
+                  <Text style={styles.countryCode}>+91</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter Mobile Number"
+                    value={phoneNumber}
+                    onChangeText={text => {
+                      setPhoneError('');
+                      setPhoneNumber(text);
+                      setError(false);
+                    }}
+                    placeholderTextColor={theme.colors.secondary}
+                    keyboardType="phone-pad"
+                  />
+                </View>
+
+                {phoneError ? (
+                  <Text style={styles.error}>{phoneError}</Text>
+                ) : null}
+                {error ? (
+                  <Text style={styles.error}>
+                    Error ocured while sending otp , please try again later
+                  </Text>
+                ) : null}
+
+                <TouchableOpacity
+                  style={[styles.button, loading && styles.disabledButton]}
+                  onPress={loading ? undefined : handleContinue}
+                  disabled={loading}>
+                  {loading ? (
+                    <ActivityIndicator
+                      size="small"
+                      color={theme.colors.secondary}
+                    />
+                  ) : (
+                    <Text style={styles.buttonText}>Continue</Text>
+                  )}
+                </TouchableOpacity>
+              </ScrollView>
 
               <TouchableOpacity
-                style={[styles.button, loading && styles.disabledButton]}
-                onPress={loading ? undefined : handleContinue}
-                disabled={loading}>
-                {loading ? (
-                  <ActivityIndicator
-                    size="small"
-                    color={theme.colors.secondary}
-                  />
-                ) : (
-                  <Text style={styles.buttonText}>Continue</Text>
-                )}
+                onPress={handleSkipLogin}
+                style={styles.skipButton}>
+                <Text style={styles.skipButtonText}>Skip</Text>
               </TouchableOpacity>
-            </ScrollView>
-
-            <TouchableOpacity
-              onPress={handleSkipLogin}
-              style={styles.skipButton}>
-              <Text style={styles.skipButtonText}>Skip</Text>
-            </TouchableOpacity>
-          </View>
+            </View>
+          </KeyboardAvoidingView>
         </SafeAreaView>
       </TouchableWithoutFeedback>
     </GestureHandlerRootView>
@@ -147,6 +154,9 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#FFD700',
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
   container: {
     flex: 1,

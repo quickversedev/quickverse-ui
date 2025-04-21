@@ -7,7 +7,6 @@ export const clearItemsFromCart = async (
   AuthData: string,
 ): Promise<any> => {
   try {
-    console.log('vendorId:', AuthData);
     const url = `${globalConfig.apiBaseUrl}/v2/clearCart?vendorId=${vendorId}`;
     const response = await axios.delete(url, {
       headers: {

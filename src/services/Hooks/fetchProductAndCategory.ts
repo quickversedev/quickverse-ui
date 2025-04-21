@@ -1,11 +1,11 @@
 import {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux'; // Ensure these hooks are set up for your Redux store
+import {useDispatch, useSelector} from 'react-redux';
 import {
   fetchProducts,
   selectProducts,
   selectProductLoading,
   selectProductError,
-} from '../productSlice'; // Update paths as necessary
+} from '../productSlice';
 import {
   fetchCategories,
   selectCategories,
@@ -19,7 +19,7 @@ interface UseFetchProductsAndCategoriesReturn {
   products: Product[];
   categories: Category[];
   loading: boolean;
-  error: string | null;
+  error: boolean;
 }
 
 export const useFetchProductsAndCategories = (
@@ -35,27 +35,36 @@ export const useFetchProductsAndCategories = (
   const categoryError = useSelector(selectCategoryError);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
       if (!vendorId) {
         return;
       }
+
       setLoading(true);
-      await Promise.all([
-        dispatch(fetchProducts({vendorId})),
-        dispatch(fetchCategories({vendorId})),
-      ]);
-      setLoading(false);
+      setError(false);
+
+      try {
+        await Promise.all([
+          dispatch(fetchProducts({vendorId})),
+          dispatch(fetchCategories({vendorId})),
+        ]);
+      } catch (err) {
+        console.error('Error while fetching products or categories:', err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchData().catch(() => setError('Failed to fetch data.'));
+    fetchData();
   }, [dispatch, vendorId]);
 
   useEffect(() => {
     if (productError || categoryError) {
-      setError(productError || categoryError);
+      setError(true);
     }
   }, [productError, categoryError]);
 

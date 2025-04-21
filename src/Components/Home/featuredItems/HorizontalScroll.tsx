@@ -6,6 +6,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native';
 import {Card, Text} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
@@ -191,6 +192,180 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
     );
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      paddingVertical: 6,
+    },
+    cardContainer: {
+      width: width * 0.3,
+      height: 210,
+      marginHorizontal: 10,
+      paddingVertical: 5,
+      alignItems: 'center',
+    },
+    card: {
+      borderRadius: 15,
+      borderWidth: 1,
+      borderColor: '#ffb632',
+      backgroundColor: '#FFEA98',
+      ...Platform.select({
+        ios: {
+          shadowColor: '#000',
+          shadowOffset: {width: 0, height: 2},
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
+        },
+        android: {
+          elevation: 3,
+        },
+      }),
+    },
+    image: {
+      height: 100,
+      width: '100%',
+      borderTopLeftRadius: 14,
+      borderTopRightRadius: 14,
+    },
+    cardContent: {
+      alignItems: 'center',
+      padding: 8,
+    },
+    itemName: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      height: 40, // Fixed height for container
+      // Vertical centering solution:
+      justifyContent: 'center', // For the text container
+      textAlignVertical: 'center', // For the text itself
+      ...Platform.select({
+        ios: {
+          fontFamily: 'System',
+          lineHeight: 20, // Half of container height for perfect centering
+        },
+        android: {
+          fontFamily: 'Roboto',
+          includeFontPadding: false,
+          lineHeight: 20,
+        },
+      }),
+    },
+
+    buttonContainer: {
+      marginTop: 2,
+      width: '100%',
+    },
+    addButton: {
+      paddingVertical: 6,
+      paddingHorizontal: 10,
+      backgroundColor: '#8B0000',
+      borderRadius: 15,
+      alignItems: 'center',
+      ...Platform.select({
+        android: {
+          elevation: 2,
+        },
+      }),
+    },
+    addButtonText: {
+      color: '#FFFFFF',
+      fontWeight: 'bold',
+      fontSize: 10,
+      ...Platform.select({
+        ios: {
+          fontFamily: 'System',
+        },
+        android: {
+          fontFamily: 'Roboto',
+          includeFontPadding: false,
+        },
+      }),
+    },
+    quantityContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+    },
+    quantityButton: {
+      paddingVertical: 2,
+      paddingHorizontal: 15,
+      backgroundColor: '#8B0000',
+      borderRadius: 15,
+      ...Platform.select({
+        android: {
+          elevation: 2,
+        },
+      }),
+    },
+    quantityButtonText: {
+      color: '#FFFFFF',
+      fontWeight: 'bold',
+      fontSize: 14,
+      textAlign: 'center',
+      ...Platform.select({
+        android: {
+          textAlignVertical: 'center',
+        },
+      }),
+    },
+    quantityText: {
+      marginHorizontal: 8,
+      fontSize: 14,
+      fontWeight: 'bold',
+    },
+    priceContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginBottom: 4,
+      width: '100%',
+    },
+    originalPrice: {
+      textDecorationLine: 'line-through',
+      color: 'gray',
+      fontSize: 10,
+      marginRight: 8,
+    },
+    salePrice: {
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: theme.colors.ternary,
+    },
+    imageContainer: {
+      position: 'relative',
+    },
+    discountBadge: {
+      position: 'absolute',
+      top: 8,
+      left: 8,
+      backgroundColor: 'red',
+      paddingVertical: 2,
+      paddingHorizontal: 6,
+      borderRadius: 15,
+      ...Platform.select({
+        ios: {
+          shadowColor: '#000',
+          shadowOffset: {width: 0, height: 1},
+          shadowOpacity: 0.3,
+          shadowRadius: 1,
+        },
+        android: {
+          elevation: 2,
+        },
+      }),
+    },
+    discountText: {
+      color: 'white',
+      fontSize: 10,
+      fontWeight: 'bold',
+      ...Platform.select({
+        android: {
+          includeFontPadding: false,
+        },
+      }),
+    },
+  });
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -199,6 +374,7 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
         horizontal
         showsHorizontalScrollIndicator={false}
         renderItem={renderItem}
+        contentContainerStyle={{paddingHorizontal: 4}}
       />
       <CustomConfirmationModal
         isVisible={isConfirmationModalVisible}
@@ -208,106 +384,5 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 6,
-  },
-  cardContainer: {
-    width: width * 0.3,
-    marginHorizontal: 10,
-    paddingVertical: 5,
-    alignItems: 'center',
-  },
-  card: {
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#ffb632',
-    backgroundColor: '#FFEA98',
-  },
-  image: {
-    height: 100,
-    width: '100%',
-  },
-  cardContent: {
-    alignItems: 'center',
-  },
-  itemName: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-
-  buttonContainer: {
-    marginTop: 5,
-  },
-  addButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    backgroundColor: '#8B0000',
-    borderRadius: 15,
-    // width: '80%',
-    alignItems: 'center',
-  },
-  addButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '60%',
-  },
-  quantityButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 15,
-    backgroundColor: '#8B0000',
-    borderRadius: 15,
-  },
-  quantityButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  quantityText: {
-    marginHorizontal: 5,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  originalPrice: {
-    textDecorationLine: 'line-through',
-    color: 'gray',
-    fontSize: 10,
-    marginRight: 8,
-  },
-  salePrice: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: theme.colors.ternary,
-  },
-  imageContainer: {
-    position: 'relative',
-  },
-  discountBadge: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    backgroundColor: 'red',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 5,
-  },
-  discountText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-});
 
 export default HorizontalScroll;

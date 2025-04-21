@@ -22,6 +22,7 @@ interface PaymentSummaryScreenProps {
   vendor: Vendor | undefined;
   isStoreOpened?: boolean;
   isCartEmpty: boolean;
+  closeCartModal: () => void;
 }
 
 type VendorCardsNavigationProp = StackNavigationProp<
@@ -34,12 +35,18 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
   vendor,
   isStoreOpened,
   isCartEmpty,
+  closeCartModal,
 }) => {
   const {vendorEndPoint} = vendor || {};
   const webUrl = vendorEndPoint ? `${vendorEndPoint}/cart` : '';
   const navigation = useNavigation<VendorCardsNavigationProp>();
   const isPlaceOrderButtonDisabled =
     isCartEmpty || !vendorEndPoint || !isStoreOpened;
+
+  const handleProceedToCheckout = () => {
+    navigation.navigate('WebView', {url: webUrl});
+    closeCartModal();
+  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.paymentSummary}>
@@ -70,7 +77,7 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
             },
           ]}
           disabled={isPlaceOrderButtonDisabled}
-          onPress={() => navigation.navigate('WebView', {url: webUrl})}>
+          onPress={handleProceedToCheckout}>
           <Text style={styles.placeOrderButtonText}>Proceed To Checkout</Text>
         </TouchableOpacity>
       </View>
@@ -87,7 +94,7 @@ const styles = StyleSheet.create({
   paymentSummary: {
     backgroundColor: 'white',
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 15,
     marginTop: 20,
     marginHorizontal: 15,
     ...Platform.select({

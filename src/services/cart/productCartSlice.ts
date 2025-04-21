@@ -90,19 +90,15 @@ const productCartSlice = createSlice({
 
 export const addToCart =
   (item: ProductCartItems, authData: string): AppThunk =>
-  async (dispatch, getState) => {
-    const {productCart} = getState().productCart;
-
-    //clear the remote cart before addin gthe product to the cart
-    if (productCart.length === 0) {
-      await clearItemsFromCart(item.vendorId, authData);
-    }
-
+  async dispatch => {
+    dispatch(productCartSlice.actions.addToProductCart(item));
     try {
       await addItemToCart(item.vendorId, item.id, authData);
-      dispatch(productCartSlice.actions.addToProductCart(item));
     } catch (error) {
       console.error('Failed to add item to cart:', error);
+      dispatch(
+        productCartSlice.actions.decrementProductQuantity({id: item.id}),
+      );
     }
   };
 
@@ -110,47 +106,74 @@ export const removeFromCart =
   (id: string, authData: string): AppThunk =>
   async (dispatch, getState) => {
     const {shopId} = getState().productCart;
+
+    const itemToRestore = getState().productCart.productCart.find(
+      item => item.id === id,
+    );
+    if (!itemToRestore) return;
+
+    dispatch(productCartSlice.actions.removeFromProductCart({id}));
+
     try {
       await deleteItemFromCart(shopId, id, true, authData);
-      dispatch(productCartSlice.actions.removeFromProductCart({id}));
     } catch (error) {
       console.error('Failed to remove item from cart:', error);
+      dispatch(productCartSlice.actions.addToProductCart(itemToRestore));
     }
   };
 
 export const clearFromCart =
   (authData: string): AppThunk =>
   async (dispatch, getState) => {
-    const {shopId} = getState().productCart;
+    const {shopId, productCart} = getState().productCart;
+
+    dispatch(productCartSlice.actions.clearCart());
+
     try {
       await clearItemsFromCart(shopId, authData);
-      dispatch(productCartSlice.actions.clearCart());
     } catch (error) {
       console.error('Failed to clear the cart:', error);
+      // Revert by restoring cart
+      productCart.forEach(item => {
+        dispatch(productCartSlice.actions.addToProductCart(item));
+      });
     }
   };
 
 export const incrementQuantity =
   (id: string, authData: string): AppThunk =>
   async (dispatch, getState) => {
+    dispatch(productCartSlice.actions.incrementProductQuantity({id}));
+
     const {shopId} = getState().productCart;
+
     try {
       await addItemToCart(shopId, id, authData);
-      dispatch(productCartSlice.actions.incrementProductQuantity({id}));
     } catch (error) {
       console.error('Failed to increment product quantity:', error);
+      dispatch(productCartSlice.actions.decrementProductQuantity({id}));
     }
   };
 
 export const decrementQuantity =
   (id: string, authData: string): AppThunk =>
   async (dispatch, getState) => {
+    const currentCart = getState().productCart.productCart;
+    const item = currentCart.find(i => i.id === id);
+
+    if (!item) return;
+
+    dispatch(productCartSlice.actions.decrementProductQuantity({id}));
+
     const {shopId} = getState().productCart;
+
     try {
       await deleteItemFromCart(shopId, id, false, authData);
-      dispatch(productCartSlice.actions.decrementProductQuantity({id}));
     } catch (error) {
       console.error('Failed to decrement product quantity:', error);
+      dispatch(
+        productCartSlice.actions.addToProductCart({...item, quantity: 1}),
+      );
     }
   };
 

@@ -79,7 +79,7 @@ export const initializeForegroundMessageHandler = () => {
 export const initializeBackgroundMessageHandler = () => {
   const message = getMessaging();
   setBackgroundMessageHandler(message, async remoteMessage => {
-    console.log('Message handled in the background!', remoteMessage);
+    // console.log('Message handled in the background!', remoteMessage);
     await displayNotification(remoteMessage);
   });
 };
@@ -90,13 +90,13 @@ export const initializeBackgroundMessageHandler = () => {
 export const getFCMToken = async (): Promise<string> => {
   const message = messaging();
   const token = await getToken(message);
-  console.log('FCM Token:', token);
   return token;
 };
 
 /**
  * Request notification permissions (required for iOS).
  */
+//todo
 export const requestNotificationPermissions = async () => {
   if (Platform.OS === 'ios') {
     const message = getMessaging();

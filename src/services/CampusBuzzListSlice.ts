@@ -8,12 +8,13 @@ import {CampusBuzz} from '../utils/canonicalModel';
 import {getCampus} from '../utils/Storage';
 import globalConfig from '../utils/GlobalConfig';
 import {fetchToken} from '../utils/KeychainStore/keychainUtil';
+import {campusBuzzMockData} from '../data/campusBuss';
 // export const fetchBampusBuzzList = createAsyncThunk(
 //   'campusBuzz/fetchBampusBuzzList',
 //   async () => {
-//     return new Promise<CampusBuzz>(resolve => {
+//     return new Promise<CampusBuzz[]>(resolve => {
 //       setTimeout(() => {
-//         resolve(campusBuzzItems);
+//         resolve(campusBuzzMockData);
 //       }, 1000);
 //     });
 //   },

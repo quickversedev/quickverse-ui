@@ -7,6 +7,7 @@ import {
   Text,
   FlatList,
   TextInput,
+  Platform,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -57,7 +58,9 @@ const VendorCards: React.FC = () => {
   }, [vendors]);
 
   const filteredVendors = useMemo(() => {
-    if (!searchQuery.trim()) return groupedVendors;
+    if (!searchQuery.trim()) {
+      return groupedVendors;
+    }
     return Object.entries(groupedVendors).reduce(
       (acc: Record<string, Vendor[]>, [category, categoryVendors]) => {
         const matchedVendors = categoryVendors.filter(
@@ -144,7 +147,8 @@ const VendorCards: React.FC = () => {
               borderColor: theme.colors.secondary,
               marginTop: 12,
               marginHorizontal: 16,
-            }}></View>
+            }}
+          />
         </View>
       ))}
     </ScrollView>
@@ -161,26 +165,56 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-
-    paddingHorizontal: 12,
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 16,
     borderRadius: 15,
     marginBottom: SPACING,
     marginHorizontal: SPACING,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        borderWidth: 1,
+        borderColor: theme.colors.secondary,
+        paddingVertical: 6,
+      },
+      android: {
+        elevation: 3,
+        borderWidth: 0.5,
+        borderColor: theme.colors.secondary,
+        paddingVertical: 4,
+      },
+    }),
   },
   searchIcon: {
-    marginRight: 5,
+    marginRight: 8,
+    color: theme.colors.ternary,
+    ...Platform.select({
+      ios: {
+        marginTop: 2, // Slight vertical adjustment for iOS
+      },
+    }),
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
     color: theme.colors.secondary,
+    ...Platform.select({
+      ios: {
+        paddingVertical: 8,
+        fontWeight: '500',
+        fontFamily: 'System',
+      },
+      android: {
+        paddingVertical: 4,
+        fontWeight: 'normal',
+        includeFontPadding: false, // Remove extra padding on Android
+      },
+    }),
   },
+
   categorySection: {
     marginBottom: SPACING,
     padding: SPACING / 2,

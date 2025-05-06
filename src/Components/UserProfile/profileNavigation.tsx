@@ -6,6 +6,7 @@ import AboutUs from './AboutUs';
 import Help from './Help';
 import Feedback from './Feedback';
 import theme from '../../theme';
+import AddressScreen from './AddressScreen';
 
 export type RootStackParamList = {
   ProfileScreen: undefined;
@@ -13,6 +14,7 @@ export type RootStackParamList = {
   Help: undefined;
   Feedback: undefined;
   ChangePinScreen: undefined;
+  AddressScreen: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -37,6 +39,20 @@ const ProfileNavigation: React.FC = () => {
           title: 'Feedback',
         }}
       />
+
+      <Stack.Screen
+        name="AddressScreen"
+        component={AddressScreen}
+        options={{
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: theme.colors.primary,
+            height: 60,
+          },
+          title: 'AddressScreen',
+        }}
+      />
+
       <Stack.Screen
         name="AboutUs"
         component={AboutUs}

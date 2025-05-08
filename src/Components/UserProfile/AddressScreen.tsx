@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -10,78 +10,229 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../../store/store';
+import {
+  fetchUserAddresses,
+  addUserAddress,
+  ApiAddress,
+  ListedAddress,
+} from '../../services/useAddressSlice';
+import {useAuth} from '../../utils/AuthContext';
 
 const COLORS = {
-  backgroundPrimary: '#FAEA7B', // Main yellow background
-  backgroundSecondary: '#FFF9E6', // Lighter yellow for inputs/cards
-  textPrimary: '#4A4A4A', // Dark grey/brown text
-  textSecondary: '#757575', // Lighter grey text
-  buttonBackground: '#8F1413', // Dark red button
-  buttonText: '#FFFFFF', // White button text
-  border: '#E0B84C', // Darker yellow border
+  backgroundPrimary: '#FAEA7B',
+  backgroundSecondary: '#FFF9E6',
+  textPrimary: '#4A4A4A',
+  textSecondary: '#757575',
+  buttonBackground: '#8F1413',
+  buttonText: '#FFFFFF',
+  border: '#E0B84C',
   iconDefault: '#4A4A4A',
   iconLight: '#757575',
-  mapPlaceholder: '#E0E0E0', // Grey for map placeholder
+  mapPlaceholder: '#E0E0E0',
 };
 
-// Interface for Address Details state
-interface AddressDetailsState {
+interface AddressFormState
+  extends Omit<ApiAddress, 'id' | 'latitude' | 'longitude'> {
   houseNo: string;
   floor: string;
   towerBlock: string;
   landmark: string;
+  // These will be needed when saving, but for now, we are not getting them from map
+  latitude?: string;
+  longitude?: string;
 }
 
 const AddressScreen: React.FC = () => {
-  // State to toggle between map view and address form view
+  const dispatch = useDispatch<AppDispatch>();
+  const {authData} = useAuth(); // Get auth data ( vendorId)
+
+  // Select state from Redux store
+  const {
+    addresses,
+    loadingList,
+    loadingAdd,
+    error: addressError,
+  } = useSelector((state: RootState) => state.address);
+
   const [isAddingDetails, setIsAddingDetails] = useState(false);
 
-  // State for the address form inputs
-  const [addressDetails, setAddressDetails] = useState<AddressDetailsState>({
+  // Form state for adding a new address
+  const [addressForm, setAddressForm] = useState<AddressFormState>({
+    name: '',
+    addressLine1: '',
+    addressLine2: '',
+    addressLine3: null,
+    city: '',
+    state: '',
+    pincode: '',
+    tag: '',
     houseNo: '',
     floor: '',
     towerBlock: '',
     landmark: '',
+    latitude: '',
+    longitude: '',
   });
 
-  // Handler for input changes
-  const handleInputChange = (
-    name: keyof AddressDetailsState,
+  console.log('AUTH_DATA::', authData);
+
+  // Fetch addresses when the component mounts or authData changes
+  useEffect(() => {
+    if (authData) {
+      dispatch(
+        fetchUserAddresses({
+          authData: authData,
+          vendorId: '8765',
+        }),
+      );
+    } else {
+      // Handle case where authData is not available (e.g., show login prompt or error)
+      console.warn(
+        'AddressScreen: Auth data not available to fetch addresses.',
+      );
+    }
+  }, [dispatch, authData]);
+
+  // Determine the address to display in the "Delivering to" card
+  const deliveringToAddress = useMemo(() => {
+    if (addresses && addresses.length > 0) {
+      // Prioritize default address, otherwise take the first one
+      return addresses.find(addr => addr.isDefaultAddress) || addresses[0];
+    }
+    return null;
+  }, [addresses]);
+
+  // Handler for form input changes
+  const handleFormInputChange = (
+    name: keyof AddressFormState,
     value: string,
   ) => {
-    setAddressDetails(prev => ({...prev, [name]: value}));
+    setAddressForm(prev => ({...prev, [name]: value}));
   };
 
   // Handler for the main action button press
   const handleActionPress = () => {
     if (isAddingDetails) {
-      // Logic to save address details
-      console.log('Saving Address:', addressDetails);
-      // TODO: Implement actual saving logic
-      // Potentially navigate back or show success message
+      // --- Save Address Logic ---
+      if (!authData) {
+        Alert.alert(
+          'Error',
+          'Authentication details missing. Cannot save address.',
+        );
+        return;
+      }
+      // Basic validation (enhance as needed)
+      if (
+        !addressForm.name ||
+        !addressForm.addressLine1 ||
+        !addressForm.city ||
+        !addressForm.state ||
+        !addressForm.pincode
+      ) {
+        Alert.alert(
+          'Validation Error',
+          'Please fill in all required address fields (Name, Address Line 1, City, State, Pincode).',
+        );
+        return;
+      }
+
+      const newAddressData: Omit<ApiAddress, 'id'> = {
+        name: addressForm.name,
+        addressLine1: `${
+          addressForm.houseNo ? addressForm.houseNo + ', ' : ''
+        }${addressForm.addressLine1}`,
+        addressLine2: addressForm.addressLine2 || null,
+        addressLine3: addressForm.addressLine3 || null,
+        city: addressForm.city,
+        state: addressForm.state,
+        pincode: addressForm.pincode,
+        latitude: addressForm.latitude || '0',
+        longitude: addressForm.longitude || '0',
+        tag: addressForm.tag || null,
+      };
+
+      console.log('PAYLOAD:', newAddressData);
+
+      dispatch(
+        addUserAddress({
+          authData: authData,
+          vendorId: '8765',
+          addressData: newAddressData,
+          isDefaultAddress: false, // Or get this from a form checkbox
+        }),
+      )
+        .unwrap() // Allows handling promise result directly
+        .then(addedAddress => {
+          Alert.alert(
+            'Success',
+            `Address "${addedAddress.name}" added successfully!`,
+          );
+          setIsAddingDetails(false); // Close the form
+        })
+        .catch(errMessage => {
+          Alert.alert('Error', errMessage || 'Failed to add address.');
+        });
     } else {
-      // Switch to the address details form
+      // --- Switch to Add Address Form ---
+      // Pre-fill parts of the form if a current address is selected (optional)
+      if (deliveringToAddress) {
+        setAddressForm({
+          name: deliveringToAddress.name || '',
+          addressLine1: deliveringToAddress.addressLine1 || '',
+          addressLine2: deliveringToAddress.addressLine2 || '',
+          addressLine3: deliveringToAddress.addressLine3 || null,
+          city: deliveringToAddress.city || '',
+          state: deliveringToAddress.state || '',
+          pincode: deliveringToAddress.pincode || '',
+          tag: deliveringToAddress.tag || '',
+          houseNo: '', // These would be new details
+          floor: '',
+          towerBlock: '',
+          landmark: '',
+          latitude: deliveringToAddress.latitude, // Pre-fill if available
+          longitude: deliveringToAddress.longitude,
+        });
+      } else {
+        // Reset form if no current address
+        setAddressForm({
+          name: '',
+          addressLine1: '',
+          addressLine2: '',
+          addressLine3: null,
+          city: '',
+          state: '',
+          pincode: '',
+          tag: '',
+          houseNo: '',
+          floor: '',
+          towerBlock: '',
+          landmark: '',
+          latitude: '',
+          longitude: '',
+        });
+      }
       setIsAddingDetails(true);
     }
   };
 
-  // Handler for the back button
   const handleBackPress = () => {
     console.log('Back pressed');
-    // TODO: Implement navigation logic (e.g., navigation.goBack())
+    // TODO: navigation.goBack();
   };
 
-  // Handler for the close button on the cards
   const handleCloseCard = () => {
     if (isAddingDetails) {
-      setIsAddingDetails(false); // Go back to the map view / delivering to card
+      setIsAddingDetails(false);
     } else {
-      // Handle close on "Delivering to" card if needed (e.g., clear selection)
       console.log("Close 'Delivering To' pressed");
-      // TODO: Implement logic if needed (e.g., clear selected address)
+      // TODO: Logic if user can deselect current address
     }
   };
 
@@ -101,9 +252,7 @@ const AddressScreen: React.FC = () => {
           <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
             <Icon name="arrow-back" size={26} color={COLORS.iconDefault} />
           </TouchableOpacity>
-          {/* Ensure headerTitle is wrapped in Text */}
           <Text style={styles.headerTitle}>Confirm Delivery Address</Text>
-          {/* Spacer view to help center the title */}
           <View style={styles.backButton} />
         </View>
 
@@ -122,25 +271,19 @@ const AddressScreen: React.FC = () => {
           />
         </View>
 
-        {/* --- Map Area (Placeholder) --- */}
+        {/* --- Map Area (Placeholder - NOT TOUCHED) --- */}
         <View style={styles.mapContainer}>
-          {/* === IMPORTANT: Replace this View with your actual Map component === */}
-          {/* Example: <MapView style={StyleSheet.absoluteFillObject} ... /> */}
           <View style={styles.mapPlaceholder}>
-            {/* Ensure placeholder text is wrapped */}
             <Text style={styles.mapPlaceholderText}>Map View Placeholder</Text>
           </View>
-          {/* === End Map Component Replacement === */}
 
-          {/* Conditional rendering of the Address Details Form OVER the map */}
+          {/* --- Address Details Form OVER the map --- */}
           {isAddingDetails && (
             <ScrollView
-              style={[styles.cardBase, styles.addressFormCard]} // Styles for the sliding card
-              contentContainerStyle={styles.scrollViewContent} // Inner padding for scroll content
-              showsVerticalScrollIndicator={false} // Hide scroll bar if desired
-            >
+              style={[styles.cardBase, styles.addressFormCard]}
+              contentContainerStyle={styles.scrollViewContent}
+              showsVerticalScrollIndicator={false}>
               <View style={styles.cardHeader}>
-                {/* Ensure card title is wrapped */}
                 <Text style={styles.cardTitle}>Address Details</Text>
                 <TouchableOpacity
                   onPress={handleCloseCard}
@@ -153,61 +296,132 @@ const AddressScreen: React.FC = () => {
                 </TouchableOpacity>
               </View>
 
-              {/* Form Fields */}
+              {/* Form Fields - Bind to addressForm state */}
               <View style={styles.formField}>
-                {/* Ensure label is wrapped */}
-                <Text style={styles.label}>House No:</Text>
+                <Text style={styles.label}>Contact Name:</Text>
                 <TextInput
-                  placeholder="House No."
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholder="Contact Name"
                   style={styles.input}
-                  value={addressDetails.houseNo}
-                  onChangeText={value => handleInputChange('houseNo', value)}
+                  value={addressForm.name}
+                  onChangeText={value => handleFormInputChange('name', value)}
                 />
               </View>
               <View style={styles.formField}>
-                {/* Ensure label is wrapped */}
-                <Text style={styles.label}>Floor:</Text>
+                <Text style={styles.label}>House No, Building Name:</Text>
                 <TextInput
-                  placeholder="Floor"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholder="House No, Building Name"
                   style={styles.input}
-                  value={addressDetails.floor}
-                  onChangeText={value => handleInputChange('floor', value)}
+                  value={addressForm.houseNo}
+                  onChangeText={value =>
+                    handleFormInputChange('houseNo', value)
+                  }
                 />
               </View>
               <View style={styles.formField}>
-                {/* Ensure label is wrapped */}
-                <Text style={styles.label}>Tower / Block:</Text>
+                <Text style={styles.label}>Street Address / Area:</Text>
                 <TextInput
-                  placeholder="Tower / Block"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholder="Street Address / Area"
                   style={styles.input}
-                  value={addressDetails.towerBlock}
-                  onChangeText={value => handleInputChange('towerBlock', value)}
+                  value={addressForm.addressLine1}
+                  onChangeText={value =>
+                    handleFormInputChange('addressLine1', value)
+                  }
                 />
               </View>
               <View style={styles.formField}>
-                {/* Ensure label is wrapped */}
-                <Text style={styles.label}>Landmark:</Text>
+                <Text style={styles.label}>
+                  Locality / Sub-Area (Optional):
+                </Text>
                 <TextInput
-                  placeholder="Landmark"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholder="Locality / Sub-Area"
                   style={styles.input}
-                  value={addressDetails.landmark}
-                  onChangeText={value => handleInputChange('landmark', value)}
+                  value={addressForm.addressLine2 || ''}
+                  onChangeText={value =>
+                    handleFormInputChange('addressLine2', value)
+                  }
                 />
               </View>
+              <View style={styles.formField}>
+                <Text style={styles.label}>Floor (Optional):</Text>
+                <TextInput
+                  placeholder="e.g., 3rd Floor"
+                  style={styles.input}
+                  value={addressForm.floor}
+                  onChangeText={value => handleFormInputChange('floor', value)}
+                />
+              </View>
+              <View style={styles.formField}>
+                <Text style={styles.label}>Tower / Block (Optional):</Text>
+                <TextInput
+                  placeholder="e.g., Tower A, Block B"
+                  style={styles.input}
+                  value={addressForm.towerBlock}
+                  onChangeText={value =>
+                    handleFormInputChange('towerBlock', value)
+                  }
+                />
+              </View>
+              <View style={styles.formField}>
+                <Text style={styles.label}>Landmark (Optional):</Text>
+                <TextInput
+                  placeholder="Nearby Landmark"
+                  style={styles.input}
+                  value={addressForm.landmark}
+                  onChangeText={value =>
+                    handleFormInputChange('landmark', value)
+                  }
+                />
+              </View>
+              <View style={styles.formField}>
+                <Text style={styles.label}>City:</Text>
+                <TextInput
+                  placeholder="City"
+                  style={styles.input}
+                  value={addressForm.city}
+                  onChangeText={value => handleFormInputChange('city', value)}
+                />
+              </View>
+              <View style={styles.formField}>
+                <Text style={styles.label}>State:</Text>
+                <TextInput
+                  placeholder="State"
+                  style={styles.input}
+                  value={addressForm.state}
+                  onChangeText={value => handleFormInputChange('state', value)}
+                />
+              </View>
+              <View style={styles.formField}>
+                <Text style={styles.label}>Pincode:</Text>
+                <TextInput
+                  placeholder="Pincode"
+                  keyboardType="numeric"
+                  style={styles.input}
+                  value={addressForm.pincode}
+                  onChangeText={value =>
+                    handleFormInputChange('pincode', value)
+                  }
+                />
+              </View>
+              <View style={styles.formField}>
+                <Text style={styles.label}>
+                  Tag (e.g., Home, Work - Optional):
+                </Text>
+                <TextInput
+                  placeholder="Home, Work, Other"
+                  style={styles.input}
+                  value={addressForm.tag || ''}
+                  onChangeText={value => handleFormInputChange('tag', value)}
+                />
+              </View>
+              {/* Latitude and Longitude are not part of this form directly (would come from map) */}
             </ScrollView>
           )}
         </View>
 
-        {/* --- Bottom Section (Conditional) --- */}
-        {/* Show "Delivering To" card only when NOT adding details */}
+        {/* --- Delivering To Card (Bottom Section) --- */}
         {!isAddingDetails && (
           <View style={[styles.cardBase, styles.deliveringToCard]}>
             <View style={styles.cardHeader}>
-              {/* Ensure card title is wrapped */}
               <Text style={styles.cardTitle}>Delivering to</Text>
               <TouchableOpacity
                 onPress={handleCloseCard}
@@ -220,33 +434,67 @@ const AddressScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
             <View style={styles.addressRow}>
-              {/* Ensure address text is wrapped */}
-              <Text style={styles.addressText}>
-                23, MG Road, Indiranagar, Bengaluru, Karnataka
-              </Text>
-              <TouchableOpacity onPress={() => console.log('Change address')}>
-                {/* Ensure button text is wrapped */}
-                <Text style={styles.changeButtonText}>Change</Text>
-              </TouchableOpacity>
+              {loadingList ? (
+                <ActivityIndicator
+                  size="small"
+                  color={COLORS.textPrimary}
+                  style={{flex: 1}}
+                />
+              ) : deliveringToAddress ? (
+                <Text style={styles.addressText}>
+                  {`${
+                    deliveringToAddress.name
+                      ? deliveringToAddress.name + '\n'
+                      : ''
+                  }`}
+                  {`${deliveringToAddress.addressLine1}`}
+                  {deliveringToAddress.addressLine2
+                    ? `\n${deliveringToAddress.addressLine2}`
+                    : ''}
+                  {`\n${deliveringToAddress.city}, ${deliveringToAddress.state} - ${deliveringToAddress.pincode}`}
+                  {deliveringToAddress.tag
+                    ? ` (${deliveringToAddress.tag})`
+                    : ''}
+                </Text>
+              ) : addressError ? (
+                <Text style={[styles.addressText, {color: 'red'}]}>
+                  {addressError}
+                </Text>
+              ) : (
+                <Text style={styles.addressText}>
+                  No addresses found. Tap below to add.
+                </Text>
+              )}
+              {!loadingList && deliveringToAddress && (
+                <TouchableOpacity
+                  onPress={() => console.log('Change address pressed')}>
+                  <Text style={styles.changeButtonText}>Change</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         )}
 
-        {/* --- Action Button (Text changes based on state) --- */}
+        {/* --- Action Button --- */}
         <TouchableOpacity
           style={styles.actionButton}
-          onPress={handleActionPress}>
-          {/* Ensure button text is wrapped */}
-          <Text style={styles.actionButtonText}>
-            {isAddingDetails ? 'Save Address Details' : 'Add Address Details'}
-          </Text>
+          onPress={handleActionPress}
+          disabled={loadingAdd || (isAddingDetails && loadingList)} // Disable if adding or list is loading when form is open
+        >
+          {loadingAdd ? (
+            <ActivityIndicator color={COLORS.buttonText} size="small" />
+          ) : (
+            <Text style={styles.actionButtonText}>
+              {isAddingDetails ? 'Save Address Details' : 'Add Address Details'}
+            </Text>
+          )}
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
-// --- Styles --- (Copied from previous correct version)
+// --- Styles ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -265,8 +513,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.backgroundPrimary,
   },
   backButton: {
-    padding: 5, // Increase touchable area
-    width: 36, // Helps balance the title centering with the spacer view
+    padding: 5,
+    width: 36,
     alignItems: 'flex-start',
   },
   headerTitle: {
@@ -296,30 +544,27 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   mapContainer: {
-    flex: 1, // Takes up remaining space above the bottom card/button
-    backgroundColor: COLORS.mapPlaceholder, // Background for the area
-    position: 'relative', // Needed for absolute positioning of the form card overlay
+    flex: 1,
+    backgroundColor: COLORS.mapPlaceholder,
+    position: 'relative',
   },
   mapPlaceholder: {
-    // Style for the placeholder View
-    ...StyleSheet.absoluteFillObject, // Make it fill the mapContainer
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.mapPlaceholder, // Can be same or different
+    backgroundColor: COLORS.mapPlaceholder,
   },
   mapPlaceholderText: {
-    // Style for the text inside the placeholder
     color: COLORS.textSecondary,
     fontSize: 16,
   },
   cardBase: {
-    // Common styles for bottom cards
     backgroundColor: COLORS.backgroundSecondary,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderColor: COLORS.border,
     borderWidth: 1,
-    borderBottomWidth: 0, // No bottom border as it blends into the button area
+    borderBottomWidth: 0,
     padding: 15,
   },
   deliveringToCard: {
@@ -327,15 +572,12 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   addressFormCard: {
-    // Specific styles for the Address Form overlay
-    position: 'absolute', // Position it over the mapContainer
-    bottom: 0, // Anchor to the bottom
-    left: 0, // Stretch left
-    right: 0, // Stretch right
-    maxHeight: '70%', // Limit how much screen it takes (adjust as needed)
-    marginHorizontal: 0, // No horizontal margin, spans full width
-    // Inherits common styles from cardBase
-    // Optional: Add elevation/shadow for visual separation
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    maxHeight: '70%',
+    marginHorizontal: 0,
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: -2},
@@ -343,81 +585,70 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   scrollViewContent: {
-    // Style for the content inside the ScrollView
-    paddingBottom: 20, // Add space at the bottom inside the scrollable area
+    paddingBottom: 20,
   },
   cardHeader: {
-    // Style for the header row within cards
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
   },
   cardTitle: {
-    // Style for the title text in cards
     fontSize: 16,
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   closeButton: {
-    // Style for the close icon touchable area
-    padding: 5, // Increase touchable area
+    padding: 5,
   },
   addressRow: {
-    // Style for the row showing the address and 'Change' button
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start', // Align items to top in case text wraps
+    alignItems: 'flex-start',
+    minHeight: 40, // Ensure space for loader or text
   },
   addressText: {
-    // Style for the address text itself
-    flex: 1, // Allow text to take available space and wrap
+    flex: 1,
     fontSize: 14,
     color: COLORS.textPrimary,
     lineHeight: 20,
-    marginRight: 10, // Space before 'Change' button
+    marginRight: 10,
   },
   changeButtonText: {
-    // Style for the 'Change' text button
     fontSize: 14,
     fontWeight: 'bold',
-    color: COLORS.buttonBackground, // Use button color for emphasis
+    color: COLORS.buttonBackground,
   },
   formField: {
-    // Style for each label + input group in the form
     marginBottom: 15,
   },
   label: {
-    // Style for the text labels above inputs
     fontSize: 13,
     color: COLORS.textSecondary,
     marginBottom: 5,
   },
   input: {
-    // Style for the text input fields
-    backgroundColor: COLORS.backgroundPrimary, // Slightly different yellow
+    backgroundColor: COLORS.backgroundPrimary,
     borderRadius: 10,
     borderColor: COLORS.border,
     borderWidth: 1,
     paddingHorizontal: 15,
-    paddingVertical: Platform.OS === 'ios' ? 15 : 12, // Adjust padding for platform consistency
+    paddingVertical: Platform.OS === 'ios' ? 15 : 12,
     fontSize: 15,
     color: COLORS.textPrimary,
-    minHeight: 50, // Ensure a minimum height
+    minHeight: 50,
   },
   actionButton: {
-    // Style for the main bottom action button
     backgroundColor: COLORS.buttonBackground,
     borderRadius: 15,
     paddingVertical: 18,
     marginHorizontal: 15,
-    marginVertical: 10, // Space above/below button
+    marginVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 50, // Ensure a minimum height
+    minHeight: 50,
   },
   actionButtonText: {
-    // Style for the text inside the action button
     color: COLORS.buttonText,
     fontSize: 16,
     fontWeight: 'bold',

@@ -160,7 +160,9 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
               {item.title}
             </Text>
             <View style={styles.priceContainer}>
-              <Text style={styles.originalPrice}>₹{item.productPrice}</Text>
+              {item.productSalePrice < item.productPrice && (
+                <Text style={styles.originalPrice}>₹{item.productPrice}</Text>
+              )}
               <Text style={styles.salePrice}> ₹{item.productSalePrice}</Text>
             </View>
             <View style={styles.buttonContainer}>
@@ -197,8 +199,6 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
       paddingVertical: 6,
     },
     cardContainer: {
-      width: width * 0.3,
-      height: 210,
       marginHorizontal: 10,
       paddingVertical: 5,
       alignItems: 'center',
@@ -228,7 +228,7 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
     },
     cardContent: {
       alignItems: 'center',
-      padding: 8,
+      padding: 4,
     },
     itemName: {
       fontSize: 14,
@@ -241,12 +241,12 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
       ...Platform.select({
         ios: {
           fontFamily: 'System',
-          lineHeight: 20, // Half of container height for perfect centering
+          lineHeight: 15, // Half of container height for perfect centering
         },
         android: {
           fontFamily: 'Roboto',
           includeFontPadding: false,
-          lineHeight: 20,
+          lineHeight: 15,
         },
       }),
     },

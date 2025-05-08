@@ -28,7 +28,7 @@ const {width: screenWidth} = Dimensions.get('window');
 const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
   const navigation = useNavigation<HomeNavigationProp>();
   const [activeIndex, setActiveIndex] = useState<number>(0);
-  const aspectRatio = 6000 / 3456;
+  const aspectRatio = 6000 / 3000;
   const bannerHeight = screenWidth / aspectRatio;
 
   const vendors = useSelector((state: RootState) => state.vendorList.vendors);

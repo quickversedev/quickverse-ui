@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,22 +9,22 @@ import {
   TextInput,
   Platform,
 } from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {fetchVendorList} from '../../services/VendorListSlice';
-import {AppDispatch, RootState} from '../../store/store';
+import { fetchVendorList } from '../../services/VendorListSlice';
+import { AppDispatch, RootState } from '../../store/store';
 import CardItem from '../util/CardItem';
-import {Loading} from '../util/Loading';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from './VendorsNavigator';
-import {useNavigation} from '@react-navigation/native';
-import {getCampus} from '../../utils/Storage';
-import {Vendor} from '../../utils/canonicalModel';
+import { Loading } from '../util/Loading';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from './VendorsNavigator';
+import { useNavigation } from '@react-navigation/native';
+import { getCampus } from '../../utils/Storage';
+import { Vendor } from '../../utils/canonicalModel';
 import theme from '../../theme';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const SPACING: number = 16;
-const ITEM_SIZE: number = (width - SPACING * 3) / 3;
+const ITEM_SIZE: number = width;
 
 type VendorCardsNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -34,7 +34,7 @@ type VendorCardsNavigationProp = StackNavigationProp<
 const VendorCards: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation<VendorCardsNavigationProp>();
-  const {vendors, loading} = useSelector(
+  const { vendors, loading } = useSelector(
     (state: RootState) => state.vendorList,
   );
 
@@ -84,7 +84,7 @@ const VendorCards: React.FC = () => {
   }
 
   const handleCardPress = (vendor: Vendor) => {
-    navigation.navigate('Categories', {vendor});
+    navigation.navigate('Categories', { vendor });
   };
 
   return (
@@ -130,13 +130,15 @@ const VendorCards: React.FC = () => {
             keyExtractor={item => item.vendorId.toString()}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
-            renderItem={({item}) => (
-              <CardItem
-                name={item.vendorName}
-                distance={item.distance}
-                image={{uri: `${item.vendorBanner}.jpg`}}
-                onPress={() => handleCardPress(item)}
-              />
+            renderItem={({ item }) => (
+              <View style={styles.cardWrapper}>
+                <CardItem
+                  name={item.vendorName}
+                  distance={item.distance}
+                  image={{ uri: `${item.vendorBanner}.jpg` }}
+                  onPress={() => handleCardPress(item)}
+                />
+              </View>
             )}
             contentContainerStyle={styles.flatListContent}
           />
@@ -173,8 +175,8 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.5,
         shadowRadius: 4,
         borderWidth: 1,
         borderColor: theme.colors.secondary,
@@ -193,7 +195,7 @@ const styles = StyleSheet.create({
     color: theme.colors.ternary,
     ...Platform.select({
       ios: {
-        marginTop: 2, // Slight vertical adjustment for iOS
+        marginTop: 2,
       },
     }),
   },
@@ -210,7 +212,7 @@ const styles = StyleSheet.create({
       android: {
         paddingVertical: 4,
         fontWeight: 'normal',
-        includeFontPadding: false, // Remove extra padding on Android
+        includeFontPadding: false, 
       },
     }),
   },
@@ -221,11 +223,6 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
     borderRadius: 15,
     backgroundColor: theme.colors.primary,
-    // shadowColor: theme.colors.ternary,
-    // shadowOffset: {width: 0, height: 2},
-    // shadowOpacity: 0.1,
-    // shadowRadius: 4,
-    // elevation: 4,
   },
   categoryTitle: {
     fontSize: 20,
@@ -237,17 +234,23 @@ const styles = StyleSheet.create({
   flatListContent: {
     paddingHorizontal: SPACING / 2,
   },
-  // cardContainer: {
-  //   width: ITEM_SIZE,
-  //   marginRight: SPACING,
-  //   borderRadius: 15,
-  //   backgroundColor: '#fff',
-  //   shadowColor: '#000',
-  //   shadowOffset: {width: 0, height: 2},
-  //   shadowOpacity: 0.1,
-  //   shadowRadius: 4,
-  //   elevation: 3,
-  // },
+  cardWrapper: {
+    width: ITEM_SIZE * 0.35,
+    marginHorizontal: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+        overflow: 'hidden',
+      },
+    }),
+  }
+
 });
 
 export default VendorCards;

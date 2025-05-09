@@ -22,7 +22,7 @@ import {
   addUserAddress,
   ApiAddress,
   ListedAddress,
-} from '../../services/useAddressSlice';
+} from '../../services/userAddressSlice';
 import {useAuth} from '../../utils/AuthContext';
 
 const COLORS = {

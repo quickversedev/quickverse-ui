@@ -4,8 +4,7 @@ import globalConfig from '../utils/GlobalConfig';
 
 // --- Type Definitions ---
 export interface ApiAddress {
-  // The core address object structure
-  id?: string; // Optional for adding, required for listing
+  id?: string;
   name: string;
   addressLine1: string;
   addressLine2?: string | null;
@@ -19,35 +18,29 @@ export interface ApiAddress {
 }
 
 export interface ListedAddress extends Omit<ApiAddress, 'id'> {
-  id: string; // ID from the backend is required
+  id: string;
   isDefaultAddress?: boolean;
 }
 
 export interface AddAddressApiPayload {
-  address: Omit<ApiAddress, 'id'>; // When adding, ID is not sent
+  address: Omit<ApiAddress, 'id'>;
   isDefaultAddress: boolean;
 }
 
-// Type for the common arguments passed to the thunks
 export interface ThunkApiArgs {
   authData: string | undefined; // SessionKey
   vendorId: string;
 }
 
-// Type for specific arguments for the addAddress thunk
 export interface AddAddressThunkArgs extends ThunkApiArgs {
   addressData: Omit<ApiAddress, 'id'>;
   isDefaultAddress: boolean;
 }
 
-// Expected API response for listing addresses
-// IMPORTANT: Adjust this based on your actual API response structure!
 export interface ListAddressesApiResponse {
   addresses: ListedAddress[];
-  // Add other potential fields like pagination cursors if applicable
 }
 
-// Expected API response when adding an address (e.g., the newly created address)
 export type AddAddressApiResponse = ListedAddress;
 // --- End Type Definitions ---
 
@@ -67,14 +60,77 @@ const initialState: AddressState = {
   error: null,
 };
 
+// --- MOCK DATA for fetchUserAddresses ---
+const mockUserAddressesData: ListedAddress[] = [
+  {
+    id: 'mock_addr_001',
+    name: 'John Doe',
+    addressLine1: '123 Main Street',
+    addressLine2: 'Apartment 4B',
+    addressLine3: null,
+    city: 'Anytown',
+    state: 'CA',
+    pincode: '90210',
+    latitude: '34.052235',
+    longitude: '-118.243683',
+    tag: 'Home',
+    isDefaultAddress: true,
+  },
+  {
+    id: 'mock_addr_002',
+    name: 'John Doe',
+    addressLine1: '789 Business Rd',
+    addressLine2: 'Suite 500',
+    addressLine3: 'Office Park',
+    city: 'Workville',
+    state: 'CA',
+    pincode: '90211',
+    latitude: '34.059900',
+    longitude: '-118.259000',
+    tag: 'Work',
+    isDefaultAddress: false,
+  },
+];
+// --- END MOCK DATA ---
+
 // --- Async Thunk for Fetching User Addresses (GET) ---
 export const fetchUserAddresses = createAsyncThunk<
   ListedAddress[], // Expected return type on success
   ThunkApiArgs, // Type of the argument passed to the thunk
   {rejectValue: string} // Type for the payload when rejectWithValue is used
 >(
-  'addresses/fetchUserAddresses',
+  'userAddresses/fetchUserAddresses',
   async ({authData, vendorId}, {rejectWithValue}) => {
+    // --- START MOCK IMPLEMENTATION ---
+    console.log('MOCK fetchUserAddresses called with:', {authData, vendorId});
+
+    return new Promise<ListedAddress[]>((resolve, reject) => {
+      setTimeout(() => {
+        if (!authData) {
+          console.warn(
+            'MOCK: Authentication key is missing for fetchUserAddresses.',
+          );
+          reject(rejectWithValue('Authentication key is missing.'));
+          return;
+        }
+        if (!vendorId) {
+          console.warn('MOCK: Vendor ID is missing for fetchUserAddresses.');
+          reject(rejectWithValue('Vendor ID is missing.'));
+          return;
+        }
+        // Simulate success
+        console.log('MOCK: Successfully returning mock addresses.');
+        resolve(mockUserAddressesData);
+
+        // To simulate an error:
+        // console.log('MOCK: Simulating fetch error for addresses.');
+        // reject(rejectWithValue('Mocked: Failed to fetch user addresses.'));
+      }, 1000); // 1-second delay
+    });
+    // --- END MOCK IMPLEMENTATION ---
+
+    // --- REAL API Call (Commented out for mocking) ---
+    /*
     if (!authData) {
       return rejectWithValue('Authentication key is missing.');
     }
@@ -84,20 +140,17 @@ export const fetchUserAddresses = createAsyncThunk<
 
     try {
       const response = await axios.get<ListAddressesApiResponse>(
-        `${globalConfig.apiBaseUrl}/v2/listAddresses`,
+        `${globalConfig.apiBaseUrl}/quickVerse/v2/listAddresses`, // Added /quickVerse/ if needed
         {
           params: {
             vendorId: vendorId,
           },
           headers: {
             SessionKey: authData,
-            // 'Content-Type': 'application/json' // Generally not needed for GET
           },
         },
       );
 
-      // Assuming the actual list of addresses is nested under an 'addresses' key
-      // Adjust if your API returns the array directly or differently
       if (response.data && Array.isArray(response.data.addresses)) {
         return response.data.addresses;
       } else {
@@ -111,7 +164,7 @@ export const fetchUserAddresses = createAsyncThunk<
       }
     } catch (error: any) {
       console.error(
-        'fetchUserAddresses Errorrr:',
+        'fetchUserAddresses Error:', // Corrected typo from Errorrr
         error.response?.data || error.message,
       );
       const message =
@@ -120,16 +173,18 @@ export const fetchUserAddresses = createAsyncThunk<
         'Failed to fetch user addresses.';
       return rejectWithValue(message);
     }
+    */
+    // --- END REAL API Call ---
   },
 );
 
 // --- Async Thunk for Adding a User Address (POST) ---
 export const addUserAddress = createAsyncThunk<
-  ListedAddress, // Expected return type on success (e.g., the newly created address)
-  AddAddressThunkArgs, // Type of the argument passed to the thunk
-  {rejectValue: string} // Type for the payload when rejectWithValue is used
+  ListedAddress,
+  AddAddressThunkArgs,
+  {rejectValue: string}
 >(
-  'addresses/addUserAddress',
+  'userAddresses/addUserAddress', // Corrected prefix
   async (
     {authData, vendorId, addressData, isDefaultAddress},
     {rejectWithValue},
@@ -146,21 +201,49 @@ export const addUserAddress = createAsyncThunk<
       isDefaultAddress: isDefaultAddress,
     };
 
+    // --- MOCK ADD USER ADDRESS (Optional, but good for consistent testing) ---
+    console.log(
+      'MOCK addUserAddress called with payload:',
+      payload,
+      'and vendorId:',
+      vendorId,
+    );
+    return new Promise<ListedAddress>((resolve, reject) => {
+      setTimeout(() => {
+        const newMockAddress: ListedAddress = {
+          ...addressData,
+          id: `mock_id_${Date.now()}`, // Generate a unique mock ID
+          isDefaultAddress: isDefaultAddress,
+        };
+        console.log(
+          'MOCK: Successfully returning newly added mock address:',
+          newMockAddress,
+        );
+        resolve(newMockAddress);
+
+        // To simulate an error for adding:
+        // console.log('MOCK: Simulating add error for address.');
+        // reject(rejectWithValue('Mocked: Failed to add user address.'));
+      }, 1000); // 1-second delay
+    });
+    // --- END MOCK ADD USER ADDRESS ---
+
+    // --- REAL API Call (Commented out for mocking) ---
+    /*
     try {
       const response = await axios.post<AddAddressApiResponse>(
-        `${globalConfig.apiBaseUrl}/v2/addAddress`,
-        payload, // Request body
+        `${globalConfig.apiBaseUrl}/quickVerse/v2/addAddress`, // Added /quickVerse/ if needed
+        payload,
         {
           params: {
             vendorId: vendorId,
           },
           headers: {
             SessionKey: authData,
-            'Content-Type': 'application/json', // Important for POST with JSON body
+            'Content-Type': 'application/json',
           },
         },
       );
-      // Assuming the API returns the newly created address object directly
       return response.data;
     } catch (error: any) {
       console.error(
@@ -173,6 +256,8 @@ export const addUserAddress = createAsyncThunk<
         'Failed to add user address.';
       return rejectWithValue(message);
     }
+    */
+    // --- END REAL API Call ---
   },
 );
 
@@ -181,31 +266,24 @@ const userAddressesSlice = createSlice({
   name: 'userAddresses',
   initialState,
   reducers: {
-    // Synchronous reducers can be added here if needed
-    // e.g., to clear an error manually:
-    // clearAddressError: (state) => {
-    //   state.error = null;
-    // }
+    // clearAddressError: (state) => { state.error = null; }
   },
   extraReducers: builder => {
     builder
-      // Cases for fetchUserAddresses
       .addCase(fetchUserAddresses.pending, state => {
         state.loadingList = true;
         state.error = null;
       })
       .addCase(fetchUserAddresses.fulfilled, (state, action) => {
         state.loadingList = false;
-        state.addresses = action.payload; // Replace existing addresses
+        state.addresses = action.payload;
         state.error = null;
       })
       .addCase(fetchUserAddresses.rejected, (state, action) => {
         state.loadingList = false;
         state.error = action.payload ?? 'Unknown error fetching addresses.';
-        state.addresses = []; // Clear addresses on error
+        state.addresses = [];
       })
-
-      // Cases for addUserAddress
       .addCase(addUserAddress.pending, state => {
         state.loadingAdd = true;
         state.error = null;
@@ -221,8 +299,5 @@ const userAddressesSlice = createSlice({
       });
   },
 });
-
-// Export actions if you add synchronous reducers
-// export const { clearAddressError } = userAddressesSlice.actions;
 
 export default userAddressesSlice.reducer;

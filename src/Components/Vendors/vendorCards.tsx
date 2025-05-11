@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -8,21 +8,22 @@ import {
   FlatList,
   TextInput,
   Platform,
+  RefreshControl,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { fetchVendorList } from '../../services/VendorListSlice';
-import { AppDispatch, RootState } from '../../store/store';
+import {fetchVendorList} from '../../services/VendorListSlice';
+import {AppDispatch, RootState} from '../../store/store';
 import CardItem from '../util/CardItem';
-import { Loading } from '../util/Loading';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from './VendorsNavigator';
-import { useNavigation } from '@react-navigation/native';
-import { getCampus } from '../../utils/Storage';
-import { Vendor } from '../../utils/canonicalModel';
+import {Loading} from '../util/Loading';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from './VendorsNavigator';
+import {useNavigation} from '@react-navigation/native';
+import {getCampus} from '../../utils/Storage';
+import {Vendor} from '../../utils/canonicalModel';
 import theme from '../../theme';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 const SPACING: number = 16;
 const ITEM_SIZE: number = width;
 
@@ -34,15 +35,34 @@ type VendorCardsNavigationProp = StackNavigationProp<
 const VendorCards: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation<VendorCardsNavigationProp>();
-  const { vendors, loading } = useSelector(
+  const {vendors, loading} = useSelector(
     (state: RootState) => state.vendorList,
   );
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false); // Add this state
 
   useEffect(() => {
     const campus = getCampus();
     campus && dispatch(fetchVendorList(campus));
+  }, [dispatch]);
+  // Add this function for refresh handling
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const campus = getCampus();
+      if (campus) {
+        await dispatch(fetchVendorList(campus));
+      }
+    } catch (error) {
+      console.error('Error refreshing vendors:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    handleRefresh(); // Initial load (you could keep your original useEffect if preferred)
   }, [dispatch]);
 
   const groupedVendors = useMemo(() => {
@@ -84,13 +104,22 @@ const VendorCards: React.FC = () => {
   }
 
   const handleCardPress = (vendor: Vendor) => {
-    navigation.navigate('Categories', { vendor });
+    navigation.navigate('Categories', {vendor});
   };
 
   return (
     <ScrollView
       contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}>
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          colors={[theme.colors.secondary]} // Customize the loading indicator color
+          tintColor={theme.colors.secondary} // iOS only
+          progressBackgroundColor={theme.colors.primary} // Android only
+        />
+      }>
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <MaterialCommunityIcons
@@ -130,12 +159,12 @@ const VendorCards: React.FC = () => {
             keyExtractor={item => item.vendorId.toString()}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
+            renderItem={({item}) => (
               <View style={styles.cardWrapper}>
                 <CardItem
                   name={item.vendorName}
                   distance={item.distance}
-                  image={{ uri: `${item.vendorBanner}.jpg` }}
+                  image={{uri: `${item.vendorBanner}.jpg`}}
                   onPress={() => handleCardPress(item)}
                 />
               </View>
@@ -175,7 +204,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.5,
         shadowRadius: 4,
         borderWidth: 1,
@@ -212,7 +241,7 @@ const styles = StyleSheet.create({
       android: {
         paddingVertical: 4,
         fontWeight: 'normal',
-        includeFontPadding: false, 
+        includeFontPadding: false,
       },
     }),
   },
@@ -240,7 +269,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,
         shadowRadius: 4,
       },
@@ -249,8 +278,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
       },
     }),
-  }
-
+  },
 });
 
 export default VendorCards;

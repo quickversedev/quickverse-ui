@@ -13,6 +13,7 @@ import {
   Alert,
   PermissionsAndroid,
   Linking,
+  RefreshControl,
 } from 'react-native';
 import theme from '../../theme';
 import HomeScreenVendors from './homeVendors/HomeScreenVendors';
@@ -39,6 +40,7 @@ const HomeScreen: React.FC = () => {
   const [clicked, setClicked] = useState(false);
   const [loading, setLoading] = useState(false); // Proper loading state
   const [searchText, setSearchText] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
   const isFirstTimeLogin = getIsNewUser();
   const {selectedCampus} = useAuth();
   const animationValue = useRef(new Animated.Value(1000)).current;
@@ -191,6 +193,18 @@ const HomeScreen: React.FC = () => {
     selectedCampus && setSelectedCampusId(selectedCampus);
   }, [selectedCampus]);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      // Call all the functions you want to refresh
+      await fetchCampus();
+      // You might want to add other data refresh calls here
+    } catch (error) {
+      console.error('Error during refresh:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
@@ -301,7 +315,16 @@ const HomeScreen: React.FC = () => {
         </View>
 
         {isFirstTimeLogin && <LoginDetails />}
-        <ScrollView style={styles.scrollView}>
+        <ScrollView
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.secondary]} // Customize as needed
+              tintColor={theme.colors.secondary} // Customize as needed
+            />
+          }>
           <PromoDiscounts campus={selectedCampusId} />
           <FeaturedItems campus={selectedCampusId} />
           <HomeScreenVendors campus={selectedCampusId} />

@@ -1343,19 +1343,7 @@ PODS:
     - React-Core
   - RNCPicker (2.9.0):
     - React-Core
-  - RNDateTimePicker (8.2.0):
-    - React-Core
-  - RNDeviceInfo (14.0.4):
-    - React-Core
-  - RNFBApp (21.12.0):
-    - Firebase/CoreOnly (= 11.8.0)
-    - React-Core
-  - RNFBMessaging (21.12.0):
-    - Firebase/Messaging (= 11.8.0)
-    - FirebaseCoreExtension
-    - React-Core
-    - RNFBApp
-  - RNGestureHandler (2.24.0):
+  - RNGestureHandler (2.16.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1397,101 +1385,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNNotifee (9.1.8):
-    - React-Core
-    - RNNotifee/NotifeeCore (= 9.1.8)
-  - RNNotifee/NotifeeCore (9.1.8):
-    - React-Core
-  - RNPermissions (5.3.0):
-    - React-Core
-  - RNReanimated (3.16.1):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.01.01.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Codegen
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 3.16.1)
-    - RNReanimated/worklets (= 3.16.1)
-    - Yoga
-  - RNReanimated/reanimated (3.16.1):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.01.01.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Codegen
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 3.16.1)
-    - Yoga
-  - RNReanimated/reanimated/apple (3.16.1):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.01.01.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Codegen
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - Yoga
-  - RNReanimated/worklets (3.16.1):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.01.01.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Codegen
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - Yoga
-  - RNScreens (3.35.0):
+  - RNScreens (3.31.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1605,14 +1499,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCCheckbox (from `../node_modules/@react-native-community/checkbox`)"
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
-  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
-  - RNDeviceInfo (from `../node_modules/react-native-device-info`)
-  - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
-  - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
-  - RNKeychain (from `../node_modules/react-native-keychain`)
-  - "RNNotifee (from `../node_modules/@notifee/react-native`)"
-  - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -1761,22 +1648,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/checkbox"
   RNCPicker:
     :path: "../node_modules/@react-native-picker/picker"
-  RNDateTimePicker:
-    :path: "../node_modules/@react-native-community/datetimepicker"
-  RNDeviceInfo:
-    :path: "../node_modules/react-native-device-info"
-  RNFBApp:
-    :path: "../node_modules/@react-native-firebase/app"
-  RNFBMessaging:
-    :path: "../node_modules/@react-native-firebase/messaging"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
-  RNKeychain:
-    :path: "../node_modules/react-native-keychain"
-  RNNotifee:
-    :path: "../node_modules/@notifee/react-native"
-  RNPermissions:
-    :path: "../node_modules/react-native-permissions"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -1862,21 +1735,14 @@ SPEC CHECKSUMS:
   React-utils: 3285151c9d1e3a28a9586571fc81d521678c196d
   ReactCommon: f42444e384d82ab89184aed5d6f3142748b54768
   RNCCheckbox: a3ca9978cb0846b981d28da4e9914bd437403d77
-  RNCPicker: f963e01f78e546a93b98aa201501713dbda14e94
-  RNDateTimePicker: 40ffda97d071a98a10fdca4fa97e3977102ccd14
-  RNDeviceInfo: feea80a690d2bde1fe51461cf548039258bd03f2
-  RNFBApp: 7cf039683867cbf8514bc3aafd756e6c5fb18898
-  RNFBMessaging: bacd21eaeee19974b39972e65540f12322d098fe
-  RNGestureHandler: 4d82e79c24b18e83040ed9d6f1a178267c5c6aa8
-  RNKeychain: 95a325506750dd120c71fbf9ba5de01c36294ba5
-  RNNotifee: 4a6ee5c7deaf00e005050052d73ee6315dff7ec9
-  RNPermissions: 8bccf82d4caa70a90ca6cf7f419c75f8c8c725c9
-  RNReanimated: af4e059a8fd0fb7a9cdf5ad35ead4699598a9447
-  RNScreens: 6b641f232990a9d505a6d139fd18c3c759c9d290
-  RNVectorIcons: 845eda5c7819bd29699cafd0fc98c9d4afe28c96
+  RNCPicker: b7873ba797dc586bfaf3307d737cbdc620a9ff3e
+  RNGestureHandler: 2282cfbcf86c360d29f44ace393203afd5c6cff7
+  RNReanimated: 8978449b2a511388ea71faf1e66f669134e87658
+  RNScreens: b32a9ff15bea7fcdbe5dff6477bc503f792b1208
+  RNVectorIcons: 2a2f79274248390b80684ea3c4400bd374a15c90
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: b9a182ab00cf25926e7f79657d08c5d23c2d03b0
 
-PODFILE CHECKSUM: 7a681f9cc0fcdea6dc303568005d316c2f9cf157
+PODFILE CHECKSUM: 247bd55779520dda55e70fad92bc3c92e092aa93
 
 COCOAPODS: 1.16.2

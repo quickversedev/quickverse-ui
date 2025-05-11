@@ -47,6 +47,7 @@
 		B73F2CEE001CBCA53F1287D0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = quickverse/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		DBF420C1E11A6991B0EA59A8 /* Pods-QuickVerse.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuickVerse.release.xcconfig"; path = "Target Support Files/Pods-QuickVerse/Pods-QuickVerse.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F45752A2FBF1E439596375A9 /* libPods-QuickVerse-quickverseTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-QuickVerse-quickverseTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

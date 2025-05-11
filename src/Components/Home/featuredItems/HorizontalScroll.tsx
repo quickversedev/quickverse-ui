@@ -204,6 +204,8 @@ const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
       alignItems: 'center',
     },
     card: {
+      width: width * 0.3,
+      height: 200,
       borderRadius: 15,
       borderWidth: 1,
       borderColor: '#ffb632',

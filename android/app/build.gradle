@@ -84,7 +84,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 20
-        versionName "2.0.1-snapshot"
+        versionName "2.0.0"
     }
     signingConfigs {
         debug {

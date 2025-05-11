@@ -1,177 +1,390 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   StyleSheet,
-  Animated,
   FlatList,
   Dimensions,
   TouchableOpacity,
+  Alert,
+  Platform,
 } from 'react-native';
 import {Card, Text} from 'react-native-paper';
-const {width} = Dimensions.get('window');
-import {FoodItem} from '../../../utils/canonicalModel';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  addToCart,
+  clearFromCart,
+  decrementQuantity,
+  incrementQuantity,
+  selectCart,
+} from '../../../services/cart/productCartSlice';
 import theme from '../../../theme';
-import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamListHome} from '../HomeNavigation';
+import CustomConfirmationModal from '../../Cart/CustomConfirmationModal';
+import {Product, ProductCartItems} from '../../../utils/canonicalModel';
+import {AppDispatch} from '../../../store/store';
+import {useAuth} from '../../../utils/AuthContext';
+import {debounce} from 'lodash';
+import {setSkipLoginFlow} from '../../../utils/Storage';
 
-const SPACING: any = 10;
-const ITEM_SIZE: any = width * 0.5;
-const EMPTY_ITEM_SIZE: any = (width - ITEM_SIZE) / 2;
-
-type HomeNavigationProp = StackNavigationProp<
-  RootStackParamListHome,
-  'WebView'
->;
+const {width} = Dimensions.get('window');
 
 interface Props {
-  featuredItems: FoodItem[];
+  featuredItems: Product[];
 }
 
 const HorizontalScroll: React.FC<Props> = ({featuredItems}) => {
-  const navigation = useNavigation<HomeNavigationProp>();
-
-  const handleCardPress = (url: string | undefined) => {
-    url && navigation.navigate('WebView', {url});
+  const dispatch = useDispatch<AppDispatch>();
+  const {authData, setSkipLogin} = useAuth();
+  const cartItems = useSelector(selectCart);
+  const inStock = featuredItems.filter(item => item.availability);
+  const handleClick = () => {
+    if (!authData) {
+      setSkipLogin(false);
+      setSkipLoginFlow(false);
+    }
   };
-  const scrollx = React.useRef(new Animated.Value(0)).current;
-  const flatListRef = React.useRef<FlatList<FoodItem>>(null);
 
-  const food = [
-    {itemId: 'empty-left'},
-    ...featuredItems,
-    {itemId: 'empty-right'},
-  ];
+  const cart = useSelector(selectCart);
+  const handleAddToCart = debounce((product: ProductCartItems) => {
+    if (!authData) {
+      Alert.alert(
+        'Login Required',
+        'Please log in to add products to your cart.',
+        [
+          {text: 'Cancel', style: 'cancel'},
+          {text: 'Login', onPress: () => handleClick()},
+        ],
+      );
+      return;
+    }
+
+    if (cart.length > 0 && cart[0].vendorId !== product.vendorId) {
+      setProductToAdd(product);
+      setConfirmationModalVisible(true);
+    } else {
+      dispatch(
+        addToCart(
+          {
+            id: product.id,
+            name: product.name,
+            productPrice: product.productPrice,
+            salePrice: product.salePrice,
+            quantity: 1,
+            image: product.image,
+            vendorId: product.vendorId,
+          },
+          authData,
+        ),
+      );
+    }
+  }, 300);
+  const [isConfirmationModalVisible, setConfirmationModalVisible] =
+    useState(false);
+  const [productToAdd, setProductToAdd] = useState<ProductCartItems | null>(
+    null,
+  );
+  const handleConfirmAddToCart = () => {
+    if (productToAdd) {
+      if (authData) {
+        dispatch(clearFromCart(authData));
+        dispatch(
+          addToCart(
+            {
+              id: productToAdd.id,
+              name: productToAdd.name,
+              productPrice: productToAdd.productPrice,
+              salePrice: productToAdd.salePrice,
+              quantity: 1,
+              image: productToAdd.image,
+              vendorId: productToAdd.vendorId,
+            },
+            authData,
+          ),
+        );
+      }
+      setConfirmationModalVisible(false);
+      setProductToAdd(null);
+    }
+  };
+  const handleCancelAddToCart = () => {
+    setConfirmationModalVisible(false);
+    setProductToAdd(null);
+  };
+  const handleIncrement = (itemId: string) => {
+    if (authData) {
+      dispatch(incrementQuantity(itemId, authData));
+    }
+  };
+
+  const handleDecrement = (itemId: string) => {
+    if (authData) {
+      dispatch(decrementQuantity(itemId, authData));
+    }
+  };
+
+  const renderItem = ({item}: {item: Product}) => {
+    const cartItem = cartItems.find(cartItem => cartItem.id === item.productId);
+    const quantity = cartItem ? cartItem.quantity : 0;
+
+    const discountPercentage = Math.round(
+      ((Number(item.productPrice) - Number(item.productSalePrice)) /
+        Number(item.productPrice)) *
+        100,
+    );
+    const product: ProductCartItems = {
+      id: item.productId,
+      name: item.title,
+      productPrice: item.productPrice,
+      salePrice: item.productSalePrice,
+      quantity: 1,
+      image: item.productImageLink,
+      vendorId: item.vendorId,
+    };
+    return (
+      <View style={styles.cardContainer}>
+        <Card style={styles.card}>
+          <View style={styles.imageContainer}>
+            <Card.Cover
+              source={{uri: `${item.productImageLink}`}}
+              style={styles.image}
+            />
+            {discountPercentage > 0 && (
+              <View style={styles.discountBadge}>
+                <Text style={styles.discountText}>
+                  {discountPercentage}% OFF
+                </Text>
+              </View>
+            )}
+          </View>
+          <Card.Content style={styles.cardContent}>
+            <Text style={styles.itemName} numberOfLines={2}>
+              {item.title}
+            </Text>
+            <View style={styles.priceContainer}>
+              {item.productSalePrice < item.productPrice && (
+                <Text style={styles.originalPrice}>₹{item.productPrice}</Text>
+              )}
+              <Text style={styles.salePrice}> ₹{item.productSalePrice}</Text>
+            </View>
+            <View style={styles.buttonContainer}>
+              {quantity === 0 ? (
+                <TouchableOpacity
+                  style={styles.addButton}
+                  onPress={() => handleAddToCart(product)}>
+                  <Text style={styles.addButtonText}>Order Now</Text>
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.quantityContainer}>
+                  <TouchableOpacity
+                    style={styles.quantityButton}
+                    onPress={() => handleDecrement(item.productId)}>
+                    <Text style={styles.quantityButtonText}>-</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.quantityText}>{quantity}</Text>
+                  <TouchableOpacity
+                    style={styles.quantityButton}
+                    onPress={() => handleIncrement(item.productId)}>
+                    <Text style={styles.quantityButtonText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          </Card.Content>
+        </Card>
+      </View>
+    );
+  };
+
+  const styles = StyleSheet.create({
+    container: {
+      paddingVertical: 6,
+    },
+    cardContainer: {
+      marginHorizontal: 10,
+      paddingVertical: 5,
+      alignItems: 'center',
+    },
+    card: {
+      width: width * 0.3,
+      height: 200,
+      borderRadius: 15,
+      borderWidth: 1,
+      borderColor: '#ffb632',
+      backgroundColor: '#FFEA98',
+      ...Platform.select({
+        ios: {
+          shadowColor: '#000',
+          shadowOffset: {width: 0, height: 2},
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
+        },
+        android: {
+          elevation: 3,
+        },
+      }),
+    },
+    image: {
+      height: 100,
+      width: '100%',
+      borderTopLeftRadius: 14,
+      borderTopRightRadius: 14,
+    },
+    cardContent: {
+      alignItems: 'center',
+      padding: 4,
+    },
+    itemName: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      height: 40, // Fixed height for container
+      // Vertical centering solution:
+      justifyContent: 'center', // For the text container
+      textAlignVertical: 'center', // For the text itself
+      ...Platform.select({
+        ios: {
+          fontFamily: 'System',
+          lineHeight: 15, // Half of container height for perfect centering
+        },
+        android: {
+          fontFamily: 'Roboto',
+          includeFontPadding: false,
+          lineHeight: 15,
+        },
+      }),
+    },
+
+    buttonContainer: {
+      marginTop: 2,
+      width: '100%',
+    },
+    addButton: {
+      paddingVertical: 6,
+      paddingHorizontal: 10,
+      backgroundColor: '#8B0000',
+      borderRadius: 15,
+      alignItems: 'center',
+      ...Platform.select({
+        android: {
+          elevation: 2,
+        },
+      }),
+    },
+    addButtonText: {
+      color: '#FFFFFF',
+      fontWeight: 'bold',
+      fontSize: 10,
+      ...Platform.select({
+        ios: {
+          fontFamily: 'System',
+        },
+        android: {
+          fontFamily: 'Roboto',
+          includeFontPadding: false,
+        },
+      }),
+    },
+    quantityContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+    },
+    quantityButton: {
+      paddingVertical: 2,
+      paddingHorizontal: 15,
+      backgroundColor: '#8B0000',
+      borderRadius: 15,
+      ...Platform.select({
+        android: {
+          elevation: 2,
+        },
+      }),
+    },
+    quantityButtonText: {
+      color: '#FFFFFF',
+      fontWeight: 'bold',
+      fontSize: 14,
+      textAlign: 'center',
+      ...Platform.select({
+        android: {
+          textAlignVertical: 'center',
+        },
+      }),
+    },
+    quantityText: {
+      marginHorizontal: 8,
+      fontSize: 14,
+      fontWeight: 'bold',
+    },
+    priceContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginBottom: 4,
+      width: '100%',
+    },
+    originalPrice: {
+      textDecorationLine: 'line-through',
+      color: 'gray',
+      fontSize: 10,
+      marginRight: 8,
+    },
+    salePrice: {
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: theme.colors.ternary,
+    },
+    imageContainer: {
+      position: 'relative',
+    },
+    discountBadge: {
+      position: 'absolute',
+      top: 8,
+      left: 8,
+      backgroundColor: 'red',
+      paddingVertical: 2,
+      paddingHorizontal: 6,
+      borderRadius: 15,
+      ...Platform.select({
+        ios: {
+          shadowColor: '#000',
+          shadowOffset: {width: 0, height: 1},
+          shadowOpacity: 0.3,
+          shadowRadius: 1,
+        },
+        android: {
+          elevation: 2,
+        },
+      }),
+    },
+    discountText: {
+      color: 'white',
+      fontSize: 10,
+      fontWeight: 'bold',
+      ...Platform.select({
+        android: {
+          includeFontPadding: false,
+        },
+      }),
+    },
+  });
 
   return (
     <View style={styles.container}>
-      <Animated.FlatList
-        ref={flatListRef}
-        showsHorizontalScrollIndicator={false}
-        data={food}
-        keyExtractor={(item, index) => {
-          return index.toString();
-        }}
+      <FlatList
+        data={inStock}
+        keyExtractor={(item, index) => index.toString()}
         horizontal
-        contentContainerStyle={{alignItems: 'center'}}
-        snapToInterval={ITEM_SIZE + SPACING * 2} // Adjusted spacing
-        decelerationRate={0.98}
-        snapToAlignment="start"
-        bounces={false}
-        onScroll={Animated.event(
-          [{nativeEvent: {contentOffset: {x: scrollx}}}],
-          {useNativeDriver: false},
-        )}
-        scrollEventThrottle={16}
-        renderItem={({item, index}) => {
-          if (!item.itemImage) {
-            return <View style={{width: EMPTY_ITEM_SIZE}} />;
-          }
-          const inputRange = [
-            (index - 2) * ITEM_SIZE,
-            (index - 1) * ITEM_SIZE,
-            index * ITEM_SIZE,
-          ];
-          const translateY = scrollx.interpolate({
-            inputRange,
-            outputRange: [0, -40, 0],
-            extrapolate: 'clamp',
-          });
-
-          return (
-            <View key={index} style={{width: ITEM_SIZE, marginBottom: 30}}>
-              <Animated.View
-                style={{
-                  marginHorizontal: SPACING,
-                  padding: SPACING,
-                  alignItems: 'center',
-                  transform: [{translateY}, {translateY: 40}], // Added constant shift down
-                  borderRadius: 20, // Rounded rectangle
-                  backgroundColor: '#FFE474', // Yellow background
-                  paddingBottom: 20,
-                  ...styles.elevatedCard, // Apply the elevation styles
-                }}>
-                <TouchableOpacity
-                  onPress={() => handleCardPress(item.itemLink)}>
-                  <View style={styles.cardContainer}>
-                    <View style={styles.imageContainer}>
-                      <Card.Cover
-                        source={{uri: `${item.itemImage}.jpg`}}
-                        style={styles.posterImage}
-                      />
-                    </View>
-                    <Text style={styles.itemName} numberOfLines={1}>
-                      {item.itemName}
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.orderButton}
-                      onPress={() => handleCardPress(item.itemLink)}>
-                      <Text style={styles.buttonText}>Order Now</Text>
-                    </TouchableOpacity>
-                  </View>
-                </TouchableOpacity>
-              </Animated.View>
-            </View>
-          );
-        }}
+        showsHorizontalScrollIndicator={false}
+        renderItem={renderItem}
+        contentContainerStyle={{paddingHorizontal: 4}}
+      />
+      <CustomConfirmationModal
+        isVisible={isConfirmationModalVisible}
+        onConfirm={handleConfirmAddToCart}
+        onCancel={handleCancelAddToCart}
       />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    display: 'flex',
-    paddingTop: 10,
-    paddingBottom: 10,
-    justifyContent: 'flex-start',
-  },
-  cardContainer: {
-    alignItems: 'center',
-    borderRadius: 20, // Ensures the entire card is rounded
-    overflow: 'hidden',
-  },
-  imageContainer: {
-    width: ITEM_SIZE * 0.6, // Adjust this size for the circle
-    height: ITEM_SIZE * 0.5, // Equal height and width to make it a circle
-    borderRadius: ITEM_SIZE * 0.25, // This makes the image circular
-    overflow: 'hidden',
-    marginBottom: 10, // Spacing below the image
-    // padding:10,
-    // backgroundColor: '#FFF', // Optional background color for the gap
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  posterImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: ITEM_SIZE * 0.25, // Ensures the image itself is also circular
-  },
-  elevatedCard: {
-    shadowColor: '#000', // Black shadow color
-    shadowOffset: {width: 0, height: 4}, // Offset for iOS
-    shadowOpacity: 0.3, // Opacity for iOS
-    shadowRadius: 6, // Shadow blur radius for iOS
-    elevation: 6, //
-  },
-  itemName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1A3C40', // Darker greenish color for the text
-    marginBottom: 10,
-  },
-  orderButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    backgroundColor: '#8B0000', // Dark red background for the button
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#FFFFFF', // White text for the button
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-});
 
 export default HorizontalScroll;

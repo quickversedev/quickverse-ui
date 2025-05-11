@@ -1,77 +1,113 @@
-// src/components/CardItem.tsx
 import React from 'react';
 import {
   StyleSheet,
   Text,
   Dimensions,
+  Image,
   TouchableOpacity,
-  ImageSourcePropType,
   View,
+  Platform,
 } from 'react-native';
-import {Card} from 'react-native-paper';
 import theme from '../../theme';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 const {width} = Dimensions.get('window');
 
+interface ImageSource {
+  uri?: string;
+}
 interface CardItemProps {
   name?: string;
   distance?: string;
-  image: ImageSourcePropType;
+  image?: ImageSource;
   onPress: () => void;
 }
-const ITEM_SIZE: any = width * 0.76;
-const SPACING: any = 4;
-const CardItem: React.FC<CardItemProps> = ({
-  name,
-  distance,
-  image,
-  onPress,
-}) => {
+
+const ITEM_SIZE = width * 0.76;
+
+const CardItem: React.FC<CardItemProps> = ({name, image, onPress}) => {
+  const imageSource = React.useMemo(() => {
+    if (image && typeof image === 'object' && 'uri' in image) {
+      const modifiedUri = (image.uri as string)?.replace(
+        'https://imgur.com/',
+        'https://i.imgur.com/',
+      );
+      return modifiedUri ? {uri: modifiedUri} : undefined;
+    }
+    return image;
+  }, [image]);
+
   return (
-    <TouchableOpacity onPress={onPress} style={styles.card}>
-      <Card.Cover source={image} style={styles.posterImage} />
-      <Card.Content style={{alignItems: 'center'}}>
-        <Text style={styles.title} numberOfLines={2}>
-          {name}
-        </Text>
-        {distance && (
-          <View style={styles.distanceContainer}>
-            <MaterialCommunityIcons
-              name="timer-outline"
-              size={20}
-              color={theme.colors.secondary}
-              style={styles.icon}
-            />
-            <Text style={styles.distance} numberOfLines={1}>
-              {distance}
-            </Text>
-          </View>
-        )}
-      </Card.Content>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+      <View style={styles.card}>
+        <Image source={imageSource} style={styles.image} />
+        <Text style={styles.nameText}>{name}</Text>
+      </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    flex: 1,
-    marginHorizontal: SPACING,
-    padding: SPACING * 2,
+    overflow: 'hidden',
+    width: ITEM_SIZE * 0.4,
+    height: ITEM_SIZE * 0.6,
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    borderRadius: 34,
+    borderRadius: 12,
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.secondary,
+    marginTop: 10,
+    marginBottom: 22,
+    marginRight: 12,
+    marginLeft: 8,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 4},
+        shadowOpacity: 0.25,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 12,
+      },
+    }),
   },
-  posterImage: {
+  image: {
     width: '100%',
-    height: ITEM_SIZE * 0.8,
-    resizeMode: 'cover',
-    borderRadius: 24,
-    marginBottom: 10,
+    height: '70%',
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    marginBottom: 5,
+    ...Platform.select({
+      ios: {
+        resizeMode: 'cover', // Better for iOS performance
+      },
+      android: {
+        objectFit: 'fill',
+      },
+    }),
   },
-  title: {
-    fontSize: 18,
+  nameText: {
     textAlign: 'center',
-    color: theme.colors.ternary,
-    fontWeight: 'bold',
+    // marginBottom: 5,
+    color: theme.colors.secondary,
+    ...Platform.select({
+      ios: {
+        fontSize: 15,
+        fontWeight: '500', // Medium weight works better on iOS
+        fontFamily: 'System', // Default iOS font
+      },
+      android: {
+        fontSize: 14,
+      },
+    }),
+  },
+  // Additional styles kept for reference
+  posterImage: {
+    width: '90%',
+    height: ITEM_SIZE * 0.5,
+    resizeMode: 'cover',
+    borderRadius: 15,
+    marginBottom: 10,
   },
   distance: {
     fontSize: 14,

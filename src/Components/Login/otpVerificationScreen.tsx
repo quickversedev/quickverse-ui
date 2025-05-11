@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import theme from '../../theme';
@@ -51,6 +52,7 @@ const Timer: React.FC<{
 const OtpVerificationScreen: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [error, setError] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [timerKey, setTimerKey] = useState<number>(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
   const inputRefs = useRef<(TextInput | null)[]>([]);
@@ -87,7 +89,6 @@ const OtpVerificationScreen: React.FC = () => {
   //   }
   // };
   const handleKeyPress = (index: number, key: string) => {
-    console.log('back', key);
     if (key === 'Backspace') {
       const newOtp = [...otp];
 
@@ -104,17 +105,26 @@ const OtpVerificationScreen: React.FC = () => {
 
   const handleLoginPress = async () => {
     const finalOtp = otp.join('');
-    await auth.verifyOtp(phoneNumber, finalOtp, otpVerificationId).catch(() => {
-      setError(true);
-    });
+    setLoading(true);
+    await auth
+      .verifyOtp(phoneNumber, finalOtp, otpVerificationId)
+      .catch(() => {
+        setError(true);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const handleResendPress = async () => {
     try {
+      setLoading(true);
       const newVerificationId = await auth.sendOtp(phoneNumber);
       setOtpVerificationId(newVerificationId);
     } catch (err) {
       setError(true);
+    } finally {
+      setLoading(false);
     }
     setIsButtonDisabled(true);
     setTimerKey(prevVal => prevVal + 1);
@@ -161,7 +171,11 @@ const OtpVerificationScreen: React.FC = () => {
               />
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
-              <Text style={styles.buttonText}>Login</Text>
+              {loading ? (
+                <ActivityIndicator size="small" color={theme.colors.ternary} />
+              ) : (
+                <Text style={styles.buttonText}>Login</Text>
+              )}
             </TouchableOpacity>
             {error && (
               <Text style={styles.error}>

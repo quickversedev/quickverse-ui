@@ -2,6 +2,7 @@ import axios from 'axios';
 import globalConfig from '../utils/GlobalConfig';
 import {fetchToken} from '../utils/KeychainStore/keychainUtil';
 import {getJWT} from '../utils/Storage';
+import {getFCMToken} from '../utils/notificationUtil.ts';
 
 export type AuthData = {
   session: {
@@ -82,7 +83,14 @@ const VerifyOtp = async (
   //     });
   //   }, 1000);
   // });
-  const token = await fetchToken();
+  let token;
+  let fcmToken = '';
+  try {
+    token = await fetchToken();
+    fcmToken = await getFCMToken();
+  } catch (error) {
+    console.log('getToken Error:', error);
+  }
   return axios
     .post(
       `${globalConfig.apiBaseUrl}/v1/login`,
@@ -90,6 +98,7 @@ const VerifyOtp = async (
         mobile: phoneNumber,
         otp: otp,
         verificationId: verificationId,
+        fcmToken: fcmToken,
       },
       {
         headers: {
@@ -182,10 +191,51 @@ const signUp = async (
       throw code;
     });
 };
+
+const signOut = async () => {
+  // return new Promise(resolve => {
+  //   setTimeout(() => {
+  //     resolve({
+  //       Response,
+  //     });
+  //   }, 1000);
+  // });
+  const token = getJWT();
+  const fcmToken = await getFCMToken();
+  return axios
+    .delete(`${globalConfig.apiBaseUrl}/v1/logout?fcmToken=${fcmToken}`, {
+      headers: {
+        SessionKey: token,
+      },
+    })
+    .then(response => {
+      return response;
+    })
+    .catch(error => {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        console.log(
+          'Server responded with non-2xx status:',
+          error.response.status,
+        );
+        console.log('Response data:', error.response.data);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.log('No response received:', error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error setting up the request:', error.message);
+      }
+      // Throw the error again to propagate it to the caller
+      throw error;
+    });
+};
+
 export const authService = {
   VerifyOtp,
   sendOtp,
   signUp,
+  signOut,
 };
 
 // const JWTTokenMock =

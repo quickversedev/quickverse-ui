@@ -2,7 +2,7 @@ export interface Vendor {
   vendorId: string;
   vendorName: string;
   vendorBanner: string; //base64
-  description: string;
+  storeDescription: string;
   distance: string;
   vendorEndPoint: string;
   storeEnabled: boolean;
@@ -10,12 +10,7 @@ export interface Vendor {
   vendorPhone: string;
   storeOpeningTime: string;
   storeClosingTime: string;
-}
-export interface Promo {
-  promoId: string;
-  promoName: string;
-  promoImage: any; //base64
-  promoLink: string;
+  storeCategory: string;
 }
 export interface Order {
   id: string;
@@ -44,6 +39,9 @@ export interface Campus {
   campusId: string;
   campusName: string;
   location: string;
+  longitude: number;
+  latitude: number;
+  displayName: string;
   vendors?: {} | undefined;
 }
 export interface User {
@@ -87,4 +85,80 @@ export interface Address {
     phone: string;
     concatenatedAddress: string;
   };
+}
+// Define the OrderMetadata interface
+export interface OrderMetadata {
+  orderId: string;
+  customerId: string;
+  customerName: string;
+  customerMobileNumber: string;
+  customerDeliveryAddress: string | null;
+  state: string;
+  totalOrderAmount: number;
+  totalItemCount: number;
+  totalProductCount: number;
+  totalInvoiceAmount: number;
+  fulfillmentOption: string;
+  creationTime: string;
+  productImageUrls: string[];
+  stateLabel: string;
+  orderDescription: string;
+  orderLink: string;
+}
+
+// Define the Cursor interface
+export interface Cursor {
+  orderId: string;
+  customerId: string;
+  platform: string;
+}
+
+// Define the OrdersResponse interface
+export interface OrdersResponse {
+  ordersMetadata: OrderMetadata[];
+  cursor: Cursor | null;
+}
+export interface ProductCartItems {
+  id: string;
+  name: string;
+  productPrice: string;
+  salePrice: string;
+  quantity: number;
+  image: string;
+  vendorId: string;
+}
+
+export interface Promo {
+  vendorId: string;
+  campusId: string;
+  promoId: number;
+  promoImage: string;
+  promoLink: string;
+  promoName: string;
+}
+
+export interface Product {
+  productId: string;
+  vendorId: string;
+  shopId: string;
+  title: string;
+  description: string;
+  availability: boolean;
+  condition: string;
+  productPrice: string;
+  productSalePrice: string;
+  productImageLink: string;
+  productBrand: string;
+  productSize: string;
+  category: string;
+  isBestSeller: boolean;
+}
+export interface Category {
+  id: string;
+  name: string;
+  description: string;
+  imageURLs: string[];
+  type: string;
+  parentCategory: string | null;
+  countOfSkus: number;
 }

@@ -4,12 +4,15 @@ import {
   createStackNavigator,
 } from '@react-navigation/stack';
 import Vendors from './Vendors';
+import {Vendor} from '../../utils/canonicalModel';
+import Categories from '../Categories/Categories';
 import WebViewScreen from '../../utils/WebViewScreen';
-import theme from '../../theme';
 import {getCampus} from '../../utils/Storage';
+import theme from '../../theme';
 
 export type RootStackParamList = {
   VendorList: undefined;
+  Categories: {vendor: Vendor};
   WebView: {url: string};
   navigation?: StackNavigationProp<any, any>;
 };
@@ -23,6 +26,13 @@ const VendorsNavigator: React.FC = () => {
         name="VendorList"
         component={Vendors}
         options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Categories"
+        component={Categories}
+        options={{
+          headerShown: false,
+        }}
       />
       <Stack.Screen
         name="WebView"

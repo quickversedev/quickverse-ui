@@ -1,0 +1,195 @@
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {RootState} from '../../store/store';
+import {getCart, getShopId, saveCart, saveShopId} from '../../utils/Storage';
+import {ProductCartItems} from '../../utils/canonicalModel';
+import {addItemToCart} from './AddItemToCartService';
+import {deleteItemFromCart} from './DeleteItemFromCart';
+import {AppThunk} from '../../store/store';
+import {clearItemsFromCart} from './ClearCart';
+
+interface ProductCartState {
+  shopId: string;
+  productCart: ProductCartItems[];
+}
+
+const initialState: ProductCartState = {
+  shopId: getShopId() || '',
+  productCart: getCart() || [],
+};
+
+const productCartSlice = createSlice({
+  name: 'cart',
+  initialState,
+  reducers: {
+    addToProductCart: (state, action: PayloadAction<ProductCartItems>) => {
+      const {vendorId} = action.payload;
+      if (state.productCart.length > 0 && state.shopId !== vendorId) {
+        console.warn(
+          'Cart contains items from another shop. Clear the cart before adding.',
+        );
+        return;
+      }
+
+      if (state.productCart.length === 0) {
+        state.shopId = vendorId;
+        saveShopId(vendorId);
+      }
+
+      state.productCart.push(action.payload);
+      saveCart(state.productCart);
+    },
+    removeFromProductCart: (state, action: PayloadAction<{id: string}>) => {
+      state.productCart = state.productCart.filter(
+        item => item.id !== action.payload.id,
+      );
+
+      if (state.productCart.length === 0) {
+        state.shopId = '';
+        saveShopId('');
+      }
+
+      saveCart(state.productCart);
+    },
+    incrementProductQuantity: (state, action: PayloadAction<{id: string}>) => {
+      const item = state.productCart.find(
+        item => item.id === action.payload.id,
+      );
+      if (item) {
+        item.quantity += 1;
+        saveCart(state.productCart);
+      }
+    },
+    decrementProductQuantity: (state, action: PayloadAction<{id: string}>) => {
+      state.productCart = state.productCart.reduce<ProductCartItems[]>(
+        (acc, item) => {
+          if (item.id === action.payload.id && item.quantity > 1) {
+            acc.push({...item, quantity: item.quantity - 1});
+          } else if (item.id !== action.payload.id) {
+            acc.push(item);
+          }
+          return acc;
+        },
+        [],
+      );
+    },
+    clearCart: state => {
+      state.productCart = [];
+      state.shopId = '';
+      saveShopId('');
+      saveCart([]);
+    },
+    updateCartState: state => {
+      if (state.productCart.length === 0) {
+        state.shopId = '';
+        saveShopId('');
+      } else {
+        saveShopId(state.shopId);
+      }
+      saveCart(state.productCart);
+    },
+  },
+});
+
+export const addToCart =
+  (item: ProductCartItems, authData: string): AppThunk =>
+  async dispatch => {
+    dispatch(productCartSlice.actions.addToProductCart(item));
+    try {
+      await addItemToCart(item.vendorId, item.id, authData);
+    } catch (error) {
+      console.error('Failed to add item to cart:', error);
+      dispatch(
+        productCartSlice.actions.decrementProductQuantity({id: item.id}),
+      );
+    }
+  };
+
+export const removeFromCart =
+  (id: string, authData: string): AppThunk =>
+  async (dispatch, getState) => {
+    const {shopId} = getState().productCart;
+
+    const itemToRestore = getState().productCart.productCart.find(
+      item => item.id === id,
+    );
+    if (!itemToRestore) return;
+
+    dispatch(productCartSlice.actions.removeFromProductCart({id}));
+
+    try {
+      await deleteItemFromCart(shopId, id, true, authData);
+    } catch (error) {
+      console.error('Failed to remove item from cart:', error);
+      dispatch(productCartSlice.actions.addToProductCart(itemToRestore));
+    }
+  };
+
+export const clearFromCart =
+  (authData: string): AppThunk =>
+  async (dispatch, getState) => {
+    const {shopId, productCart} = getState().productCart;
+
+    dispatch(productCartSlice.actions.clearCart());
+
+    try {
+      await clearItemsFromCart(shopId, authData);
+    } catch (error) {
+      console.error('Failed to clear the cart:', error);
+      // Revert by restoring cart
+      productCart.forEach(item => {
+        dispatch(productCartSlice.actions.addToProductCart(item));
+      });
+    }
+  };
+
+export const incrementQuantity =
+  (id: string, authData: string): AppThunk =>
+  async (dispatch, getState) => {
+    dispatch(productCartSlice.actions.incrementProductQuantity({id}));
+
+    const {shopId} = getState().productCart;
+
+    try {
+      await addItemToCart(shopId, id, authData);
+    } catch (error) {
+      console.error('Failed to increment product quantity:', error);
+      dispatch(productCartSlice.actions.decrementProductQuantity({id}));
+    }
+  };
+
+export const decrementQuantity =
+  (id: string, authData: string): AppThunk =>
+  async (dispatch, getState) => {
+    const currentCart = getState().productCart.productCart;
+    const item = currentCart.find(i => i.id === id);
+
+    if (!item) return;
+
+    dispatch(productCartSlice.actions.decrementProductQuantity({id}));
+
+    const {shopId} = getState().productCart;
+
+    try {
+      await deleteItemFromCart(shopId, id, false, authData);
+      dispatch(productCartSlice.actions.updateCartState());
+    } catch (error) {
+      console.error('Failed to decrement product quantity:', error);
+      dispatch(
+        productCartSlice.actions.addToProductCart({...item, quantity: 1}),
+      );
+      dispatch(productCartSlice.actions.updateCartState());
+    }
+  };
+
+export const {
+  addToProductCart,
+  removeFromProductCart,
+  incrementProductQuantity,
+  decrementProductQuantity,
+  clearCart,
+} = productCartSlice.actions;
+
+export const selectCart = (state: RootState) => state.productCart.productCart;
+export const selectShopId = (state: RootState) => state.productCart.shopId;
+
+export default productCartSlice.reducer;

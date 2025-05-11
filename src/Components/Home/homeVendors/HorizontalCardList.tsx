@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, FlatList, Dimensions} from 'react-native';
+import {View, StyleSheet, FlatList, Dimensions, Platform} from 'react-native';
 import CardItem from '../../util/CardItem';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamListHome} from '../HomeNavigation';
@@ -7,13 +7,12 @@ import {useNavigation} from '@react-navigation/native';
 import {Vendor} from '../../../utils/canonicalModel';
 
 const {width} = Dimensions.get('window');
-const SPACING: any = 3;
-const ITEM_SIZE: any = width * 0.46;
-// const EMPTY_ITEM_SIZE: any = width - ITEM_SIZE * 2.5;
+const SPACING = 10;
+const ITEM_SIZE = width;
 
 type HomeNavigationProp = StackNavigationProp<
   RootStackParamListHome,
-  'WebView'
+  'Categories'
 >;
 interface Props {
   vendors: Vendor[];
@@ -21,9 +20,9 @@ interface Props {
 const HorizontalCardList: React.FC<Props> = ({vendors}) => {
   const navigation = useNavigation<HomeNavigationProp>();
 
-  const handleCardPress = (url: string) => {
+  const handleCardPress = (vendor: Vendor) => {
     navigation.removeListener;
-    navigation.navigate('WebView', {url});
+    navigation.navigate('Categories', {vendor});
   };
 
   return (
@@ -31,28 +30,24 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
       <FlatList
         showsHorizontalScrollIndicator={false}
         data={vendors}
-        keyExtractor={(item, index) => {
-          return index.toString();
-        }}
+        keyExtractor={(item, index) => index.toString()}
         horizontal
-        // contentContainerStyle={{alignItems: 'center'}}
-        snapToInterval={ITEM_SIZE}
-        decelerationRate={0.98}
+        contentContainerStyle={styles.listContent}
+        snapToInterval={ITEM_SIZE + SPACING * 2}
+        decelerationRate={Platform.select({ios: 0.98, android: 0.95})}
         snapToAlignment="start"
         bounces={false}
         scrollEventThrottle={16}
-        renderItem={({item, index}) => {
-          return (
-            <View key={index} style={{width: ITEM_SIZE, margin: SPACING * 2}}>
-              <CardItem
-                name={item.vendorName}
-                distance={item.distance}
-                image={{uri: `${item.vendorBanner}.jpg`}}
-                onPress={() => handleCardPress(item.vendorEndPoint)}
-              />
-            </View>
-          );
-        }}
+        renderItem={({item}) => (
+          <View style={styles.cardWrapper}>
+            <CardItem
+              name={item.vendorName}
+              distance={item.distance}
+              image={{uri: `${item.vendorBanner}.jpg`}}
+              onPress={() => handleCardPress(item)}
+            />
+          </View>
+        )}
       />
     </View>
   );
@@ -61,7 +56,33 @@ const HorizontalCardList: React.FC<Props> = ({vendors}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: SPACING * 8,
+    marginVertical: Platform.select({
+      ios: 15,
+      android: 10,
+    }),
+  },
+  listContent: {
+    // paddingHorizontal: Platform.select({
+    //   ios: SPACING,
+    //   android: SPACING,
+    // }),
+  },
+  cardWrapper: {
+    width: ITEM_SIZE * 0.35,
+    marginHorizontal: SPACING,
+    // backgroundColor: 'white',//
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+        overflow: 'hidden',
+      },
+    }),
   },
 });
 

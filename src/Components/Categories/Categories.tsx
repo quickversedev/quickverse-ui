@@ -134,11 +134,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({ route }) => {
 
   );
   const [searchQuery, setSearchQuery] = useState('');
-  useEffect(() => {
-    if (categoriesWithProducts.length > 0) {
-      setSelectedCategory(categoriesWithProducts[0]?.id);
-    }
-  });
+
 
 
   useEffect(() => {

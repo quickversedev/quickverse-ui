@@ -1,6 +1,6 @@
 {
   "name": "quickverse",
-  "version": "2.0.1-snapshot",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",

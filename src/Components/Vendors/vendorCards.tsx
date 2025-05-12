@@ -8,6 +8,7 @@ import {
   FlatList,
   TextInput,
   Platform,
+  RefreshControl,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -24,7 +25,7 @@ import theme from '../../theme';
 
 const {width} = Dimensions.get('window');
 const SPACING: number = 16;
-const ITEM_SIZE: number = (width - SPACING * 3) / 3;
+const ITEM_SIZE: number = width;
 
 type VendorCardsNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -39,10 +40,29 @@ const VendorCards: React.FC = () => {
   );
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false); // Add this state
 
   useEffect(() => {
     const campus = getCampus();
     campus && dispatch(fetchVendorList(campus));
+  }, [dispatch]);
+  // Add this function for refresh handling
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const campus = getCampus();
+      if (campus) {
+        await dispatch(fetchVendorList(campus));
+      }
+    } catch (error) {
+      console.error('Error refreshing vendors:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    handleRefresh(); // Initial load (you could keep your original useEffect if preferred)
   }, [dispatch]);
 
   const groupedVendors = useMemo(() => {
@@ -90,7 +110,16 @@ const VendorCards: React.FC = () => {
   return (
     <ScrollView
       contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}>
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          colors={[theme.colors.secondary]} // Customize the loading indicator color
+          tintColor={theme.colors.secondary} // iOS only
+          progressBackgroundColor={theme.colors.primary} // Android only
+        />
+      }>
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <MaterialCommunityIcons
@@ -131,12 +160,14 @@ const VendorCards: React.FC = () => {
             horizontal={true}
             showsHorizontalScrollIndicator={false}
             renderItem={({item}) => (
-              <CardItem
-                name={item.vendorName}
-                distance={item.distance}
-                image={{uri: `${item.vendorBanner}.jpg`}}
-                onPress={() => handleCardPress(item)}
-              />
+              <View style={styles.cardWrapper}>
+                <CardItem
+                  name={item.vendorName}
+                  distance={item.distance}
+                  image={{uri: `${item.vendorBanner}.jpg`}}
+                  onPress={() => handleCardPress(item)}
+                />
+              </View>
             )}
             contentContainerStyle={styles.flatListContent}
           />
@@ -174,7 +205,7 @@ const styles = StyleSheet.create({
       ios: {
         shadowColor: '#000',
         shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.1,
+        shadowOpacity: 0.5,
         shadowRadius: 4,
         borderWidth: 1,
         borderColor: theme.colors.secondary,
@@ -193,7 +224,7 @@ const styles = StyleSheet.create({
     color: theme.colors.ternary,
     ...Platform.select({
       ios: {
-        marginTop: 2, // Slight vertical adjustment for iOS
+        marginTop: 2,
       },
     }),
   },
@@ -210,7 +241,7 @@ const styles = StyleSheet.create({
       android: {
         paddingVertical: 4,
         fontWeight: 'normal',
-        includeFontPadding: false, // Remove extra padding on Android
+        includeFontPadding: false,
       },
     }),
   },
@@ -221,11 +252,6 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
     borderRadius: 15,
     backgroundColor: theme.colors.primary,
-    // shadowColor: theme.colors.ternary,
-    // shadowOffset: {width: 0, height: 2},
-    // shadowOpacity: 0.1,
-    // shadowRadius: 4,
-    // elevation: 4,
   },
   categoryTitle: {
     fontSize: 20,
@@ -237,17 +263,22 @@ const styles = StyleSheet.create({
   flatListContent: {
     paddingHorizontal: SPACING / 2,
   },
-  // cardContainer: {
-  //   width: ITEM_SIZE,
-  //   marginRight: SPACING,
-  //   borderRadius: 15,
-  //   backgroundColor: '#fff',
-  //   shadowColor: '#000',
-  //   shadowOffset: {width: 0, height: 2},
-  //   shadowOpacity: 0.1,
-  //   shadowRadius: 4,
-  //   elevation: 3,
-  // },
+  cardWrapper: {
+    width: ITEM_SIZE * 0.35,
+    marginHorizontal: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+        overflow: 'hidden',
+      },
+    }),
+  },
 });
 
 export default VendorCards;

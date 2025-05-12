@@ -71,19 +71,21 @@ const productCartSlice = createSlice({
         },
         [],
       );
-
-      if (state.productCart.length === 0) {
-        state.shopId = '';
-        saveShopId('');
-      }
-
-      saveCart(state.productCart);
     },
     clearCart: state => {
       state.productCart = [];
       state.shopId = '';
       saveShopId('');
       saveCart([]);
+    },
+    updateCartState: state => {
+      if (state.productCart.length === 0) {
+        state.shopId = '';
+        saveShopId('');
+      } else {
+        saveShopId(state.shopId);
+      }
+      saveCart(state.productCart);
     },
   },
 });
@@ -169,11 +171,13 @@ export const decrementQuantity =
 
     try {
       await deleteItemFromCart(shopId, id, false, authData);
+      dispatch(productCartSlice.actions.updateCartState());
     } catch (error) {
       console.error('Failed to decrement product quantity:', error);
       dispatch(
         productCartSlice.actions.addToProductCart({...item, quantity: 1}),
       );
+      dispatch(productCartSlice.actions.updateCartState());
     }
   };
 

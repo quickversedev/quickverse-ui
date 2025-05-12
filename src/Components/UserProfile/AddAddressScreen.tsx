@@ -1,5 +1,3 @@
-// src/screens/AddAddressScreen.tsx (or your preferred path)
-
 import React, {useState, useEffect} from 'react';
 import {
   KeyboardAvoidingView,
@@ -17,18 +15,13 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
-import {useNavigation, RouteProp} from '@react-navigation/native'; // For navigation
-import {StackNavigationProp} from '@react-navigation/stack'; // For navigation types
+import {RouteProp} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 import {Switch} from 'react-native';
 
-import {AppDispatch, RootState} from '../../store/store'; // Adjust path
-import {
-  addUserAddress,
-  fetchUserAddresses, // To refetch list after adding
-  ApiAddress,
-  // ListedAddress, // Not directly needed here unless editing
-} from '../../services/userAddressSlice'; // Adjust path
+import {AppDispatch, RootState} from '../../store/store';
+import {addUserAddress, ApiAddress} from '../../services/userAddressSlice';
 import {useAuth} from '../../utils/AuthContext';
 import {AddressStackParamList} from './AddressListScreen'; // Import from AddressListScreen or a central types file
 
@@ -56,18 +49,18 @@ interface AddressFormState // Same as before
 }
 
 // Navigation props for this screen
-type AddEditAddressRouteProp = RouteProp<
+type AddAddressScreenRouteProp = RouteProp<
   AddressStackParamList,
-  'AddEditAddress'
+  'AddAddressScreen'
 >;
-type AddEditAddressNavigationProp = StackNavigationProp<
+type AddAddressScreenNavigationProp = StackNavigationProp<
   AddressStackParamList,
-  'AddEditAddress'
+  'AddAddressScreen'
 >;
 
 interface Props {
-  route: AddEditAddressRouteProp;
-  navigation: AddEditAddressNavigationProp;
+  route: AddAddressScreenRouteProp;
+  navigation: AddAddressScreenNavigationProp;
 }
 
 const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
@@ -409,6 +402,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.mapPlaceholder,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 20,
     marginBottom: 20,
     marginHorizontal: 15,
     borderRadius: 8,

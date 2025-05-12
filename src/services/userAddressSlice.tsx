@@ -28,7 +28,7 @@ export interface AddAddressApiPayload {
 }
 
 export interface ThunkApiArgs {
-  authData: string | undefined; // SessionKey
+  authData: string | undefined;
   vendorId: string;
 }
 

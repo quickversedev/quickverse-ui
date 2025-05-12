@@ -35,18 +35,11 @@ const COLORS = {
   iconDefault: '#4A4A4A',
 };
 
-// Define your navigation param list if you have one for this stack
-// This assumes you have a navigator that includes 'AddEditAddressScreen'
 export type AddressStackParamList = {
   AddressList: undefined; // This screen
   AddEditAddress: {addressId?: string}; // Screen for adding/editing
   // ... other screens in this stack
 };
-
-// type AddressListNavigationProp = StackNavigationProp<
-//   AddressStackParamList,
-//   'AddressList'
-// >;
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -130,8 +123,7 @@ const AddressScreen: React.FC = () => {
   };
 
   const handleBackPress = () => {
-    // navigation.goBack(); // Or your specific back navigation logic
-    console.log('Back pressed from Address List');
+    navigation.goBack();
   };
 
   return (
@@ -214,7 +206,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    // backgroundColor: '#f0f0f0', // Lighter background for content area
   },
   header: {
     flexDirection: 'row',

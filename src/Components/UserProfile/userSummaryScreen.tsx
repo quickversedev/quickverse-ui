@@ -102,7 +102,7 @@ const ProfileScreen = () => {
             size={24}
             color={theme.colors.ternary}
           />
-          <Text style={styles.optionText}>Location</Text>
+          <Text style={styles.optionText}>Address</Text>
           <MaterialCommunityIcons
             name="chevron-right"
             size={24}

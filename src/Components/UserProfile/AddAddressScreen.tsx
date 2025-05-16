@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import MapView, {PROVIDER_GOOGLE, Marker, Region} from 'react-native-maps';
 import {
   KeyboardAvoidingView,
@@ -19,8 +19,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
+import axios from 'axios';
 
-// --- Geolocation and Permissions for RN CLI ---
+// --- Geolocation and Permissions ---
 import Geolocation from 'react-native-geolocation-service';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 // --- End Geolocation and Permissions ---
@@ -30,8 +31,10 @@ import {addUserAddress, ApiAddress} from '../../services/userAddressSlice';
 import {useAuth} from '../../utils/AuthContext';
 import {AddressStackParamList} from './AddressListScreen';
 
+const GOOGLE_MAPS_API_KEY = 'AIzaSyCyQqXzvpH9Y8c61Z7UYOyNyUpkMv_DzJ0';
+
 const COLORS = {
-  /* ... your COLORS object ... */ backgroundPrimary: '#FAEA7B',
+  backgroundPrimary: '#FAEA7B',
   backgroundSecondary: '#FFF9E6',
   textPrimary: '#4A4A4A',
   textSecondary: '#757575',
@@ -52,6 +55,7 @@ interface AddressFormState
   longitude?: string;
 }
 
+// Type Arguments for Navigation Props
 type AddAddressScreenRouteProp = RouteProp<
   AddressStackParamList,
   'AddAddressScreen'
@@ -99,9 +103,10 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
   const [isDefault, setIsDefault] = useState(false);
   const [isLocationPermissionGranted, setIsLocationPermissionGranted] =
     useState(false);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const geocodeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // --- Request Location Permission for RN CLI ---
-  const requestLocationPermission = async () => {
+  const requestLocationPermission = async (): Promise<boolean> => {
     const permission = Platform.select({
       ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
       android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
@@ -117,40 +122,34 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
 
     try {
       let status = await check(permission);
-      console.log('Initial location permission status:', status);
-
       if (status === RESULTS.GRANTED) {
         setIsLocationPermissionGranted(true);
         return true;
       }
-
       if (status === RESULTS.DENIED) {
         status = await request(permission);
-        console.log('Requested location permission status:', status);
         if (status === RESULTS.GRANTED) {
           setIsLocationPermissionGranted(true);
           return true;
         } else {
           Alert.alert(
             'Permission Denied',
-            'Location permission is required to automatically set your address. Please enable it in settings or select location manually.',
+            'Location permission is required. Please enable it in settings or select location manually.',
           );
           setIsLocationPermissionGranted(false);
           return false;
         }
       }
-      // Handle RESULTS.BLOCKED (user denied permanently) or RESULTS.UNAVAILABLE
-      if (status === RESULTS.BLOCKED) {
+      if (status === RESULTS.BLOCKED)
         Alert.alert(
           'Permission Blocked',
-          'Location permission is blocked. Please enable it in your app settings to use this feature.',
+          'Location permission is blocked. Please enable it in your app settings.',
         );
-      } else if (status === RESULTS.UNAVAILABLE) {
+      else if (status === RESULTS.UNAVAILABLE)
         Alert.alert(
           'Location Unavailable',
           'Location services are not available on this device.',
         );
-      }
       setIsLocationPermissionGranted(false);
       return false;
     } catch (err) {
@@ -168,18 +167,19 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
         Geolocation.getCurrentPosition(
           position => {
             const {latitude, longitude} = position.coords;
-            console.log('Current position:', latitude, longitude);
-            setMapRegion({
+            const initialRegion = {
               latitude,
               longitude,
               latitudeDelta: 0.005,
               longitudeDelta: 0.004,
-            });
+            };
+            setMapRegion(initialRegion);
             setAddressForm(prev => ({
               ...prev,
               latitude: latitude.toString(),
               longitude: longitude.toString(),
             }));
+            performReverseGeocode(latitude, longitude);
           },
           error => {
             console.error(
@@ -191,20 +191,93 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
               'Location Error',
               'Could not fetch current location. Please select manually on the map.',
             );
-            // Fallback to default region if needed, or just let user pan
           },
-          {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 10000,
+            distanceFilter: 0,
+          },
         );
-      } else {
-        console.log(
-          'Location permission not granted, using default map region.',
-        );
-        // User might have to pan to their location or enter address manually
       }
     };
-
     fetchInitialLocation();
-  }, []); // Run once on mount
+
+    // Cleanup debounce timer on unmount
+    return () => {
+      if (geocodeTimeoutRef.current) {
+        clearTimeout(geocodeTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const performReverseGeocode = async (latitude: number, longitude: number) => {
+    if (!GOOGLE_MAPS_API_KEY) {
+      Alert.alert(
+        'API Key Missing',
+        'Google Maps API key for geocoding is not configured.',
+      );
+      return;
+    }
+    setIsGeocoding(true);
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`,
+      );
+      if (response.data.status === 'OK' && response.data.results.length > 0) {
+        const components = response.data.results[0].address_components;
+        let streetNumber = '',
+          route = '',
+          sublocality = '',
+          city = '',
+          state = '',
+          pincode = '';
+        components.forEach((component: any) => {
+          if (component.types.includes('street_number'))
+            streetNumber = component.long_name;
+          if (component.types.includes('route')) route = component.long_name;
+          if (
+            component.types.includes('sublocality_level_1') ||
+            component.types.includes('sublocality')
+          )
+            sublocality = component.long_name;
+          if (component.types.includes('locality')) city = component.long_name;
+          if (component.types.includes('administrative_area_level_1'))
+            state = component.short_name;
+          if (component.types.includes('postal_code'))
+            pincode = component.long_name;
+        });
+        let derivedAddressLine1 = route;
+        if (sublocality && sublocality !== route)
+          derivedAddressLine1 = derivedAddressLine1
+            ? `${derivedAddressLine1}, ${sublocality}`
+            : sublocality;
+        setAddressForm(prev => ({
+          ...prev,
+          houseNo: streetNumber || prev.houseNo, // Prefer geocoded, fallback to user input if any
+          addressLine1: derivedAddressLine1 || prev.addressLine1,
+          city: city || prev.city,
+          state: state || prev.state,
+          pincode: pincode || prev.pincode,
+          latitude: latitude.toString(),
+          longitude: longitude.toString(),
+        }));
+        // Alert.alert("Location Updated", "Address details prefilled. Please verify."); // Optional
+      } else {
+        console.warn(
+          'Reverse geocoding failed:',
+          response.data.status,
+          response.data.error_message,
+        );
+        // Alert.alert("Geocoding Error", `Could not fetch address: ${response.data.error_message || response.data.status}`);
+      }
+    } catch (error) {
+      console.error('Error during reverse geocoding:', error);
+      // Alert.alert("Network Error", "Failed to fetch address details.");
+    } finally {
+      setIsGeocoding(false);
+    }
+  };
 
   const handleFormInputChange = (
     name: keyof AddressFormState,
@@ -220,6 +293,10 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
       latitude: newRegion.latitude.toString(),
       longitude: newRegion.longitude.toString(),
     }));
+    if (geocodeTimeoutRef.current) clearTimeout(geocodeTimeoutRef.current);
+    geocodeTimeoutRef.current = setTimeout(() => {
+      performReverseGeocode(newRegion.latitude, newRegion.longitude);
+    }, 1000);
   };
 
   const handleSaveAddress = () => {
@@ -249,10 +326,7 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
       addressForm.latitude === '0' ||
       addressForm.longitude === '0'
     ) {
-      Alert.alert(
-        'Location Missing',
-        'Please select a location on the map or ensure location services are enabled.',
-      );
+      Alert.alert('Location Missing', 'Please select a location on the map.');
       return;
     }
 
@@ -283,8 +357,8 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
 
     dispatch(
       addUserAddress({
-        authData: authData, // Pass the token string
-        vendorId: '8765', // Replace if dynamic
+        authData: authData,
+        vendorId: '8765',
         addressData: newAddressData,
         isDefaultAddress: isDefault,
       }),
@@ -339,43 +413,61 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
               style={styles.mapView}
               region={mapRegion}
               onRegionChangeComplete={onRegionChangeComplete}
-              showsUserLocation={isLocationPermissionGranted} // Only show if permission granted
-              // followsUserLocation={isLocationPermissionGranted} // Optional:
+              showsUserLocation={isLocationPermissionGranted}
             />
-            <View style={styles.mapCenterMarker}>
-              <Icon name="pin" size={34} color={COLORS.buttonBackground} />
+            <View style={styles.mapCenterMarkerContainer}>
+              {isGeocoding && (
+                <ActivityIndicator
+                  size="small"
+                  color={COLORS.buttonBackground}
+                  style={styles.mapLoadingIndicator}
+                />
+              )}
+              <Icon
+                name="pin"
+                size={34}
+                color={
+                  isGeocoding ? COLORS.textSecondary : COLORS.buttonBackground
+                }
+              />
             </View>
           </View>
           <Text style={styles.mapInstruction}>
-            {isLocationPermissionGranted
-              ? 'Pan map to adjust pin. Your location is shown.'
+            {isGeocoding
+              ? 'Fetching address details...'
+              : isLocationPermissionGranted
+              ? 'Pan map to adjust pin. Address will auto-fill.'
               : 'Pan map to set location. Enable location for auto-detection.'}
           </Text>
 
-          {/* Form Fields ... same as before ... */}
           <View style={styles.formFieldsSection}>
+            {/* <Text>{addressForm?.latitude}</Text> */}
             <View style={styles.formField}>
               <Text style={styles.label}>Contact Name:</Text>
               <TextInput
-                /* ... */ value={addressForm.name}
+                value={addressForm.name}
                 onChangeText={value => handleFormInputChange('name', value)}
                 style={styles.input}
                 placeholder="Enter name"
               />
             </View>
             <View style={styles.formField}>
-              <Text style={styles.label}>House No, Building Name:</Text>
+              <Text style={styles.label}>
+                House No, Building Name: (Verify/Enter)
+              </Text>
               <TextInput
-                /* ... */ value={addressForm.houseNo}
+                value={addressForm.houseNo}
                 onChangeText={value => handleFormInputChange('houseNo', value)}
                 style={styles.input}
                 placeholder="e.g., A-123, Sunshine Apartments"
               />
             </View>
             <View style={styles.formField}>
-              <Text style={styles.label}>Street Address / Area:</Text>
+              <Text style={styles.label}>
+                Street Address / Area: (Auto-filled, Verify)
+              </Text>
               <TextInput
-                /* ... */ value={addressForm.addressLine1}
+                value={addressForm.addressLine1}
                 onChangeText={value =>
                   handleFormInputChange('addressLine1', value)
                 }
@@ -386,7 +478,7 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
             <View style={styles.formField}>
               <Text style={styles.label}>Locality / Sub-Area (Optional):</Text>
               <TextInput
-                /* ... */ value={addressForm.addressLine2 || ''}
+                value={addressForm.addressLine2 || ''}
                 onChangeText={value =>
                   handleFormInputChange('addressLine2', value)
                 }
@@ -397,7 +489,7 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
             <View style={styles.formField}>
               <Text style={styles.label}>Floor (Optional):</Text>
               <TextInput
-                /* ... */ value={addressForm.floor || ''}
+                value={addressForm.floor || ''}
                 onChangeText={value => handleFormInputChange('floor', value)}
                 style={styles.input}
                 placeholder="e.g., 3rd Floor"
@@ -406,7 +498,7 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
             <View style={styles.formField}>
               <Text style={styles.label}>Tower / Block (Optional):</Text>
               <TextInput
-                /* ... */ value={addressForm.towerBlock || ''}
+                value={addressForm.towerBlock || ''}
                 onChangeText={value =>
                   handleFormInputChange('towerBlock', value)
                 }
@@ -417,34 +509,34 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
             <View style={styles.formField}>
               <Text style={styles.label}>Landmark (Optional):</Text>
               <TextInput
-                /* ... */ value={addressForm.landmark || ''}
+                value={addressForm.landmark || ''}
                 onChangeText={value => handleFormInputChange('landmark', value)}
                 style={styles.input}
                 placeholder="e.g., Opposite Post Office"
               />
             </View>
             <View style={styles.formField}>
-              <Text style={styles.label}>City:</Text>
+              <Text style={styles.label}>City: (Auto-filled, Verify)</Text>
               <TextInput
-                /* ... */ value={addressForm.city}
+                value={addressForm.city}
                 onChangeText={value => handleFormInputChange('city', value)}
                 style={styles.input}
                 placeholder="Enter city"
               />
             </View>
             <View style={styles.formField}>
-              <Text style={styles.label}>State:</Text>
+              <Text style={styles.label}>State: (Auto-filled, Verify)</Text>
               <TextInput
-                /* ... */ value={addressForm.state}
+                value={addressForm.state}
                 onChangeText={value => handleFormInputChange('state', value)}
                 style={styles.input}
                 placeholder="Enter state"
               />
             </View>
             <View style={styles.formField}>
-              <Text style={styles.label}>Pincode:</Text>
+              <Text style={styles.label}>Pincode: (Auto-filled, Verify)</Text>
               <TextInput
-                /* ... */ value={addressForm.pincode}
+                value={addressForm.pincode}
                 onChangeText={value => handleFormInputChange('pincode', value)}
                 style={styles.input}
                 placeholder="Enter pincode"
@@ -456,7 +548,7 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
                 Tag (e.g., Home, Work - Optional):
               </Text>
               <TextInput
-                /* ... */ value={addressForm.tag || ''}
+                value={addressForm.tag || ''}
                 onChangeText={value => handleFormInputChange('tag', value)}
                 style={styles.input}
                 placeholder="Home, Work, etc."
@@ -473,7 +565,6 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
                 value={isDefault}
               />
             </View>
-
             {addressError && (
               <Text style={styles.errorTextForm}>
                 {typeof addressError === 'string'
@@ -487,7 +578,7 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
         <TouchableOpacity
           style={styles.saveButton}
           onPress={handleSaveAddress}
-          disabled={loadingAdd}>
+          disabled={loadingAdd || isGeocoding}>
           {loadingAdd ? (
             <ActivityIndicator color={COLORS.buttonText} size="small" />
           ) : (
@@ -499,7 +590,6 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
   );
 };
 
-// Styles remain the same as your last provided version
 const styles = StyleSheet.create({
   safeArea: {flex: 1, backgroundColor: COLORS.backgroundPrimary},
   container: {flex: 1},
@@ -523,9 +613,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.mapPlaceholder,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   mapView: {...StyleSheet.absoluteFillObject},
-  mapCenterMarker: {},
+  mapCenterMarkerContainer: {
+    /* Centered by mapSection */
+  },
+  mapLoadingIndicator: {position: 'absolute', top: -25},
   mapInstruction: {
     textAlign: 'center',
     color: COLORS.textSecondary,

@@ -53,8 +53,15 @@ type CategoriesScreenProps = {
 const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const {authData, setSkipLogin} = useAuth();
   const vendor: Vendor = route.params.vendor;
-  const {products, categories, loading, error, refetch} =
-    useFetchProductsAndCategories(vendor.vendorId);
+  const {
+    products,
+    categories,
+    loading, // True while either products or categories are loading
+    productsLoading, // True only while products are loading
+    categoriesLoading, // True only while categories are loading
+    error,
+    refetch,
+  } = useFetchProductsAndCategories(vendor.vendorId);
   const dispatch = useDispatch<AppDispatch>();
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
@@ -161,11 +168,13 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             : product.category === selectedCategory,
         )
       : products || []
-  ).sort((a, b) => {
-    // Sort in-stock items (availability = true) before out-of-stock items
-    if (a.availability === b.availability) return 0;
-    return a.availability ? -1 : 1;
-  });
+  )
+    .slice()
+    .sort((a, b) => {
+      // Sort in-stock items (availability = true) before out-of-stock items
+      if (a.availability === b.availability) return 0;
+      return a.availability ? -1 : 1;
+    });
 
   const handleCategoryPress = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -343,7 +352,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   // Calculate total number of items in the cart
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
 
-  if (loading) {
+  if (loading && !products.length && !categories.length) {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color={theme.colors.ternary} />
@@ -362,6 +371,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         />
         <Text style={styles.errorText}>Failed to load products</Text>
         <Text style={styles.errorSubText}>Please try again later</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={refetch}>
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -422,23 +434,32 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         <View style={styles.contentContainer}>
           {/* Categories */}
           <View style={styles.categoriesListContainer}>
-            <FlatList
-              data={filteredCategories}
-              renderItem={renderCategoryItem}
-              keyExtractor={item => item.id}
-              showsVerticalScrollIndicator={false}
-              onScroll={handleScroll}
-              scrollEventThrottle={100}
-              keyboardDismissMode="on-drag"
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  colors={[theme.colors.ternary]}
-                  tintColor={theme.colors.ternary}
-                />
-              }
-            />
+            {categoriesLoading && categories.length === 0 ? (
+              <View style={styles.sectionLoading}>
+                <ActivityIndicator size="small" color={theme.colors.ternary} />
+                <Text style={styles.sectionLoadingText}>
+                  Loading categories...
+                </Text>
+              </View>
+            ) : (
+              <FlatList
+                data={filteredCategories}
+                renderItem={renderCategoryItem}
+                keyExtractor={item => item.id}
+                showsVerticalScrollIndicator={false}
+                onScroll={handleScroll}
+                scrollEventThrottle={100}
+                keyboardDismissMode="on-drag"
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={[theme.colors.ternary]}
+                    tintColor={theme.colors.ternary}
+                  />
+                }
+              />
+            )}
           </View>
 
           {/* seperator-line */}
@@ -446,33 +467,42 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
           {/* products */}
           <View style={styles.productsListContainer}>
-            <FlatList
-              data={filteredProducts}
-              renderItem={renderProductItem}
-              keyExtractor={item => item.productId}
-              showsVerticalScrollIndicator={false}
-              keyboardDismissMode="on-drag"
-              contentContainerStyle={
-                filteredProducts.length === 0 && styles.emptyProductList
-              }
-              onScroll={handleScroll}
-              scrollEventThrottle={100}
-              ListEmptyComponent={
-                <Text style={styles.noProductsText}>
-                  {searchQuery
-                    ? 'No products match your search'
-                    : 'No products available in this category'}
+            {productsLoading && products.length === 0 ? (
+              <View style={styles.sectionLoading}>
+                <ActivityIndicator size="small" color={theme.colors.ternary} />
+                <Text style={styles.sectionLoadingText}>
+                  Loading products...
                 </Text>
-              }
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  colors={[theme.colors.ternary]}
-                  tintColor={theme.colors.ternary}
-                />
-              }
-            />
+              </View>
+            ) : (
+              <FlatList
+                data={filteredProducts}
+                renderItem={renderProductItem}
+                keyExtractor={item => item.productId}
+                showsVerticalScrollIndicator={false}
+                keyboardDismissMode="on-drag"
+                contentContainerStyle={
+                  filteredProducts.length === 0 && styles.emptyProductList
+                }
+                onScroll={handleScroll}
+                scrollEventThrottle={100}
+                ListEmptyComponent={
+                  <Text style={styles.noProductsText}>
+                    {searchQuery
+                      ? 'No products match your search'
+                      : 'No products available in this category'}
+                  </Text>
+                }
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={[theme.colors.ternary]}
+                    tintColor={theme.colors.ternary}
+                  />
+                }
+              />
+            )}
           </View>
         </View>
       </View>
@@ -782,6 +812,26 @@ const styles = StyleSheet.create({
     color: 'red',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  sectionLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  sectionLoadingText: {
+    marginTop: 8,
+    color: theme.colors.secondary,
+  },
+  retryButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: theme.colors.ternary,
+    borderRadius: 5,
+  },
+  retryButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

@@ -39,17 +39,37 @@ export const fetchProducts = createAsyncThunk(
   async ({vendorId}: {vendorId: string}, {rejectWithValue}) => {
     try {
       const token = await fetchToken();
-      const response = await axios.post<any>(
-        `${API_BASE_URL}/${vendorId}/products`,
-        {},
-        {
-          headers: {
-            Authorization: token,
-          },
-        },
-      );
+      let allProducts: Product[] = [];
+      let offset = 0;
+      const limit = 50; // Batch size
+      let hasMore = true;
+      const MAX_ITERATIONS = 30; // Safety net to prevent infinite loops
+      let iteration = 0;
+      while (hasMore && iteration < MAX_ITERATIONS) {
+        iteration++;
+        console.log('offset:', offset);
 
-      return response.data?.products.product;
+        const response = await axios.post<any>(
+          `${API_BASE_URL}/${vendorId}/products`,
+          {offset},
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
+
+        const productsBatch = response.data?.products?.product || [];
+        allProducts = [...allProducts, ...productsBatch];
+
+        // Check if we've received fewer items than requested
+        if (productsBatch.length < limit) {
+          hasMore = false;
+        } else {
+          offset += limit; // Prepare for next batch
+        }
+      }
+      return allProducts;
     } catch (error) {
       console.error('Failed to fetch products:', error);
       return rejectWithValue('Failed to fetch products');

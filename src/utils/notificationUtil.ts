@@ -4,7 +4,6 @@ import messaging, {
   getToken,
   hasPermission,
   onMessage,
-  setBackgroundMessageHandler,
 } from '@react-native-firebase/messaging';
 import notifee, {
   AndroidImportance,
@@ -13,6 +12,12 @@ import notifee, {
 } from '@notifee/react-native';
 import {Platform, PermissionsAndroid} from 'react-native';
 
+interface NotificationCache {
+  id: string;
+  timestamp: number;
+}
+let lastNotification: NotificationCache | null = null;
+const NOTIFICATION_COOLDOWN_MS = 5000; // 5 second deduplication window
 /**
  * Initialize the notification channel for Android.
  */
@@ -32,11 +37,43 @@ export const initializeNotificationChannel = async () => {
     importance: AndroidImportance.HIGH,
   });
 };
-
+const getNotificationId = (
+  remoteMessage: FirebaseMessagingTypes.RemoteMessage,
+): any => {
+  return (
+    remoteMessage.messageId ||
+    remoteMessage.data?.notificationId ||
+    JSON.stringify(remoteMessage.data) ||
+    `${Date.now()}`
+  );
+};
 export const displayNotification = async (
   remoteMessage: FirebaseMessagingTypes.RemoteMessage,
+  isBackground: boolean = false,
 ) => {
   try {
+    const notificationId = getNotificationId(remoteMessage);
+    const currentTime = Date.now();
+
+    // Deduplication check
+    if (
+      lastNotification &&
+      lastNotification.id === notificationId &&
+      currentTime - lastNotification.timestamp < NOTIFICATION_COOLDOWN_MS
+    ) {
+      console.log('Skipping duplicate notification');
+      return;
+    }
+
+    lastNotification = {
+      id: notificationId,
+      timestamp: currentTime,
+    };
+
+    if (!remoteMessage.notification) {
+      console.log('No notification content available');
+      return;
+    }
     // Check if the notification object is present
     if (remoteMessage.notification) {
       await notifee.displayNotification({
@@ -54,6 +91,7 @@ export const displayNotification = async (
             text: remoteMessage.notification.body || 'No body',
           },
           showTimestamp: true,
+          groupId: isBackground ? 'background' : 'foreground',
         },
       });
     } else {
@@ -67,23 +105,25 @@ export const displayNotification = async (
  * Initialize the foreground message handler.
  */
 export const initializeForegroundMessageHandler = () => {
+  console.log('Message handled in the background!');
   const message = getMessaging();
   return onMessage(message, async remoteMessage => {
-    await displayNotification(remoteMessage);
+    await displayNotification(remoteMessage, false);
   });
 };
 
 /**
  * Initialize the background message handler.
  */
+
 export const initializeBackgroundMessageHandler = () => {
-  const message = getMessaging();
-  setBackgroundMessageHandler(message, async remoteMessage => {
-    // console.log('Message handled in the background!', remoteMessage);
-    await displayNotification(remoteMessage);
+  messaging().setBackgroundMessageHandler(async () => {
+    return Promise.resolve();
+  });
+  messaging().onMessage(async remoteMessage => {
+    await displayNotification(remoteMessage, true);
   });
 };
-
 /**
  * Get the FCM token for the device.
  */

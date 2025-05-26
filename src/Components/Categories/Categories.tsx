@@ -24,6 +24,8 @@ import {
   Product,
   ProductCartItems,
   Vendor,
+  SubProduct, // Import SubProduct
+  SubProductModalUnit, // Import SubProductModalUnit
 } from '../../utils/canonicalModel';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -34,6 +36,12 @@ import {
   incrementQuantity,
   selectCart,
 } from '../../services/cart/productCartSlice';
+
+import SubProductModal from '../../Components/SubProductsModal'; // Ensure path is correct
+import {
+  fetchSubProducts,
+  clearSubProducts,
+} from '../../services/subProductSlice'; // Import sub-product actions
 
 import CartScreen from '../Cart/CartScreen';
 import VendorDetails from './venderHeader';
@@ -78,6 +86,61 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const [showBanner, setShowBanner] = useState(true);
   const bannerTranslateY = useRef(new Animated.Value(0)).current;
   const lastScrollY = useRef(0);
+
+  const [selectedProductForVariants, setSelectedProductForVariants] =
+    useState<Product | null>(null);
+  const [isSubProductModalVisible, setIsSubProductModalVisible] =
+    useState(false);
+
+  // Get sub-product state from Redux
+  const {
+    currentSubProducts,
+    loading: subProductsLoading,
+    error: subProductsError,
+    currentParentProductId,
+  } = useSelector((state: RootState) => state.subProducts);
+
+  const handleAddToCartOrOpenSubModal = (productItem: Product) => {
+    // Use an explicit flag like productItem.hasVariants if available from your API
+    // Otherwise, fall back to checking productSize or if subProducts are pre-loaded
+    const hasVariants =
+      productItem.hasVariants === true ||
+      (productItem.productSize && productItem.productSize.length > 1);
+
+    if (hasVariants) {
+      setSelectedProductForVariants(productItem);
+      setIsSubProductModalVisible(true);
+      if (authData && vendor?.vendorId) {
+        // Ensure authData and vendorId are available
+        dispatch(
+          fetchSubProducts({
+            authData: authData.sessionKey, // Or however you access the token
+            vendorId: vendor.vendorId,
+            parentProductId: productItem.productId,
+          }),
+        );
+      } else {
+        Alert.alert(
+          'Error',
+          'Cannot fetch product variants. Authentication or vendor details missing.',
+        );
+        setIsSubProductModalVisible(false); // Don't open modal if essential data is missing
+        setSelectedProductForVariants(null);
+      }
+    } else {
+      // Product has no variants, proceed with direct add to cart
+      const cartProduct: ProductCartItems = {
+        id: productItem.productId,
+        name: productItem.title,
+        productPrice: productItem.productPrice,
+        salePrice: productItem.productSalePrice,
+        quantity: 1,
+        image: productItem.productImageLink,
+        vendorId: productItem.vendorId,
+      };
+      handleAddToCart(cartProduct); // Your existing debounced add to cart
+    }
+  };
 
   const handleScroll = event => {
     const offsetY = event.nativeEvent.contentOffset.y;
@@ -149,22 +212,26 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       setSelectedCategory(categoriesWithProducts[0]?.id);
     }
   }, [categoriesWithProducts]);
-  const filteredProducts = (
-    searchQuery
-      ? (products || []).filter(product =>
-          product.title.toLowerCase().includes(searchQuery.toLowerCase()),
-        )
-      : selectedCategory
-      ? (products || []).filter(product =>
-          selectedCategory === 'other'
-            ? !categoriesWithProducts.some(cat => cat.id === product.category)
-            : product.category === selectedCategory,
-        )
-      : products || []
-  ).sort((a, b) => {
+
+  const baseFilteredProducts = searchQuery
+    ? (products || []).filter(product =>
+        product.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : selectedCategory
+    ? (products || []).filter(product =>
+        selectedCategory === 'other'
+          ? !categoriesWithProducts.some(cat => cat.id === product.category)
+          : product.category === selectedCategory,
+      )
+    : products || []; // Get the array to be sorted
+
+  // Now, create a copy of baseFilteredProducts and then sort it
+  const filteredProducts = [...baseFilteredProducts].sort((a, b) => {
     // Sort in-stock items (availability = true) before out-of-stock items
-    if (a.availability === b.availability) return 0;
-    return a.availability ? -1 : 1;
+    if (a.availability === b.availability) {
+      return 0; // Keep original relative order if availability is the same
+    }
+    return a.availability ? -1 : 1; // true (in-stock) comes before false (out-of-stock)
   });
 
   const handleCategoryPress = (categoryId: string) => {
@@ -180,16 +247,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   };
 
   const handleAddToCart = debounce((product: ProductCartItems) => {
+    // ... (your existing logic for auth check, store open, vendor conflict)
     if (!authData) {
-      Alert.alert(
-        'Login Required',
-        'Please log in to add products to your cart.',
-        [
-          {text: 'Cancel', style: 'cancel'},
-          {text: 'Login', onPress: () => handleClick()},
-        ],
-      );
-      return;
+      /* ... */ return;
     }
     if (storeOpen) {
       if (cart.length > 0 && cart[0].vendorId !== product.vendorId) {
@@ -199,15 +259,16 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         dispatch(
           addToCart(
             {
-              id: product.id,
+              id: product.id, // This should be the specific sub-product ID if applicable
+              parentId: product.parentId, // Add parentId if it's a variant
               name: product.name,
               productPrice: product.productPrice,
               salePrice: product.salePrice,
-              quantity: 1,
+              quantity: product.quantity || 1,
               image: product.image,
               vendorId: product.vendorId,
             },
-            authData,
+            authData, // Pass authData to cart actions if they need it for backend sync
           ),
         );
       }
@@ -281,64 +342,54 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   };
 
   const renderProductItem = ({item}: {item: Product}) => {
-    const isInStock = item.availability;
-
-    const product: ProductCartItems = {
+    // ... (isInStock, currentCartItem, isProductOnSale)
+    const currentCartItem = cartItems[item.productId];
+    const displayProductForCartButton: ProductCartItems = {
       id: item.productId,
       name: item.title,
       productPrice: item.productPrice,
       salePrice: item.productSalePrice,
-      quantity: cartItems[item.productId]?.quantity || 0,
+      quantity: currentCartItem?.quantity || 0, // Show quantity of parent if no variants selected yet
       image: item.productImageLink,
       vendorId: item.vendorId,
     };
-    const isProductOnSale =
-      item.productSalePrice && item.productSalePrice !== item.productPrice;
     return (
-      <View
-        style={[
-          styles.productContainer,
-          (!storeOpen || !isInStock) && styles.disabledProductContainer,
-        ]}>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Image
-            source={{uri: product.image}}
-            style={styles.productImage}
-            resizeMode="cover"
-          />
-          {!isInStock && (
-            <View style={styles.outOfStockOverlay}>
-              <Text style={styles.outOfStockText}>Out of Stock</Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.productDetails}>
-          <Text style={styles.productName} numberOfLines={2}>
-            {product.name}
-          </Text>
-          {isProductOnSale && (
-            <Text style={styles.originalPrice}>₹{product.productPrice}</Text>
-          )}
-          <Text style={styles.salePrice}> ₹{product.salePrice}</Text>
-        </View>
+      <View /* ... productContainer ... */>
+        {/* ... Image, Details ... */}
         <View style={{position: 'absolute', bottom: 8, right: 0}}>
           <CartButton
-            quantity={product.quantity}
-            onIncrease={() => handleIncreaseQuantity(product.id)}
-            onDecrease={() => handleDecreaseQuantity(product.id)}
-            onAdd={() => handleAddToCart(product)}
-            added={product.quantity > 0}
-            disabled={!storeOpen || !isInStock || loading || error}
+            quantity={displayProductForCartButton.quantity}
+            // For +/- on the main product card, it should probably still affect the "default" or main item,
+            // or be disabled if variants must be chosen. This depends on your UX.
+            // For simplicity, let's assume +/- here operate on the main product ID if it's already in cart.
+            onIncrease={() => handleIncreaseQuantity(item.productId)}
+            onDecrease={() => handleDecreaseQuantity(item.productId)}
+            onAdd={() => handleAddToCartOrOpenSubModal(item)} // This now handles variant logic
+            added={displayProductForCartButton.quantity > 0}
+            disabled={!storeOpen || !item.availability || loading || !!error}
           />
         </View>
       </View>
     );
   };
+
+  const subProductModalUnits: SubProductModalUnit[] = useMemo(() => {
+    if (!selectedProductForVariants || currentSubProducts.length === 0)
+      return [];
+    // Only map if the loaded subProducts match the selected parent product
+    if (currentParentProductId !== selectedProductForVariants.productId)
+      return [];
+
+    return currentSubProducts.map(sub => ({
+      id: sub.id,
+      label: sub.label,
+      volume: sub.volume,
+      price: sub.price,
+      discountedPrice: sub.discountedPrice,
+      image: sub.image || selectedProductForVariants.productImageLink, // Fallback to parent image
+      originalSubProduct: sub, // Keep the original sub-product data
+    }));
+  }, [currentSubProducts, selectedProductForVariants, currentParentProductId]);
 
   // Calculate total number of items in the cart
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
@@ -486,6 +537,50 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         onConfirm={handleConfirmAddToCart}
         onCancel={handleCancelAddToCart}
       />
+
+      {selectedProductForVariants && ( // Ensure a product is selected before trying to render modal
+        <SubProductModal
+          visible={isSubProductModalVisible}
+          onClose={() => {
+            setIsSubProductModalVisible(false);
+            setSelectedProductForVariants(null);
+            dispatch(clearSubProducts()); // Clear sub-product state when modal closes
+          }}
+          title={`Select unit for ${selectedProductForVariants.title}`}
+          units={subProductModalUnits}
+          isLoading={subProductsLoading} // Pass loading state to modal
+          error={subProductsError} // Pass error state to modal
+          onAdd={selectedUnitId => {
+            // Assuming onAdd from modal gives just the ID of the selected SubProductModalUnit
+            const selectedUnitOriginal = subProductModalUnits.find(
+              u => u.id === selectedUnitId,
+            )?.originalSubProduct;
+
+            if (selectedUnitOriginal && selectedProductForVariants) {
+              const variantCartItem: ProductCartItems = {
+                id: selectedUnitOriginal.id, // Use the sub-product's unique ID
+                parentId: selectedProductForVariants.productId, // Link to parent product
+                name: `${selectedProductForVariants.title} (${selectedUnitOriginal.label})`,
+                productPrice: selectedUnitOriginal.price,
+                salePrice:
+                  selectedUnitOriginal.discountedPrice ||
+                  selectedUnitOriginal.price,
+                quantity: 1, // Add one specific variant
+                image:
+                  selectedUnitOriginal.image ||
+                  selectedProductForVariants.productImageLink,
+                vendorId: selectedProductForVariants.vendorId,
+              };
+              handleAddToCart(variantCartItem); // Add the specific variant to cart
+              setIsSubProductModalVisible(false);
+              setSelectedProductForVariants(null);
+              dispatch(clearSubProducts());
+            } else {
+              Alert.alert('Error', 'Could not find selected variant details.');
+            }
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 };

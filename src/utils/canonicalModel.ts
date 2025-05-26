@@ -118,11 +118,37 @@ export interface OrdersResponse {
   ordersMetadata: OrderMetadata[];
   cursor: Cursor | null;
 }
-export interface ProductCartItems {
+
+export interface SubProduct {
+  // Or Variant, SKU, Unit etc.
+  id: string; // Unique ID for this specific sub-product/variant
+  parentId: string; // ID of the main product it belongs to
+  label: string; // e.g., "Small", "Large", "250ml"
+  volume?: string;
+  price: number;
+  discountedPrice?: number;
+  image?: string; // Optional: specific image for this variant
+  availability: boolean; // Each variant can have its own availability
+  // ... any other variant-specific properties
+}
+
+// For the SubProductModal's 'units' prop, we might transform SubProduct
+export interface SubProductModalUnit {
   id: string;
+  label: string;
+  volume?: string;
+  price: number;
+  discountedPrice?: number;
+  image: any; // For local or remote images
+  originalSubProduct: SubProduct; // Keep original for adding to cart
+}
+
+export interface ProductCartItems {
+  id: string; // ID of the specific variant/sub-product if applicable
+  parentId?: string; // ID of the main product if this is a variant
   name: string;
-  productPrice: string;
-  salePrice: string;
+  productPrice: number;
+  salePrice: number;
   quantity: number;
   image: string;
   vendorId: string;
@@ -152,7 +178,10 @@ export interface Product {
   productSize: string;
   category: string;
   isBestSeller: boolean;
+
+  hasVariants?: boolean;
 }
+
 export interface Category {
   id: string;
   name: string;

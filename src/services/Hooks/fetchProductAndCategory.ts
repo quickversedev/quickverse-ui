@@ -5,6 +5,8 @@ import {
   selectProducts,
   selectProductLoading,
   selectProductError,
+  selectProductComplete,
+  productSlice,
 } from '../productSlice';
 import {
   fetchCategories,
@@ -18,9 +20,11 @@ import {Category, Product} from '../../utils/canonicalModel';
 interface UseFetchProductsAndCategoriesReturn {
   products: Product[];
   categories: Category[];
-  loading: boolean; // Overall loading state
-  productsLoading: boolean; // Products-specific loading
-  categoriesLoading: boolean; // Categories-specific loading
+  loading: boolean;
+  productsLoading: boolean;
+  categoriesLoading: boolean;
+  productsComplete: boolean;
+  categoriesComplete: boolean;
   error: boolean;
   refetch: () => Promise<void>;
 }
@@ -30,16 +34,17 @@ export const useFetchProductsAndCategories = (
 ): UseFetchProductsAndCategoriesReturn => {
   const dispatch = useDispatch<AppDispatch>();
 
+  // Selectors
   const products = useSelector(selectProducts);
   const categories = useSelector(selectCategories);
   const productLoading = useSelector(selectProductLoading);
   const categoryLoading = useSelector(selectCategoryLoading);
   const productError = useSelector(selectProductError);
   const categoryError = useSelector(selectCategoryError);
+  const productsComplete = useSelector(selectProductComplete);
 
+  // Local state
   const [loading, setLoading] = useState<boolean>(false);
-  const [productsLoading, setProductsLoading] = useState<boolean>(false);
-  const [categoriesLoading, setCategoriesLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
 
   const refetch = useCallback(async () => {
@@ -47,56 +52,33 @@ export const useFetchProductsAndCategories = (
 
     setLoading(true);
     setError(false);
-    setProductsLoading(true);
-    setCategoriesLoading(true);
 
     try {
-      // Start both requests
-      const productsPromise = dispatch(fetchProducts({vendorId}));
-      const categoriesPromise = dispatch(fetchCategories({vendorId}));
+      // Reset complete states
+      dispatch(productSlice.actions.setComplete(false));
 
-      // Wait for both to complete
-      await Promise.all([productsPromise, categoriesPromise]);
+      // Start both requests in parallel
+      await Promise.all([
+        dispatch(fetchProducts({vendorId})),
+        dispatch(fetchCategories({vendorId})),
+      ]);
     } catch (err) {
       console.error('Error while fetching products or categories:', err);
       setError(true);
     } finally {
-      // The individual loading states will be updated by the Redux slices
-      // We'll handle the overall loading state in the effect below
+      setLoading(false);
     }
   }, [dispatch, vendorId]);
 
+  // Initial fetch
   useEffect(() => {
     refetch();
   }, [refetch]);
 
-  // Update loading states based on Redux state
-  useEffect(() => {
-    // Products have finished loading
-    if (!productLoading) {
-      setProductsLoading(false);
-      console.log('Products loaded:', products.length);
-    }
-
-    // Categories have finished loading
-    if (!categoryLoading) {
-      setCategoriesLoading(false);
-      console.log('Categories loaded:', categories.length);
-    }
-
-    // Overall loading is complete when both are done
-    if (!productLoading && !categoryLoading) {
-      setLoading(false);
-      console.log('All data loaded');
-    }
-  }, [productLoading, categoryLoading, products.length, categories.length]);
-
+  // Error handling
   useEffect(() => {
     if (productError || categoryError) {
       setError(true);
-      setLoading(false);
-      setProductsLoading(false);
-      setCategoriesLoading(false);
     }
   }, [productError, categoryError]);
 
@@ -104,8 +86,10 @@ export const useFetchProductsAndCategories = (
     products,
     categories,
     loading,
-    productsLoading,
-    categoriesLoading,
+    productsLoading: productLoading,
+    categoriesLoading: categoryLoading,
+    productsComplete,
+    categoriesComplete: !categoryLoading, // Assuming no partial loading for categories
     error,
     refetch,
   };

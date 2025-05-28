@@ -1,74 +1,65 @@
 import {createSlice, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
 import {RootState} from '../store/store';
-import {mockProductData, Product} from '../data/mockProductData';
 import axios from 'axios';
 import globalConfig from '../utils/GlobalConfig';
 import {fetchToken} from '../utils/KeychainStore/keychainUtil';
+import {Product} from '../utils/canonicalModel';
 
-// Define the state interface
 interface ProductState {
   products: Product[];
   loading: boolean;
   error: string | null;
+  isComplete: boolean;
 }
 
-// Initial state with mock data
 const initialState: ProductState = {
   products: [],
   loading: false,
   error: null,
+  isComplete: false,
 };
 
-// Async thunk to fetch products from an API with a 1-second delay
-// export const fetchProducts = createAsyncThunk(
-//   'products/fetchProducts',
-//   async (vendorId: string) => {
-//     return new Promise<Product[]>(resolve => {
-//       setTimeout(() => {
-//         console.log('vendorId to fetch Product mock:', vendorId);
-//         resolve(mockProductData);
-//       }, 1000);
-//     });
-//   },
-// );
 const API_BASE_URL = `${globalConfig.apiBaseUrl}/v2/campus`;
 
-// Async thunk to fetch products using Axios with campusId as a path param
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
-  async ({vendorId}: {vendorId: string}, {rejectWithValue}) => {
+  async ({vendorId}: {vendorId: string}, {rejectWithValue, dispatch}) => {
     try {
       const token = await fetchToken();
       let allProducts: Product[] = [];
       let offset = 0;
-      const limit = 50; // Batch size
+      const limit = 50;
       let hasMore = true;
-      const MAX_ITERATIONS = 30; // Safety net to prevent infinite loops
+      const MAX_ITERATIONS = 30;
       let iteration = 0;
+
+      // Clear existing products before new fetch
+      dispatch(productSlice.actions.clearProducts());
+      dispatch(productSlice.actions.setComplete(false));
+
       while (hasMore && iteration < MAX_ITERATIONS) {
         iteration++;
-        console.log('offset:', offset);
 
         const response = await axios.post<any>(
           `${API_BASE_URL}/${vendorId}/products`,
           {offset},
-          {
-            headers: {
-              Authorization: token,
-            },
-          },
+          {headers: {Authorization: token}},
         );
 
         const productsBatch = response.data?.products?.product || [];
+
+        // Dispatch incremental update
+        dispatch(productSlice.actions.appendProducts(productsBatch));
+
         allProducts = [...allProducts, ...productsBatch];
 
-        // Check if we've received fewer items than requested
         if (productsBatch.length < limit) {
           hasMore = false;
         } else {
-          offset += limit; // Prepare for next batch
+          offset += limit;
         }
       }
+
       return allProducts;
     } catch (error) {
       console.error('Failed to fetch products:', error);
@@ -84,23 +75,31 @@ export const productSlice = createSlice({
     setProducts: (state, action: PayloadAction<Product[]>) => {
       state.products = action.payload;
     },
+    appendProducts: (state, action: PayloadAction<Product[]>) => {
+      state.products = [...state.products, ...action.payload];
+    },
+    clearProducts: state => {
+      state.products = [];
+    },
+    setComplete: (state, action: PayloadAction<boolean>) => {
+      state.isComplete = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
       .addCase(fetchProducts.pending, state => {
         state.loading = true;
         state.error = null;
+        state.isComplete = false;
       })
-      .addCase(
-        fetchProducts.fulfilled,
-        (state, action: PayloadAction<Product[]>) => {
-          state.products = action.payload;
-          state.loading = false;
-        },
-      )
+      .addCase(fetchProducts.fulfilled, state => {
+        state.loading = false;
+        state.isComplete = true;
+      })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+        state.isComplete = false;
       });
   },
 });
@@ -109,6 +108,9 @@ export const selectProducts = (state: RootState) => state.products.products;
 export const selectProductLoading = (state: RootState) =>
   state.products.loading;
 export const selectProductError = (state: RootState) => state.products.error;
+export const selectProductComplete = (state: RootState) =>
+  state.products.isComplete;
 
-export const {setProducts} = productSlice.actions;
+export const {setProducts, appendProducts, clearProducts, setComplete} =
+  productSlice.actions;
 export default productSlice.reducer;

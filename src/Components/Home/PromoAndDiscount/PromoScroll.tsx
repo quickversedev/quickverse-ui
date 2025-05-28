@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
-import {Promo, Vendor} from '../../../utils/canonicalModel';
+import {Promo} from '../../../utils/canonicalModel';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../../store/store';
 import {useNavigation} from '@react-navigation/native';
@@ -39,9 +39,15 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
     vendor: vendors.find(v => v.vendorId === promo.vendorId),
   }));
 
-  const handleCardPress = (vendor: Vendor | undefined) => {
+  const handleCardPress = (item: any) => {
     navigation.removeListener;
-    vendor && navigation.navigate('Categories', {vendor});
+
+    const vendor = item.vendor;
+    if (!vendor && item?.vendorId.startsWith('qv-')) {
+      navigation.navigate('WebView', {url: item?.promoLink});
+    } else {
+      vendor && navigation.navigate('Categories', {vendor});
+    }
   };
 
   return (
@@ -61,20 +67,24 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
           parallaxScrollingOffset: 50,
         }}
         onSnapToItem={index => setActiveIndex(index)}
-        renderItem={({item}) => (
-          <TouchableOpacity onPress={() => handleCardPress(item?.vendor)}>
-            <View style={styles.imageContainer}>
-              <Image
-                source={{uri: `${item.promoImage}.jpg`}}
-                style={[styles.image, {height: bannerHeight}]}
-                resizeMode="cover"
-                onError={() =>
-                  console.log('Image failed to load:', item.promoImage)
-                }
-              />
-            </View>
-          </TouchableOpacity>
-        )}
+        renderItem={({item, index}) => {
+          return (
+            <TouchableOpacity
+              key={`promo-${item.promoId}-${index}`}
+              onPress={() => handleCardPress(item)}>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={{uri: `${item.promoImage}.jpg`}}
+                  style={[styles.image, {height: bannerHeight}]}
+                  resizeMode="cover"
+                  onError={() =>
+                    console.log('Image failed to load:', item.promoImage)
+                  }
+                />
+              </View>
+            </TouchableOpacity>
+          );
+        }}
       />
     </View>
   );

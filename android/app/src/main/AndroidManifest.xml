@@ -18,6 +18,10 @@
      android:name="com.google.android.geo.API_KEY"
      android:value="AIzaSyCyQqXzvpH9Y8c61Z7UYOyNyUpkMv_DzJ0"/>
 
+      <meta-data
+        android:name="com.google.firebase.messaging.default_notification_icon"
+        android:resource="@drawable/qv_blue" />
+      
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

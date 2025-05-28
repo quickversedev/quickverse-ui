@@ -1,20 +1,24 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axios from 'axios';
-import globalConfig from '../utils/GlobalConfig';
-import {SubProduct} from '../utils/canonicalModel'; // Assuming types are here
 
-// Expected API response for fetching sub-products
-// IMPORTANT: Adjust this based on your actual API!
-export interface FetchSubProductsApiResponse {
-  subProducts: SubProduct[];
-  // Or whatever structure your API returns
-}
+import globalConfig from '../utils/GlobalConfig';
+
+import {SubProduct, Product} from '../utils/canonicalModel'; // Adjust path
+
+// The API response is an array of Product-like objects, which we'll treat as SubProducts
+// Let's adjust SubProduct to better match the response if needed, or ensure Product type covers it.
+// For now, assuming the response items can be mapped to your existing SubProduct type or Product type.
+// If `SubProduct` is significantly different from `Product`, you might need a mapping function.
+
+// Let's define what a sub-product means in the context of the API response.
+// It seems the API returns full Product objects as variants.
+export type ApiVariant = Product; // The API returns Product-like objects as variants
 
 interface SubProductState {
-  currentSubProducts: SubProduct[];
+  currentSubProducts: ApiVariant[]; // Store the variants as received
   loading: boolean;
   error: string | null;
-  currentParentProductId: string | null; // To know which product's variants are loaded
+  currentParentProductId: string | null;
 }
 
 const initialState: SubProductState = {
@@ -24,80 +28,80 @@ const initialState: SubProductState = {
   currentParentProductId: null,
 };
 
-// --- Thunk Args (assuming you need auth and product ID) ---
 export interface FetchSubProductsArgs {
-  authData: string | undefined;
+  basicAuthToken: string; // e.g., "Basic cXZDYXN0bGVFbnRyeTpjYSR0bGVfUGVybWl0QDAx"
   vendorId: string;
   parentProductId: string;
 }
 
-// --- Async Thunk for Fetching Sub-Products ---
 export const fetchSubProducts = createAsyncThunk<
-  SubProduct[], // Return type
+  ApiVariant[], // Return type is an array of these variant/product objects
   FetchSubProductsArgs,
   {rejectValue: string}
 >(
   'subProducts/fetchSubProducts',
-  async ({authData, vendorId, parentProductId}, {rejectWithValue}) => {
-    if (!authData || !vendorId || !parentProductId) {
+  async ({basicAuthToken, vendorId, parentProductId}, {rejectWithValue}) => {
+    if (!basicAuthToken || !vendorId || !parentProductId) {
       return rejectWithValue(
         'Missing required parameters for fetching sub-products.',
       );
     }
-    console.log(`Fetching sub-products for productId: ${parentProductId}`);
-    try {
-      // === IMPORTANT: Replace with your ACTUAL API endpoint for sub-products ===
-      // This is a GUESS based on common patterns.
-      const response = await axios.get<FetchSubProductsApiResponse>(
-        `${globalConfig.apiBaseUrl}/v2/products/${parentProductId}/subProducts`, // EXAMPLE ENDPOINT
-        {
-          params: {vendorId},
-          headers: {SessionKey: authData},
-        },
-      );
+    console.log(
+      `Fetching sub-products for parentProductId: ${parentProductId} under vendorId: ${vendorId}`,
+    );
 
-      if (response.data && Array.isArray(response.data.subProducts)) {
-        return response.data.subProducts;
+    const endpoint = '/quickVerse/v2/subproducts';
+    const url = `${globalConfig}${endpoint}`; // Use your configured API_BASE_URL
+
+    try {
+      const response = await axios.get<ApiVariant[]>(url, {
+        // Expect an array of ApiVariant
+        params: {
+          vendorId: vendorId,
+          productId: parentProductId, // API uses 'productId' for the parent here
+        },
+        headers: {
+          Authorization: basicAuthToken, // Use Basic Auth
+          // 'Content-Type': 'application/json' // Not strictly needed for GET
+        },
+      });
+
+      // The response itself is expected to be the array of sub-products/variants
+      if (response.data && Array.isArray(response.data)) {
+        console.log(`Fetched ${response.data.length} sub-products/variants.`);
+        // We need to ensure each variant has a distinguishable 'label' or 'id' for the modal
+        // and a 'price'. The current response items have 'productId' as their unique ID
+        // and 'title' (which might be same for all variants) and 'productSalePrice'.
+        // We'll map them slightly to fit the SubProduct idea better, if SubProduct type requires it.
+        // Or, if ApiVariant (which is Product) is directly usable, just return it.
+
+        return response.data.map(variant => ({
+          ...variant,
+          id: variant.productId, // Use productId as the unique ID for the variant
+          parentId: parentProductId, // Add parentId for reference
+          label: variant.description || variant.title, // Try to find a distinguishing label
+          // You might need more specific logic here
+          // e.g., if description contains "Half" or "Full"
+          price:
+            parseFloat(variant.productSalePrice as any) ||
+            parseFloat(variant.productPrice as any) ||
+            0, // Ensure price is a number
+          // discountedPrice: variant.productSalePrice !== variant.productPrice ? parseFloat(variant.productSalePrice as any) : undefined,
+          // availability: variant.availability,
+          // image: variant.productImageLink
+        })) as SubProduct[]; // Cast to SubProduct[] if your SubProduct type is different
+        // but for now, we'll assume ApiVariant[] is fine and SubProductModal can adapt
       } else {
-        // --- MOCK IMPLEMENTATION (Remove when API is ready) ---
         console.warn(
-          'MOCK: Sub-product API not implemented or returned unexpected data. Using mock sub-products.',
+          'Sub-product API returned unexpected data structure:',
+          response.data,
         );
-        await new Promise(res => setTimeout(res, 700)); // Simulate delay
-        const mockSubProducts: SubProduct[] = [
-          {
-            id: `${parentProductId}-s`,
-            parentId: parentProductId,
-            label: 'Small',
-            price: 90,
-            availability: true,
-            image: 'https://via.placeholder.com/50/FF0000/FFFFFF?Text=S',
-          },
-          {
-            id: `${parentProductId}-m`,
-            parentId: parentProductId,
-            label: 'Medium',
-            price: 100,
-            availability: true,
-            image: 'https://via.placeholder.com/50/00FF00/FFFFFF?Text=M',
-          },
-          {
-            id: `${parentProductId}-l`,
-            parentId: parentProductId,
-            label: 'Large',
-            price: 110,
-            availability: false,
-            image: 'https://via.placeholder.com/50/0000FF/FFFFFF?Text=L',
-          },
-        ];
-        return mockSubProducts;
-        // --- END MOCK ---
-        // return rejectWithValue('Invalid data format for sub-products.');
+        return rejectWithValue('Invalid data format for sub-products.');
       }
     } catch (error: any) {
       console.error(
         'fetchSubProducts Error:',
-        error.response?.data || error.message,
+        error.response?.data || error.message || error,
       );
       const message =
         error.response?.data?.message ||
@@ -124,11 +128,12 @@ const subProductSlice = createSlice({
       .addCase(fetchSubProducts.pending, (state, action) => {
         state.loading = true;
         state.error = null;
-        state.currentParentProductId = action.meta.arg.parentProductId; // Store which product we are fetching for
-        state.currentSubProducts = []; // Clear previous sub-products
+        state.currentParentProductId = action.meta.arg.parentProductId;
+        state.currentSubProducts = [];
       })
       .addCase(fetchSubProducts.fulfilled, (state, action) => {
         state.loading = false;
+        // action.payload is now ApiVariant[] (or SubProduct[] after mapping)
         state.currentSubProducts = action.payload;
       })
       .addCase(fetchSubProducts.rejected, (state, action) => {

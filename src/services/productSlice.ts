@@ -20,17 +20,17 @@ const initialState: ProductState = {
 };
 
 // Async thunk to fetch products from an API with a 1-second delay
-export const fetchProducts = createAsyncThunk(
-  'products/fetchProducts',
-  async (vendorId: string) => {
-    return new Promise<Product[]>(resolve => {
-      setTimeout(() => {
-        console.log('vendorId to fetch Product mock:', vendorId);
-        resolve(mockProductData);
-      }, 1000);
-    });
-  },
-);
+// export const fetchProducts = createAsyncThunk(
+//   'products/fetchProducts',
+//   async (vendorId: string) => {
+//     return new Promise<Product[]>(resolve => {
+//       setTimeout(() => {
+//         console.log('vendorId to fetch Product mock:', vendorId);
+//         resolve(mockProductData);
+//       }, 1000);
+//     });
+//   },
+// );
 const API_BASE_URL = `${globalConfig.apiBaseUrl}/v2/campus`;
 
 // Async thunk to fetch products using Axios with campusId as a path param
@@ -56,6 +56,51 @@ const API_BASE_URL = `${globalConfig.apiBaseUrl}/v2/campus`;
 //     }
 //   },
 // );
+// const API_BASE_URL = `${globalConfig.apiBaseUrl}/v2/campus`;
+
+// Async thunk to fetch products using Axios with campusId as a path param
+export const fetchProducts = createAsyncThunk(
+  'products/fetchProducts',
+  async ({vendorId}: {vendorId: string}, {rejectWithValue}) => {
+    try {
+      const token = await fetchToken();
+      let allProducts: Product[] = [];
+      let offset = 0;
+      const limit = 50; // Batch size
+      let hasMore = true;
+      const MAX_ITERATIONS = 30; // Safety net to prevent infinite loops
+      let iteration = 0;
+      while (hasMore && iteration < MAX_ITERATIONS) {
+        iteration++;
+        console.log('offset:', offset);
+
+        const response = await axios.post<any>(
+          `${API_BASE_URL}/${vendorId}/products`,
+          {offset},
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
+
+        const productsBatch = response.data?.products?.product || [];
+        allProducts = [...allProducts, ...productsBatch];
+
+        // Check if we've received fewer items than requested
+        if (productsBatch.length < limit) {
+          hasMore = false;
+        } else {
+          offset += limit; // Prepare for next batch
+        }
+      }
+      return allProducts;
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+      return rejectWithValue('Failed to fetch products');
+    }
+  },
+);
 
 export const productSlice = createSlice({
   name: 'products',

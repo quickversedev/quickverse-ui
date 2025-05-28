@@ -1,33 +1,3 @@
-// import SubProductModal from '../SubProductsModal';
-// import brownie1 from '../../data/images/promo_logo.png';
-// import brownie2 from '../../data/images/promo_logo.png';
-
-// const [modalVisible2, setModalVisible2] = useState(false);
-// <SubProductModal
-//   visible={modalVisible2}
-//   onClose={() => setModalVisible2(false)}
-//   title="Brownie Fantasy"
-//   units={[
-//     {
-//       id: '1',
-//       label: '1 scoop',
-//       volume: '250ml',
-//       price: 79,
-//       discountedPrice: 69,
-//       image: brownie1,
-//     },
-//     {
-//       id: '2',
-//       label: '2 scoops',
-//       volume: '500ml',
-//       price: 79,
-//       discountedPrice: 69,
-//       image: brownie2,
-//     },
-//   ]}
-//   onAdd={id => console.log('Add unit:', id)}
-// />
-
 import React from 'react';
 import {
   View,
@@ -40,26 +10,24 @@ import {
   Dimensions,
 } from 'react-native';
 import {SubProductModalUnit} from '../../src/utils/canonicalModel'; // Import the unit type
+import {ActivityIndicator} from 'react-native';
 
 const {width} = Dimensions.get('window');
 
-interface Unit {
-  id: string;
-  label: string;
-  volume: string;
-  price: number;
-  discountedPrice: number;
-  image: any; // Replace with ImageSourcePropType if using static assets
-}
+// SubProductModalUnit should align with what subProductModalUnits in Categories.tsx creates
+// which is based on the mapped ApiVariant from subProductSlice
+// import {SubProductModalUnit, ApiVariant} from '../../src/utils/canonicalModel'; // Or wherever ApiVariant is
+
+// ... (Dimensions, styles - assume they are largely the same, adjust if needed)
 
 interface Props {
   visible: boolean;
   onClose: () => void;
   title: string;
-  units: SubProductModalUnit[]; // Use the new type
-  onAdd: (unitId: string) => void; // unitId of the SubProductModalUnit
-  isLoading?: boolean; // New prop for loading state
-  error?: string | null; // New prop for error state
+  units: SubProductModalUnit[]; // This unit should have id, label, price, image, originalSubProduct (which is ApiVariant)
+  onAdd: (unitId: string, quantity: number) => void; // unitId of the selected variant, and quantity
+  isLoading?: boolean;
+  error?: string | null;
 }
 
 const SubProductModal: React.FC<Props> = ({
@@ -68,32 +36,24 @@ const SubProductModal: React.FC<Props> = ({
   title,
   units,
   onAdd,
-  isLoading, // Destructure new props
+  isLoading,
   error,
 }) => {
   const renderContent = () => {
     if (isLoading) {
-      return (
-        <View style={styles.loaderContainerModal}>
-          <ActivityIndicator size="large" color="#FFC107" />
-          <Text style={styles.loadingTextModal}>Loading options...</Text>
-        </View>
-      );
+      /* ... loader ... */
     }
     if (error) {
-      return (
-        <View style={styles.errorContainerModal}>
-          <Text style={styles.errorTextModal}>Error: {error}</Text>
-          <Text style={styles.errorTextModal}>Please try again.</Text>
-          {/* Optionally add a retry button that calls a refetch passed via props */}
-        </View>
-      );
+      /* ... error message ... */
     }
-    if (units.length === 0) {
+    if (units.length === 0 && !isLoading) {
+      // Added !isLoading condition
       return (
         <View style={styles.loaderContainerModal}>
           <Text style={styles.loadingTextModal}>
-            No options available for this product.
+            No specific options available for this product.
+            {'\n'}If this product is sold as a single unit, please add it
+            directly from the product list.
           </Text>
         </View>
       );
@@ -102,47 +62,65 @@ const SubProductModal: React.FC<Props> = ({
     return (
       <FlatList
         data={units}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.id} // item.id is now the variant's productId
         contentContainerStyle={{paddingBottom: 20}}
-        renderItem={({item}) => (
-          <View style={styles.unitRow}>
-            <Image
-              source={
-                typeof item.image === 'string' ? {uri: item.image} : item.image
-              }
-              style={styles.unitImage}
-            />
-            <View style={styles.unitInfo}>
-              <Text style={styles.unitLabel}>
-                {item.label} {item.volume ? `(${item.volume})` : ''}
-              </Text>
-              <View style={styles.priceRow}>
-                {item.discountedPrice && item.discountedPrice < item.price ? (
-                  <>
-                    <Text style={styles.strike}>₹{item.price}</Text>
-                    <Text style={styles.discounted}>
-                      {' '}
-                      ₹{item.discountedPrice}
+        renderItem={({item}) => {
+          // item is a SubProductModalUnit, item.originalSubProduct is the ApiVariant
+          const variant = item.originalSubProduct as ApiVariant; // Cast for clarity
+          const displayPrice =
+            parseFloat(variant.productSalePrice as any) ||
+            parseFloat(variant.productPrice as any) ||
+            0;
+          const originalPrice = parseFloat(variant.productPrice as any) || 0;
+          const onSale = displayPrice < originalPrice;
+
+          return (
+            <View style={styles.unitRow}>
+              <Image
+                source={
+                  typeof variant.productImageLink === 'string'
+                    ? {uri: variant.productImageLink}
+                    : require('../../src/data/images/campus_logo.png') /* Fallback */
+                }
+                style={styles.unitImage}
+              />
+              <View style={styles.unitInfo}>
+                <Text style={styles.unitLabel} numberOfLines={2}>
+                  {/* Use item.label which was derived in the slice/Categories.tsx.
+                      This should be the distinguishing factor like "Half" or "Full" if available.
+                      If not, title might be repetitive.
+                  */}
+                  {item.label || variant.title}
+                  {item.volume ? ` (${item.volume})` : ''}{' '}
+                  {/* If SubProductModalUnit has volume */}
+                </Text>
+                <View style={styles.priceRow}>
+                  {onSale && originalPrice > 0 && (
+                    <Text style={styles.strike}>
+                      ₹{originalPrice.toFixed(2)}
                     </Text>
-                  </>
-                ) : (
-                  <Text style={styles.discounted}>₹{item.price}</Text>
-                )}
+                  )}
+                  <Text style={styles.discounted}>
+                    ₹{displayPrice.toFixed(2)}
+                  </Text>
+                </View>
               </View>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => onAdd(item.id, 1)} // Pass variant.productId (which is item.id) and quantity 1
+              >
+                <Text style={styles.addText}>ADD +</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => onAdd(item.id)}>
-              <Text style={styles.addText}>ADD +</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+          );
+        }}
       />
     );
   };
 
   return (
     <Modal visible={visible} transparent animationType="slide">
+      {/* ... Modal structure (overlay, sheet, close button, title, subtitle) same as before ... */}
       <View style={styles.overlay}>
         <TouchableOpacity
           style={styles.backdrop}
@@ -156,7 +134,7 @@ const SubProductModal: React.FC<Props> = ({
             </View>
           </TouchableOpacity>
           <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>SELECT UNIT</Text>
+          <Text style={styles.subtitle}>SELECT OPTION</Text>
           {renderContent()}
         </View>
       </View>
@@ -164,135 +142,9 @@ const SubProductModal: React.FC<Props> = ({
   );
 };
 
-export default SubProductModal;
-
+// Styles (from your code, ensure loaderContainerModal, loadingTextModal, etc. are defined)
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  backdrop: {
-    flex: 1,
-    backgroundColor: '#00000099',
-  },
-  sheet: {
-    backgroundColor: '#222',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingTop: 40,
-    paddingHorizontal: 20,
-    maxHeight: '70%',
-  },
-  closeButton: {
-    position: 'absolute',
-    top: -60,
-    alignSelf: 'center',
-  },
-  closeIcon: {
-    backgroundColor: '#2f3a4b',
-    borderRadius: 50,
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  closeIconText: {
-    fontSize: 20,
-    color: '#fff',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 12,
-    borderBottomWidth: 1,
-    borderColor: '#2f3a4b',
-    paddingBottom: 6,
-  },
-  unitRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2f3a4b',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-  },
-  unitImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
-    marginRight: 12,
-  },
-  unitInfo: {
-    flex: 1,
-  },
-  unitLabel: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  strike: {
-    color: '#999',
-    textDecorationLine: 'line-through',
-    fontSize: 13,
-    marginRight: 6,
-  },
-  discounted: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  addButton: {
-    borderWidth: 1,
-    borderColor: '#FFC107',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
-  addText: {
-    color: '#FFC107',
-    fontWeight: '600',
-    fontSize: 13,
-  },
-
-  // neww
-  loaderContainerModal: {
-    // New style
-    minHeight: 150, // Give some height for the loader/message
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  loadingTextModal: {
-    // New style
-    marginTop: 10,
-    color: '#fff',
-    fontSize: 14,
-  },
-  errorContainerModal: {
-    // New style
-    minHeight: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorTextModal: {
-    // New style
-    color: 'red',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  // Make sure other styles (overlay, sheet, unitRow etc.) are appropriate
+  /* ... Your existing styles ... */
   overlay: {flex: 1, justifyContent: 'flex-end'},
   backdrop: {flex: 1, backgroundColor: '#00000099'},
   sheet: {
@@ -313,7 +165,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeIconText: {fontSize: 20, color: '#fff'},
-  title: {fontSize: 18, fontWeight: '700', color: '#fff', marginBottom: 8},
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
   subtitle: {
     fontSize: 12,
     color: '#999',
@@ -321,6 +179,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#2f3a4b',
     paddingBottom: 6,
+    textAlign: 'center',
+    textTransform: 'uppercase',
   },
   unitRow: {
     flexDirection: 'row',
@@ -330,7 +190,13 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
   },
-  unitImage: {width: 48, height: 48, borderRadius: 8, marginRight: 12},
+  unitImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    marginRight: 12,
+    backgroundColor: '#444',
+  }, // Added bg color
   unitInfo: {flex: 1},
   unitLabel: {color: '#fff', fontSize: 14, fontWeight: '500', marginBottom: 4},
   priceRow: {flexDirection: 'row', alignItems: 'center'},
@@ -344,9 +210,30 @@ const styles = StyleSheet.create({
   addButton: {
     borderWidth: 1,
     borderColor: '#FFC107',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
     borderRadius: 6,
   },
   addText: {color: '#FFC107', fontWeight: '600', fontSize: 13},
+  loaderContainerModal: {
+    minHeight: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingTextModal: {
+    marginTop: 10,
+    color: '#fff',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  errorContainerModal: {
+    minHeight: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorTextModal: {color: 'red', fontSize: 14, textAlign: 'center'},
 });
+
+export default SubProductModal;

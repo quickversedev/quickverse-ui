@@ -24,8 +24,8 @@ import {
   Product,
   ProductCartItems,
   Vendor,
-  SubProduct, // Import SubProduct
-  SubProductModalUnit, // Import SubProductModalUnit
+  SubProduct,
+  SubProductModalUnit,
 } from '../../utils/canonicalModel';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -61,8 +61,15 @@ type CategoriesScreenProps = {
 const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const {authData, setSkipLogin} = useAuth();
   const vendor: Vendor = route.params.vendor;
-  const {products, categories, loading, error, refetch} =
-    useFetchProductsAndCategories(vendor.vendorId);
+  const {
+    products,
+    categories,
+    loading, // True while either products or categories are loading
+    productsLoading, // True only while products are loading
+    categoriesLoading, // True only while categories are loading
+    error,
+    refetch,
+  } = useFetchProductsAndCategories(vendor.vendorId);
   const dispatch = useDispatch<AppDispatch>();
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
@@ -87,6 +94,26 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const bannerTranslateY = useRef(new Animated.Value(0)).current;
   const lastScrollY = useRef(0);
 
+  const handleScroll = event => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    lastScrollY.current = offsetY;
+    Keyboard.dismiss();
+    if (offsetY > 10 && showBanner) {
+      Animated.timing(bannerTranslateY, {
+        toValue: -500,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setShowBanner(false));
+    } else if (offsetY <= 10 && !showBanner) {
+      setShowBanner(true);
+      Animated.timing(bannerTranslateY, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
+
   const [selectedProductForVariants, setSelectedProductForVariants] =
     useState<Product | null>(null);
   const [isSubProductModalVisible, setIsSubProductModalVisible] =
@@ -101,11 +128,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   } = useSelector((state: RootState) => state.subProducts);
 
   const handleAddToCartOrOpenSubModal = (productItem: Product) => {
-    // Use an explicit flag like productItem.hasVariants if available from your API
-    // Otherwise, fall back to checking productSize or if subProducts are pre-loaded
-    const hasVariants =
-      productItem.hasVariants === true ||
-      (productItem.productSize && productItem.productSize.length > 1);
+    console.log('handleAddToCartOrOpenSubModal called');
+
+    const hasVariants = productItem.productSize !== '1';
 
     if (hasVariants) {
       setSelectedProductForVariants(productItem);
@@ -139,26 +164,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         vendorId: productItem.vendorId,
       };
       handleAddToCart(cartProduct); // Your existing debounced add to cart
-    }
-  };
-
-  const handleScroll = event => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    lastScrollY.current = offsetY;
-    Keyboard.dismiss();
-    if (offsetY > 10 && showBanner) {
-      Animated.timing(bannerTranslateY, {
-        toValue: -500,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => setShowBanner(false));
-    } else if (offsetY <= 10 && !showBanner) {
-      setShowBanner(true);
-      Animated.timing(bannerTranslateY, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
     }
   };
 
@@ -212,28 +217,26 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       setSelectedCategory(categoriesWithProducts[0]?.id);
     }
   }, [categoriesWithProducts]);
-
-  const baseFilteredProducts = searchQuery
-    ? (products || []).filter(product =>
-        product.title.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : selectedCategory
-    ? (products || []).filter(product =>
-        selectedCategory === 'other'
-          ? !categoriesWithProducts.some(cat => cat.id === product.category)
-          : product.category === selectedCategory,
-      )
-    : products || []; // Get the array to be sorted
-
-  // Now, create a copy of baseFilteredProducts and then sort it
-  const filteredProducts = [...baseFilteredProducts].sort((a, b) => {
-    // Sort in-stock items (availability = true) before out-of-stock items
-    if (a.availability === b.availability) {
-      return 0; // Keep original relative order if availability is the same
-    }
-    return a.availability ? -1 : 1; // true (in-stock) comes before false (out-of-stock)
-  });
-
+  const filteredProducts = (
+    searchQuery
+      ? (products || []).filter(product =>
+          product.title.toLowerCase().includes(searchQuery.toLowerCase()),
+        )
+      : selectedCategory
+      ? (products || []).filter(product =>
+          selectedCategory === 'other'
+            ? !categoriesWithProducts.some(cat => cat.id === product.category)
+            : product.category === selectedCategory,
+        )
+      : products || []
+  )
+    .slice()
+    .sort((a, b) => {
+      // Sort in-stock items (availability = true) before out-of-stock items
+      if (a.availability === b.availability) return 0;
+      return a.availability ? -1 : 1;
+    });
+  console.log('filtered products:', filteredProducts);
   const handleCategoryPress = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setSearchQuery('');
@@ -247,9 +250,16 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   };
 
   const handleAddToCart = debounce((product: ProductCartItems) => {
-    // ... (your existing logic for auth check, store open, vendor conflict)
     if (!authData) {
-      /* ... */ return;
+      Alert.alert(
+        'Login Required',
+        'Please log in to add products to your cart.',
+        [
+          {text: 'Cancel', style: 'cancel'},
+          {text: 'Login', onPress: () => handleClick()},
+        ],
+      );
+      return;
     }
     if (storeOpen) {
       if (cart.length > 0 && cart[0].vendorId !== product.vendorId) {
@@ -259,16 +269,16 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         dispatch(
           addToCart(
             {
-              id: product.id, // This should be the specific sub-product ID if applicable
-              parentId: product.parentId, // Add parentId if it's a variant
+              id: product.id,
               name: product.name,
               productPrice: product.productPrice,
               salePrice: product.salePrice,
-              quantity: product.quantity || 1,
+              quantity: 1,
+              // quantity: product.quantity || 1,
               image: product.image,
               vendorId: product.vendorId,
             },
-            authData, // Pass authData to cart actions if they need it for backend sync
+            authData,
           ),
         );
       }
@@ -342,31 +352,75 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   };
 
   const renderProductItem = ({item}: {item: Product}) => {
-    // ... (isInStock, currentCartItem, isProductOnSale)
+    console.log('Varient_count:', item.productSize);
+
+    const isInStock = item.availability;
+    let hasVariants = false; // Your logic for hasVariants
+    if (
+      typeof item.productSize === 'string' &&
+      item.productSize.trim() !== ''
+    ) {
+      if (item.productSize !== '1') {
+        hasVariants = true;
+      }
+    }
+
     const currentCartItem = cartItems[item.productId];
-    const displayProductForCartButton: ProductCartItems = {
-      id: item.productId,
-      name: item.title,
-      productPrice: item.productPrice,
-      salePrice: item.productSalePrice,
-      quantity: currentCartItem?.quantity || 0, // Show quantity of parent if no variants selected yet
-      image: item.productImageLink,
-      vendorId: item.vendorId,
-    };
+    const quantityInCart = currentCartItem?.quantity || 0;
+
     return (
-      <View /* ... productContainer ... */>
-        {/* ... Image, Details ... */}
+      <View
+        style={[
+          styles.productContainer,
+          (!storeOpen || !isInStock) && styles.disabledProductContainer,
+        ]}>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <Image
+            source={{uri: item.productImageLink}}
+            style={styles.productImage}
+            resizeMode="cover"
+          />
+          {!isInStock && (
+            <View style={styles.outOfStockOverlay}>
+              <Text style={styles.outOfStockText}>Out of Stock</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Product Details */}
+        <View style={styles.productDetails}>
+          <Text style={styles.productName} numberOfLines={2}>
+            {item.title}
+          </Text>
+          {item.productSize && hasVariants && (
+            <Text style={{color: 'grey'}}>{item.productSize}</Text>
+          )}
+          <View style={styles.priceContainer}>
+            <Text style={styles.originalPrice}>₹{item?.productPrice}</Text>
+
+            <Text style={styles.salePrice}>₹{item?.productSalePrice}</Text>
+          </View>
+        </View>
+
+        {/* Cart Button Area */}
         <View style={{position: 'absolute', bottom: 8, right: 0}}>
           <CartButton
-            quantity={displayProductForCartButton.quantity}
-            // For +/- on the main product card, it should probably still affect the "default" or main item,
-            // or be disabled if variants must be chosen. This depends on your UX.
-            // For simplicity, let's assume +/- here operate on the main product ID if it's already in cart.
-            onIncrease={() => handleIncreaseQuantity(item.productId)}
+            quantity={quantityInCart}
+            onIncrease={() => {
+              if (hasVariants) {
+                handleAddToCartOrOpenSubModal(item);
+              } else {
+                handleIncreaseQuantity(item.productId);
+              }
+            }}
+            // onDecrease={() => {
+            //   if (quantityInCart > 0) handleDecreaseQuantity(item.productId);
+            // }}
             onDecrease={() => handleDecreaseQuantity(item.productId)}
-            onAdd={() => handleAddToCartOrOpenSubModal(item)} // This now handles variant logic
-            added={displayProductForCartButton.quantity > 0}
-            disabled={!storeOpen || !item.availability || loading || !!error}
+            onAdd={() => handleAddToCartOrOpenSubModal(item)}
+            added={quantityInCart > 0}
+            // isVariantProduct={hasVariants}
+            disabled={!storeOpen || !isInStock || loading || !!error}
           />
         </View>
       </View>
@@ -374,8 +428,12 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   };
 
   const subProductModalUnits: SubProductModalUnit[] = useMemo(() => {
+    console.log('selectedProductForVariants:::', selectedProductForVariants);
+    console.log('currentSubProducts:::', currentSubProducts); //[]
+
     if (!selectedProductForVariants || currentSubProducts.length === 0)
       return [];
+
     // Only map if the loaded subProducts match the selected parent product
     if (currentParentProductId !== selectedProductForVariants.productId)
       return [];
@@ -394,7 +452,34 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   // Calculate total number of items in the cart
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
 
-  if (loading) {
+  // if (loading && !products.length && !categories.length) {
+  //   return (
+  //     <View style={styles.loaderContainer}>
+  //       <ActivityIndicator size="large" color={theme.colors.ternary} />
+  //       <Text style={styles.loaderText}>Loading products...</Text>
+  //     </View>
+  //   );
+  // }
+
+  // if (error) {
+  //   return (
+  //     <View style={styles.errorContainer}>
+  //       <MaterialCommunityIcons
+  //         name="alert-circle-outline"
+  //         size={48}
+  //         color={theme.colors.error}
+  //       />
+  //       <Text style={styles.errorText}>Failed to load products</Text>
+  //       <Text style={styles.errorSubText}>Please try again later</Text>
+  //       <TouchableOpacity style={styles.retryButton} onPress={refetch}>
+  //         <Text style={styles.retryButtonText}>Retry</Text>
+  //       </TouchableOpacity>
+  //     </View>
+  //   );
+  // }
+
+  if (loading && !products.length && !categories.length) {
+    // Use 'loading'
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color={theme.colors.ternary} />
@@ -404,6 +489,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   }
 
   if (error) {
+    // Use 'error'
     return (
       <View style={styles.errorContainer}>
         <MaterialCommunityIcons
@@ -412,21 +498,26 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           color={theme.colors.error}
         />
         <Text style={styles.errorText}>Failed to load products</Text>
-        <Text style={styles.errorSubText}>Please try again later</Text>
+        <Text style={styles.errorSubText}>
+          {typeof error === 'string' ? error : 'Please try again later.'}
+        </Text>
+        <TouchableOpacity style={styles.retryButton} onPress={refetch}>
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   return (
     <SafeAreaView style={styles.main}>
-      {/* store-Status */}
+      {/* store-Status Banner */}
       {!storeOpen && (
         <View style={styles.storeClosedBanner}>
           <Text style={styles.storeClosedText}>Store is Closed</Text>
         </View>
       )}
 
-      {/* Header Section */}
+      {/* Header Section (Search and Cart Button) */}
       <View style={styles.searchAndCartContainer}>
         <View style={styles.searchContainer}>
           <MaterialCommunityIcons
@@ -438,20 +529,21 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           <TextInput
             style={styles.searchInput}
             placeholder="Search by Category or Product"
-            placeholderTextColor={theme.colors.secondary}
+            placeholderTextColor={theme.colors.secondary} // Use theme color
             value={searchQuery}
             onChangeText={setSearchQuery}
-            editable={!loading && !error}
+            editable={!loading && !error} // Use 'loading' and 'error' from useFetchProductsAndCategories
           />
         </View>
         <TouchableOpacity
           style={styles.cartButton}
-          onPress={() => setModalVisible(true)}
-          disabled={loading || error}>
+          onPress={() => setModalVisible(true)} // setModalVisible is for CartScreen
+          disabled={loading || !!error} // Use 'loading' and 'error'
+        >
           <MaterialCommunityIcons
             name="cart-outline"
             size={24}
-            color="#FFDC52"
+            color="#FFDC52" // Or theme.colors.iconOnSecondary
           />
           {totalCartItems > 0 && (
             <View style={styles.cartBadge}>
@@ -462,121 +554,155 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       </View>
 
       <View style={{flex: 1}}>
-        {/* vendor-banner */}
+        {/* Vendor Details Banner (Animated) */}
         {showBanner && (
           <Animated.View style={{transform: [{translateY: bannerTranslateY}]}}>
             <VendorDetails vendor={vendor} />
           </Animated.View>
         )}
 
-        {/* Categories and Products */}
+        {/* Categories and Products Lists */}
         <View style={styles.contentContainer}>
-          {/* Categories */}
           <View style={styles.categoriesListContainer}>
-            <FlatList
-              data={filteredCategories}
-              renderItem={renderCategoryItem}
-              keyExtractor={item => item.id}
-              showsVerticalScrollIndicator={false}
-              onScroll={handleScroll}
-              scrollEventThrottle={100}
-              keyboardDismissMode="on-drag"
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  colors={[theme.colors.ternary]}
-                  tintColor={theme.colors.ternary}
-                />
-              }
-            />
+            {categoriesLoading && categories.length === 0 ? (
+              <View style={styles.sectionLoading}>
+                <ActivityIndicator size="small" color={theme.colors.ternary} />
+                <Text style={styles.sectionLoadingText}>
+                  Loading categories...
+                </Text>
+              </View>
+            ) : (
+              <FlatList
+                data={filteredCategories}
+                renderItem={renderCategoryItem}
+                keyExtractor={item => item.id}
+                showsVerticalScrollIndicator={false}
+                onScroll={handleScroll} // Ensure handleScroll is memoized if performance is an issue
+                scrollEventThrottle={100}
+                keyboardDismissMode="on-drag"
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={[theme.colors.ternary]}
+                    tintColor={theme.colors.ternary}
+                  />
+                }
+              />
+            )}
           </View>
 
-          {/* seperator-line */}
           <View style={styles.separator} />
 
-          {/* products */}
           <View style={styles.productsListContainer}>
-            <FlatList
-              data={filteredProducts}
-              renderItem={renderProductItem}
-              keyExtractor={item => item.productId}
-              showsVerticalScrollIndicator={false}
-              keyboardDismissMode="on-drag"
-              contentContainerStyle={
-                filteredProducts.length === 0 && styles.emptyProductList
-              }
-              onScroll={handleScroll}
-              scrollEventThrottle={100}
-              ListEmptyComponent={
-                <Text style={styles.noProductsText}>
-                  {searchQuery
-                    ? 'No products match your search'
-                    : 'No products available in this category'}
+            {productsLoading && products.length === 0 ? (
+              <View style={styles.sectionLoading}>
+                <ActivityIndicator size="small" color={theme.colors.ternary} />
+                <Text style={styles.sectionLoadingText}>
+                  Loading products...
                 </Text>
-              }
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  colors={[theme.colors.ternary]}
-                  tintColor={theme.colors.ternary}
-                />
-              }
-            />
+              </View>
+            ) : (
+              <FlatList
+                data={filteredProducts}
+                renderItem={renderProductItem}
+                keyExtractor={item => item.productId}
+                showsVerticalScrollIndicator={false}
+                keyboardDismissMode="on-drag"
+                contentContainerStyle={
+                  filteredProducts.length === 0
+                    ? styles.emptyProductList
+                    : undefined // Apply only if empty
+                }
+                onScroll={handleScroll} // Ensure handleScroll is memoized
+                scrollEventThrottle={100}
+                ListEmptyComponent={() =>
+                  // Provide a function for ListEmptyComponent
+                  !productsLoading && products.length > 0 ? ( // Only show if not loading and products were fetched
+                    <Text style={styles.noProductsText}>
+                      {searchQuery
+                        ? 'No products match your search'
+                        : 'No products in this category'}
+                    </Text>
+                  ) : null
+                }
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={[theme.colors.ternary]}
+                    tintColor={theme.colors.ternary}
+                  />
+                }
+              />
+            )}
           </View>
         </View>
       </View>
 
+      {/* Main Cart Modal */}
       <CartScreen
-        modalVisible={modalVisible}
+        modalVisible={modalVisible} // This was state for CartScreen modal
         closeCartModal={() => setModalVisible(false)}
       />
+
+      {/* Vendor Conflict Confirmation Modal */}
       <CustomConfirmationModal
         isVisible={isConfirmationModalVisible}
         onConfirm={handleConfirmAddToCart}
         onCancel={handleCancelAddToCart}
       />
 
-      {selectedProductForVariants && ( // Ensure a product is selected before trying to render modal
+      {/* --- SubProductModal (This was missing) --- */}
+      {selectedProductForVariants && ( // Only render if a parent product is selected for variants
         <SubProductModal
           visible={isSubProductModalVisible}
           onClose={() => {
             setIsSubProductModalVisible(false);
             setSelectedProductForVariants(null);
-            dispatch(clearSubProducts()); // Clear sub-product state when modal closes
+            dispatch(clearSubProducts()); // Important: Clear sub-product state
           }}
           title={`Select unit for ${selectedProductForVariants.title}`}
-          units={subProductModalUnits}
-          isLoading={subProductsLoading} // Pass loading state to modal
-          error={subProductsError} // Pass error state to modal
-          onAdd={selectedUnitId => {
-            // Assuming onAdd from modal gives just the ID of the selected SubProductModalUnit
-            const selectedUnitOriginal = subProductModalUnits.find(
+          units={subProductModalUnits} // The memoized and transformed list of variants
+          isLoading={subProductsLoading} // Loading state for fetching sub-products
+          error={subProductsError} // Error state for fetching sub-products
+          onAdd={(selectedUnitId, quantity) => {
+            // Callback when a variant is added from the modal
+            const selectedUnit = subProductModalUnits.find(
               u => u.id === selectedUnitId,
-            )?.originalSubProduct;
+            );
 
-            if (selectedUnitOriginal && selectedProductForVariants) {
+            if (
+              selectedUnit?.originalSubProduct &&
+              selectedProductForVariants
+            ) {
               const variantCartItem: ProductCartItems = {
-                id: selectedUnitOriginal.id, // Use the sub-product's unique ID
-                parentId: selectedProductForVariants.productId, // Link to parent product
-                name: `${selectedProductForVariants.title} (${selectedUnitOriginal.label})`,
-                productPrice: selectedUnitOriginal.price,
+                id: selectedUnit.originalSubProduct.id, // Use the sub-product's (variant's) unique ID
+                parentId: selectedProductForVariants.productId, // Link to the parent product
+                name: `${selectedProductForVariants.title} (${
+                  selectedUnit.originalSubProduct.label ||
+                  selectedUnit.originalSubProduct.name ||
+                  ''
+                })`, // Descriptive name
+                productPrice: selectedUnit.originalSubProduct.price,
                 salePrice:
-                  selectedUnitOriginal.discountedPrice ||
-                  selectedUnitOriginal.price,
-                quantity: 1, // Add one specific variant
+                  selectedUnit.originalSubProduct.discountedPrice ||
+                  selectedUnit.originalSubProduct.price,
+                quantity: quantity || 1, // Use quantity from modal, default to 1
                 image:
-                  selectedUnitOriginal.image ||
-                  selectedProductForVariants.productImageLink,
+                  selectedUnit.originalSubProduct.image ||
+                  selectedProductForVariants.productImageLink, // Variant image or fallback
                 vendorId: selectedProductForVariants.vendorId,
               };
-              handleAddToCart(variantCartItem); // Add the specific variant to cart
+              handleAddToCart(variantCartItem); // Use your existing debounced add to cart logic
               setIsSubProductModalVisible(false);
               setSelectedProductForVariants(null);
               dispatch(clearSubProducts());
             } else {
-              Alert.alert('Error', 'Could not find selected variant details.');
+              Alert.alert(
+                'Error',
+                'Could not add the selected variant. Please try again.',
+              );
             }
           }}
         />
@@ -877,6 +1003,26 @@ const styles = StyleSheet.create({
     color: 'red',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  sectionLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  sectionLoadingText: {
+    marginTop: 8,
+    color: theme.colors.secondary,
+  },
+  retryButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: theme.colors.ternary,
+    borderRadius: 5,
+  },
+  retryButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

@@ -109,6 +109,26 @@ const ProfileScreen = () => {
             color={theme.colors.ternary}
           />
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => {
+            navigation.removeListener;
+            navigation.navigate('AddressScreen');
+          }}>
+          <MaterialCommunityIcons
+            name="pin"
+            size={24}
+            color={theme.colors.ternary}
+          />
+          <Text style={styles.optionText}>Address</Text>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={24}
+            color={theme.colors.ternary}
+          />
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.option}
           onPress={() => {

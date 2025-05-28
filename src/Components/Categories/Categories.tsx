@@ -25,7 +25,6 @@ import {
   ProductCartItems,
   Vendor,
 } from '../../utils/canonicalModel';
-
 import {useDispatch, useSelector} from 'react-redux';
 import {
   addToCart,
@@ -34,7 +33,6 @@ import {
   incrementQuantity,
   selectCart,
 } from '../../services/cart/productCartSlice';
-
 import CartScreen from '../Cart/CartScreen';
 import VendorDetails from './venderHeader';
 import {RouteProp} from '@react-navigation/native';
@@ -56,21 +54,21 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const {
     products,
     categories,
-    loading, // True while either products or categories are loading
-    productsLoading, // True only while products are loading
-    categoriesLoading, // True only while categories are loading
+    loading,
+    productsLoading,
+    categoriesLoading,
+    productsComplete,
     error,
     refetch,
   } = useFetchProductsAndCategories(vendor.vendorId);
+
   const dispatch = useDispatch<AppDispatch>();
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
     setRefreshing(true);
-
-    refetch().then(() => {
-      setRefreshing(false);
-    });
+    refetch().then(() => setRefreshing(false));
   };
+
   const [cartItems, setCartItems] = useState<{[key: string]: ProductCartItems}>(
     {},
   );
@@ -136,6 +134,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
     return baseCategories;
   }, [categories, products]);
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -151,11 +150,13 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const filteredCategories = categoriesWithProducts.filter(category =>
     category.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
   useEffect(() => {
     if (categoriesWithProducts.length > 0) {
       setSelectedCategory(categoriesWithProducts[0]?.id);
     }
   }, [categoriesWithProducts]);
+
   const filteredProducts = (
     searchQuery
       ? (products || []).filter(product =>
@@ -170,11 +171,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       : products || []
   )
     .slice()
-    .sort((a, b) => {
-      // Sort in-stock items (availability = true) before out-of-stock items
-      if (a.availability === b.availability) return 0;
-      return a.availability ? -1 : 1;
-    });
+    .sort((a, b) =>
+      a.availability === b.availability ? 0 : a.availability ? -1 : 1,
+    );
 
   const handleCategoryPress = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -224,24 +223,22 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   }, 300);
 
   const handleConfirmAddToCart = () => {
-    if (productToAdd) {
-      if (authData) {
-        dispatch(clearFromCart(authData));
-        dispatch(
-          addToCart(
-            {
-              id: productToAdd.id,
-              name: productToAdd.name,
-              productPrice: productToAdd.productPrice,
-              salePrice: productToAdd.salePrice,
-              quantity: 1,
-              image: productToAdd.image,
-              vendorId: productToAdd.vendorId,
-            },
-            authData,
-          ),
-        );
-      }
+    if (productToAdd && authData) {
+      dispatch(clearFromCart(authData));
+      dispatch(
+        addToCart(
+          {
+            id: productToAdd.id,
+            name: productToAdd.name,
+            productPrice: productToAdd.productPrice,
+            salePrice: productToAdd.salePrice,
+            quantity: 1,
+            image: productToAdd.image,
+            vendorId: productToAdd.vendorId,
+          },
+          authData,
+        ),
+      );
       setConfirmationModalVisible(false);
       setProductToAdd(null);
     }
@@ -253,18 +250,14 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   };
 
   const handleIncreaseQuantity = debounce((productId: string) => {
-    if (storeOpen) {
-      if (authData) {
-        dispatch(incrementQuantity(productId, authData));
-      }
+    if (storeOpen && authData) {
+      dispatch(incrementQuantity(productId, authData));
     }
   }, 300);
 
   const handleDecreaseQuantity = debounce((productId: string) => {
-    if (storeOpen) {
-      if (authData) {
-        dispatch(decrementQuantity(productId, authData));
-      }
+    if (storeOpen && authData) {
+      dispatch(decrementQuantity(productId, authData));
     }
   }, 300);
 
@@ -291,7 +284,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
   const renderProductItem = ({item}: {item: Product}) => {
     const isInStock = item.availability;
-
     const product: ProductCartItems = {
       id: item.productId,
       name: item.title,
@@ -303,17 +295,14 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     };
     const isProductOnSale =
       item.productSalePrice && item.productSalePrice !== item.productPrice;
+
     return (
       <View
         style={[
           styles.productContainer,
           (!storeOpen || !isInStock) && styles.disabledProductContainer,
         ]}>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
           <Image
             source={{uri: product.image}}
             style={styles.productImage}
@@ -349,7 +338,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     );
   };
 
-  // Calculate total number of items in the cart
+  // Calculate total items in cart
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
 
   if (loading && !products.length && !categories.length) {
@@ -380,14 +369,12 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
   return (
     <SafeAreaView style={styles.main}>
-      {/* store-Status */}
       {!storeOpen && (
         <View style={styles.storeClosedBanner}>
           <Text style={styles.storeClosedText}>Store is Closed</Text>
         </View>
       )}
 
-      {/* Header Section */}
       <View style={styles.searchAndCartContainer}>
         <View style={styles.searchContainer}>
           <MaterialCommunityIcons
@@ -423,16 +410,13 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       </View>
 
       <View style={{flex: 1}}>
-        {/* vendor-banner */}
         {showBanner && (
           <Animated.View style={{transform: [{translateY: bannerTranslateY}]}}>
             <VendorDetails vendor={vendor} />
           </Animated.View>
         )}
 
-        {/* Categories and Products */}
         <View style={styles.contentContainer}>
-          {/* Categories */}
           <View style={styles.categoriesListContainer}>
             {categoriesLoading && categories.length === 0 ? (
               <View style={styles.sectionLoading}>
@@ -462,10 +446,8 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             )}
           </View>
 
-          {/* seperator-line */}
           <View style={styles.separator} />
 
-          {/* products */}
           <View style={styles.productsListContainer}>
             {productsLoading && products.length === 0 ? (
               <View style={styles.sectionLoading}>
@@ -486,12 +468,18 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
                 }
                 onScroll={handleScroll}
                 scrollEventThrottle={100}
-                ListEmptyComponent={
-                  <Text style={styles.noProductsText}>
-                    {searchQuery
-                      ? 'No products match your search'
-                      : 'No products available in this category'}
-                  </Text>
+                ListFooterComponent={
+                  !productsComplete && (
+                    <View style={styles.loadingMoreContainer}>
+                      <ActivityIndicator
+                        size="small"
+                        color={theme.colors.ternary}
+                      />
+                      <Text style={styles.loadingMoreText}>
+                        Loading more products...
+                      </Text>
+                    </View>
+                  )
                 }
                 refreshControl={
                   <RefreshControl
@@ -832,6 +820,16 @@ const styles = StyleSheet.create({
   retryButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  loadingMoreContainer: {
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingMoreText: {
+    marginTop: 5,
+    color: theme.colors.secondary,
+    fontSize: 12,
   },
 });
 

@@ -32,7 +32,7 @@ import {addUserAddress, ApiAddress} from '../../services/userAddressSlice'; // A
 import {useAuth} from '../../utils/AuthContext'; // Adjust path
 import {AddressStackParamList} from './AddressScreen'; // Adjust path, assuming AddressScreen exports this
 
-const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY_HERE'; // <<-- IMPORTANT: REPLACE WITH YOUR KEY
+const GOOGLE_MAPS_API_KEY = 'AIzaSyCyQqXzvpH9Y8c61Z7UYOyNyUpkMv_DzJ0'; // <<-- IMPORTANT: REPLACE WITH YOUR KEY
 
 const COLORS = {
   backgroundPrimary: '#FAEA7B',
@@ -97,6 +97,10 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
   const [isGeocoding, setIsGeocoding] = useState(false);
   const geocodeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [isFetchingPincodeDetails, setIsFetchingPincodeDetails] =
+    useState(false);
+  const [pincodeError, setPincodeError] = useState<string | null>(null); // Optional for displaying specific pincode errors
+
   const requestLocationPermission = async (): Promise<boolean> => {
     const permission = Platform.select({
       ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
@@ -160,8 +164,8 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
             const initialRegion = {
               latitude,
               longitude,
-              latitudeDelta: 0.005,
-              longitudeDelta: 0.004,
+              latitudeDelta: 20.593,
+              longitudeDelta: 78.962,
             };
             setMapRegion(initialRegion);
             setAddressForm(prev => ({
@@ -191,17 +195,17 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
         );
       }
     };
+
     fetchInitialLocation();
     return () => {
       if (geocodeTimeoutRef.current) clearTimeout(geocodeTimeoutRef.current);
+      if (pincodeApiTimeoutRef.current)
+        clearTimeout(pincodeApiTimeoutRef.current); // Cleanup pincode timeout too
     };
   }, []);
 
   const performReverseGeocode = async (latitude: number, longitude: number) => {
-    if (
-      !GOOGLE_MAPS_API_KEY ||
-      GOOGLE_MAPS_API_KEY === 'AIzaSyCyQqXzvpH9Y8c61Z7UYOyNyUpkMv_DzJ0'
-    ) {
+    if (!GOOGLE_MAPS_API_KEY) {
       Alert.alert(
         'API Key Missing',
         'Google Maps API key for geocoding is not configured.',
@@ -274,11 +278,30 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
     }
   };
 
+  const pincodeApiTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleFormInputChange = (
     name: keyof AddressFormState,
     value: string | null,
   ) => {
-    setAddressForm(prev => ({...prev, [name]: value}));
+    const newValue = value || ''; // Ensure value is a string for length check etc.
+    setAddressForm(prev => ({...prev, [name]: newValue}));
+
+    if (name === 'pincode') {
+      // Clear previous timeout if user is still typing
+      if (pincodeApiTimeoutRef.current) {
+        clearTimeout(pincodeApiTimeoutRef.current);
+      }
+      // If pincode is 6 digits, trigger the API call after a short delay
+      if (newValue.length === 6) {
+        pincodeApiTimeoutRef.current = setTimeout(() => {
+          fetchDetailsFromPincode(newValue);
+        }, 800); // Debounce for 800ms
+      } else {
+        // Optionally clear city/state if pincode becomes invalid or shorter
+        // setAddressForm(prev => ({ ...prev, city: '', state: '' }));
+      }
+    }
   };
 
   const onRegionChangeComplete = (newRegion: Region) => {
@@ -364,11 +387,86 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
             ? errMessage
             : 'An unknown error occurred.',
         );
+        console.warn('ERRORR:', errMessage);
       });
   };
 
   const handleBackPress = () => {
     navigation.goBack();
+  };
+
+  const fetchDetailsFromPincode = async (pinCode: string) => {
+    if (pinCode.length !== 6) {
+      setPincodeError('Pincode must be 6 digits.');
+      return;
+    }
+    setPincodeError(null); // Clear previous error
+    setIsFetchingPincodeDetails(true);
+    try {
+      const response = await axios.get(
+        `https://api.postalpincode.in/pincode/${pinCode}`,
+      );
+      console.log('Pincode API Response:', response.data);
+
+      if (
+        response.data &&
+        Array.isArray(response.data) &&
+        response.data.length > 0
+      ) {
+        const data = response.data[0]; // Get the first result object
+        if (
+          data.Status === 'Success' &&
+          data.PostOffice &&
+          data.PostOffice.length > 0
+        ) {
+          const postOfficeInfo = data.PostOffice[0]; // Take details from the first post office
+
+          // Extract City (District) and State
+          const city = postOfficeInfo.District;
+          const state = postOfficeInfo.State;
+
+          // Update the form state
+          setAddressForm(prev => ({
+            ...prev,
+            city: city || prev.city, // Use fetched city, or keep existing if API doesn't return it
+            state: state || prev.state, // Use fetched state, or keep existing
+          }));
+          Alert.alert(
+            'Location Info',
+            `Fetched City: ${city}, State: ${state} for pincode ${pinCode}. Please verify.`,
+          );
+        } else if (data.Status === 'Error') {
+          Alert.alert(
+            'Pincode Error',
+            data.Message || 'Invalid Pincode or no details found.',
+          );
+          console.warn('Pincode API Error:', data.Message);
+        } else if (data.Status === '404') {
+          Alert.alert(
+            'Pincode Not Found',
+            `No details found for pincode ${pinCode}.`,
+          );
+          console.warn('Pincode API: 404 Not Found');
+        } else {
+          Alert.alert(
+            'Pincode Info',
+            'No post office details found for this pincode.',
+          );
+          console.warn('No PostOffice details in pincode response:', data);
+        }
+      } else {
+        Alert.alert('Pincode Error', 'Invalid response from pincode API.');
+        console.warn('Unexpected response from pincode API:', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching pincode details:', error);
+      Alert.alert(
+        'API Error',
+        'Could not fetch details for the pincode. Please check your connection or try again.',
+      );
+    } finally {
+      setIsFetchingPincodeDetails(false);
+    }
   };
 
   return (
@@ -435,9 +533,9 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
                 onChangeText={value => handleFormInputChange('name', value)}
                 style={styles.input}
                 placeholder="Enter name"
+                maxLength={20}
               />
             </View>
-
             <View style={styles.formField}>
               <Text style={styles.label}>Address Line 1:</Text>
               <TextInput
@@ -446,10 +544,12 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
                   handleFormInputChange('addressLine1', value)
                 }
                 style={styles.input}
+                numberOfLines={3}
+                multiline={true}
+                maxLength={120}
                 placeholder="e.g., House No, Street, Main Road"
               />
             </View>
-
             <View style={styles.formField}>
               <Text style={styles.label}>Address Line 2:</Text>
               <TextInput
@@ -458,10 +558,12 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
                   handleFormInputChange('addressLine2', value)
                 }
                 style={styles.input}
+                numberOfLines={3}
+                multiline={true}
+                maxLength={120}
                 placeholder="e.g., Apt, Suite, Locality, Area"
               />
             </View>
-
             <View style={styles.formField}>
               <Text style={styles.label}>Address Line 3:</Text>
               <TextInput
@@ -470,10 +572,40 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
                   handleFormInputChange('addressLine3', value)
                 }
                 style={styles.input}
+                numberOfLines={3}
+                multiline={true}
+                maxLength={120}
                 placeholder="e.g., Landmark, Floor, Tower/Block"
               />
             </View>
 
+            <View style={styles.formField}>
+              <Text style={styles.label}>Pincode:</Text>
+              <View style={styles.pincodeInputContainer}>
+                <TextInput
+                  value={addressForm.pincode}
+                  onChangeText={value =>
+                    handleFormInputChange('pincode', value)
+                  }
+                  style={styles.pincodeInput} // Use a slightly different style if needed
+                  placeholder="Enter 6-digit pincode"
+                  keyboardType="numeric"
+                  maxLength={6} // Restrict to 6 digits
+                />
+                {isFetchingPincodeDetails && (
+                  <ActivityIndicator
+                    size="small"
+                    color={COLORS.buttonBackground}
+                    style={styles.pincodeLoader}
+                  />
+                )}
+              </View>
+              {pincodeError && (
+                <Text style={styles.pincodeErrorText}>{pincodeError}</Text>
+              )}
+            </View>
+
+            {/* city & state from pinCode */}
             <View style={styles.formField}>
               <Text style={styles.label}>City:</Text>
               <TextInput
@@ -481,6 +613,8 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
                 onChangeText={value => handleFormInputChange('city', value)}
                 style={styles.input}
                 placeholder="Enter city"
+                maxLength={20}
+                editable={isFetchingPincodeDetails}
               />
             </View>
             <View style={styles.formField}>
@@ -490,18 +624,11 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
                 onChangeText={value => handleFormInputChange('state', value)}
                 style={styles.input}
                 placeholder="Enter state"
+                maxLength={20}
+                editable={isFetchingPincodeDetails}
               />
             </View>
-            <View style={styles.formField}>
-              <Text style={styles.label}>Pincode:</Text>
-              <TextInput
-                value={addressForm.pincode}
-                onChangeText={value => handleFormInputChange('pincode', value)}
-                style={styles.input}
-                placeholder="Enter pincode"
-                keyboardType="numeric"
-              />
-            </View>
+
             <View style={styles.formField}>
               <Text style={styles.label}>
                 Tag (e.g., Home, Work - Optional):
@@ -511,9 +638,9 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
                 onChangeText={value => handleFormInputChange('tag', value)}
                 style={styles.input}
                 placeholder="Home, Work, etc."
+                maxLength={20}
               />
             </View>
-
             {/* Display Latitude and Longitude (read-only) */}
             {/* {addressForm.latitude && addressForm.longitude && (
               <View style={styles.formField}>
@@ -524,7 +651,6 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
                 </Text>
               </View>
             )} */}
-
             <View style={styles.toggleContainer}>
               <Text style={styles.labelToggle}>Set as Default Address</Text>
               <Switch
@@ -546,10 +672,15 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
         </ScrollView>
 
         <TouchableOpacity
-          style={styles.saveButton}
+          // style={styles.saveButton}
+          style={[
+            styles.saveButton,
+            (loadingAdd || isGeocoding || isFetchingPincodeDetails) &&
+              styles.saveButtonDisabled,
+          ]}
           onPress={handleSaveAddress}
-          disabled={loadingAdd || isGeocoding}>
-          {loadingAdd || isGeocoding ? (
+          disabled={loadingAdd || isGeocoding || isFetchingPincodeDetails}>
+          {loadingAdd || isGeocoding || isFetchingPincodeDetails ? (
             <ActivityIndicator color={COLORS.buttonText} size="small" />
           ) : (
             <Text style={styles.saveButtonText}>Save Address</Text>
@@ -650,7 +781,46 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 8,
   },
+  saveButtonDisabled: {
+    backgroundColor: 'grey',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    marginHorizontal: 20,
+    marginBottom: Platform.OS === 'ios' ? 10 : 20,
+    marginTop: 10,
+    borderRadius: 8,
+  },
   saveButtonText: {color: COLORS.buttonText, fontSize: 16, fontWeight: 'bold'},
+  pincodeInputContainer: {
+    // New style
+    flexDirection: 'row',
+    alignItems: 'center',
+    // Reuse input style for border, background etc. or define separately
+    backgroundColor: COLORS.backgroundSecondary,
+    borderRadius: 8,
+    borderColor: COLORS.border,
+    borderWidth: 1,
+    minHeight: 48, // Match other inputs
+  },
+  pincodeInput: {
+    // New style
+    flex: 1, // Take up available space before loader
+    paddingHorizontal: 12,
+    paddingVertical: Platform.OS === 'ios' ? 14 : 10,
+    fontSize: 15,
+    color: COLORS.textPrimary,
+  },
+  pincodeLoader: {
+    // New style
+    marginRight: 10,
+  },
+  pincodeErrorText: {
+    // Optional
+    color: 'red',
+    fontSize: 12,
+    marginTop: 4,
+  },
 });
 
 export default AddAddressScreen;

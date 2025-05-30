@@ -47,6 +47,7 @@ export type AddAddressApiResponse = ListedAddress;
 // --- Define State Structure ---
 interface AddressState {
   addresses: ListedAddress[];
+  defaultAddressId: string | null;
   loadingList: boolean;
   loadingAdd: boolean;
   error: string | null;
@@ -55,6 +56,7 @@ interface AddressState {
 // --- Initial State ---
 const initialState: AddressState = {
   addresses: [],
+  defaultAddressId: null,
   loadingList: false,
   loadingAdd: false,
   error: null,
@@ -188,6 +190,8 @@ export const addUserAddress = createAsyncThunk<
     {authData, vendorId, addressData, isDefaultAddress},
     {rejectWithValue},
   ) => {
+    console.log('PAYLOAD:', addressData, isDefaultAddress);
+
     if (!authData) {
       return rejectWithValue('Authentication key is missing.');
     }
@@ -275,7 +279,8 @@ const userAddressesSlice = createSlice({
       })
       .addCase(fetchUserAddresses.fulfilled, (state, action) => {
         state.loadingList = false;
-        state.addresses = action.payload;
+        state.addresses = action.payload.addresses || [];
+        state.defaultAddressId = action.payload.defaultAddressId || null;
         state.error = null;
       })
       .addCase(fetchUserAddresses.rejected, (state, action) => {
@@ -289,7 +294,27 @@ const userAddressesSlice = createSlice({
       })
       .addCase(addUserAddress.fulfilled, (state, action) => {
         state.loadingAdd = false;
+        // action.payload is a single ListedAddress
+        if (!Array.isArray(state.addresses)) {
+          // Defensive check
+          state.addresses = [];
+        }
         state.addresses.push(action.payload);
+
+        // If adding an address makes it the new default (and API reflects this)
+        // you might need to update state.defaultAddressId here too,
+        // or the API response for addUserAddress should include the new defaultAddressId.
+        // For now, assume adding an address might change the default, so we update it from the added address.
+        if (action.payload.isDefaultAddress) {
+          state.defaultAddressId = action.payload.id;
+        } else if (
+          state.defaultAddressId === action.payload.id &&
+          !action.payload.isDefaultAddress
+        ) {
+          // If the updated address was the default but is no longer, clear default or find a new one.
+          // This logic can get complex. Simpler might be to re-fetch listAddresses after add/update if default changes.
+          state.defaultAddressId = null; // Or find another default
+        }
         state.error = null;
       })
       .addCase(addUserAddress.rejected, (state, action) => {

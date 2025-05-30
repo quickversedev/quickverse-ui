@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
-  Alert,
   FlatList,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -15,7 +14,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from './profileNavigation'; // Key import for type safety
+import {RootStackParamList} from './profileNavigation';
 
 import {AppDispatch, RootState} from '../../store/store';
 import {
@@ -38,7 +37,6 @@ const COLORS = {
 export type AddressStackParamList = {
   AddressList: undefined; // This screen
   AddEditAddress: {addressId?: string}; // Screen for adding/editing
-  // ... other screens in this stack
 };
 
 type ProfileScreenNavigationProp = StackNavigationProp<
@@ -53,6 +51,7 @@ const AddressScreen: React.FC = () => {
 
   const {
     addresses,
+    defaultAddressId,
     loadingList,
     error: addressError,
   } = useSelector((state: RootState) => state.userAddresses);
@@ -82,41 +81,13 @@ const AddressScreen: React.FC = () => {
     return unsubscribe; // Cleanup listener on unmount
   }, [navigation, loadAddresses]);
 
-  const handleSelectAddress = (address: ListedAddress) => {
-    // TODO: Implement logic for what happens when an address is selected
-    // e.g., set as default, use for order, navigate back with selected address
-    Alert.alert(
-      'Address Selected',
-      `${address?.address?.name}\n${address?.address?.addressLine1}`,
-    );
-    // navigation.navigate('PreviousScreenWithSelectedAddress', { selectedAddress: address });
-  };
-
   const renderAddressItem = ({item}: {item: ListedAddress}) => (
-    <TouchableOpacity
-      style={styles.addressItemContainer}
-      // onPress={() => handleSelectAddress(item)}
-    >
-      {addresses.defaultAddressId === item.id && (
-        <Text
-          style={{
-            position: 'absolute',
-            top: 6,
-            right: 8,
-            backgroundColor: '#f0f0f0',
-            paddingHorizontal: 8,
-            paddingVertical: 2,
-            borderRadius: 8,
-            // fontSize: 12,
-            fontWeight: '600',
-            color: '#333',
-          }}>
-          Default
-        </Text>
+    <TouchableOpacity style={styles.addressItemContainer}>
+      {defaultAddressId === item.id && (
+        <Text style={styles.defaultToggle}>Default</Text>
       )}
 
       <View style={styles.addressItemContent}>
-        {item?.id === <Text></Text>}
         <Text style={styles.addressName}>
           {item?.address?.name}{' '}
           {item?.address?.tag ? `(${item?.address?.tag})` : ''}
@@ -136,11 +107,7 @@ const AddressScreen: React.FC = () => {
           {item?.address?.pincode}
         </Text>
       </View>
-      {/* <Icon
-        name="chevron-forward-outline"
-        size={24}
-        color={COLORS.textSecondary}
-      /> */}
+
       {/* TODO: Add Edit/Delete buttons here if needed */}
     </TouchableOpacity>
   );
@@ -191,7 +158,7 @@ const AddressScreen: React.FC = () => {
         {/* Address List */}
         {!loadingList && !addressError && (
           <FlatList
-            data={addresses?.addresses}
+            data={addresses}
             renderItem={renderAddressItem}
             keyExtractor={item => item.id}
             ListEmptyComponent={
@@ -205,7 +172,7 @@ const AddressScreen: React.FC = () => {
               </View>
             }
             contentContainerStyle={styles.listContentContainer}
-            style={{flex: 1}} // Ensure FlatList takes available space
+            style={styles.container} // Ensure FlatList takes available space
           />
         )}
 
@@ -217,7 +184,7 @@ const AddressScreen: React.FC = () => {
             name="add-circle-outline"
             size={24}
             color={COLORS.buttonText}
-            style={{marginRight: 8}}
+            style={styles.addIcon}
           />
           <Text style={styles.addNewButtonText}>Add New Address</Text>
         </TouchableOpacity>
@@ -295,6 +262,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
+  defaultToggle: {
+    position: 'absolute',
+    top: 6,
+    right: 8,
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    // fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+  },
   addressItemContent: {
     flex: 1,
   },
@@ -303,6 +282,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     marginBottom: 4,
+    maxWidth: '90%',
   },
   defaultTag: {
     fontSize: 12,
@@ -339,6 +319,7 @@ const styles = StyleSheet.create({
     margin: 15,
     borderRadius: 8,
   },
+  addIcon: {marginRight: 8},
   addNewButtonText: {
     color: COLORS.buttonText,
     fontSize: 16,

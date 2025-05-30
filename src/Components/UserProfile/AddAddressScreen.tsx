@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
   Alert,
   Switch,
-  Dimensions, // Import Dimensions
+  Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
@@ -27,12 +27,10 @@ import Geolocation from 'react-native-geolocation-service';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 // --- End Geolocation and Permissions ---
 
-import {AppDispatch, RootState} from '../../store/store'; // Adjust path
-import {addUserAddress, ApiAddress} from '../../services/userAddressSlice'; // Adjust path
-import {useAuth} from '../../utils/AuthContext'; // Adjust path
-import {AddressStackParamList} from './AddressScreen'; // Adjust path, assuming AddressScreen exports this
-
-const GOOGLE_MAPS_API_KEY = 'AIzaSyCyQqXzvpH9Y8c61Z7UYOyNyUpkMv_DzJ0'; // <<-- IMPORTANT: REPLACE WITH YOUR KEY
+import {AppDispatch, RootState} from '../../store/store';
+import {addUserAddress, ApiAddress} from '../../services/userAddressSlice';
+import {useAuth} from '../../utils/AuthContext';
+import {AddressStackParamList} from './AddressScreen';
 
 const COLORS = {
   backgroundPrimary: '#FAEA7B',
@@ -46,13 +44,12 @@ const COLORS = {
   mapPlaceholder: '#E0E0E0',
 };
 
-// AddressFormState now directly matches the fields needed for the API payload (excluding 'id')
 interface AddressFormState extends Omit<ApiAddress, 'id'> {}
 
 // Type Arguments for Navigation Props
 type AddAddressScreenRouteProp = RouteProp<
   AddressStackParamList,
-  'AddAddressScreen' // Ensure this route name is in AddressStackParamList
+  'AddAddressScreen'
 >;
 type AddAddressScreenNavigationProp = StackNavigationProp<
   AddressStackParamList,
@@ -64,11 +61,11 @@ interface Props {
   navigation: AddAddressScreenNavigationProp;
 }
 
-const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
+const AddAddressScreen: React.FC<Props> = ({navigation}) => {
   const dispatch = useDispatch<AppDispatch>();
-  const {authData} = useAuth(); // Expects { sessionKey: string, vendorId: string, ... }
+  const {authData} = useAuth();
   const {loadingAdd, error: addressError} = useSelector(
-    (state: RootState) => state.address, // Or state.userAddresses if that's your store key
+    (state: RootState) => state.userAddresses,
   );
 
   const [addressForm, setAddressForm] = useState<AddressFormState>({
@@ -80,7 +77,7 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
     state: '',
     pincode: '',
     tag: null,
-    latitude: '37.78825', // Default latitude (e.g., San Francisco)
+    latitude: '37.78825', // Default latitude (India)
     longitude: '-122.4324', // Default longitude
   });
 
@@ -94,8 +91,6 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
   const [isDefault, setIsDefault] = useState(false);
   const [isLocationPermissionGranted, setIsLocationPermissionGranted] =
     useState(false);
-  const [isGeocoding, setIsGeocoding] = useState(false);
-  const geocodeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isFetchingPincodeDetails, setIsFetchingPincodeDetails] =
     useState(false);
@@ -134,16 +129,17 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
           return false;
         }
       }
-      if (status === RESULTS.BLOCKED)
+      if (status === RESULTS.BLOCKED) {
         Alert.alert(
           'Permission Blocked',
           'Location permission is blocked. Please enable it in your app settings.',
         );
-      else if (status === RESULTS.UNAVAILABLE)
+      } else if (status === RESULTS.UNAVAILABLE) {
         Alert.alert(
           'Location Unavailable',
           'Location services are not available on this device.',
         );
+      }
       setIsLocationPermissionGranted(false);
       return false;
     } catch (err) {
@@ -173,7 +169,6 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
               latitude: latitude.toString(),
               longitude: longitude.toString(),
             }));
-            // performReverseGeocode(latitude, longitude);
           },
           error => {
             console.error(
@@ -197,86 +192,7 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
     };
 
     fetchInitialLocation();
-    return () => {
-      if (geocodeTimeoutRef.current) clearTimeout(geocodeTimeoutRef.current);
-      if (pincodeApiTimeoutRef.current)
-        clearTimeout(pincodeApiTimeoutRef.current); // Cleanup pincode timeout too
-    };
   }, []);
-
-  const performReverseGeocode = async (latitude: number, longitude: number) => {
-    if (!GOOGLE_MAPS_API_KEY) {
-      Alert.alert(
-        'API Key Missing',
-        'Google Maps API key for geocoding is not configured.',
-      );
-      setIsGeocoding(false); // Ensure geocoding stops if key is missing
-      return;
-    }
-    setIsGeocoding(true);
-    try {
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`,
-      );
-      if (response.data.status === 'OK' && response.data.results.length > 0) {
-        const result = response.data.results[0];
-        const components = result.address_components;
-
-        let streetNumber = '',
-          route = '',
-          sublocality_level_1 = '',
-          neighborhood = '',
-          city = '',
-          state = '',
-          pincode = '';
-
-        components.forEach((component: any) => {
-          const types = component.types;
-          if (types.includes('street_number'))
-            streetNumber = component.long_name;
-          if (types.includes('route')) route = component.long_name;
-          if (types.includes('sublocality_level_1'))
-            sublocality_level_1 = component.long_name;
-          if (types.includes('neighborhood'))
-            neighborhood = component.long_name; // Often useful
-          if (types.includes('locality')) city = component.long_name;
-          if (types.includes('administrative_area_level_1'))
-            state = component.short_name;
-          if (types.includes('postal_code')) pincode = component.long_name;
-        });
-
-        // Construct address lines (you'll need to refine this logic based on API responses)
-        const derivedAddressLine1 = `${streetNumber} ${route}`.trim();
-        const derivedAddressLine2 =
-          [sublocality_level_1, neighborhood]
-            .filter(Boolean)
-            .join(', ')
-            .trim() || null;
-
-        setAddressForm(prev => ({
-          ...prev, // Keep existing name, tag, and any manual addressLine3
-          addressLine1: derivedAddressLine1 || '',
-          addressLine2: derivedAddressLine2,
-          // addressLine3 is not typically provided by geocoding, so user enters it
-          city: city || '',
-          state: state || '',
-          pincode: pincode || '',
-          latitude: latitude.toString(),
-          longitude: longitude.toString(),
-        }));
-      } else {
-        console.warn(
-          'Reverse geocoding failed:',
-          response.data.status,
-          response.data.error_message,
-        );
-      }
-    } catch (error) {
-      console.error('Error during reverse geocoding:', error);
-    } finally {
-      setIsGeocoding(false);
-    }
-  };
 
   const pincodeApiTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -311,10 +227,6 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
       latitude: newRegion.latitude.toString(),
       longitude: newRegion.longitude.toString(),
     }));
-    if (geocodeTimeoutRef.current) clearTimeout(geocodeTimeoutRef.current);
-    geocodeTimeoutRef.current = setTimeout(() => {
-      // performReverseGeocode(newRegion.latitude, newRegion.longitude);
-    }, 1000); // Debounce reverse geocoding
   };
 
   const handleSaveAddress = () => {
@@ -374,10 +286,7 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
     )
       .unwrap()
       .then(addedAddress => {
-        Alert.alert(
-          'Success',
-          `Address for "${addedAddress.name}" added successfully!`,
-        );
+        Alert.alert('Success', 'Address added successfully!');
         navigation.goBack();
       })
       .catch(errMessage => {
@@ -501,28 +410,11 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
               // onPress={e => onRegionChangeComplete(e.nativeEvent.coordinate)} // Alternative to center pin
             />
             <View style={styles.mapCenterMarkerContainer}>
-              {isGeocoding && (
-                <ActivityIndicator
-                  size="small"
-                  color={COLORS.buttonBackground}
-                  style={styles.mapLoadingIndicator}
-                />
-              )}
-              <Icon
-                name="pin"
-                size={34}
-                color={
-                  isGeocoding ? COLORS.textSecondary : COLORS.buttonBackground
-                }
-              />
+              <Icon name="pin" size={34} color={COLORS.buttonBackground} />
             </View>
           </View>
           <Text style={styles.mapInstruction}>
-            {isGeocoding
-              ? 'Fetching address details...'
-              : isLocationPermissionGranted
-              ? 'Pan map to adjust pin. Address will auto-fill.'
-              : 'Pan map to set location. Enable location for auto-detection.'}
+            {'Pan map to set location.'}
           </Text>
 
           <View style={styles.formFieldsSection}>
@@ -587,7 +479,7 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
                   onChangeText={value =>
                     handleFormInputChange('pincode', value)
                   }
-                  style={styles.pincodeInput} // Use a slightly different style if needed
+                  style={styles.pincodeInput}
                   placeholder="Enter 6-digit pincode"
                   keyboardType="numeric"
                   maxLength={6} // Restrict to 6 digits
@@ -672,15 +564,14 @@ const AddAddressScreen: React.FC<Props> = ({route, navigation}) => {
         </ScrollView>
 
         <TouchableOpacity
-          // style={styles.saveButton}
           style={[
             styles.saveButton,
-            (loadingAdd || isGeocoding || isFetchingPincodeDetails) &&
+            (loadingAdd || isFetchingPincodeDetails) &&
               styles.saveButtonDisabled,
           ]}
           onPress={handleSaveAddress}
-          disabled={loadingAdd || isGeocoding || isFetchingPincodeDetails}>
-          {loadingAdd || isGeocoding || isFetchingPincodeDetails ? (
+          disabled={loadingAdd || isFetchingPincodeDetails}>
+          {loadingAdd || isFetchingPincodeDetails ? (
             <ActivityIndicator color={COLORS.buttonText} size="small" />
           ) : (
             <Text style={styles.saveButtonText}>Save Address</Text>

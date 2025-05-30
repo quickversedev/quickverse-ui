@@ -36,7 +36,7 @@ const COLORS = {
 
 export type AddressStackParamList = {
   AddressList: undefined; // This screen
-  AddEditAddress: {addressId?: string}; // Screen for adding/editing
+  AddAddressScreen: {addressId?: string}; // Screen for adding/editing
 };
 
 type ProfileScreenNavigationProp = StackNavigationProp<

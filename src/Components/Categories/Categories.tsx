@@ -43,6 +43,7 @@ import {useAuth} from '../../utils/AuthContext';
 import {setSkipLoginFlow} from '../../utils/Storage';
 import {AppDispatch} from '../../store/store';
 import {debounce} from 'lodash';
+import VariantDrawer, {ProductWithVariants} from './SubVeriant';
 
 type CategoriesScreenProps = {
   route: RouteProp<RootStackParamList, 'Categories'>;
@@ -78,6 +79,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const [productToAdd, setProductToAdd] = useState<ProductCartItems | null>(
     null,
   );
+  const [showVariantDrawer, setShowVariantDrawer] = useState(false);
+  const [selectedProductForVariants, setSelectedProductForVariants] =
+    useState<Product | null>(null);
   const cart = useSelector(selectCart);
 
   const [showBanner, setShowBanner] = useState(true);
@@ -187,32 +191,50 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     }
   };
 
-  const handleAddToCart = debounce((product: ProductCartItems) => {
-    if (!authData) {
-      Alert.alert(
-        'Login Required',
-        'Please log in to add products to your cart.',
-        [
-          {text: 'Cancel', style: 'cancel'},
-          {text: 'Login', onPress: () => handleClick()},
-        ],
-      );
-      return;
-    }
+  const handleAddToCart = debounce((product: Product) => {
     if (storeOpen) {
+      if (product.productSize && Number(product.productSize) > 1) {
+        setSelectedProductForVariants(product);
+        setShowVariantDrawer(true);
+        return;
+      }
+
+      if (!authData) {
+        Alert.alert(
+          'Login Required',
+          'Please log in to add products to your cart.',
+          [
+            {text: 'Cancel', style: 'cancel'},
+            {text: 'Login', onPress: () => handleClick()},
+          ],
+        );
+        return;
+      }
+
+      // Check if product has variants
+
+      // Existing logic for non-variant products
       if (cart.length > 0 && cart[0].vendorId !== product.vendorId) {
-        setProductToAdd(product);
+        setProductToAdd({
+          id: product.productId,
+          name: product.title,
+          productPrice: product.productPrice,
+          salePrice: product.productSalePrice,
+          quantity: 1,
+          image: product.productImageLink,
+          vendorId: product.vendorId,
+        });
         setConfirmationModalVisible(true);
       } else {
         dispatch(
           addToCart(
             {
-              id: product.id,
-              name: product.name,
+              id: product.productId,
+              name: product.title,
               productPrice: product.productPrice,
-              salePrice: product.salePrice,
+              salePrice: product.productSalePrice,
               quantity: 1,
-              image: product.image,
+              image: product.productImageLink,
               vendorId: product.vendorId,
             },
             authData,
@@ -284,6 +306,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
   const renderProductItem = ({item}: {item: Product}) => {
     const isInStock = item.availability;
+    const hasVariants = item.productSize && Number(item.productSize) > 1;
     const product: ProductCartItems = {
       id: item.productId,
       name: item.title,
@@ -323,13 +346,30 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             <Text style={styles.originalPrice}>₹{product.productPrice}</Text>
           )}
           <Text style={styles.salePrice}> ₹{product.salePrice}</Text>
+          {hasVariants && (
+            <Text style={styles.variantIndicator}>Variants available</Text>
+          )}
         </View>
         <View style={{position: 'absolute', bottom: 8, right: 0}}>
           <CartButton
             quantity={product.quantity}
-            onIncrease={() => handleIncreaseQuantity(product.id)}
-            onDecrease={() => handleDecreaseQuantity(product.id)}
-            onAdd={() => handleAddToCart(product)}
+            onIncrease={() => {
+              if (item.productSize && Number(item.productSize) > 1) {
+                setSelectedProductForVariants(item);
+                setShowVariantDrawer(true);
+                return;
+              }
+              handleIncreaseQuantity(product.id);
+            }}
+            onDecrease={() => {
+              if (item.productSize && Number(item.productSize) > 1) {
+                setSelectedProductForVariants(item);
+                setShowVariantDrawer(true);
+                return;
+              }
+              handleDecreaseQuantity(product.id);
+            }}
+            onAdd={() => handleAddToCart(item)}
             added={product.quantity > 0}
             disabled={!storeOpen || !isInStock || loading || error}
           />
@@ -494,6 +534,23 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           </View>
         </View>
       </View>
+
+      {showVariantDrawer && selectedProductForVariants && (
+        <VariantDrawer
+          product={selectedProductForVariants}
+          onClose={() => {
+            setShowVariantDrawer(false);
+            setSelectedProductForVariants(null);
+          }}
+          disabled={!storeOpen || loading || error}
+          storeOpen={storeOpen}
+          vendorId={vendor.vendorId}
+          handleAddToCart={handleAddToCart}
+          handleIncreaseQuantity={handleIncreaseQuantity}
+          handleDecreaseQuantity={handleDecreaseQuantity}
+          // onAddToCart={handleAddVariantToCart}
+        />
+      )}
 
       <CartScreen
         modalVisible={modalVisible}

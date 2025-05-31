@@ -17,8 +17,9 @@ export interface ApiAddress {
   tag?: string | null;
 }
 
-export interface ListedAddress extends Omit<ApiAddress, 'id'> {
+export interface ListedAddress {
   id: string;
+  address: ApiAddress;
   isDefaultAddress?: boolean;
 }
 

@@ -160,11 +160,12 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
             const initialRegion = {
               latitude,
               longitude,
-              latitudeDelta: 20.593,
-              longitudeDelta: 78.962,
+              latitudeDelta: 0.005, //for zoom in/out
+              longitudeDelta: 0.004, //for zoom in/out
             };
-            setMapRegion(initialRegion);
+            setMapRegion(initialRegion); // Set MapView to current location
             setAddressForm(prev => ({
+              // Set form's lat/lng to current location
               ...prev,
               latitude: latitude.toString(),
               longitude: longitude.toString(),
@@ -285,7 +286,7 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
       }),
     )
       .unwrap()
-      .then(addedAddress => {
+      .then(() => {
         Alert.alert('Success', 'Address added successfully!');
         navigation.goBack();
       })
@@ -533,16 +534,7 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
                 maxLength={20}
               />
             </View>
-            {/* Display Latitude and Longitude (read-only) */}
-            {/* {addressForm.latitude && addressForm.longitude && (
-              <View style={styles.formField}>
-                <Text style={styles.label}>Coordinates (from map):</Text>
-                <Text style={styles.coordsText}>
-                  Lat: {parseFloat(addressForm.latitude).toFixed(4)}, Lon:{' '}
-                  {parseFloat(addressForm.longitude).toFixed(4)}
-                </Text>
-              </View>
-            )} */}
+
             <View style={styles.toggleContainer}>
               <Text style={styles.labelToggle}>Set as Default Address</Text>
               <Switch

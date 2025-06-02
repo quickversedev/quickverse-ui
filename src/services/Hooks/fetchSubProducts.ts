@@ -12,7 +12,7 @@ export const useProducts = ({vendorId, productId}: UseProductsProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  console.log('useProducts hook initialized with vendorId:', vendorId);
+
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
@@ -30,10 +30,6 @@ export const useProducts = ({vendorId, productId}: UseProductsProps) => {
             'Content-Type': 'application/json',
           },
         },
-      );
-      console.log(
-        'Fetched products::::::::::::::::::::::::::::',
-        response.data,
       );
       setProducts(response.data);
     } catch (err) {

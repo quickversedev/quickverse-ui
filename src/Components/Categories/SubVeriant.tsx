@@ -51,7 +51,6 @@ const VariantDrawer: React.FC<VariantDrawerProps> = ({
   handleDecreaseQuantity,
   handleIncreaseQuantity,
 }) => {
-  console.log('VariantDrawer initialized with product:', product);
   const cartItems = useSelector(selectCart);
   const [selectedVariant, setSelectedVariant] = useState<Product | null>(null);
   const {products, loading, error, refetch} = useProducts({

@@ -126,6 +126,7 @@ export interface ProductCartItems {
   quantity: number;
   image: string;
   vendorId: string;
+  varients: string;
 }
 
 export interface Promo {

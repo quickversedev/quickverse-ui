@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Linking,
-  TouchableOpacity,
-  Platform,
-} from 'react-native';
+import {View, Text, Image, StyleSheet, Platform} from 'react-native';
 import {Vendor} from '../../utils/canonicalModel';
 import theme from '../../theme';
 
@@ -27,7 +19,7 @@ const VendorDetails: React.FC<VendorDetailsProps> = ({vendor}) => {
           <Text style={styles.name} numberOfLines={1}>
             {vendor?.vendorName}
           </Text>
-          <Text style={styles.description} numberOfLines={1}>
+          <Text style={styles.description} numberOfLines={3}>
             {vendor.storeDescription}
           </Text>
           <Text style={styles.category} numberOfLines={1}>
@@ -41,10 +33,6 @@ const VendorDetails: React.FC<VendorDetailsProps> = ({vendor}) => {
           <Text style={styles.info} numberOfLines={1}>
             👤 {vendor.vendorOwner}
           </Text>
-          <TouchableOpacity
-            onPress={() => Linking.openURL(`tel:${vendor.vendorPhone}`)}>
-            <Text style={styles.phone}>📞 {vendor.vendorPhone}</Text>
-          </TouchableOpacity>
         </View>
       </View>
     )

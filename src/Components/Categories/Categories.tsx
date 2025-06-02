@@ -246,6 +246,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           quantity: 1,
           image: product.productImageLink,
           vendorId: product.vendorId,
+          varients: product.productSize,
         });
         setConfirmationModalVisible(true);
       } else {
@@ -259,6 +260,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
               quantity: 1,
               image: product.productImageLink,
               vendorId: product.vendorId,
+              varients: product.productSize,
             },
             authData,
           ),
@@ -280,6 +282,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             quantity: 1,
             image: productToAdd.image,
             vendorId: productToAdd.vendorId,
+            varients: productToAdd.varients,
           },
           authData,
         ),
@@ -338,6 +341,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       quantity: cartItems[item.productId]?.quantity || 0,
       image: item.productImageLink,
       vendorId: item.vendorId,
+      varients: item.productSize,
     };
     const isProductOnSale =
       item.productSalePrice && item.productSalePrice !== item.productPrice;
@@ -370,7 +374,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           )}
           <Text style={styles.salePrice}> ₹{product.salePrice}</Text>
           {hasVariants && (
-            <Text style={styles.variantIndicator}>Variants available</Text>
+            <Text style={styles.variantIndicator}>
+              {product.varients} Varients
+            </Text>
           )}
         </View>
         <View style={{position: 'absolute', bottom: 8, right: 0}}>
@@ -668,6 +674,17 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.secondary,
       },
     }),
+  },
+  variantIndicator: {
+    marginTop: 6,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 25,
+    backgroundColor: 'rgba(100, 100, 255, 0.1)', // soft blue background
+    color: theme.colors.ternary, // matching soft blue text
+    fontSize: 12,
+    fontWeight: '500',
   },
   searchIcon: {
     marginRight: 8,

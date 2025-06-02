@@ -8,7 +8,6 @@ import {
   FlatList,
   SafeAreaView,
   Platform,
-  Animated,
   Alert,
   TextInput,
   ActivityIndicator,
@@ -43,11 +42,21 @@ import {useAuth} from '../../utils/AuthContext';
 import {setSkipLoginFlow} from '../../utils/Storage';
 import {AppDispatch} from '../../store/store';
 import {debounce} from 'lodash';
-import VariantDrawer, {ProductWithVariants} from './SubVeriant';
+import VariantDrawer from './SubVeriant';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  useAnimatedScrollHandler,
+  interpolate,
+  Extrapolate,
+} from 'react-native-reanimated';
+import 'react-native-gesture-handler';
 
 type CategoriesScreenProps = {
   route: RouteProp<RootStackParamList, 'Categories'>;
 };
+const bannerHeight = 150;
 
 const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const {authData, setSkipLogin} = useAuth();
@@ -84,29 +93,43 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     useState<Product | null>(null);
   const cart = useSelector(selectCart);
 
-  const [showBanner, setShowBanner] = useState(true);
-  const bannerTranslateY = useRef(new Animated.Value(0)).current;
-  const lastScrollY = useRef(0);
+  const scrollY = useSharedValue(0);
 
-  const handleScroll = event => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    lastScrollY.current = offsetY;
-    Keyboard.dismiss();
-    if (offsetY > 10 && showBanner) {
-      Animated.timing(bannerTranslateY, {
-        toValue: -500,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => setShowBanner(false));
-    } else if (offsetY <= 10 && !showBanner) {
-      setShowBanner(true);
-      Animated.timing(bannerTranslateY, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-  };
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: event => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const bannerAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: interpolate(
+            scrollY.value,
+            [0, bannerHeight * 2],
+            [0, -bannerHeight * 2],
+            Extrapolate.CLAMP,
+          ),
+        },
+      ],
+    };
+  });
+
+  const contentAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: interpolate(
+            scrollY.value,
+            [0, bannerHeight * 2],
+            [0, -bannerHeight * 2],
+            Extrapolate.CLAMP,
+          ),
+        },
+      ],
+    };
+  });
 
   const [storeOpen] = useState(
     isStoreOpen(vendor.storeOpeningTime, vendor.storeClosingTime),
@@ -409,131 +432,124 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
   return (
     <SafeAreaView style={styles.main}>
-      {!storeOpen && (
-        <View style={styles.storeClosedBanner}>
-          <Text style={styles.storeClosedText}>Store is Closed</Text>
-        </View>
-      )}
-
-      <View style={styles.searchAndCartContainer}>
-        <View style={styles.searchContainer}>
-          <MaterialCommunityIcons
-            name="magnify"
-            size={24}
-            color={theme.colors.ternary}
-            style={styles.searchIcon}
-          />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search by Category or Product"
-            placeholderTextColor={theme.colors.secondary}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            editable={!loading && !error}
-          />
-        </View>
-        <TouchableOpacity
-          style={styles.cartButton}
-          onPress={() => setModalVisible(true)}
-          disabled={loading || error}>
-          <MaterialCommunityIcons
-            name="cart-outline"
-            size={24}
-            color="#FFDC52"
-          />
-          {totalCartItems > 0 && (
-            <View style={styles.cartBadge}>
-              <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
-
-      <View style={{flex: 1}}>
-        {showBanner && (
-          <Animated.View style={{transform: [{translateY: bannerTranslateY}]}}>
-            <VendorDetails vendor={vendor} />
-          </Animated.View>
+      <Animated.View style={[styles.bannerContainer, bannerAnimatedStyle]}>
+        {!storeOpen && (
+          <View style={styles.storeClosedBanner}>
+            <Text style={styles.storeClosedText}>Store is Closed</Text>
+          </View>
         )}
 
-        <View style={styles.contentContainer}>
-          <View style={styles.categoriesListContainer}>
-            {categoriesLoading && categories.length === 0 ? (
-              <View style={styles.sectionLoading}>
-                <ActivityIndicator size="small" color={theme.colors.ternary} />
-                <Text style={styles.sectionLoadingText}>
-                  Loading categories...
-                </Text>
-              </View>
-            ) : (
-              <FlatList
-                data={filteredCategories}
-                renderItem={renderCategoryItem}
-                keyExtractor={item => item.id}
-                showsVerticalScrollIndicator={false}
-                onScroll={handleScroll}
-                scrollEventThrottle={100}
-                keyboardDismissMode="on-drag"
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={[theme.colors.ternary]}
-                    tintColor={theme.colors.ternary}
-                  />
-                }
-              />
-            )}
+        <View style={styles.searchAndCartContainer}>
+          <View style={styles.searchContainer}>
+            <MaterialCommunityIcons
+              name="magnify"
+              size={24}
+              color={theme.colors.ternary}
+              style={styles.searchIcon}
+            />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search by Category or Product"
+              placeholderTextColor={theme.colors.secondary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              editable={!loading && !error}
+            />
           </View>
-
-          <View style={styles.separator} />
-
-          <View style={styles.productsListContainer}>
-            {productsLoading && products.length === 0 ? (
-              <View style={styles.sectionLoading}>
-                <ActivityIndicator size="small" color={theme.colors.ternary} />
-                <Text style={styles.sectionLoadingText}>
-                  Loading products...
-                </Text>
+          <TouchableOpacity
+            style={styles.cartButton}
+            onPress={() => setModalVisible(true)}
+            disabled={loading || error}>
+            <MaterialCommunityIcons
+              name="cart-outline"
+              size={24}
+              color="#FFDC52"
+            />
+            {totalCartItems > 0 && (
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
               </View>
-            ) : (
-              <FlatList
-                data={filteredProducts}
-                renderItem={renderProductItem}
-                keyExtractor={item => item.productId}
-                showsVerticalScrollIndicator={false}
-                keyboardDismissMode="on-drag"
-                contentContainerStyle={
-                  filteredProducts.length === 0 && styles.emptyProductList
-                }
-                onScroll={handleScroll}
-                scrollEventThrottle={100}
-                ListFooterComponent={
-                  !productsComplete && (
-                    <View style={styles.loadingMoreContainer}>
-                      <ActivityIndicator
-                        size="small"
-                        color={theme.colors.ternary}
-                      />
-                      <Text style={styles.loadingMoreText}>
-                        Loading more products...
-                      </Text>
-                    </View>
-                  )
-                }
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={[theme.colors.ternary]}
-                    tintColor={theme.colors.ternary}
-                  />
-                }
-              />
             )}
-          </View>
+          </TouchableOpacity>
         </View>
-      </View>
+        <VendorDetails vendor={vendor} />
+      </Animated.View>
+
+      <Animated.View style={[styles.contentContainer, contentAnimatedStyle]}>
+        <View style={styles.categoriesListContainer}>
+          {categoriesLoading && categories.length === 0 ? (
+            <View style={styles.sectionLoading}>
+              <ActivityIndicator size="small" color={theme.colors.ternary} />
+              <Text style={styles.sectionLoadingText}>
+                Loading categories...
+              </Text>
+            </View>
+          ) : (
+            <Animated.FlatList
+              data={filteredCategories}
+              renderItem={renderCategoryItem}
+              keyExtractor={item => item.id}
+              showsVerticalScrollIndicator={false}
+              onScroll={scrollHandler}
+              // scrollEventThrottle={16}
+              keyboardDismissMode="on-drag"
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  colors={[theme.colors.ternary]}
+                  tintColor={theme.colors.ternary}
+                />
+              }
+            />
+          )}
+        </View>
+
+        <View style={styles.separator} />
+
+        <View style={styles.productsListContainer}>
+          {productsLoading && products.length === 0 ? (
+            <View style={styles.sectionLoading}>
+              <ActivityIndicator size="small" color={theme.colors.ternary} />
+              <Text style={styles.sectionLoadingText}>Loading products...</Text>
+            </View>
+          ) : (
+            <Animated.FlatList
+              data={filteredProducts}
+              renderItem={renderProductItem}
+              keyExtractor={item => item.productId}
+              showsVerticalScrollIndicator={false}
+              keyboardDismissMode="on-drag"
+              contentContainerStyle={
+                filteredProducts.length === 0 && styles.emptyProductList
+              }
+              onScroll={scrollHandler}
+              scrollEventThrottle={16}
+              ListFooterComponent={
+                !productsComplete && (
+                  <View style={styles.loadingMoreContainer}>
+                    <ActivityIndicator
+                      size="small"
+                      color={theme.colors.ternary}
+                    />
+                    <Text style={styles.loadingMoreText}>
+                      Loading more products...
+                    </Text>
+                  </View>
+                )
+              }
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  colors={[theme.colors.ternary]}
+                  tintColor={theme.colors.ternary}
+                />
+              }
+            />
+          )}
+        </View>
+      </Animated.View>
 
       {showVariantDrawer && selectedProductForVariants && (
         <VariantDrawer
@@ -711,11 +727,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+  bannerContainer: {
+    zIndex: 10,
+    backgroundColor: theme.colors.primary,
+  },
   contentContainer: {
-    flex: 2,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
+    zIndex: 1, // Lower than banner
+
+    // marginTop: 150, // Initial position below banner
   },
   categoriesListContainer: {
     height: '100%',

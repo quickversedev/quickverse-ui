@@ -1,17 +1,15 @@
-import React, {useEffect, useState, useRef, useMemo} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {
   StyleSheet,
   Text,
   View,
   Image,
   TouchableOpacity,
-  FlatList,
   SafeAreaView,
   Platform,
   Alert,
   TextInput,
   ActivityIndicator,
-  Keyboard,
   RefreshControl,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -46,7 +44,6 @@ import VariantDrawer from './SubVeriant';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withTiming,
   useAnimatedScrollHandler,
   interpolate,
   Extrapolate,

@@ -115,30 +115,27 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
         setLoading(false);
       }
     };
-    const deleteCookies = async () => {
-      const cookiesToDelete = ['X_AMZ_JWT', 'REQUEST_ORIGIN'];
-      const existingCookies: Cookies = await CookieManager.get(
-        'https://' + effectiveurl,
-      );
-      for (const cookieName of cookiesToDelete) {
-        const existingCookieValue = existingCookies[cookieName]?.value;
-        if (existingCookieValue) {
-          await CookieManager.clearAll()
-            .then(() => {
-              console.log('All cookies cleared');
-            })
-            .catch(error => {
-              console.log('Error clearing cookies:', error);
-            });
-        }
-        setLoading(false);
-      }
-    };
-    if (configs?.configuration?.cookieEnabled) {
-      setMultipleCookies();
-    } else {
-      deleteCookies();
-    }
+    // const deleteCookies = async () => {
+    //   const cookiesToDelete = ['X_AMZ_JWT', 'REQUEST_ORIGIN'];
+    //   const existingCookies: Cookies = await CookieManager.get(
+    //     'https://' + effectiveurl,
+    //   );
+    //   for (const cookieName of cookiesToDelete) {
+    //     const existingCookieValue = existingCookies[cookieName]?.value;
+    //     if (existingCookieValue) {
+    //       await CookieManager.clearAll()
+    //         .then(() => {
+    //           console.log('All cookies cleared');
+    //         })
+    //         .catch(error => {
+    //           console.log('Error clearing cookies:', error);
+    //         });
+    //     }
+    //     setLoading(false);
+    //   }
+    // };
+
+    setMultipleCookies();
   }, [authData, Url, navigation, configs?.configuration, reloadCount]);
 
   if (loading) {

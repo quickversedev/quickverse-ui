@@ -66,17 +66,11 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const handleScroll = (event: {nativeEvent: {contentOffset: {y: number}}}) => {
     const scrollOffset = event.nativeEvent.contentOffset.y;
 
-    console.log('KKK:', scrollOffset);
-
-    const BANNER_SCROLL_THRESHOLD = 1; // Hide banner after scrolling 50 pixels
+    const BANNER_SCROLL_THRESHOLD = -1; // Hide banner after scrolling 50 pixels
 
     // If scrolling down AND the banner is currently visible
     if (scrollOffset > BANNER_SCROLL_THRESHOLD && showBanner) {
       setShowBanner(false);
-    }
-    // If scrolling back to the top AND the banner is currently hidden
-    else if (scrollOffset <= BANNER_SCROLL_THRESHOLD && !showBanner) {
-      setShowBanner(true);
     }
   };
 
@@ -422,9 +416,11 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     <SafeAreaView style={styles.main}>
       <View style={[styles.bannerContainer]}>
         {!storeOpen && (
-          <View style={styles.storeClosedBanner}>
+          <TouchableOpacity
+            onPress={() => setShowBanner(true)}
+            style={styles.storeClosedBanner}>
             <Text style={styles.storeClosedText}>Store is Closed</Text>
-          </View>
+          </TouchableOpacity>
         )}
 
         <View style={styles.searchAndCartContainer}>
@@ -463,18 +459,11 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         {showBanner ? (
           <VendorDetails vendor={vendor} />
         ) : (
-          <View
-            style={{
-              backgroundColor: theme.colors.backdrop,
-              padding: 10,
-              marginHorizontal: 12,
-              marginBottom: 12,
-              borderRadius: 5,
-            }}>
-            <Text style={{color: theme.colors.primary, fontSize: 20}}>
-              {vendor?.vendorName}
-            </Text>
-          </View>
+          <TouchableOpacity onPress={() => setShowBanner(true)}>
+            <View style={styles.smallBanner}>
+              <Text style={styles.smallBannerText}>{vendor?.vendorName}</Text>
+            </View>
+          </TouchableOpacity>
         )}
       </View>
 
@@ -524,7 +513,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
               showsVerticalScrollIndicator={false}
               keyboardDismissMode="on-drag"
               onScroll={handleScroll} // Attach the handler
-              scrollEventThrottle={50}
+              scrollEventThrottle={50} // Important for performance!
               contentContainerStyle={
                 filteredProducts.length === 0 && styles.emptyProductList
               }
@@ -741,6 +730,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+  smallBanner: {
+    backgroundColor: theme.colors.backdrop,
+    padding: 10,
+    marginHorizontal: 12,
+    marginBottom: 12,
+    borderRadius: 5,
+  },
+  smallBannerText: {color: theme.colors.primary, fontSize: 20},
   bannerContainer: {
     zIndex: 10,
     backgroundColor: theme.colors.primary,

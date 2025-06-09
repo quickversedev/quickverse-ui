@@ -61,6 +61,25 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     refetch,
   } = useFetchProductsAndCategories(vendor.vendorId);
 
+  const [showBanner, setShowBanner] = useState(true);
+
+  const handleScroll = (event: {nativeEvent: {contentOffset: {y: number}}}) => {
+    const scrollOffset = event.nativeEvent.contentOffset.y;
+
+    console.log('KKK:', scrollOffset);
+
+    const BANNER_SCROLL_THRESHOLD = 1; // Hide banner after scrolling 50 pixels
+
+    // If scrolling down AND the banner is currently visible
+    if (scrollOffset > BANNER_SCROLL_THRESHOLD && showBanner) {
+      setShowBanner(false);
+    }
+    // If scrolling back to the top AND the banner is currently hidden
+    else if (scrollOffset <= BANNER_SCROLL_THRESHOLD && !showBanner) {
+      setShowBanner(true);
+    }
+  };
+
   const dispatch = useDispatch<AppDispatch>();
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
@@ -441,7 +460,22 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             )}
           </TouchableOpacity>
         </View>
-        <VendorDetails vendor={vendor} />
+        {showBanner ? (
+          <VendorDetails vendor={vendor} />
+        ) : (
+          <View
+            style={{
+              backgroundColor: theme.colors.backdrop,
+              padding: 10,
+              marginHorizontal: 12,
+              marginBottom: 12,
+              borderRadius: 5,
+            }}>
+            <Text style={{color: theme.colors.primary, fontSize: 20}}>
+              {vendor?.vendorName}
+            </Text>
+          </View>
+        )}
       </View>
 
       <View style={[styles.contentContainer]}>
@@ -459,7 +493,8 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
               renderItem={renderCategoryItem}
               keyExtractor={item => item.id}
               showsVerticalScrollIndicator={false}
-              // scrollEventThrottle={16}
+              onScroll={handleScroll} // Attach the handler
+              scrollEventThrottle={16} // Important for performance!
               keyboardDismissMode="on-drag"
               refreshControl={
                 <RefreshControl
@@ -488,10 +523,11 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
               keyExtractor={item => item.productId}
               showsVerticalScrollIndicator={false}
               keyboardDismissMode="on-drag"
+              onScroll={handleScroll} // Attach the handler
+              scrollEventThrottle={50}
               contentContainerStyle={
                 filteredProducts.length === 0 && styles.emptyProductList
               }
-              scrollEventThrottle={16}
               ListFooterComponent={
                 !productsComplete && (
                   <View style={styles.loadingMoreContainer}>

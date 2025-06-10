@@ -18,7 +18,7 @@ export const fetchVendorList = createAsyncThunk<Vendor[], string>(
           },
         },
       );
-      return response.data?.vendors.vendor;
+      return response.data?.vendors?.vendor;
     } catch (error) {
       throw new Error('Failed to fetch vendors');
     }
@@ -54,14 +54,14 @@ const selectVendorList = (state: RootState) => state.vendorList.vendors;
 export const selectVendorEndpointById = createSelector(
   [selectVendorList, (state: RootState, vendorId: string) => vendorId],
   (vendors, vendorId) => {
-    const vendor = vendors.find(v => v.vendorId === vendorId);
+    const vendor = vendors?.find(v => v.vendorId === vendorId);
     return vendor ? vendor.vendorEndPoint : null;
   },
 );
 export const selectVendorDetailsByShopId = createSelector(
   [selectVendorList, (state: RootState, vendorId: string) => vendorId],
   (vendors, vendorId) => {
-    return vendors.find(v => v.vendorId === vendorId);
+    return vendors?.find(v => v.vendorId === vendorId);
   },
 );
 export default vendorListSlice.reducer;

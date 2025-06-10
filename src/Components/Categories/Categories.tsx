@@ -101,7 +101,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
   const categoriesWithProducts = useMemo(() => {
     const bestSellerProducts = (products || []).filter(p => p.bestSeller);
-    console.log('Best Seller Products:', bestSellerProducts);
+
     const baseCategories = (categories || []).filter(category =>
       (products || []).some(product => product.category === category.id),
     );
@@ -302,6 +302,8 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   }) => {
     const isSelected = item.id === selectedCategory;
     const isLastItem = index === filteredCategories.length - 1; // Check if it's the last item
+    const image =
+      item?.imageURLs?.[0] || 'https://i.postimg.cc/xCfHJ1Rn/application.png';
     return (
       <TouchableOpacity
         style={[
@@ -313,7 +315,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         onPress={() => handleCategoryPress(item.id)}
         disabled={loading || error}>
         <Image
-          source={{uri: item?.imageURLs?.[0]}}
+          source={{uri: image}}
           style={styles.categoryImage}
           resizeMode="cover"
         />
@@ -340,7 +342,8 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
     // Check if it's the last item in the filteredProducts array
     const isLastProductItem = index === filteredProducts.length - 1;
-
+    const image =
+      product.image || 'https://i.postimg.cc/6qdyMszY/new-product.png';
     return (
       <View
         style={[
@@ -350,7 +353,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         ]}>
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
           <Image
-            source={{uri: product.image}}
+            source={{uri: image}}
             style={styles.productImage}
             resizeMode="cover"
           />

@@ -32,7 +32,7 @@ export const fetchProducts = createAsyncThunk(
       let hasMore = true;
       const MAX_ITERATIONS = 30;
       let iteration = 0;
-
+      console.log('Fetching products for vendor:', vendorId);
       // Clear existing products before new fetch
       dispatch(productSlice.actions.clearProducts());
       dispatch(productSlice.actions.setComplete(false));
@@ -52,7 +52,9 @@ export const fetchProducts = createAsyncThunk(
         dispatch(productSlice.actions.appendProducts(productsBatch));
 
         allProducts = [...allProducts, ...productsBatch];
-
+        console.log(
+          `Fetched ${productsBatch.length} products, total: ${allProducts.length}`,
+        );
         if (productsBatch.length < limit) {
           hasMore = false;
         } else {

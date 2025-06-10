@@ -100,6 +100,8 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   );
 
   const categoriesWithProducts = useMemo(() => {
+    const bestSellerProducts = (products || []).filter(p => p.bestSeller);
+    console.log('Best Seller Products:', bestSellerProducts);
     const baseCategories = (categories || []).filter(category =>
       (products || []).some(product => product.category === category.id),
     );
@@ -108,22 +110,35 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       product => !baseCategories.some(cat => cat.id === product.category),
     );
 
-    if (productsWithoutCategory.length > 0) {
-      return [
-        ...baseCategories,
-        {
-          id: 'other',
-          name: 'Other',
-          imageURLs: ['https://via.placeholder.com/150'],
-          description: 'other',
-          type: '',
-          parentCategory: null,
-          countOfSkus: 0,
-        },
-      ];
+    const finalCategories: Category[] = [];
+
+    if (bestSellerProducts.length > 0) {
+      finalCategories.push({
+        id: 'best-sellers',
+        name: 'Best Sellers',
+        imageURLs: ['https://i.postimg.cc/3w1f5gvj/best-Seller.png'], // You can use a custom image
+        description: 'Best selling products',
+        type: '',
+        parentCategory: null,
+        countOfSkus: bestSellerProducts.length,
+      });
     }
 
-    return baseCategories;
+    finalCategories.push(...baseCategories);
+
+    if (productsWithoutCategory.length > 0) {
+      finalCategories.push({
+        id: 'other',
+        name: 'Other',
+        imageURLs: ['https://img.icons8.com/color/96/box.png'],
+        description: 'other',
+        type: '',
+        parentCategory: null,
+        countOfSkus: productsWithoutCategory.length,
+      });
+    }
+
+    return finalCategories;
   }, [categories, products]);
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>();
@@ -154,11 +169,16 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           product.title.toLowerCase().includes(searchQuery.toLowerCase()),
         )
       : selectedCategory
-      ? (products || []).filter(product =>
-          selectedCategory === 'other'
-            ? !categoriesWithProducts.some(cat => cat.id === product.category)
-            : product.category === selectedCategory,
-        )
+      ? (products || []).filter(product => {
+          if (selectedCategory === 'other') {
+            return !categoriesWithProducts.some(
+              cat => cat.id === product.category,
+            );
+          } else if (selectedCategory === 'best-sellers') {
+            return product.bestSeller;
+          }
+          return product.category === selectedCategory;
+        })
       : products || []
   )
     .slice()

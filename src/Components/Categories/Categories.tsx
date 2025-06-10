@@ -485,6 +485,11 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           <TouchableOpacity onPress={() => setShowBanner(true)}>
             <View style={styles.smallBanner}>
               <Text style={styles.smallBannerText}>{vendor?.vendorName}</Text>
+              <MaterialCommunityIcons
+                name="chevron-down"
+                size={30}
+                color={'black'}
+              />
             </View>
           </TouchableOpacity>
         )}
@@ -754,13 +759,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   smallBanner: {
-    backgroundColor: theme.colors.backdrop,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'white',
     padding: 10,
-    marginHorizontal: 12,
+    marginHorizontal: 16,
     marginBottom: 12,
-    borderRadius: 5,
+    borderRadius: 15,
   },
-  smallBannerText: {color: theme.colors.primary, fontSize: 20},
+  smallBannerText: {color: 'black', fontSize: 20},
   bannerContainer: {
     zIndex: 10,
     backgroundColor: theme.colors.primary,

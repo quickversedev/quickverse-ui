@@ -5,7 +5,7 @@ import {Text} from 'react-native-paper';
 import HorizontalScroll from './HorizontalScroll';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {Loading} from '../../util/Loading';
+
 import {AppDispatch, RootState} from '../../../store/store';
 import {fetchFoodItems} from '../../../services/FoodItemsSlice';
 import theme from '../../../theme';
@@ -15,17 +15,12 @@ interface FeaturedItemsProps {
 
 const FeaturedItems: React.FC<FeaturedItemsProps> = ({campus}) => {
   const dispatch = useDispatch<AppDispatch>();
-  const {foodItemsList, loading} = useSelector(
-    (state: RootState) => state.foodItems,
-  );
+  const {foodItemsList} = useSelector((state: RootState) => state.foodItems);
   useEffect(() => {
     setTimeout(() => {
       campus && dispatch(fetchFoodItems(campus));
     }, 1000);
   }, [campus, dispatch]);
-  if (loading) {
-    return <Loading />;
-  }
 
   return foodItemsList?.length > 0 ? (
     <View style={styles.featuredContainer}>

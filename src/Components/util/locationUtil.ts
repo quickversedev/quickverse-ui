@@ -24,7 +24,7 @@ export const autoSelectCampus = (
   deviceLat: number,
   deviceLon: number,
   campusses: any[],
-  radiusKm: number = 50,
+  radiusKm: number = 10,
 ): string | undefined => {
   let nearestCampus: {campus: any; distance: number} = {
     campus: undefined,

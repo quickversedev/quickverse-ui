@@ -11,6 +11,7 @@ import {
   TextInput,
   ActivityIndicator,
   RefreshControl,
+  FlatList,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CartButton from './CartButton';
@@ -41,19 +42,10 @@ import {setSkipLoginFlow} from '../../utils/Storage';
 import {AppDispatch} from '../../store/store';
 import {debounce} from 'lodash';
 import VariantDrawer from './SubVeriant';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  useAnimatedScrollHandler,
-  interpolate,
-  Extrapolate,
-} from 'react-native-reanimated';
-import 'react-native-gesture-handler';
 
 type CategoriesScreenProps = {
   route: RouteProp<RootStackParamList, 'Categories'>;
 };
-const bannerHeight = 150;
 
 const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const {authData, setSkipLogin} = useAuth();
@@ -68,6 +60,19 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     error,
     refetch,
   } = useFetchProductsAndCategories(vendor.vendorId);
+
+  const [showBanner, setShowBanner] = useState(true);
+
+  const handleScroll = (event: {nativeEvent: {contentOffset: {y: number}}}) => {
+    const scrollOffset = event.nativeEvent.contentOffset.y;
+
+    const BANNER_SCROLL_THRESHOLD = -1; // Hide banner after scrolling 50 pixels
+
+    // If scrolling down AND the banner is currently visible
+    if (scrollOffset > BANNER_SCROLL_THRESHOLD && showBanner) {
+      setShowBanner(false);
+    }
+  };
 
   const dispatch = useDispatch<AppDispatch>();
   const [refreshing, setRefreshing] = useState(false);
@@ -89,44 +94,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const [selectedProductForVariants, setSelectedProductForVariants] =
     useState<Product | null>(null);
   const cart = useSelector(selectCart);
-
-  const scrollY = useSharedValue(0);
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: event => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
-
-  const bannerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: interpolate(
-            scrollY.value,
-            [0, bannerHeight * 2],
-            [0, -bannerHeight * 2],
-            Extrapolate.CLAMP,
-          ),
-        },
-      ],
-    };
-  });
-
-  const contentAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: interpolate(
-            scrollY.value,
-            [0, bannerHeight * 2],
-            [0, -bannerHeight * 2],
-            Extrapolate.CLAMP,
-          ),
-        },
-      ],
-    };
-  });
 
   const [storeOpen] = useState(
     isStoreOpen(vendor.storeOpeningTime, vendor.storeClosingTime),
@@ -306,14 +273,22 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     }
   }, 300);
 
-  const renderCategoryItem = ({item}: {item: Category}) => {
+  const renderCategoryItem = ({
+    item,
+    index,
+  }: {
+    item: Category;
+    index: number;
+  }) => {
     const isSelected = item.id === selectedCategory;
+    const isLastItem = index === filteredCategories.length - 1; // Check if it's the last item
     return (
       <TouchableOpacity
         style={[
           styles.categoryContainer,
           isSelected && styles.selectedCategoryContainer,
           !storeOpen && styles.disabledCategoryContainer,
+          isLastItem && styles.lastCategoryItem, // Apply conditional style
         ]}
         onPress={() => handleCategoryPress(item.id)}
         disabled={loading || error}>
@@ -327,7 +302,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     );
   };
 
-  const renderProductItem = ({item}: {item: Product}) => {
+  const renderProductItem = ({item, index}: {item: Product; index: number}) => {
     const isInStock = item.availability;
     const hasVariants = item.productSize && Number(item.productSize) > 1;
     const product: ProductCartItems = {
@@ -343,11 +318,15 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     const isProductOnSale =
       item.productSalePrice && item.productSalePrice !== item.productPrice;
 
+    // Check if it's the last item in the filteredProducts array
+    const isLastProductItem = index === filteredProducts.length - 1;
+
     return (
       <View
         style={[
           styles.productContainer,
           (!storeOpen || !isInStock) && styles.disabledProductContainer,
+          isLastProductItem && styles.lastProductItem,
         ]}>
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
           <Image
@@ -435,11 +414,13 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
   return (
     <SafeAreaView style={styles.main}>
-      <Animated.View style={[styles.bannerContainer, bannerAnimatedStyle]}>
+      <View style={[styles.bannerContainer]}>
         {!storeOpen && (
-          <View style={styles.storeClosedBanner}>
+          <TouchableOpacity
+            onPress={() => setShowBanner(true)}
+            style={styles.storeClosedBanner}>
             <Text style={styles.storeClosedText}>Store is Closed</Text>
-          </View>
+          </TouchableOpacity>
         )}
 
         <View style={styles.searchAndCartContainer}>
@@ -475,10 +456,18 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             )}
           </TouchableOpacity>
         </View>
-        <VendorDetails vendor={vendor} />
-      </Animated.View>
+        {showBanner ? (
+          <VendorDetails vendor={vendor} />
+        ) : (
+          <TouchableOpacity onPress={() => setShowBanner(true)}>
+            <View style={styles.smallBanner}>
+              <Text style={styles.smallBannerText}>{vendor?.vendorName}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      </View>
 
-      <Animated.View style={[styles.contentContainer, contentAnimatedStyle]}>
+      <View style={[styles.contentContainer]}>
         <View style={styles.categoriesListContainer}>
           {categoriesLoading && categories.length === 0 ? (
             <View style={styles.sectionLoading}>
@@ -488,13 +477,13 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
               </Text>
             </View>
           ) : (
-            <Animated.FlatList
+            <FlatList
               data={filteredCategories}
               renderItem={renderCategoryItem}
               keyExtractor={item => item.id}
               showsVerticalScrollIndicator={false}
-              onScroll={scrollHandler}
-              // scrollEventThrottle={16}
+              onScroll={handleScroll} // Attach the handler
+              scrollEventThrottle={16} // Important for performance!
               keyboardDismissMode="on-drag"
               refreshControl={
                 <RefreshControl
@@ -517,17 +506,17 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
               <Text style={styles.sectionLoadingText}>Loading products...</Text>
             </View>
           ) : (
-            <Animated.FlatList
+            <FlatList
               data={filteredProducts}
               renderItem={renderProductItem}
               keyExtractor={item => item.productId}
               showsVerticalScrollIndicator={false}
               keyboardDismissMode="on-drag"
+              onScroll={handleScroll} // Attach the handler
+              scrollEventThrottle={50} // Important for performance!
               contentContainerStyle={
                 filteredProducts.length === 0 && styles.emptyProductList
               }
-              onScroll={scrollHandler}
-              scrollEventThrottle={16}
               ListFooterComponent={
                 !productsComplete && (
                   <View style={styles.loadingMoreContainer}>
@@ -552,7 +541,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             />
           )}
         </View>
-      </Animated.View>
+      </View>
 
       {showVariantDrawer && selectedProductForVariants && (
         <VariantDrawer
@@ -741,6 +730,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+  smallBanner: {
+    backgroundColor: theme.colors.backdrop,
+    padding: 10,
+    marginHorizontal: 12,
+    marginBottom: 12,
+    borderRadius: 5,
+  },
+  smallBannerText: {color: theme.colors.primary, fontSize: 20},
   bannerContainer: {
     zIndex: 10,
     backgroundColor: theme.colors.primary,
@@ -812,6 +809,12 @@ const styles = StyleSheet.create({
   },
   disabledCategoryContainer: {
     opacity: 0.5,
+  },
+  lastCategoryItem: {
+    marginBottom: 350,
+  },
+  lastProductItem: {
+    marginBottom: 350,
   },
   categoryImage: {
     width: 50,

@@ -226,13 +226,6 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  // if (loading) {
-  //   return (
-  //     <SafeAreaView style={styles.loadingContainer}>
-  //       <Text style={{color: theme.colors.ternary}}>Loading campuses...</Text>
-  //     </SafeAreaView>
-  //   );
-  // }
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -262,76 +255,6 @@ const HomeScreen: React.FC = () => {
               />
             </TouchableOpacity>
 
-            {/* {clicked && (
-              <View style={styles.dropdownContainer}>
-                {loading ? (
-                  <ActivityIndicator
-                    style={{margin: 20}}
-                    size="small"
-                    color={theme.colors.secondary}
-                  />
-                ) : (
-                  <>
-                    <View style={styles.searchContainer}>
-                      <MaterialCommunityIcons
-                        name="magnify"
-                        size={20}
-                        color={theme.colors.ternary}
-                        style={styles.searchIcon}
-                      />
-                      <TextInput
-                        style={styles.searchInput}
-                        placeholder="Search campus..."
-                        placeholderTextColor={theme.colors.ternary}
-                        value={searchText}
-                        onChangeText={text => setSearchText(text)}
-                      />
-                      {searchText.length > 0 && (
-                        <TouchableOpacity
-                          onPress={() => setSearchText('')}
-                          style={styles.clearIcon}>
-                          <MaterialCommunityIcons
-                            name="close-circle"
-                            size={20}
-                            color={theme.colors.ternary}
-                          />
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                    <FlatList
-                      data={campusOptions?.filter(item => {
-                        const searchTerm = searchText.toLowerCase();
-                        return (
-                          item.value.toLowerCase().includes(searchTerm) ||
-                          (item.displayName &&
-                            item.displayName
-                              .toLowerCase()
-                              .includes(searchTerm)) ||
-                          (item.label &&
-                            item.label.toLowerCase().includes(searchTerm))
-                        );
-                      })}
-                      keyExtractor={item => item.value}
-                      renderItem={({item}) => (
-                        <TouchableOpacity
-                          style={styles.listItem}
-                          onPress={() => {
-                            setSelectedCampusId(item.value);
-                            setCampusToastName(item.displayName); // or item.label
-                            setCampusToastVisible(true);
-                            setClicked(false);
-                            setSearchText('');
-                          }}>
-                          <Text style={styles.listItemText}>
-                            {item.displayName}
-                          </Text>
-                        </TouchableOpacity>
-                      )}
-                    />
-                  </>
-                )}
-              </View>
-            )} */}
             {clicked && (
               <View style={styles.dropdownContainer}>
                 {loading ? (

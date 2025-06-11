@@ -378,7 +378,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             </Text>
           )}
         </View>
-        <View style={{position: 'absolute', bottom: 8, right: 0}}>
+        <View style={{position: 'absolute', bottom: 4, right: 0}}>
           <CartButton
             quantity={product.quantity}
             onIncrease={() => {

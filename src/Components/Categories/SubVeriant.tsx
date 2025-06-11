@@ -99,9 +99,6 @@ const VariantDrawer: React.FC<VariantDrawerProps> = ({
           <Text style={styles.salePrice}> ₹{item.productSalePrice}</Text>
         </View>
         <View style={styles.priceAndCartContainer}>
-          <Text style={styles.variantPrice}>
-            ₹{item.productSalePrice || item.productPrice}
-          </Text>
           <View style={styles.cartButtonWrapper}>
             <CartButton
               quantity={getQuantityForProduct(item.productId)}

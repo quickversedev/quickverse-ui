@@ -16,7 +16,7 @@ import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../store/store';
-import {fetchOrders} from '../../services/cart/OrdersSlice';
+import {fetchOrders, resetOrders} from '../../services/cart/OrdersSlice';
 import ZeroOrdersState from './ZeroOrderState';
 import {OrderMetadata} from '../../utils/canonicalModel';
 import {OrderStackParamList} from './OrdersNavigator';
@@ -42,6 +42,7 @@ const MyOrdersScreen: React.FC = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
+    dispatch(resetOrders());
     await dispatch(fetchOrders({cursor: null, authData})); // Refresh orders
     setRefreshing(false);
   };

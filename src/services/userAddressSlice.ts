@@ -151,8 +151,6 @@ export const fetchUserAddresses = createAsyncThunk<
         },
       );
 
-      console.log('RESPONSE::', response.data.addresses);
-
       if (response.data && Array.isArray(response.data.addresses)) {
         return response.data;
       } else {

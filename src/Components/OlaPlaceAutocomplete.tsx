@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback, useEffect, useRef} from 'react'; // 1. Import useRef
 import {
   View,
   TextInput,
@@ -12,26 +12,6 @@ import {
 import axios from 'axios';
 import {debounce} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
-
-// export interface PlacePrediction {
-//   description: string;
-//   place_id?: string;
-//   reference?: string;
-//   [key: string]: any;
-// }
-
-// interface OlaPlaceAutocompleteProps {
-//   apiKey: string; // Make API key a required prop
-//   onPlaceSelected: (place: PlacePrediction) => void;
-//   placeholder?: string;
-//   debounceTime?: number;
-//   inputStyle?: object;
-//   listContainerStyle?: object; // Style for the suggestions container
-//   listItemStyle?: object;
-//   listItemTextStyle?: object;
-//   loaderStyle?: object;
-//   errorTextStyle?: object;
-// }
 
 const OLA_MAPS_AUTOCOMPLETE_ENDPOINT =
   'https://api.olamaps.io/places/v1/autocomplete';
@@ -53,6 +33,9 @@ const OlaPlaceAutocomplete = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 2. Create a ref to track if a selection was made
+  const isSelectionMade = useRef(false);
+
   const fetchAutocompleteSuggestions = useCallback(
     debounce(async (currentSearchQuery: string) => {
       if (!currentSearchQuery.trim()) {
@@ -72,7 +55,7 @@ const OlaPlaceAutocomplete = ({
         const response = await axios.get(OLA_MAPS_AUTOCOMPLETE_ENDPOINT, {
           params: {
             input: currentSearchQuery,
-            api_key: apiKey, // Use apiKey from props
+            api_key: apiKey,
           },
           headers: {
             Accept: 'application/json',
@@ -83,11 +66,7 @@ const OlaPlaceAutocomplete = ({
         console.log('OlaPlaceAutocomplete: Raw result', response.data);
         if (response.data && Array.isArray(response.data.predictions)) {
           setSuggestions(response.data.predictions);
-        }
-        // else if (response.data && Array.isArray(response.data)) {
-        //   setSuggestions(response.data);
-        // }
-        else {
+        } else {
           console.warn(
             'OlaPlaceAutocomplete: Unexpected response structure',
             response.data,
@@ -105,19 +84,25 @@ const OlaPlaceAutocomplete = ({
         setLoading(false);
       }
     }, debounceTime),
-    [apiKey, debounceTime], // apiKey is a dependency now
+    [apiKey, debounceTime],
   );
 
+  // 4. Update useEffect to check the ref's flag
   useEffect(() => {
+    // If a selection was just made, do not fetch new suggestions.
+    // Reset the flag for the next user input.
+    if (isSelectionMade.current) {
+      isSelectionMade.current = false;
+      return;
+    }
+
     if (query.trim().length > 2) {
-      // Start searching after 2 characters
       fetchAutocompleteSuggestions(query);
     } else {
       setSuggestions([]);
-      if (loading) setLoading(false); // Clear loading if query becomes too short while loading
+      if (loading) setLoading(false);
     }
 
-    // Cleanup debounce on unmount or if dependencies change
     return () => {
       fetchAutocompleteSuggestions.cancel();
     };
@@ -127,7 +112,9 @@ const OlaPlaceAutocomplete = ({
     setQuery(text);
   };
 
+  // 3. Update handleSuggestionPress to set the flag
   const handleSuggestionPress = place => {
+    isSelectionMade.current = true; // Set the flag before updating the query
     setQuery(place.description); // Update input with selected place description
     setSuggestions([]); // Hide suggestions list
     onPlaceSelected(place); // Callback to parent with the selected place object
@@ -153,36 +140,37 @@ const OlaPlaceAutocomplete = ({
         placeholderTextColor="#888"
         autoCorrect={false}
         spellCheck={false}
+        // Using `visible-password` to disable suggestions is a common workaround,
+        // but it may have accessibility implications. Consider if this is the desired behavior.
+        keyboardType="visible-password"
       />
       {loading && (
         <ActivityIndicator
           style={[styles.loader, loaderStyle]}
           size="small"
-          color="#007AFF" // Example color
+          color="#007AFF"
         />
       )}
       {error && <Text style={[styles.errorText, errorTextStyle]}>{error}</Text>}
-      {suggestions.length > 0 &&
-        !loading && ( // Only show list if not loading and has suggestions
-          <View style={[styles.suggestionsContainer, listContainerStyle]}>
-            <FlatList
-              data={suggestions}
-              renderItem={renderSuggestionItem}
-              keyExtractor={(item, index) =>
-                item?.reference || item?.place_id || `ola-place-${index}`
-              }
-              keyboardShouldPersistTaps="handled"
-              style={styles.list}
-            />
-          </View>
-        )}
+      {suggestions.length > 0 && !loading && (
+        <View style={[styles.suggestionsContainer, listContainerStyle]}>
+          <FlatList
+            data={suggestions}
+            renderItem={renderSuggestionItem}
+            keyExtractor={(item, index) =>
+              item?.reference || item?.place_id || `ola-place-${index}`
+            }
+            keyboardShouldPersistTaps="handled"
+            style={styles.list}
+          />
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   wrapper: {
-    // Wrapper for the entire component
     width: '100%',
   },
   input: {
@@ -193,7 +181,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
     backgroundColor: '#FFFFFF',
-    marginBottom: 4, // Space before suggestions list might appear
+    marginHorizontal: 12,
+    marginVertical: 12,
   },
   loader: {
     marginVertical: 8,
@@ -208,22 +197,20 @@ const styles = StyleSheet.create({
   suggestionsContainer: {
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
-    marginTop: 0, // No extra margin if input has marginBottom
-    // iOS Shadow
+    marginHorizontal: 12,
+    marginBottom: 5,
+    marginTop: 0,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    // Android Elevation
     elevation: Platform.OS === 'android' ? 3 : 0,
-    maxHeight: 200, // Max height for the scrollable list
-    overflow: 'hidden', // Ensure content respects border radius
-    borderWidth: Platform.OS === 'android' ? 0 : 1, // Border for iOS to match shadow look
+    maxHeight: 200,
+    overflow: 'hidden',
+    borderWidth: Platform.OS === 'android' ? 0 : 1,
     borderColor: Platform.OS === 'android' ? 'transparent' : '#EAEAEA',
   },
-  list: {
-    // FlatList itself doesn't need much styling if suggestionsContainer handles it
-  },
+  list: {},
   listItem: {
     paddingVertical: 12,
     paddingHorizontal: 15,

@@ -1,6 +1,5 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import MapView, {PROVIDER_GOOGLE, Region} from 'react-native-maps';
-import debounce from 'lodash/debounce';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -16,14 +15,12 @@ import {
   Alert,
   Switch,
   Dimensions,
-  FlatList,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import axios from 'axios';
-import {v4 as uuidv4} from 'uuid'; // For generating a unique X-Request-Id
 
 // --- Geolocation and Permissions ---
 import Geolocation from 'react-native-geolocation-service';
@@ -84,16 +81,13 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
     state: '',
     pincode: '',
     tag: null,
-    latitude: '37.78825', // Default latitude (India)
-    longitude: '-122.4324', // Default longitude
+    latitude: '', // Changed: Initialize as empty
+    longitude: '', // Changed: Initialize as empty
   });
 
-  const [mapRegion, setMapRegion] = useState<Region>({
-    latitude: 37.78825,
-    longitude: -122.4324,
-    latitudeDelta: 0.015,
-    longitudeDelta: 0.0121,
-  });
+  // Changed: Initialize mapRegion to null to wait for user's location
+  const [mapRegion, setMapRegion] = useState<Region | null>(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(true); // Added: Loading state for initial location fetch
 
   const [isDefault, setIsDefault] = useState(false);
   const [isLocationPermissionGranted, setIsLocationPermissionGranted] =
@@ -101,7 +95,7 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
 
   const [isFetchingPincodeDetails, setIsFetchingPincodeDetails] =
     useState(false);
-  const [pincodeError, setPincodeError] = useState<string | null>(null); // Optional for displaying specific pincode errors
+  const [pincodeError, setPincodeError] = useState<string | null>(null);
 
   const requestLocationPermission = async (): Promise<boolean> => {
     const permission = Platform.select({
@@ -130,7 +124,7 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
         } else {
           Alert.alert(
             'Permission Denied',
-            'Location permission is required. Please enable it in settings or select location manually.',
+            'Location permission is required to automatically find your address. Please enable it in settings or select a location manually.',
           );
           setIsLocationPermissionGranted(false);
           return false;
@@ -157,9 +151,23 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
     }
   };
 
+  // Changed: Updated useEffect to handle loading state and provide a fallback
   useEffect(() => {
     const fetchInitialLocation = async () => {
+      setIsInitialLoading(true);
       const hasPermission = await requestLocationPermission();
+
+      const fallbackToDefaultLocation = () => {
+        // Fallback to a central location in India if permission/fetch fails
+        setMapRegion({
+          latitude: 20.5937,
+          longitude: 78.9629,
+          latitudeDelta: 15, // Zoom out to show a larger area of the country
+          longitudeDelta: 15,
+        });
+        setIsInitialLoading(false); // Stop loading
+      };
+
       if (hasPermission) {
         Geolocation.getCurrentPosition(
           position => {
@@ -167,16 +175,16 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
             const initialRegion = {
               latitude,
               longitude,
-              latitudeDelta: 0.005, //for zoom in/out
-              longitudeDelta: 0.004, //for zoom in/out
+              latitudeDelta: 0.005, // Zoom in on the user's location
+              longitudeDelta: 0.004,
             };
-            setMapRegion(initialRegion); // Set MapView to current location
+            setMapRegion(initialRegion);
             setAddressForm(prev => ({
-              // Set form's lat/lng to current location
               ...prev,
               latitude: latitude.toString(),
               longitude: longitude.toString(),
             }));
+            setIsInitialLoading(false); // Stop loading on success
           },
           error => {
             console.error(
@@ -186,8 +194,9 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
             );
             Alert.alert(
               'Location Error',
-              'Could not fetch current location. Please select manually on the map.',
+              'Could not fetch current location. Showing a default map area.',
             );
+            fallbackToDefaultLocation(); // Use fallback on error
           },
           {
             enableHighAccuracy: true,
@@ -196,6 +205,9 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
             distanceFilter: 0,
           },
         );
+      } else {
+        // Permission denied, use fallback
+        fallbackToDefaultLocation();
       }
     };
 
@@ -208,22 +220,17 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
     name: keyof AddressFormState,
     value: string | null,
   ) => {
-    const newValue = value || ''; // Ensure value is a string for length check etc.
+    const newValue = value || '';
     setAddressForm(prev => ({...prev, [name]: newValue}));
 
     if (name === 'pincode') {
-      // Clear previous timeout if user is still typing
       if (pincodeApiTimeoutRef.current) {
         clearTimeout(pincodeApiTimeoutRef.current);
       }
-      // If pincode is 6 digits, trigger the API call after a short delay
       if (newValue.length === 6) {
         pincodeApiTimeoutRef.current = setTimeout(() => {
           fetchDetailsFromPincode(newValue);
-        }, 800); // Debounce for 800ms
-      } else {
-        // Optionally clear city/state if pincode becomes invalid or shorter
-        // setAddressForm(prev => ({ ...prev, city: '', state: '' }));
+        }, 800);
       }
     }
   };
@@ -268,7 +275,6 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
       return;
     }
 
-    // Construct the payload directly from addressForm, applying trim and null checks
     const newAddressData: Omit<ApiAddress, 'id'> = {
       name: addressForm.name.trim(),
       addressLine1: addressForm.addressLine1.trim(),
@@ -317,7 +323,7 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
       setPincodeError('Pincode must be 6 digits.');
       return;
     }
-    setPincodeError(null); // Clear previous error
+    setPincodeError(null);
     setIsFetchingPincodeDetails(true);
     try {
       const response = await axios.get(
@@ -330,23 +336,20 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
         Array.isArray(response.data) &&
         response.data.length > 0
       ) {
-        const data = response.data[0]; // Get the first result object
+        const data = response.data[0];
         if (
           data.Status === 'Success' &&
           data.PostOffice &&
           data.PostOffice.length > 0
         ) {
-          const postOfficeInfo = data.PostOffice[0]; // Take details from the first post office
-
-          // Extract City (District) and State
+          const postOfficeInfo = data.PostOffice[0];
           const city = postOfficeInfo.District;
           const state = postOfficeInfo.State;
 
-          // Update the form state
           setAddressForm(prev => ({
             ...prev,
-            city: city || prev.city, // Use fetched city, or keep existing if API doesn't return it
-            state: state || prev.state, // Use fetched state, or keep existing
+            city: city || prev.city,
+            state: state || prev.state,
           }));
           Alert.alert(
             'Location Info',
@@ -386,12 +389,23 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
     }
   };
 
-  // --- autoCompleteSuggestions ---
-
   const handleSuggestionPress = place => {
-    // setQuery(place.description);
-    // setAutoCompleteSuggestions([]);
     setSelectedPlace(place);
+    const latitude = place.geometry.location.lat;
+    const longitude = place.geometry.location.lng;
+
+    setMapRegion({
+      latitude: latitude,
+      longitude: longitude,
+      latitudeDelta: 0.015,
+      longitudeDelta: 0.0121,
+    });
+
+    setAddressForm(prev => ({
+      ...prev,
+      latitude: latitude.toString(),
+      longitude: longitude.toString(),
+    }));
   };
 
   return (
@@ -412,39 +426,41 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
           <View style={styles.backButtonPlaceholder} />
         </View>
 
-        {/* --- autocomplete --- */}
-
         <OlaPlaceAutocomplete
           apiKey={OLA_MAPS_API_KEY}
           onPlaceSelected={handleSuggestionPress}
           placeholder="Enter address or point of interest"
-          // Example of passing custom styles:
-          // inputStyle={{ borderColor: 'blue', height: 50 }}
-          // listContainerStyle={{ maxHeight: 250, borderColor: 'green' }}
         />
 
         <ScrollView
           style={styles.formContainer}
           contentContainerStyle={styles.scrollViewContent}
           keyboardShouldPersistTaps="handled">
+          {/* --- Changed: Conditional rendering for MapView --- */}
           <View style={styles.mapSection}>
-            <MapView
-              provider={PROVIDER_GOOGLE}
-              style={styles.mapView}
-              region={mapRegion}
-              onRegionChangeComplete={onRegionChangeComplete}
-              showsUserLocation={isLocationPermissionGranted}
-              // onPress={e => onRegionChangeComplete(e.nativeEvent.coordinate)} // Alternative to center pin
-            />
-            <View style={styles.mapCenterMarkerContainer}>
-              <Icon name="pin" size={34} color={COLORS.buttonBackground} />
-            </View>
+            {isInitialLoading ? (
+              <ActivityIndicator size="large" color={COLORS.buttonBackground} />
+            ) : (
+              <>
+                <MapView
+                  provider={PROVIDER_GOOGLE}
+                  style={styles.mapView}
+                  region={mapRegion!} // '!' asserts mapRegion is not null here due to the loading logic
+                  onRegionChangeComplete={onRegionChangeComplete}
+                  showsUserLocation={isLocationPermissionGranted}
+                />
+                <View style={styles.mapCenterMarkerContainer}>
+                  <Icon name="pin" size={34} color={COLORS.buttonBackground} />
+                </View>
+              </>
+            )}
           </View>
           <Text style={styles.mapInstruction}>
             {'Pan map to set location.'}
           </Text>
 
           <View style={styles.formFieldsSection}>
+            {/* ... rest of the form fields ... */}
             <View style={styles.formField}>
               <Text style={styles.label}>Contact Name:</Text>
               <TextInput
@@ -509,7 +525,7 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
                   style={styles.pincodeInput}
                   placeholder="Enter 6-digit pincode"
                   keyboardType="numeric"
-                  maxLength={6} // Restrict to 6 digits
+                  maxLength={6}
                 />
                 {isFetchingPincodeDetails && (
                   <ActivityIndicator
@@ -523,8 +539,6 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
                 <Text style={styles.pincodeErrorText}>{pincodeError}</Text>
               )}
             </View>
-
-            {/* city & state from pinCode */}
             <View style={styles.formField}>
               <Text style={styles.label}>City:</Text>
               <TextInput
@@ -533,7 +547,7 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
                 style={styles.input}
                 placeholder="Enter city"
                 maxLength={20}
-                editable={isFetchingPincodeDetails}
+                editable={!isFetchingPincodeDetails}
               />
             </View>
             <View style={styles.formField}>
@@ -544,10 +558,9 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
                 style={styles.input}
                 placeholder="Enter state"
                 maxLength={20}
-                editable={isFetchingPincodeDetails}
+                editable={!isFetchingPincodeDetails}
               />
             </View>
-
             <View style={styles.formField}>
               <Text style={styles.label}>
                 Tag (e.g., Home, Work - Optional):
@@ -560,7 +573,6 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
                 maxLength={20}
               />
             </View>
-
             <View style={styles.toggleContainer}>
               <Text style={styles.labelToggle}>Set as Default Address</Text>
               <Switch
@@ -601,7 +613,7 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
 };
 
 // --- Styles ---
-const screenHeight = Dimensions.get('window').height; // Get screen height
+const screenHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   safeArea: {flex: 1, backgroundColor: COLORS.backgroundPrimary},
@@ -626,16 +638,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.mapPlaceholder,
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden' /* No side margins for full width map */,
+    overflow: 'hidden',
   },
   mapView: {...StyleSheet.absoluteFillObject},
   mapCenterMarkerContainer: {
-    /* This view is a conceptual overlay for the pin icon */
+    /* This view is an overlay for the pin icon, centered by its parent */
   },
-  mapLoadingIndicator: {
-    position: 'absolute',
-    top: 10 /* Adjust based on pin icon */,
-  },
+  // The mapLoadingIndicator style is no longer needed as ActivityIndicator is centered by mapSection flex properties
   mapInstruction: {
     textAlign: 'center',
     color: COLORS.textSecondary,
@@ -692,104 +701,34 @@ const styles = StyleSheet.create({
   },
   saveButtonDisabled: {
     backgroundColor: 'grey',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    marginHorizontal: 20,
-    marginBottom: Platform.OS === 'ios' ? 10 : 20,
-    marginTop: 10,
-    borderRadius: 8,
   },
   saveButtonText: {color: COLORS.buttonText, fontSize: 16, fontWeight: 'bold'},
   pincodeInputContainer: {
-    // New style
     flexDirection: 'row',
     alignItems: 'center',
-    // Reuse input style for border, background etc. or define separately
     backgroundColor: COLORS.backgroundSecondary,
     borderRadius: 8,
     borderColor: COLORS.border,
     borderWidth: 1,
-    minHeight: 48, // Match other inputs
+    minHeight: 48,
   },
   pincodeInput: {
-    // New style
-    flex: 1, // Take up available space before loader
+    flex: 1,
     paddingHorizontal: 12,
     paddingVertical: Platform.OS === 'ios' ? 14 : 10,
     fontSize: 15,
     color: COLORS.textPrimary,
   },
   pincodeLoader: {
-    // New style
     marginRight: 10,
   },
   pincodeErrorText: {
-    // Optional
     color: 'red',
     fontSize: 12,
     marginTop: 4,
   },
-
-  // --- autoCompleteSuggestions ---
-  containerAUTO: {
-    width: '100%',
-    paddingHorizontal: 10, // Add some padding to the container
-    paddingVertical: 5,
-  },
-  inputAUTO: {
-    height: 45,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    backgroundColor: '#fff',
-    marginBottom: 5,
-  },
-  loader: {
-    marginVertical: 10,
-    alignSelf: 'center', // Center the loader
-  },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-    paddingVertical: 10,
-  },
-  suggestionsContainer: {
-    // This wrapper helps with shadow/border on the list
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    marginTop: 2, // Small space between input and list
-    // iOS Shadow
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 3.84,
-    // Android Elevation
-    elevation: Platform.OS === 'android' ? 3 : 0,
-    maxHeight: 200, // Limit the height of the suggestions dropdown
-    overflow: 'hidden', // Important if FlatList content might exceed borderRadius
-    borderWidth: Platform.OS === 'android' ? 0 : 1, // Border for iOS to match shadow look
-    borderColor: Platform.OS === 'android' ? 'transparent' : '#eee',
-  },
-  list: {
-    // No specific styles needed here if suggestionsContainer handles background and border
-    // maxHeight is handled by suggestionsContainer
-  },
-  suggestionItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  suggestionText: {
-    fontSize: 15,
-    color: '#333',
-  },
+  // --- OlaPlaceAutocomplete Styles ---
+  // (Assuming these are defined within the OlaPlaceAutocomplete component or passed as props)
 });
 
 export default AddAddressScreen;

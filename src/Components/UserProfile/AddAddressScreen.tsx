@@ -1,5 +1,6 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import MapView, {PROVIDER_GOOGLE, Region} from 'react-native-maps';
+import debounce from 'lodash/debounce';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -15,12 +16,14 @@ import {
   Alert,
   Switch,
   Dimensions,
+  FlatList,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import axios from 'axios';
+import {v4 as uuidv4} from 'uuid'; // For generating a unique X-Request-Id
 
 // --- Geolocation and Permissions ---
 import Geolocation from 'react-native-geolocation-service';
@@ -31,6 +34,9 @@ import {AppDispatch, RootState} from '../../store/store';
 import {addUserAddress, ApiAddress} from '../../services/userAddressSlice';
 import {useAuth} from '../../utils/AuthContext';
 import {AddressStackParamList} from './AddressScreen';
+
+const OLA_MAPS_AUTOCOMPLETE_ENDPOINT =
+  'https://api.olamaps.io/places/v1/autocomplete';
 
 const COLORS = {
   backgroundPrimary: '#FAEA7B',
@@ -62,6 +68,14 @@ interface Props {
 }
 
 const AddAddressScreen: React.FC<Props> = ({navigation}) => {
+  const [query, setQuery] = useState('');
+  const [autoCompleteSuggestions, setAutoCompleteSuggestions] = useState([]);
+  const [selectedPlace, setSelectedPlace] = useState();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const debounceTime = 300;
+  const OLA_MAPS_API_KEY = 'U3I3QUrUi1bjLCMQgtZGWzF2v0Wd7InexqwCaXhn';
+
   const dispatch = useDispatch<AppDispatch>();
   const {authData} = useAuth();
   const {loadingAdd, error: addressError} = useSelector(
@@ -379,6 +393,92 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
     }
   };
 
+  // --- autoCompleteSuggestions ---
+
+  const fetchAutocompleteSuggestions = useCallback(
+    debounce(async (currentQuery: string) => {
+      if (!currentQuery.trim()) {
+        setAutoCompleteSuggestions([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      const requestId = uuidv4(); // Generate a unique request ID
+
+      try {
+        console.log(
+          `Direct Axios Autocomplete: Fetching for query "${query}", Request ID: ${requestId}`,
+        );
+
+        const response = await axios.get(OLA_MAPS_AUTOCOMPLETE_ENDPOINT, {
+          params: {
+            input: currentQuery,
+            api_key: OLA_MAPS_API_KEY,
+          },
+          headers: {
+            Accept: 'application/json',
+            'X-Request-Id': requestId,
+          },
+        });
+
+        // console.log('Autocomplete: Raw result', response.data);
+        if (response.data && Array.isArray(response.data.predictions)) {
+          console.log('UUU:', JSON.stringify(response.data.predictions));
+          setAutoCompleteSuggestions(response.data.predictions);
+        } else {
+          console.warn(
+            'Direct Axios Autocomplete: Unexpected response structure',
+            response.data,
+          );
+          setAutoCompleteSuggestions([]);
+        }
+      } catch (err: any) {
+        console.error('Error during Ola Maps autocomplete:', err);
+        setError(err.message || 'Failed to fetch suggestions.');
+        setAutoCompleteSuggestions([]);
+      } finally {
+        setLoading(false);
+      }
+    }, debounceTime),
+    [debounceTime, OLA_MAPS_API_KEY, OLA_MAPS_AUTOCOMPLETE_ENDPOINT],
+  );
+
+  useEffect(() => {
+    if (query.trim().length > 2) {
+      fetchAutocompleteSuggestions(query);
+    } else {
+      setAutoCompleteSuggestions([]);
+      setLoading(false); // Clear loading state when query is too short
+    }
+
+    return () => {
+      fetchAutocompleteSuggestions.cancel();
+    };
+  }, [query, fetchAutocompleteSuggestions]);
+
+  const handleInputChange = (text: string) => {
+    setQuery(text);
+  };
+
+  const handleSuggestionPress = place => {
+    // setQuery(place.description);
+    setAutoCompleteSuggestions([]);
+    setSelectedPlace(place);
+  };
+
+  const renderSuggestionItem = ({item}: {item}) => (
+    <TouchableOpacity
+      style={styles.suggestionItem}
+      onPress={() => handleSuggestionPress(item)}>
+      <Text style={styles.suggestionText}>
+        {item?.description || 'No description available'}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar
@@ -395,6 +495,41 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Add New Address</Text>
           <View style={styles.backButtonPlaceholder} />
+        </View>
+
+        {/* --- autocomplete --- */}
+
+        <View style={styles.containerAUTO}>
+          <TextInput
+            style={styles.inputAUTO} // Apply style
+            placeholder={'Search place'} // Use placeholder prop or default
+            value={query}
+            onChangeText={handleInputChange}
+            placeholderTextColor="#888" // Example placeholder color
+          />
+          {loading && (
+            <ActivityIndicator
+              style={styles.loader}
+              size="small"
+              color="#0000ff"
+            />
+          )}
+          {error && <Text style={styles.errorText}>{error}</Text>}
+          {autoCompleteSuggestions.length > 0 && (
+            <View style={styles.suggestionsContainer}>
+              {/* Wrapper for elevation/shadow on list */}
+              <FlatList
+                data={autoCompleteSuggestions}
+                renderItem={renderSuggestionItem}
+                keyExtractor={
+                  (item, index) =>
+                    item?.reference || item?.place_id || `ola-place-${index}` // Use 'reference' if available, then 'place_id'
+                }
+                keyboardShouldPersistTaps="handled"
+                style={styles.list} // Apply style
+              />
+            </View>
+          )}
         </View>
 
         <ScrollView
@@ -703,6 +838,66 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 12,
     marginTop: 4,
+  },
+
+  // --- autoCompleteSuggestions ---
+  containerAUTO: {
+    width: '100%',
+    paddingHorizontal: 10, // Add some padding to the container
+    paddingVertical: 5,
+  },
+  inputAUTO: {
+    height: 45,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    backgroundColor: '#fff',
+    marginBottom: 5,
+  },
+  loader: {
+    marginVertical: 10,
+    alignSelf: 'center', // Center the loader
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    paddingVertical: 10,
+  },
+  suggestionsContainer: {
+    // This wrapper helps with shadow/border on the list
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginTop: 2, // Small space between input and list
+    // iOS Shadow
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.84,
+    // Android Elevation
+    elevation: Platform.OS === 'android' ? 3 : 0,
+    maxHeight: 200, // Limit the height of the suggestions dropdown
+    overflow: 'hidden', // Important if FlatList content might exceed borderRadius
+    borderWidth: Platform.OS === 'android' ? 0 : 1, // Border for iOS to match shadow look
+    borderColor: Platform.OS === 'android' ? 'transparent' : '#eee',
+  },
+  list: {
+    // No specific styles needed here if suggestionsContainer handles background and border
+    // maxHeight is handled by suggestionsContainer
+  },
+  suggestionItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  suggestionText: {
+    fontSize: 15,
+    color: '#333',
   },
 });
 

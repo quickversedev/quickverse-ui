@@ -21,6 +21,8 @@ const OlaPlaceAutocomplete = ({
   onPlaceSelected,
   placeholder = 'Search for places...',
   debounceTime = 300,
+  latitude,
+  longitude,
   inputStyle,
   listContainerStyle,
   listItemStyle,
@@ -50,12 +52,15 @@ const OlaPlaceAutocomplete = ({
 
       try {
         console.log(
-          `OlaPlaceAutocomplete: Fetching for query "${currentSearchQuery}", ID: ${requestId}`,
+          `OlaPlaceAutocomplete: Fetching for query "${currentSearchQuery}", ID: ${requestId},`,
         );
+
+        console.log(`from props:${latitude},${longitude}`);
         const response = await axios.get(OLA_MAPS_AUTOCOMPLETE_ENDPOINT, {
           params: {
             input: currentSearchQuery,
             api_key: apiKey,
+            location: `${Number(latitude)},${Number(longitude)}`,
           },
           headers: {
             Accept: 'application/json',

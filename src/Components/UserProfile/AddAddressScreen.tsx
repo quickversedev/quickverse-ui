@@ -430,6 +430,8 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
           apiKey={OLA_MAPS_API_KEY}
           onPlaceSelected={handleSuggestionPress}
           placeholder="Enter address or point of interest"
+          latitude={addressForm.latitude}
+          longitude={addressForm.longitude}
         />
 
         <ScrollView

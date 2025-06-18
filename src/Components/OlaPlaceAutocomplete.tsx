@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect, useRef} from 'react'; // 1. Import useRef
+import React, {useState, useCallback, useEffect, useRef} from 'react';
 import {
   View,
   TextInput,
@@ -35,7 +35,6 @@ const OlaPlaceAutocomplete = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 2. Create a ref to track if a selection was made
   const isSelectionMade = useRef(false);
 
   const fetchAutocompleteSuggestions = useCallback(
@@ -52,10 +51,8 @@ const OlaPlaceAutocomplete = ({
 
       try {
         console.log(
-          `OlaPlaceAutocomplete: Fetching for query "${currentSearchQuery}", ID: ${requestId},`,
+          `OlaPlaceAutocomplete: Fetching for query "${currentSearchQuery}", ID: ${requestId}, lati:${latitude},longi:${longitude} `,
         );
-
-        console.log(`from props:${latitude},${longitude}`);
         const response = await axios.get(OLA_MAPS_AUTOCOMPLETE_ENDPOINT, {
           params: {
             input: currentSearchQuery,
@@ -92,7 +89,6 @@ const OlaPlaceAutocomplete = ({
     [apiKey, debounceTime],
   );
 
-  // 4. Update useEffect to check the ref's flag
   useEffect(() => {
     // If a selection was just made, do not fetch new suggestions.
     // Reset the flag for the next user input.
@@ -105,7 +101,9 @@ const OlaPlaceAutocomplete = ({
       fetchAutocompleteSuggestions(query);
     } else {
       setSuggestions([]);
-      if (loading) setLoading(false);
+      if (loading) {
+        setLoading(false);
+      }
     }
 
     return () => {
@@ -117,7 +115,6 @@ const OlaPlaceAutocomplete = ({
     setQuery(text);
   };
 
-  // 3. Update handleSuggestionPress to set the flag
   const handleSuggestionPress = place => {
     isSelectionMade.current = true; // Set the flag before updating the query
     setQuery(place.description); // Update input with selected place description
@@ -145,9 +142,7 @@ const OlaPlaceAutocomplete = ({
         placeholderTextColor="#888"
         autoCorrect={false}
         spellCheck={false}
-        // Using `visible-password` to disable suggestions is a common workaround,
-        // but it may have accessibility implications. Consider if this is the desired behavior.
-        keyboardType="visible-password"
+        keyboardType="visible-password" //to disable suggestions
       />
       {loading && (
         <ActivityIndicator
@@ -179,6 +174,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   input: {
+    color: '#000',
     height: 45,
     borderColor: '#D1D1D1',
     borderWidth: 1,

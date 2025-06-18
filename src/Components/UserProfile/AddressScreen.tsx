@@ -37,6 +37,7 @@ const COLORS = {
 export type AddressStackParamList = {
   AddressList: undefined; // This screen
   AddAddressScreen: {addressId?: string}; // Screen for adding/editing
+  AddAddressScreen2: {latitude: number; longitude: number}; // The new form screen
 };
 
 type ProfileScreenNavigationProp = StackNavigationProp<

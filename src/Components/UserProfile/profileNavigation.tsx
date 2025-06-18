@@ -8,6 +8,7 @@ import Feedback from './Feedback';
 import theme from '../../theme';
 import AddressScreen from './AddressScreen';
 import AddAddressScreen from './AddAddressScreen';
+import AddAddressScreen2 from './AddAddressScreen2';
 
 export type RootStackParamList = {
   ProfileScreen: undefined;
@@ -18,6 +19,7 @@ export type RootStackParamList = {
   ChangePinScreen: undefined;
   AddressScreen: undefined;
   AddAddressScreen: undefined;
+  AddAddressScreen2: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -66,6 +68,19 @@ const ProfileNavigation: React.FC = () => {
             height: 60,
           },
           title: 'AddAddressScreen',
+        }}
+      />
+
+      <Stack.Screen
+        name="AddAddressScreen2"
+        component={AddAddressScreen2}
+        options={{
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: theme.colors.primary,
+            height: 60,
+          },
+          title: 'AddAddressScreen2',
         }}
       />
 

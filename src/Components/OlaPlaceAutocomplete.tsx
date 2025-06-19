@@ -8,6 +8,9 @@ import {
   StyleSheet,
   ActivityIndicator,
   Platform,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
 } from 'react-native';
 import axios from 'axios';
 import {debounce} from 'lodash';
@@ -16,7 +19,59 @@ import {v4 as uuidv4} from 'uuid';
 const OLA_MAPS_AUTOCOMPLETE_ENDPOINT =
   'https://api.olamaps.io/places/v1/autocomplete';
 
-const OlaPlaceAutocomplete = ({
+// --- Type defination start ---
+export interface OlaPlaceAutocompleteProps {
+  apiKey: string;
+  onPlaceSelected: (place: {description: string; place_id: string}) => void;
+  placeholder?: string;
+  debounceTime?: number;
+  latitude?: number;
+  longitude?: number;
+  inputStyle?: StyleProp<TextStyle>;
+  listContainerStyle?: StyleProp<ViewStyle>;
+  listItemStyle?: StyleProp<ViewStyle>;
+  listItemTextStyle?: StyleProp<TextStyle>;
+  loaderStyle?: StyleProp<ViewStyle>;
+  errorTextStyle?: StyleProp<TextStyle>;
+}
+
+export interface OlaPlacePrediction {
+  reference: string;
+  types: string[];
+  matched_substrings: MatchedSubstring[];
+  terms: Term[];
+  structured_formatting: StructuredFormatting;
+  description: string;
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+  place_id: string;
+  layer: string[];
+}
+
+export interface MatchedSubstring {
+  offset: number;
+  length: number;
+}
+
+export interface Term {
+  offset: number;
+  value: string;
+}
+
+export interface StructuredFormatting {
+  main_text: string;
+  secondary_text: string;
+  main_text_matched_substrings: MatchedSubstring[];
+  secondary_text_matched_substrings: MatchedSubstring[];
+}
+
+// --- end type definations ---
+
+const OlaPlaceAutocomplete: React.FC<OlaPlaceAutocompleteProps> = ({
   apiKey,
   onPlaceSelected,
   placeholder = 'Search for places...',
@@ -65,8 +120,12 @@ const OlaPlaceAutocomplete = ({
           },
         });
 
-        console.log('OlaPlaceAutocomplete: Raw result', response.data);
+        console.log(
+          'OlaPlaceAutocomplete: Raw result',
+          response.data.predictions,
+        );
         if (response.data && Array.isArray(response.data.predictions)) {
+          console.log('KK:', response.data.predictions);
           setSuggestions(response.data.predictions);
         } else {
           console.warn(
@@ -76,7 +135,7 @@ const OlaPlaceAutocomplete = ({
           setSuggestions([]);
         }
       } catch (err: any) {
-        console.error(
+        console.warn(
           'Error during Ola Maps autocomplete:',
           err.response?.data || err.message || err,
         );
@@ -115,14 +174,14 @@ const OlaPlaceAutocomplete = ({
     setQuery(text);
   };
 
-  const handleSuggestionPress = place => {
+  const handleSuggestionPress = (place: OlaPlacePrediction) => {
     isSelectionMade.current = true; // Set the flag before updating the query
     setQuery(place.description); // Update input with selected place description
     setSuggestions([]); // Hide suggestions list
     onPlaceSelected(place); // Callback to parent with the selected place object
   };
 
-  const renderSuggestionItem = ({item}) => (
+  const renderSuggestionItem = ({item}: {item: OlaPlacePrediction}) => (
     <TouchableOpacity
       style={[styles.listItem, listItemStyle]}
       onPress={() => handleSuggestionPress(item)}>

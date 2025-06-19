@@ -155,8 +155,9 @@ const AddAddressScreen2: React.FC<Props> = ({route, navigation}) => {
       .then(() => {
         Alert.alert('Success', 'Address added successfully!');
         // Navigate back to the main address list, not just one screen
-        navigation.popToTop();
-        navigation.goBack();
+        // navigation.popToTop();
+        // navigation.goBack();
+        navigation.pop(2);
       })
       .catch(errMessage => {
         Alert.alert(

@@ -9,7 +9,7 @@ import {
   View,
   ActivityIndicator,
   Alert,
-  Dimensions,
+  // Dimensions,
   Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -20,7 +20,6 @@ import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
 import {AddressStackParamList} from './AddressScreen';
 import OlaPlaceAutocomplete from '../OlaPlaceAutocomplete';
-import AddAddressScreen2 from './AddAddressScreen2';
 
 const COLORS = {
   backgroundPrimary: '#FAEA7B',
@@ -62,7 +61,9 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
       android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
     });
 
-    if (!permission) return false;
+    if (!permission) {
+      return false;
+    }
 
     try {
       let status = await check(permission);
@@ -214,7 +215,7 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
   );
 };
 
-const screenHeight = Dimensions.get('window').height;
+// const screenHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   safeArea: {flex: 1, backgroundColor: COLORS.backgroundPrimary},

@@ -36,7 +36,6 @@ const COLORS = {
   iconDefault: '#4A4A4A',
 };
 
-// Update this in your navigation stack definition
 type AddressFormScreenRouteProp = RouteProp<
   AddressStackParamList,
   'AddAddressScreen2'
@@ -52,7 +51,6 @@ interface Props {
 }
 
 const AddAddressScreen2: React.FC<Props> = ({route, navigation}) => {
-  // Receive coordinates from the previous screen
   const {latitude, longitude} = route.params;
 
   const dispatch = useDispatch<AppDispatch>();
@@ -155,9 +153,9 @@ const AddAddressScreen2: React.FC<Props> = ({route, navigation}) => {
       .then(() => {
         Alert.alert('Success', 'Address added successfully!');
         // Navigate back to the main address list, not just one screen
-        // navigation.popToTop();
-        // navigation.goBack();
-        navigation.pop(2);
+        navigation.popToTop();
+        navigation.goBack();
+        // navigation.pop(2);
       })
       .catch(errMessage => {
         Alert.alert(

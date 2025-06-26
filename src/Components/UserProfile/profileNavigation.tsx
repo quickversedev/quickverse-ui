@@ -19,7 +19,7 @@ export type RootStackParamList = {
   ChangePinScreen: undefined;
   AddressScreen: undefined;
   AddAddressScreen: undefined;
-  AddAddressScreen2: undefined;
+  AddAddressScreen2: {latitude: number; longitude: number};
 };
 
 const Stack = createStackNavigator<RootStackParamList>();

@@ -4,7 +4,7 @@ import globalConfig from '../utils/GlobalConfig';
 
 // --- Type Definitions ---
 export interface ApiAddress {
-  id?: string;
+  addressID?: string;
   name: string;
   addressLine1: string;
   addressLine2?: string | null;
@@ -18,23 +18,23 @@ export interface ApiAddress {
 }
 
 export interface ListedAddress {
-  id: string;
+  addressID: string;
   address: ApiAddress;
   isDefaultAddress?: boolean;
 }
 
 export interface AddAddressApiPayload {
-  address: Omit<ApiAddress, 'id'>;
+  address: Omit<ApiAddress, 'addressID'>;
   isDefaultAddress: boolean;
 }
 
 export interface ThunkApiArgs {
   authData: string | undefined;
-  vendorId: string;
 }
 
 export interface AddAddressThunkArgs extends ThunkApiArgs {
-  addressData: Omit<ApiAddress, 'id'>;
+  addressData: Omit<ApiAddress, 'addressID'>;
+  vendorId: string;
   isDefaultAddress: boolean;
 }
 
@@ -66,7 +66,7 @@ const initialState: AddressState = {
 // --- MOCK DATA for fetchUserAddresses ---
 const mockUserAddressesData: ListedAddress[] = [
   {
-    id: 'mock_addr_001',
+    addressID: 'mock_addr_001',
     name: 'John Doe',
     addressLine1: '123 Main Street',
     addressLine2: 'Apartment 4B',
@@ -80,7 +80,7 @@ const mockUserAddressesData: ListedAddress[] = [
     isDefaultAddress: true,
   },
   {
-    id: 'mock_addr_002',
+    addressID: 'mock_addr_002',
     name: 'John Doe',
     addressLine1: '789 Business Rd',
     addressLine2: 'Suite 500',
@@ -101,82 +101,71 @@ export const fetchUserAddresses = createAsyncThunk<
   ListedAddress[], // Expected return type on success
   ThunkApiArgs, // Type of the argument passed to the thunk
   {rejectValue: string} // Type for the payload when rejectWithValue is used
->(
-  'userAddresses/fetchUserAddresses',
-  async ({authData, vendorId}, {rejectWithValue}) => {
-    // --- START MOCK IMPLEMENTATION ---
-    // console.log('MOCK fetchUserAddresses called with:', {authData, vendorId});
-    // return new Promise<ListedAddress[]>((resolve, reject) => {
-    //   setTimeout(() => {
-    //     if (!authData) {
-    //       console.warn(
-    //         'MOCK: Authentication key is missing for fetchUserAddresses.',
-    //       );
-    //       reject(rejectWithValue('Authentication key is missing.'));
-    //       return;
-    //     }
-    //     if (!vendorId) {
-    //       console.warn('MOCK: Vendor ID is missing for fetchUserAddresses.');
-    //       reject(rejectWithValue('Vendor ID is missing.'));
-    //       return;
-    //     }
-    //     // Simulate success
-    //     console.log('MOCK: Successfully returning mock addresses.');
-    //     resolve(mockUserAddressesData);
-    //     // To simulate an error:
-    //     // console.log('MOCK: Simulating fetch error for addresses.');
-    //     // reject(rejectWithValue('Mocked: Failed to fetch user addresses.'));
-    //   }, 1000); // 1-second delay
-    // });
-    // --- END MOCK IMPLEMENTATION ---
-    // --- REAL API Call (Commented out for mocking) ---
+>('userAddresses/fetchUserAddresses', async ({authData}, {rejectWithValue}) => {
+  // --- START MOCK IMPLEMENTATION ---
+  // console.log('MOCK fetchUserAddresses called with:', {authData, vendorId});
+  // return new Promise<ListedAddress[]>((resolve, reject) => {
+  //   setTimeout(() => {
+  //     if (!authData) {
+  //       console.warn(
+  //         'MOCK: Authentication key is missing for fetchUserAddresses.',
+  //       );
+  //       reject(rejectWithValue('Authentication key is missing.'));
+  //       return;
+  //     }
+  //     if (!vendorId) {
+  //       console.warn('MOCK: Vendor ID is missing for fetchUserAddresses.');
+  //       reject(rejectWithValue('Vendor ID is missing.'));
+  //       return;
+  //     }
+  //     // Simulate success
+  //     console.log('MOCK: Successfully returning mock addresses.');
+  //     resolve(mockUserAddressesData);
+  //     // To simulate an error:
+  //     // console.log('MOCK: Simulating fetch error for addresses.');
+  //     // reject(rejectWithValue('Mocked: Failed to fetch user addresses.'));
+  //   }, 1000); // 1-second delay
+  // });
+  // --- END MOCK IMPLEMENTATION ---
+  // --- REAL API Call (Commented out for mocking) ---
 
-    if (!authData) {
-      return rejectWithValue('Authentication key is missing.');
-    }
-    if (!vendorId) {
-      return rejectWithValue('Vendor ID is missing.');
-    }
+  if (!authData) {
+    return rejectWithValue('Authentication key is missing.');
+  }
 
-    try {
-      const response = await axios.get<ListAddressesApiResponse>(
-        `${globalConfig.apiBaseUrl}/v2/listAddresses`, // Added /quickVerse/ if needed
-        {
-          params: {
-            vendorId: vendorId,
-          },
-          headers: {
-            SessionKey: authData,
-          },
+  try {
+    const response = await axios.get<ListAddressesApiResponse>(
+      `${globalConfig.apiBaseUrl}/v2/getLocalAddress`,
+      {
+        headers: {
+          SessionKey: authData,
         },
-      );
+      },
+    );
 
-      if (response.data && Array.isArray(response.data.addresses)) {
-        return response.data;
-      } else {
-        console.warn(
-          'Unexpected response structure for fetchUserAddresses:',
-          response.data,
-        );
-        return rejectWithValue(
-          'Invalid data format received from server when fetching addresses.',
-        );
-      }
-    } catch (error: any) {
-      console.error(
-        'fetchUserAddresses Error:', // Corrected typo from Errorrr
-        error.response?.data || error.message,
+    if (response.data && Array.isArray(response.data)) {
+      return response.data;
+    } else {
+      console.warn(
+        'Unexpected response structure for fetchUserAddresses:',
+        response.data,
       );
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        'Failed to fetch user addresses.';
-      return rejectWithValue(message);
+      return rejectWithValue(
+        'Invalid data format received from server when fetching addresses.',
+      );
     }
-
-    // --- END REAL API Call ---
-  },
-);
+  } catch (error: any) {
+    console.error(
+      'fetchUserAddresses Error:',
+      error.response?.data || error.message,
+    );
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      'Failed to fetch user addresses.';
+    return rejectWithValue(message);
+  }
+});
 
 // --- Async Thunk for Adding a User Address (POST) ---
 export const addUserAddress = createAsyncThunk<
@@ -189,13 +178,8 @@ export const addUserAddress = createAsyncThunk<
     {authData, vendorId, addressData, isDefaultAddress},
     {rejectWithValue},
   ) => {
-    console.log('PAYLOAD:', addressData, isDefaultAddress);
-
     if (!authData) {
       return rejectWithValue('Authentication key is missing.');
-    }
-    if (!vendorId) {
-      return rejectWithValue('Vendor ID is missing.');
     }
 
     const payload: AddAddressApiPayload = {
@@ -258,18 +242,13 @@ export const addUserAddress = createAsyncThunk<
         'Failed to add user address.';
       return rejectWithValue(message);
     }
-
-    // --- END REAL API Call ---
   },
 );
 
-// --- Create the Slice ---
 const userAddressesSlice = createSlice({
   name: 'userAddresses',
   initialState,
-  reducers: {
-    // clearAddressError: (state) => { state.error = null; }
-  },
+  reducers: {},
   extraReducers: builder => {
     builder
       .addCase(fetchUserAddresses.pending, state => {
@@ -278,8 +257,7 @@ const userAddressesSlice = createSlice({
       })
       .addCase(fetchUserAddresses.fulfilled, (state, action) => {
         state.loadingList = false;
-        state.addresses = action.payload.addresses || [];
-        state.defaultAddressId = action.payload.defaultAddressId || null;
+        state.addresses = action.payload || [];
         state.error = null;
       })
       .addCase(fetchUserAddresses.rejected, (state, action) => {
@@ -305,9 +283,9 @@ const userAddressesSlice = createSlice({
         // or the API response for addUserAddress should include the new defaultAddressId.
         // For now, assume adding an address might change the default, so we update it from the added address.
         if (action.payload.isDefaultAddress) {
-          state.defaultAddressId = action.payload.id;
+          state.defaultAddressId = action.payload.addressID;
         } else if (
-          state.defaultAddressId === action.payload.id &&
+          state.defaultAddressId === action.payload.addressID &&
           !action.payload.isDefaultAddress
         ) {
           // If the updated address was the default but is no longer, clear default or find a new one.

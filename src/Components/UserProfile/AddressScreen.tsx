@@ -18,6 +18,7 @@ import {RootStackParamList} from './profileNavigation';
 
 import {AppDispatch, RootState} from '../../store/store';
 import {
+  ApiAddress,
   fetchUserAddresses,
   ListedAddress,
 } from '../../services/userAddressSlice';
@@ -56,13 +57,12 @@ const AddressScreen: React.FC = () => {
     loadingList,
     error: addressError,
   } = useSelector((state: RootState) => state.userAddresses);
-
+  console.log('address n address screen', addresses, addressError);
   const loadAddresses = useCallback(() => {
     if (authData) {
       dispatch(
         fetchUserAddresses({
           authData: authData,
-          vendorId: '8765',
         }),
       );
     } else {
@@ -80,30 +80,28 @@ const AddressScreen: React.FC = () => {
     return unsubscribe; // Cleanup listener on unmount
   }, [navigation, loadAddresses]);
 
-  const renderAddressItem = ({item}: {item: ListedAddress}) => (
+  const renderAddressItem = ({item}: {item: ApiAddress}) => (
     <TouchableOpacity style={styles.addressItemContainer}>
-      {defaultAddressId === item.id && (
+      {defaultAddressId === item.addressID && (
         <Text style={styles.defaultToggle}>Default</Text>
       )}
 
       <View style={styles.addressItemContent}>
         <Text style={styles.addressName}>
-          {item?.address?.name}{' '}
-          {item?.address?.tag ? `(${item?.address?.tag})` : ''}
-          {item.isDefaultAddress && (
+          {item?.name} {item?.tag ? `(${item?.tag})` : ''}
+          {/* {item.isDefaultAddress && (
             <Text style={styles.defaultTag}> (Default)</Text>
-          )}
+          )} */}
         </Text>
-        <Text style={styles.addressLine}>{item?.address?.addressLine1}</Text>
-        {item?.address?.addressLine2 && (
-          <Text style={styles.addressLine}>{item?.address?.addressLine2}</Text>
+        <Text style={styles.addressLine}>{item?.addressLine1}</Text>
+        {item?.addressLine2 && (
+          <Text style={styles.addressLine}>{item?.addressLine2}</Text>
         )}
-        {item?.address?.addressLine3 && (
-          <Text style={styles.addressLine}>{item?.address?.addressLine3}</Text>
+        {item?.addressLine3 && (
+          <Text style={styles.addressLine}>{item?.addressLine3}</Text>
         )}
         <Text style={styles.addressLine}>
-          {item?.address?.city}, {item?.address?.state} -{' '}
-          {item?.address?.pincode}
+          {item?.city}, {item?.state} - {item?.postalCode}
         </Text>
       </View>
 
@@ -159,7 +157,7 @@ const AddressScreen: React.FC = () => {
           <FlatList
             data={addresses}
             renderItem={renderAddressItem}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.addressID}
             ListEmptyComponent={
               <View style={styles.emptyListContainer}>
                 <Text style={styles.emptyListText}>

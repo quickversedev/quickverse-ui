@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import MapView, {PROVIDER_GOOGLE, Region} from 'react-native-maps';
 import {
   SafeAreaView,
@@ -13,13 +13,14 @@ import {
   Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {RouteProp} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Geolocation from 'react-native-geolocation-service';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
 import {AddressStackParamList} from './AddressScreen';
 import OlaPlaceAutocomplete from '../OlaPlaceAutocomplete';
+import {throttle} from 'lodash';
 
 const COLORS = {
   backgroundPrimary: '#FAEA7B',
@@ -33,23 +34,14 @@ const COLORS = {
   mapPlaceholder: '#E0E0E0',
 };
 
-type SelectLocationScreenRouteProp = RouteProp<
-  AddressStackParamList,
-  'AddAddressScreen2'
->;
 type SelectLocationScreenNavigationProp = StackNavigationProp<
   AddressStackParamList,
   'AddAddressScreen2'
 >;
 
-interface Props {
-  route: SelectLocationScreenRouteProp;
-  navigation: SelectLocationScreenNavigationProp;
-}
-
-const AddAddressScreen: React.FC<Props> = ({navigation}) => {
+const AddAddressScreen: React.FC = () => {
   const OLA_MAPS_API_KEY = 'U3I3QUrUi1bjLCMQgtZGWzF2v0Wd7InexqwCaXhn';
-
+  const navigation = useNavigation<SelectLocationScreenNavigationProp>();
   const [mapRegion, setMapRegion] = useState<Region | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isLocationPermissionGranted, setIsLocationPermissionGranted] =
@@ -100,6 +92,9 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
           longitudeDelta: 15,
         });
         setIsInitialLoading(false);
+        setTimeout(() => {
+          isProgrammaticMove.current = false;
+        }, 100);
       };
 
       if (hasPermission) {
@@ -117,6 +112,9 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
             setMapRegion(initialRegion);
 
             setIsInitialLoading(false);
+            setTimeout(() => {
+              isProgrammaticMove.current = false;
+            }, 100);
           },
           error => {
             console.error('Error Getting Location:', error.message);
@@ -131,33 +129,58 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
 
     fetchInitialLocation();
   }, []);
+  const isProgrammaticMove = useRef(false);
+  const lastRegionRef = useRef<Region | null>(null);
 
-  const onRegionChangeComplete = (newRegion: Region) => {
-    setMapRegion(newRegion);
-    console.log('onPan:', newRegion);
-  };
+  const throttledRegionChange = useRef(
+    throttle((newRegion: Region) => {
+      if (
+        !lastRegionRef.current ||
+        Math.abs(newRegion.latitude - lastRegionRef.current.latitude) >
+          0.0001 ||
+        Math.abs(newRegion.longitude - lastRegionRef.current.longitude) > 0.0001
+      ) {
+        lastRegionRef.current = newRegion;
+        setMapRegion(newRegion);
+      }
+      console.log('new  region::::', newRegion);
+    }, 500),
+  ).current;
 
-  const handleSuggestionPress = (place: any) => {
+  const onRegionChangeComplete = useCallback(
+    (newRegion: Region) => {
+      if (!isProgrammaticMove.current) {
+        throttledRegionChange(newRegion);
+      }
+    },
+    [throttledRegionChange],
+  );
+
+  const handleSuggestionPress = useCallback((place: any) => {
     const {lat, lng} = place.geometry.location;
+    isProgrammaticMove.current = true;
     setMapRegion({
       latitude: lat,
       longitude: lng,
       latitudeDelta: 0.005,
       longitudeDelta: 0.004,
     });
-  };
 
-  const handleConfirmLocation = () => {
+    setTimeout(() => {
+      isProgrammaticMove.current = false;
+    }, 100);
+  }, []);
+
+  const handleConfirmLocation = useCallback(() => {
     if (!mapRegion) {
       Alert.alert('Error', 'Please select a location on the map.');
       return;
     }
-    // Navigate to the form screen, passing the selected coordinates
     navigation.navigate('AddAddressScreen2', {
       latitude: mapRegion.latitude,
       longitude: mapRegion.longitude,
     });
-  };
+  }, [mapRegion, navigation]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -214,8 +237,6 @@ const AddAddressScreen: React.FC<Props> = ({navigation}) => {
     </SafeAreaView>
   );
 };
-
-// const screenHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   safeArea: {flex: 1, backgroundColor: COLORS.backgroundPrimary},

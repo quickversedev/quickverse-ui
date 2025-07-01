@@ -17,7 +17,7 @@ export const mockProductData: Product[] = [
     productBrand: 'AudioPro',
     productSize: 'Medium',
     category: '1d3d014d-b0de-44c6-aab1-311bc1a2b7bb',
-    isBestSeller: false,
+    bestSeller: false,
   },
   {
     productId: 'P67890',
@@ -35,7 +35,7 @@ export const mockProductData: Product[] = [
     productBrand: 'TechBrand',
     productSize: '6.5-inch',
     category: '1d3d014d-b0de-44c6-aab1-311bc1a2b7bb',
-    isBestSeller: false,
+    bestSeller: false,
   },
   {
     productId: 'P54321',
@@ -53,7 +53,7 @@ export const mockProductData: Product[] = [
     productBrand: 'GamePro',
     productSize: '15.6-inch',
     category: '49735092-3f7f-4a32-a89a-90514826391a',
-    isBestSeller: false,
+    bestSeller: false,
   },
   {
     productId: 'P78901',
@@ -71,7 +71,7 @@ export const mockProductData: Product[] = [
     productBrand: 'WatchTech',
     productSize: 'One Size',
     category: 'd2f9faee-af14-45a9-9f2e-947b932cc319',
-    isBestSeller: false,
+    bestSeller: false,
   },
   {
     productId: 'P65432',
@@ -89,7 +89,7 @@ export const mockProductData: Product[] = [
     productBrand: 'PeriTech',
     productSize: 'Standard',
     category: 'd2f9faee-af14-45a9-9f2e-947b932cc319',
-    isBestSeller: false,
+    bestSeller: false,
   },
   {
     productId: 'P98765',
@@ -106,7 +106,7 @@ export const mockProductData: Product[] = [
     productBrand: 'SoundElite',
     productSize: 'Small',
     category: '9a89bc07-8762-4067-a89e-e6b69f1c50d5',
-    isBestSeller: false,
+    bestSeller: false,
   },
   {
     productId: 'P45678',
@@ -124,7 +124,7 @@ export const mockProductData: Product[] = [
     productBrand: 'VisionX',
     productSize: '55-inch',
     category: '9a89bc07-8762-4067-a89e-e6b69f1c50d5',
-    isBestSeller: false,
+    bestSeller: false,
   },
   {
     productId: 'P32109',
@@ -141,6 +141,6 @@ export const mockProductData: Product[] = [
     productBrand: 'BoomBox',
     productSize: 'Small',
     category: 'ed593933-d7f5-447e-ae74-3406cca8da8c',
-    isBestSeller: false,
+    bestSeller: false,
   },
 ];

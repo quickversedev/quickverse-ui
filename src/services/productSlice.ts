@@ -33,7 +33,6 @@ export const fetchProducts = createAsyncThunk(
       const MAX_ITERATIONS = 30;
       let iteration = 0;
 
-      // Clear existing products before new fetch
       dispatch(productSlice.actions.clearProducts());
       dispatch(productSlice.actions.setComplete(false));
 
@@ -48,7 +47,6 @@ export const fetchProducts = createAsyncThunk(
 
         const productsBatch = response.data?.products?.product || [];
 
-        // Dispatch incremental update
         dispatch(productSlice.actions.appendProducts(productsBatch));
 
         allProducts = [...allProducts, ...productsBatch];

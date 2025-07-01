@@ -126,6 +126,7 @@ export interface ProductCartItems {
   quantity: number;
   image: string;
   vendorId: string;
+  varients: string;
 }
 
 export interface Promo {
@@ -151,7 +152,7 @@ export interface Product {
   productBrand: string;
   productSize: string;
   category: string;
-  isBestSeller: boolean;
+  bestSeller: boolean;
 }
 export interface Category {
   id: string;

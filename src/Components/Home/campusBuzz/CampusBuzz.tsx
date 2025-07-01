@@ -5,7 +5,6 @@ import CampusBuzzList from './CampusBuzzList';
 import {useDispatch, useSelector} from 'react-redux';
 import {fetchBampusBuzzList} from '../../../services/CampusBuzzListSlice';
 import {AppDispatch, RootState} from '../../../store/store';
-import {Loading} from '../../util/Loading';
 import theme from '../../../theme';
 interface PCampusBuzzProps {
   campus: string | undefined; // Define the type for the campus prop
@@ -18,13 +17,8 @@ const CampusBuzz: React.FC<PCampusBuzzProps> = ({campus}) => {
       campus && dispatch(fetchBampusBuzzList(campus));
     }, 1000);
   }, [campus, dispatch]);
-  const {campusBuzz, loading} = useSelector(
-    (state: RootState) => state.campusBuzz,
-  );
+  const {campusBuzz} = useSelector((state: RootState) => state.campusBuzz);
 
-  if (loading) {
-    return <Loading />;
-  }
   return campusBuzz?.length > 0 ? (
     <View style={styles.buzzContainer}>
       <View style={styles.headContainer}>

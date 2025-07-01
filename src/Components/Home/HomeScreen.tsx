@@ -14,6 +14,7 @@ import {
   PermissionsAndroid,
   Linking,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import theme from '../../theme';
 import HomeScreenVendors from './homeVendors/HomeScreenVendors';
@@ -35,8 +36,12 @@ const HomeScreen: React.FC = () => {
   const [selectedCampusId, setSelectedCampusId] = useState<
     string | undefined
   >();
+  const [campusToastVisible, setCampusToastVisible] = useState(false);
+  const [campusToastName, setCampusToastName] = useState('');
+  const [campusError, setCampusError] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [campusOptions, setCampusOptions] = useState<any>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [clicked, setClicked] = useState(false);
   const [loading, setLoading] = useState(false); // Proper loading state
   const [searchText, setSearchText] = useState('');
@@ -56,7 +61,8 @@ const HomeScreen: React.FC = () => {
   };
 
   const fetchCampus = async () => {
-    setLoading(true); // Start loading
+    setLoading(true);
+    setCampusError(false);
     try {
       const response = await fetchCampusIds();
       const campusOption = response?.map(campus => ({
@@ -67,11 +73,12 @@ const HomeScreen: React.FC = () => {
         latitude: campus.latitude,
       }));
       setCampusOptions(campusOption);
-      await getDeviceLocation(campusOption); // Pass campus options to getDeviceLocation
+      await getDeviceLocation(campusOption);
     } catch (error) {
       console.error('Error fetching campuses:', error);
+      setCampusError(true);
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
@@ -155,7 +162,9 @@ const HomeScreen: React.FC = () => {
         const campusId = autoSelectCampus(latitude, longitude, campuses);
         if (campusId) {
           setSelectedCampusId(campusId);
-          setCampus(campusId); // Save selected campus to storage
+          setCampus(campusId);
+          setCampusToastName(campusId);
+          setCampusToastVisible(true);
         } else {
           setSelectedCampusId('IIMU-313001'); // Default campus
           setCampus('IIMU-313001'); // Save default campus to storage
@@ -180,7 +189,9 @@ const HomeScreen: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchCampus();
+    if (!selectedCampusId) {
+      fetchCampus();
+    }
   }, []);
 
   useEffect(() => {
@@ -192,26 +203,29 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     selectedCampus && setSelectedCampusId(selectedCampus);
   }, [selectedCampus]);
+  useEffect(() => {
+    if (campusToastVisible) {
+      const timer = setTimeout(() => {
+        setCampusToastVisible(false);
+      }, 5000); // Hide after 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [campusToastVisible]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      // Call all the functions you want to refresh
-      await fetchCampus();
-      // You might want to add other data refresh calls here
+      if (!selectedCampusId) {
+        await fetchCampus();
+      }
+      setRefreshKey(prev => prev + 1);
     } catch (error) {
       console.error('Error during refresh:', error);
     } finally {
       setRefreshing(false);
     }
   };
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.loadingContainer}>
-        <Text style={{color: theme.colors.ternary}}>Loading campuses...</Text>
-      </SafeAreaView>
-    );
-  }
+
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -243,58 +257,83 @@ const HomeScreen: React.FC = () => {
 
             {clicked && (
               <View style={styles.dropdownContainer}>
-                <View style={styles.searchContainer}>
-                  <MaterialCommunityIcons
-                    name="magnify"
-                    size={20}
-                    color={theme.colors.ternary}
-                    style={styles.searchIcon}
+                {loading ? (
+                  <ActivityIndicator
+                    style={{margin: 20}}
+                    size="small"
+                    color={theme.colors.secondary}
                   />
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search campus..."
-                    placeholderTextColor={theme.colors.ternary}
-                    value={searchText}
-                    onChangeText={text => setSearchText(text)}
-                  />
-                  {searchText.length > 0 && (
+                ) : campusError ? (
+                  <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>
+                      Failed to fetch campuses. Please try again.
+                    </Text>
                     <TouchableOpacity
-                      onPress={() => setSearchText('')}
-                      style={styles.clearIcon}>
+                      style={styles.retryButton}
+                      onPress={fetchCampus}>
+                      <Text style={styles.retryButtonText}>Retry</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <>
+                    <View style={styles.searchContainer}>
                       <MaterialCommunityIcons
-                        name="close-circle"
+                        name="magnify"
                         size={20}
                         color={theme.colors.ternary}
+                        style={styles.searchIcon}
                       />
-                    </TouchableOpacity>
-                  )}
-                </View>
-                <FlatList
-                  data={campusOptions?.filter(item => {
-                    const searchTerm = searchText.toLowerCase();
-                    return (
-                      item.value.toLowerCase().includes(searchTerm) ||
-                      (item.displayName &&
-                        item.displayName.toLowerCase().includes(searchTerm)) ||
-                      (item.label &&
-                        item.label.toLowerCase().includes(searchTerm))
-                    );
-                  })}
-                  keyExtractor={item => item.value}
-                  renderItem={({item}) => (
-                    <TouchableOpacity
-                      style={styles.listItem}
-                      onPress={() => {
-                        setSelectedCampusId(item.value);
-                        setClicked(false);
-                        setSearchText('');
-                      }}>
-                      <Text style={styles.listItemText}>
-                        {item.displayName}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                />
+                      <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search campus..."
+                        placeholderTextColor={theme.colors.ternary}
+                        value={searchText}
+                        onChangeText={text => setSearchText(text)}
+                      />
+                      {searchText.length > 0 && (
+                        <TouchableOpacity
+                          onPress={() => setSearchText('')}
+                          style={styles.clearIcon}>
+                          <MaterialCommunityIcons
+                            name="close-circle"
+                            size={20}
+                            color={theme.colors.ternary}
+                          />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                    <FlatList
+                      data={campusOptions?.filter(item => {
+                        const searchTerm = searchText.toLowerCase();
+                        return (
+                          item.value.toLowerCase().includes(searchTerm) ||
+                          (item.displayName &&
+                            item.displayName
+                              .toLowerCase()
+                              .includes(searchTerm)) ||
+                          (item.label &&
+                            item.label.toLowerCase().includes(searchTerm))
+                        );
+                      })}
+                      keyExtractor={item => item.value}
+                      renderItem={({item}) => (
+                        <TouchableOpacity
+                          style={styles.listItem}
+                          onPress={() => {
+                            setSelectedCampusId(item.value);
+                            setCampusToastName(item.displayName);
+                            setCampusToastVisible(true);
+                            setClicked(false);
+                            setSearchText('');
+                          }}>
+                          <Text style={styles.listItemText}>
+                            {item.displayName}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    />
+                  </>
+                )}
               </View>
             )}
           </View>
@@ -325,11 +364,27 @@ const HomeScreen: React.FC = () => {
               tintColor={theme.colors.secondary} // Customize as needed
             />
           }>
-          <PromoDiscounts campus={selectedCampusId} />
-          <FeaturedItems campus={selectedCampusId} />
-          <HomeScreenVendors campus={selectedCampusId} />
-          <CampusBuzz campus={selectedCampusId} />
+          <PromoDiscounts
+            campus={selectedCampusId}
+            key={`promo-${refreshKey}`}
+          />
+          <FeaturedItems
+            campus={selectedCampusId}
+            key={`featured-${refreshKey}`}
+          />
+          <HomeScreenVendors
+            campus={selectedCampusId}
+            key={`vendors-${refreshKey}`}
+          />
+          <CampusBuzz campus={selectedCampusId} key={`buzz-${refreshKey}`} />
         </ScrollView>
+        {campusToastVisible && (
+          <View style={styles.toastContainer}>
+            <Text style={styles.toastText}>
+              Currently showing vendors for {campusToastName}
+            </Text>
+          </View>
+        )}
       </SafeAreaView>
       <CartScreen modalVisible={modalVisible} closeCartModal={closeCartModal} />
     </>
@@ -484,6 +539,48 @@ const styles = StyleSheet.create({
         elevation: 2,
       },
     }),
+  },
+  toastContainer: {
+    position: 'absolute',
+    top: 80,
+    left: 20,
+    right: 20,
+    backgroundColor: theme.colors.secondary,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 15,
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  toastText: {
+    color: theme.colors.primary,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  errorContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  retryButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: theme.colors.secondary,
+    borderRadius: 10,
+  },
+  retryButtonText: {
+    color: theme.colors.primary,
+    fontWeight: '600',
   },
 });
 

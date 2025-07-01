@@ -1,19 +1,17 @@
-import React, {useEffect, useState, useRef, useMemo} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {
   StyleSheet,
   Text,
   View,
   Image,
   TouchableOpacity,
-  FlatList,
   SafeAreaView,
   Platform,
-  Animated,
   Alert,
   TextInput,
   ActivityIndicator,
-  Keyboard,
   RefreshControl,
+  FlatList,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CartButton from './CartButton';
@@ -43,6 +41,7 @@ import {useAuth} from '../../utils/AuthContext';
 import {setSkipLoginFlow} from '../../utils/Storage';
 import {AppDispatch} from '../../store/store';
 import {debounce} from 'lodash';
+import VariantDrawer from './SubVeriant';
 
 type CategoriesScreenProps = {
   route: RouteProp<RootStackParamList, 'Categories'>;
@@ -62,6 +61,19 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     refetch,
   } = useFetchProductsAndCategories(vendor.vendorId);
 
+  const [showBanner, setShowBanner] = useState(true);
+
+  const handleScroll = (event: {nativeEvent: {contentOffset: {y: number}}}) => {
+    const scrollOffset = event.nativeEvent.contentOffset.y;
+
+    const BANNER_SCROLL_THRESHOLD = -1; // Hide banner after scrolling 50 pixels
+
+    // If scrolling down AND the banner is currently visible
+    if (scrollOffset > BANNER_SCROLL_THRESHOLD && showBanner) {
+      setShowBanner(false);
+    }
+  };
+
   const dispatch = useDispatch<AppDispatch>();
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
@@ -78,37 +90,18 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   const [productToAdd, setProductToAdd] = useState<ProductCartItems | null>(
     null,
   );
+  const [showVariantDrawer, setShowVariantDrawer] = useState(false);
+  const [selectedProductForVariants, setSelectedProductForVariants] =
+    useState<Product | null>(null);
   const cart = useSelector(selectCart);
-
-  const [showBanner, setShowBanner] = useState(true);
-  const bannerTranslateY = useRef(new Animated.Value(0)).current;
-  const lastScrollY = useRef(0);
-
-  const handleScroll = event => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    lastScrollY.current = offsetY;
-    Keyboard.dismiss();
-    if (offsetY > 10 && showBanner) {
-      Animated.timing(bannerTranslateY, {
-        toValue: -500,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => setShowBanner(false));
-    } else if (offsetY <= 10 && !showBanner) {
-      setShowBanner(true);
-      Animated.timing(bannerTranslateY, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-  };
 
   const [storeOpen] = useState(
     isStoreOpen(vendor.storeOpeningTime, vendor.storeClosingTime),
   );
 
   const categoriesWithProducts = useMemo(() => {
+    const bestSellerProducts = (products || []).filter(p => p.bestSeller);
+
     const baseCategories = (categories || []).filter(category =>
       (products || []).some(product => product.category === category.id),
     );
@@ -117,22 +110,35 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       product => !baseCategories.some(cat => cat.id === product.category),
     );
 
-    if (productsWithoutCategory.length > 0) {
-      return [
-        ...baseCategories,
-        {
-          id: 'other',
-          name: 'Other',
-          imageURLs: ['https://via.placeholder.com/150'],
-          description: 'other',
-          type: '',
-          parentCategory: null,
-          countOfSkus: 0,
-        },
-      ];
+    const finalCategories: Category[] = [];
+
+    if (bestSellerProducts.length > 0) {
+      finalCategories.push({
+        id: 'best-sellers',
+        name: 'Best Sellers',
+        imageURLs: ['https://i.postimg.cc/3w1f5gvj/best-Seller.png'], // You can use a custom image
+        description: 'Best selling products',
+        type: '',
+        parentCategory: null,
+        countOfSkus: bestSellerProducts.length,
+      });
     }
 
-    return baseCategories;
+    finalCategories.push(...baseCategories);
+
+    if (productsWithoutCategory.length > 0) {
+      finalCategories.push({
+        id: 'other',
+        name: 'Other',
+        imageURLs: ['https://img.icons8.com/color/96/box.png'],
+        description: 'other',
+        type: '',
+        parentCategory: null,
+        countOfSkus: productsWithoutCategory.length,
+      });
+    }
+
+    return finalCategories;
   }, [categories, products]);
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>();
@@ -163,11 +169,16 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           product.title.toLowerCase().includes(searchQuery.toLowerCase()),
         )
       : selectedCategory
-      ? (products || []).filter(product =>
-          selectedCategory === 'other'
-            ? !categoriesWithProducts.some(cat => cat.id === product.category)
-            : product.category === selectedCategory,
-        )
+      ? (products || []).filter(product => {
+          if (selectedCategory === 'other') {
+            return !categoriesWithProducts.some(
+              cat => cat.id === product.category,
+            );
+          } else if (selectedCategory === 'best-sellers') {
+            return product.bestSeller;
+          }
+          return product.category === selectedCategory;
+        })
       : products || []
   )
     .slice()
@@ -187,33 +198,53 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     }
   };
 
-  const handleAddToCart = debounce((product: ProductCartItems) => {
-    if (!authData) {
-      Alert.alert(
-        'Login Required',
-        'Please log in to add products to your cart.',
-        [
-          {text: 'Cancel', style: 'cancel'},
-          {text: 'Login', onPress: () => handleClick()},
-        ],
-      );
-      return;
-    }
+  const handleAddToCart = debounce((product: Product) => {
     if (storeOpen) {
+      if (product.productSize && Number(product.productSize) > 1) {
+        setSelectedProductForVariants(product);
+        setShowVariantDrawer(true);
+        return;
+      }
+
+      if (!authData) {
+        Alert.alert(
+          'Login Required',
+          'Please log in to add products to your cart.',
+          [
+            {text: 'Cancel', style: 'cancel'},
+            {text: 'Login', onPress: () => handleClick()},
+          ],
+        );
+        return;
+      }
+
+      // Check if product has variants
+
+      // Existing logic for non-variant products
       if (cart.length > 0 && cart[0].vendorId !== product.vendorId) {
-        setProductToAdd(product);
+        setProductToAdd({
+          id: product.productId,
+          name: product.title,
+          productPrice: product.productPrice,
+          salePrice: product.productSalePrice,
+          quantity: 1,
+          image: product.productImageLink,
+          vendorId: product.vendorId,
+          varients: product.productSize,
+        });
         setConfirmationModalVisible(true);
       } else {
         dispatch(
           addToCart(
             {
-              id: product.id,
-              name: product.name,
+              id: product.productId,
+              name: product.title,
               productPrice: product.productPrice,
-              salePrice: product.salePrice,
+              salePrice: product.productSalePrice,
               quantity: 1,
-              image: product.image,
+              image: product.productImageLink,
               vendorId: product.vendorId,
+              varients: product.productSize,
             },
             authData,
           ),
@@ -235,6 +266,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             quantity: 1,
             image: productToAdd.image,
             vendorId: productToAdd.vendorId,
+            varients: productToAdd.varients,
           },
           authData,
         ),
@@ -261,19 +293,29 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     }
   }, 300);
 
-  const renderCategoryItem = ({item}: {item: Category}) => {
+  const renderCategoryItem = ({
+    item,
+    index,
+  }: {
+    item: Category;
+    index: number;
+  }) => {
     const isSelected = item.id === selectedCategory;
+    const isLastItem = index === filteredCategories.length - 1; // Check if it's the last item
+    const image =
+      item?.imageURLs?.[0] || 'https://i.postimg.cc/xCfHJ1Rn/application.png';
     return (
       <TouchableOpacity
         style={[
           styles.categoryContainer,
           isSelected && styles.selectedCategoryContainer,
           !storeOpen && styles.disabledCategoryContainer,
+          isLastItem && styles.lastCategoryItem, // Apply conditional style
         ]}
         onPress={() => handleCategoryPress(item.id)}
         disabled={loading || error}>
         <Image
-          source={{uri: item?.imageURLs?.[0]}}
+          source={{uri: image}}
           style={styles.categoryImage}
           resizeMode="cover"
         />
@@ -282,8 +324,9 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
     );
   };
 
-  const renderProductItem = ({item}: {item: Product}) => {
+  const renderProductItem = ({item, index}: {item: Product; index: number}) => {
     const isInStock = item.availability;
+    const hasVariants = item.productSize && Number(item.productSize) > 1;
     const product: ProductCartItems = {
       id: item.productId,
       name: item.title,
@@ -292,19 +335,25 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       quantity: cartItems[item.productId]?.quantity || 0,
       image: item.productImageLink,
       vendorId: item.vendorId,
+      varients: item.productSize,
     };
     const isProductOnSale =
       item.productSalePrice && item.productSalePrice !== item.productPrice;
 
+    // Check if it's the last item in the filteredProducts array
+    const isLastProductItem = index === filteredProducts.length - 1;
+    const image =
+      product.image || 'https://i.postimg.cc/6qdyMszY/new-product.png';
     return (
       <View
         style={[
           styles.productContainer,
           (!storeOpen || !isInStock) && styles.disabledProductContainer,
+          isLastProductItem && styles.lastProductItem,
         ]}>
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
           <Image
-            source={{uri: product.image}}
+            source={{uri: image}}
             style={styles.productImage}
             resizeMode="cover"
           />
@@ -323,13 +372,32 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
             <Text style={styles.originalPrice}>₹{product.productPrice}</Text>
           )}
           <Text style={styles.salePrice}> ₹{product.salePrice}</Text>
+          {hasVariants && (
+            <Text style={styles.variantIndicator}>
+              {product.varients} Varients
+            </Text>
+          )}
         </View>
         <View style={{position: 'absolute', bottom: 8, right: 0}}>
           <CartButton
             quantity={product.quantity}
-            onIncrease={() => handleIncreaseQuantity(product.id)}
-            onDecrease={() => handleDecreaseQuantity(product.id)}
-            onAdd={() => handleAddToCart(product)}
+            onIncrease={() => {
+              if (item.productSize && Number(item.productSize) > 1) {
+                setSelectedProductForVariants(item);
+                setShowVariantDrawer(true);
+                return;
+              }
+              handleIncreaseQuantity(product.id);
+            }}
+            onDecrease={() => {
+              if (item.productSize && Number(item.productSize) > 1) {
+                setSelectedProductForVariants(item);
+                setShowVariantDrawer(true);
+                return;
+              }
+              handleDecreaseQuantity(product.id);
+            }}
+            onAdd={() => handleAddToCart(item)}
             added={product.quantity > 0}
             disabled={!storeOpen || !isInStock || loading || error}
           />
@@ -369,131 +437,156 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
   return (
     <SafeAreaView style={styles.main}>
-      {!storeOpen && (
-        <View style={styles.storeClosedBanner}>
-          <Text style={styles.storeClosedText}>Store is Closed</Text>
-        </View>
-      )}
-
-      <View style={styles.searchAndCartContainer}>
-        <View style={styles.searchContainer}>
-          <MaterialCommunityIcons
-            name="magnify"
-            size={24}
-            color={theme.colors.ternary}
-            style={styles.searchIcon}
-          />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search by Category or Product"
-            placeholderTextColor={theme.colors.secondary}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            editable={!loading && !error}
-          />
-        </View>
-        <TouchableOpacity
-          style={styles.cartButton}
-          onPress={() => setModalVisible(true)}
-          disabled={loading || error}>
-          <MaterialCommunityIcons
-            name="cart-outline"
-            size={24}
-            color="#FFDC52"
-          />
-          {totalCartItems > 0 && (
-            <View style={styles.cartBadge}>
-              <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
-
-      <View style={{flex: 1}}>
-        {showBanner && (
-          <Animated.View style={{transform: [{translateY: bannerTranslateY}]}}>
-            <VendorDetails vendor={vendor} />
-          </Animated.View>
+      <View style={[styles.bannerContainer]}>
+        {!storeOpen && (
+          <TouchableOpacity
+            onPress={() => setShowBanner(true)}
+            style={styles.storeClosedBanner}>
+            <Text style={styles.storeClosedText}>Store is Closed</Text>
+          </TouchableOpacity>
         )}
 
-        <View style={styles.contentContainer}>
-          <View style={styles.categoriesListContainer}>
-            {categoriesLoading && categories.length === 0 ? (
-              <View style={styles.sectionLoading}>
-                <ActivityIndicator size="small" color={theme.colors.ternary} />
-                <Text style={styles.sectionLoadingText}>
-                  Loading categories...
-                </Text>
-              </View>
-            ) : (
-              <FlatList
-                data={filteredCategories}
-                renderItem={renderCategoryItem}
-                keyExtractor={item => item.id}
-                showsVerticalScrollIndicator={false}
-                onScroll={handleScroll}
-                scrollEventThrottle={100}
-                keyboardDismissMode="on-drag"
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={[theme.colors.ternary]}
-                    tintColor={theme.colors.ternary}
-                  />
-                }
-              />
-            )}
+        <View style={styles.searchAndCartContainer}>
+          <View style={styles.searchContainer}>
+            <MaterialCommunityIcons
+              name="magnify"
+              size={24}
+              color={theme.colors.ternary}
+              style={styles.searchIcon}
+            />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search by Category or Product"
+              placeholderTextColor={theme.colors.secondary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              editable={!loading && !error}
+            />
           </View>
-
-          <View style={styles.separator} />
-
-          <View style={styles.productsListContainer}>
-            {productsLoading && products.length === 0 ? (
-              <View style={styles.sectionLoading}>
-                <ActivityIndicator size="small" color={theme.colors.ternary} />
-                <Text style={styles.sectionLoadingText}>
-                  Loading products...
-                </Text>
+          <TouchableOpacity
+            style={styles.cartButton}
+            onPress={() => setModalVisible(true)}
+            disabled={loading || error}>
+            <MaterialCommunityIcons
+              name="cart-outline"
+              size={24}
+              color="#FFDC52"
+            />
+            {totalCartItems > 0 && (
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
               </View>
-            ) : (
-              <FlatList
-                data={filteredProducts}
-                renderItem={renderProductItem}
-                keyExtractor={item => item.productId}
-                showsVerticalScrollIndicator={false}
-                keyboardDismissMode="on-drag"
-                contentContainerStyle={
-                  filteredProducts.length === 0 && styles.emptyProductList
-                }
-                onScroll={handleScroll}
-                scrollEventThrottle={100}
-                ListFooterComponent={
-                  !productsComplete && (
-                    <View style={styles.loadingMoreContainer}>
-                      <ActivityIndicator
-                        size="small"
-                        color={theme.colors.ternary}
-                      />
-                      <Text style={styles.loadingMoreText}>
-                        Loading more products...
-                      </Text>
-                    </View>
-                  )
-                }
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={[theme.colors.ternary]}
-                    tintColor={theme.colors.ternary}
-                  />
-                }
-              />
             )}
-          </View>
+          </TouchableOpacity>
+        </View>
+        {showBanner ? (
+          <VendorDetails vendor={vendor} />
+        ) : (
+          <TouchableOpacity onPress={() => setShowBanner(true)}>
+            <View style={styles.smallBanner}>
+              <Text style={styles.smallBannerText}>{vendor?.vendorName}</Text>
+              <MaterialCommunityIcons
+                name="chevron-down"
+                size={30}
+                color={'black'}
+              />
+            </View>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <View style={[styles.contentContainer]}>
+        <View style={styles.categoriesListContainer}>
+          {categoriesLoading && categories.length === 0 ? (
+            <View style={styles.sectionLoading}>
+              <ActivityIndicator size="small" color={theme.colors.ternary} />
+              <Text style={styles.sectionLoadingText}>
+                Loading categories...
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredCategories}
+              renderItem={renderCategoryItem}
+              keyExtractor={item => item.id}
+              showsVerticalScrollIndicator={false}
+              onScroll={handleScroll} // Attach the handler
+              scrollEventThrottle={16} // Important for performance!
+              keyboardDismissMode="on-drag"
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  colors={[theme.colors.ternary]}
+                  tintColor={theme.colors.ternary}
+                />
+              }
+            />
+          )}
+        </View>
+
+        <View style={styles.separator} />
+
+        <View style={styles.productsListContainer}>
+          {productsLoading && products.length === 0 ? (
+            <View style={styles.sectionLoading}>
+              <ActivityIndicator size="small" color={theme.colors.ternary} />
+              <Text style={styles.sectionLoadingText}>Loading products...</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredProducts}
+              renderItem={renderProductItem}
+              keyExtractor={item => item.productId}
+              showsVerticalScrollIndicator={false}
+              keyboardDismissMode="on-drag"
+              onScroll={handleScroll} // Attach the handler
+              scrollEventThrottle={50} // Important for performance!
+              contentContainerStyle={
+                filteredProducts.length === 0 && styles.emptyProductList
+              }
+              ListFooterComponent={
+                !productsComplete && (
+                  <View style={styles.loadingMoreContainer}>
+                    <ActivityIndicator
+                      size="small"
+                      color={theme.colors.ternary}
+                    />
+                    <Text style={styles.loadingMoreText}>
+                      Loading more products...
+                    </Text>
+                  </View>
+                )
+              }
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  colors={[theme.colors.ternary]}
+                  tintColor={theme.colors.ternary}
+                />
+              }
+            />
+          )}
         </View>
       </View>
+
+      {showVariantDrawer && selectedProductForVariants && (
+        <VariantDrawer
+          product={selectedProductForVariants}
+          onClose={() => {
+            setShowVariantDrawer(false);
+            setSelectedProductForVariants(null);
+          }}
+          disabled={!storeOpen || loading || error}
+          storeOpen={storeOpen}
+          vendorId={vendor.vendorId}
+          handleAddToCart={handleAddToCart}
+          handleIncreaseQuantity={handleIncreaseQuantity}
+          handleDecreaseQuantity={handleDecreaseQuantity}
+          // onAddToCart={handleAddVariantToCart}
+        />
+      )}
 
       <CartScreen
         modalVisible={modalVisible}
@@ -596,6 +689,17 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  variantIndicator: {
+    marginTop: 6,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 25,
+    backgroundColor: 'rgba(100, 100, 255, 0.1)', // soft blue background
+    color: theme.colors.ternary, // matching soft blue text
+    fontSize: 12,
+    fontWeight: '500',
+  },
   searchIcon: {
     marginRight: 8,
     color: theme.colors.ternary,
@@ -654,11 +758,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
-  contentContainer: {
-    flex: 2,
+  smallBanner: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    alignItems: 'center',
+    backgroundColor: 'white',
+    padding: 10,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 15,
+  },
+  smallBannerText: {color: 'black', fontSize: 20},
+  bannerContainer: {
+    zIndex: 10,
+    backgroundColor: theme.colors.primary,
+  },
+  contentContainer: {
+    flexDirection: 'row',
+    zIndex: 1, // Lower than banner
+
+    // marginTop: 150, // Initial position below banner
   },
   categoriesListContainer: {
     height: '100%',
@@ -721,6 +840,12 @@ const styles = StyleSheet.create({
   },
   disabledCategoryContainer: {
     opacity: 0.5,
+  },
+  lastCategoryItem: {
+    marginBottom: 350,
+  },
+  lastProductItem: {
+    marginBottom: 350,
   },
   categoryImage: {
     width: 50,

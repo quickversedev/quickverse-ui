@@ -105,9 +105,6 @@ const OlaPlaceAutocomplete: React.FC<OlaPlaceAutocompleteProps> = ({
       const requestId = uuidv4();
 
       try {
-        console.log(
-          `OlaPlaceAutocomplete: Fetching for query "${currentSearchQuery}", ID: ${requestId}, lati:${latitude},longi:${longitude} `,
-        );
         const response = await axios.get(OLA_MAPS_AUTOCOMPLETE_ENDPOINT, {
           params: {
             input: currentSearchQuery,
@@ -120,12 +117,7 @@ const OlaPlaceAutocomplete: React.FC<OlaPlaceAutocompleteProps> = ({
           },
         });
 
-        console.log(
-          'OlaPlaceAutocomplete: Raw result',
-          response.data.predictions,
-        );
         if (response.data && Array.isArray(response.data.predictions)) {
-          console.log('KK:', response.data.predictions);
           setSuggestions(response.data.predictions);
         } else {
           console.warn(
@@ -168,7 +160,7 @@ const OlaPlaceAutocomplete: React.FC<OlaPlaceAutocompleteProps> = ({
     return () => {
       fetchAutocompleteSuggestions.cancel();
     };
-  }, [query, fetchAutocompleteSuggestions]);
+  }, [query, fetchAutocompleteSuggestions, loading]);
 
   const handleInputChange = (text: string) => {
     setQuery(text);

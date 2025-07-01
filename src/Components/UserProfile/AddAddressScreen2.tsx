@@ -135,7 +135,7 @@ const AddAddressScreen2: React.FC<Props> = ({route, navigation}) => {
       return;
     }
 
-    const newAddressData: Omit<ApiAddress, 'id'> = {
+    const newAddressData: Omit<ApiAddress, 'addressID'> = {
       ...addressForm,
       latitude: Number(addressForm.latitude).toFixed(6),
       longitude: Number(addressForm.longitude).toFixed(6),
@@ -144,7 +144,6 @@ const AddAddressScreen2: React.FC<Props> = ({route, navigation}) => {
     dispatch(
       addUserAddress({
         authData: authData!,
-        vendorId: '8765',
         addressData: newAddressData,
         isDefaultAddress: isDefault,
       }),
@@ -152,7 +151,7 @@ const AddAddressScreen2: React.FC<Props> = ({route, navigation}) => {
       .unwrap()
       .then(() => {
         Alert.alert('Success', 'Address added successfully!');
-        // Navigate back to the main address list, not just one screen
+
         navigation.popToTop();
         navigation.goBack();
         // navigation.pop(2);

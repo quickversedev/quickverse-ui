@@ -84,7 +84,6 @@ const AddAddressScreen: React.FC = () => {
       const hasPermission = await requestLocationPermission();
 
       const fallbackToDefaultLocation = () => {
-        console.log('fallbackToDefaultLocation HIT');
         setMapRegion({
           latitude: 20.5937,
           longitude: 78.9629,
@@ -107,7 +106,6 @@ const AddAddressScreen: React.FC = () => {
               latitudeDelta: 0.005,
               longitudeDelta: 0.004,
             };
-            console.log('onLoad:', initialRegion);
 
             setMapRegion(initialRegion);
 
@@ -143,7 +141,6 @@ const AddAddressScreen: React.FC = () => {
         lastRegionRef.current = newRegion;
         setMapRegion(newRegion);
       }
-      console.log('new  region::::', newRegion);
     }, 500),
   ).current;
 

@@ -2,7 +2,6 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axios from 'axios';
 import globalConfig from '../utils/GlobalConfig';
 
-// --- Type Definitions ---
 export interface ApiAddress {
   addressID?: string;
   name: string;
@@ -34,7 +33,6 @@ export interface ThunkApiArgs {
 
 export interface AddAddressThunkArgs extends ThunkApiArgs {
   addressData: Omit<ApiAddress, 'addressID'>;
-  vendorId: string;
   isDefaultAddress: boolean;
 }
 
@@ -43,9 +41,7 @@ export interface ListAddressesApiResponse {
 }
 
 export type AddAddressApiResponse = ListedAddress;
-// --- End Type Definitions ---
 
-// --- Define State Structure ---
 interface AddressState {
   addresses: ListedAddress[];
   defaultAddressId: string | null;
@@ -54,7 +50,6 @@ interface AddressState {
   error: string | null;
 }
 
-// --- Initial State ---
 const initialState: AddressState = {
   addresses: [],
   defaultAddressId: null,
@@ -63,72 +58,11 @@ const initialState: AddressState = {
   error: null,
 };
 
-// --- MOCK DATA for fetchUserAddresses ---
-const mockUserAddressesData: ListedAddress[] = [
-  {
-    addressID: 'mock_addr_001',
-    name: 'John Doe',
-    addressLine1: '123 Main Street',
-    addressLine2: 'Apartment 4B',
-    addressLine3: null,
-    city: 'Anytown',
-    state: 'CA',
-    pincode: '90210',
-    latitude: '34.052235',
-    longitude: '-118.243683',
-    tag: 'Home',
-    isDefaultAddress: true,
-  },
-  {
-    addressID: 'mock_addr_002',
-    name: 'John Doe',
-    addressLine1: '789 Business Rd',
-    addressLine2: 'Suite 500',
-    addressLine3: 'Office Park',
-    city: 'Workville',
-    state: 'CA',
-    pincode: '90211',
-    latitude: '34.059900',
-    longitude: '-118.259000',
-    tag: 'Work',
-    isDefaultAddress: false,
-  },
-];
-// --- END MOCK DATA ---
-
-// --- Async Thunk for Fetching User Addresses (GET) ---
 export const fetchUserAddresses = createAsyncThunk<
   ListedAddress[], // Expected return type on success
   ThunkApiArgs, // Type of the argument passed to the thunk
   {rejectValue: string} // Type for the payload when rejectWithValue is used
 >('userAddresses/fetchUserAddresses', async ({authData}, {rejectWithValue}) => {
-  // --- START MOCK IMPLEMENTATION ---
-  // console.log('MOCK fetchUserAddresses called with:', {authData, vendorId});
-  // return new Promise<ListedAddress[]>((resolve, reject) => {
-  //   setTimeout(() => {
-  //     if (!authData) {
-  //       console.warn(
-  //         'MOCK: Authentication key is missing for fetchUserAddresses.',
-  //       );
-  //       reject(rejectWithValue('Authentication key is missing.'));
-  //       return;
-  //     }
-  //     if (!vendorId) {
-  //       console.warn('MOCK: Vendor ID is missing for fetchUserAddresses.');
-  //       reject(rejectWithValue('Vendor ID is missing.'));
-  //       return;
-  //     }
-  //     // Simulate success
-  //     console.log('MOCK: Successfully returning mock addresses.');
-  //     resolve(mockUserAddressesData);
-  //     // To simulate an error:
-  //     // console.log('MOCK: Simulating fetch error for addresses.');
-  //     // reject(rejectWithValue('Mocked: Failed to fetch user addresses.'));
-  //   }, 1000); // 1-second delay
-  // });
-  // --- END MOCK IMPLEMENTATION ---
-  // --- REAL API Call (Commented out for mocking) ---
-
   if (!authData) {
     return rejectWithValue('Authentication key is missing.');
   }
@@ -167,17 +101,13 @@ export const fetchUserAddresses = createAsyncThunk<
   }
 });
 
-// --- Async Thunk for Adding a User Address (POST) ---
 export const addUserAddress = createAsyncThunk<
   ListedAddress,
   AddAddressThunkArgs,
   {rejectValue: string}
 >(
   'userAddresses/addUserAddress',
-  async (
-    {authData, vendorId, addressData, isDefaultAddress},
-    {rejectWithValue},
-  ) => {
+  async ({authData, addressData, isDefaultAddress}, {rejectWithValue}) => {
     if (!authData) {
       return rejectWithValue('Authentication key is missing.');
     }
@@ -187,43 +117,11 @@ export const addUserAddress = createAsyncThunk<
       isDefaultAddress: isDefaultAddress,
     };
 
-    // --- MOCK ADD USER ADDRESS (Optional, but good for consistent testing) ---
-    // console.log(
-    //   'MOCK addUserAddress called with payload:',
-    //   payload,
-    //   'and vendorId:',
-    //   vendorId,
-    // );
-    // return new Promise<ListedAddress>((resolve, reject) => {
-    //   setTimeout(() => {
-    //     const newMockAddress: ListedAddress = {
-    //       ...addressData,
-    //       id: `mock_id_${Date.now()}`, // Generate a unique mock ID
-    //       isDefaultAddress: isDefaultAddress,
-    //     };
-    //     console.log(
-    //       'MOCK: Successfully returning newly added mock address:',
-    //       newMockAddress,
-    //     );
-    //     resolve(newMockAddress);
-
-    //     // To simulate an error for adding:
-    //     // console.log('MOCK: Simulating add error for address.');
-    //     // reject(rejectWithValue('Mocked: Failed to add user address.'));
-    //   }, 1000); // 1-second delay
-    // });
-    // --- END MOCK ADD USER ADDRESS ---
-
-    // --- REAL API Call (Commented out for mocking) ---
-
     try {
       const response = await axios.post<AddAddressApiResponse>(
-        `${globalConfig.apiBaseUrl}/v2/addAddress`, // Added /quickVerse/ if needed
+        `${globalConfig.apiBaseUrl}/v2/addAddress`,
         payload,
         {
-          params: {
-            vendorId: vendorId,
-          },
           headers: {
             SessionKey: authData,
             'Content-Type': 'application/json',
@@ -278,19 +176,13 @@ const userAddressesSlice = createSlice({
         }
         state.addresses.push(action.payload);
 
-        // If adding an address makes it the new default (and API reflects this)
-        // you might need to update state.defaultAddressId here too,
-        // or the API response for addUserAddress should include the new defaultAddressId.
-        // For now, assume adding an address might change the default, so we update it from the added address.
         if (action.payload.isDefaultAddress) {
           state.defaultAddressId = action.payload.addressID;
         } else if (
           state.defaultAddressId === action.payload.addressID &&
           !action.payload.isDefaultAddress
         ) {
-          // If the updated address was the default but is no longer, clear default or find a new one.
-          // This logic can get complex. Simpler might be to re-fetch listAddresses after add/update if default changes.
-          state.defaultAddressId = null; // Or find another default
+          state.defaultAddressId = null;
         }
         state.error = null;
       })

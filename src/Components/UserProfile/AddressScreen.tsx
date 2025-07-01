@@ -57,7 +57,7 @@ const AddressScreen: React.FC = () => {
     loadingList,
     error: addressError,
   } = useSelector((state: RootState) => state.userAddresses);
-  console.log('address n address screen', addresses, addressError);
+
   const loadAddresses = useCallback(() => {
     if (authData) {
       dispatch(

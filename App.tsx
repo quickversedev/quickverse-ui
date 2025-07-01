@@ -4,6 +4,7 @@ import {AuthProvider} from './src/utils/AuthContext';
 import {Provider} from 'react-redux';
 import store from './src/store/store';
 import {saveToken} from './src/utils/KeychainStore/keychainUtil';
+import 'react-native-get-random-values';
 
 const App = () => {
   useEffect(() => {

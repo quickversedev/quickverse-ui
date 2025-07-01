@@ -15,6 +15,8 @@ import categoriesSlice from '../services/categorySlice';
 import productsSlice from '../services/productSlice';
 import OrdersSlice from '../services/cart/OrdersSlice';
 import productCartSlice from '../services/cart/productCartSlice';
+import userAddressesSlice from '../services/userAddressSlice';
+
 const store = configureStore({
   reducer: {
     vendorList: VendorListSlice,
@@ -29,6 +31,7 @@ const store = configureStore({
     products: productsSlice,
     orders: OrdersSlice,
     productCart: productCartSlice,
+    userAddresses: userAddressesSlice,
   },
 });
 export type AppThunk<ReturnType = void> = ThunkAction<

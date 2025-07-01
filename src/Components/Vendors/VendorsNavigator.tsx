@@ -9,11 +9,13 @@ import Categories from '../Categories/Categories';
 import WebViewScreen from '../../utils/WebViewScreen';
 import {getCampus} from '../../utils/Storage';
 import theme from '../../theme';
+import AddressNavigator from '../Cart/cartAddressNavigator';
 
 export type RootStackParamList = {
   VendorList: undefined;
   Categories: {vendor: Vendor};
   WebView: {url: string};
+  AddAddress: undefined;
   navigation?: StackNavigationProp<any, any>;
 };
 
@@ -44,6 +46,11 @@ const VendorsNavigator: React.FC = () => {
           },
           title: getCampus() ? getCampus() : 'Place an Order',
         }}
+      />
+      <Stack.Screen
+        name="AddAddress"
+        component={AddressNavigator}
+        options={{headerShown: false}}
       />
     </Stack.Navigator>
   );

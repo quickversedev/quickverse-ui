@@ -42,7 +42,7 @@ const PromoScroll: React.FC<Props> = ({promoItemsList}) => {
   const handleCardPress = (item: any) => {
     navigation.removeListener;
 
-    const vendor = item.vendor;
+    const vendor = item?.vendor;
     if (!vendor && item?.vendorId.startsWith('qv-')) {
       navigation.navigate('WebView', {url: item?.promoLink});
     } else {

@@ -6,11 +6,13 @@ import theme from '../../theme';
 import {getCampus} from '../../utils/Storage';
 import {Vendor} from '../../utils/canonicalModel';
 import Categories from '../Categories/Categories';
+import AddressNavigator from '../Cart/cartAddressNavigator';
 
 export type RootStackParamListHome = {
   HomeScreen: undefined;
   WebView: {url: string};
   Categories: {vendor: Vendor};
+  AddAddress?: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamListHome>();
@@ -36,6 +38,17 @@ const HomeNavigation: React.FC = () => {
             backgroundColor: theme.colors.primary,
           },
           title: getCampus(),
+        }}
+      />
+      <Stack.Screen
+        name="AddAddress"
+        component={AddressNavigator}
+        options={{
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: theme.colors.primary,
+          },
+          title: 'Add Address',
         }}
       />
     </Stack.Navigator>

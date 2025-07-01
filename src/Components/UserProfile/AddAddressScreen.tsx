@@ -17,6 +17,8 @@ import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Geolocation from 'react-native-geolocation-service';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+// @ts-expect-error: TypeScript declaration for @env
+import {OLA_MAPS_API_KEY} from '@env';
 
 import {AddressStackParamList} from './AddressScreen';
 import OlaPlaceAutocomplete from '../OlaPlaceAutocomplete';
@@ -40,7 +42,6 @@ type SelectLocationScreenNavigationProp = StackNavigationProp<
 >;
 
 const AddAddressScreen: React.FC = () => {
-  const OLA_MAPS_API_KEY = '4BCmnjxofvyjOnyJ0Sn6lHBBQ0yv6TALIrsRvE36';
   const navigation = useNavigation<SelectLocationScreenNavigationProp>();
   const [mapRegion, setMapRegion] = useState<Region | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);

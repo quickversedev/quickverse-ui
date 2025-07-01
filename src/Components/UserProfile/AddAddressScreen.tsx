@@ -212,7 +212,7 @@ const AddAddressScreen: React.FC = () => {
           ) : (
             <>
               <MapView
-                provider={PROVIDER_GOOGLE}
+                provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
                 style={styles.mapView}
                 region={mapRegion}
                 onRegionChangeComplete={onRegionChangeComplete}

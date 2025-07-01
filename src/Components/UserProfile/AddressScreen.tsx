@@ -17,11 +17,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from './profileNavigation';
 
 import {AppDispatch, RootState} from '../../store/store';
-import {
-  ApiAddress,
-  fetchUserAddresses,
-  ListedAddress,
-} from '../../services/userAddressSlice';
+import {ApiAddress, fetchUserAddresses} from '../../services/userAddressSlice';
 import {useAuth} from '../../utils/AuthContext';
 
 const COLORS = {
@@ -57,7 +53,7 @@ const AddressScreen: React.FC = () => {
     loadingList,
     error: addressError,
   } = useSelector((state: RootState) => state.userAddresses);
-
+  console.log('addresses:0', addresses);
   const loadAddresses = useCallback(() => {
     if (authData) {
       dispatch(

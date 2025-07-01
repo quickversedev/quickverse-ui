@@ -3,7 +3,7 @@ import axios from 'axios';
 import globalConfig from '../utils/GlobalConfig';
 
 export interface ApiAddress {
-  addressID?: string;
+  addressID: string;
   name: string;
   addressLine1: string;
   addressLine2?: string | null;
@@ -43,7 +43,7 @@ export interface ListAddressesApiResponse {
 export type AddAddressApiResponse = ListedAddress;
 
 interface AddressState {
-  addresses: ListedAddress[];
+  addresses: ApiAddress[];
   defaultAddressId: string | null;
   loadingList: boolean;
   loadingAdd: boolean;

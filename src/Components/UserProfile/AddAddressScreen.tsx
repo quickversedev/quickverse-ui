@@ -40,13 +40,13 @@ type SelectLocationScreenNavigationProp = StackNavigationProp<
 >;
 
 const AddAddressScreen: React.FC = () => {
-  const OLA_MAPS_API_KEY = 'U3I3QUrUi1bjLCMQgtZGWzF2v0Wd7InexqwCaXhn';
+  const OLA_MAPS_API_KEY = '4BCmnjxofvyjOnyJ0Sn6lHBBQ0yv6TALIrsRvE36';
   const navigation = useNavigation<SelectLocationScreenNavigationProp>();
   const [mapRegion, setMapRegion] = useState<Region | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isLocationPermissionGranted, setIsLocationPermissionGranted] =
     useState(false);
-
+  console.log('add addess screen');
   const requestLocationPermission = async (): Promise<boolean> => {
     const permission = Platform.select({
       ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,

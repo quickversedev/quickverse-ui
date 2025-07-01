@@ -73,7 +73,7 @@ const AddAddressScreen2: React.FC<Props> = ({route, navigation}) => {
     longitude: longitude.toString(),
   });
 
-  const [isDefault, setIsDefault] = useState(false);
+  const [isDefault, setIsDefault] = useState(true);
   const [isFetchingPincodeDetails, setIsFetchingPincodeDetails] =
     useState(false);
 

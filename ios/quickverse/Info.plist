@@ -42,7 +42,9 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Need the location access for Address</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Need the location access for Address</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

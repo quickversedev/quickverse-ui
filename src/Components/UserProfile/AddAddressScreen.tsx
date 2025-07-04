@@ -47,7 +47,7 @@ const AddAddressScreen: React.FC = () => {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isLocationPermissionGranted, setIsLocationPermissionGranted] =
     useState(false);
-
+  console.log('add addess screen');
   const requestLocationPermission = async (): Promise<boolean> => {
     const permission = Platform.select({
       ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,

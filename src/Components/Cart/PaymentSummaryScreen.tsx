@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -12,15 +12,15 @@ import {
   FlatList,
 } from 'react-native';
 import theme from '../../theme';
-import {useNavigation} from '@react-navigation/native';
-import {RootStackParamList} from '../Vendors/VendorsNavigator';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {Vendor} from '../../utils/canonicalModel';
-import {useAuth} from '../../utils/AuthContext';
-import {useSelector, useDispatch} from 'react-redux';
-import {RootState, AppDispatch} from '../../store/store';
-import {fetchUserAddresses, ApiAddress} from '../../services/userAddressSlice';
-import {unwrapResult} from '@reduxjs/toolkit';
+import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../Vendors/VendorsNavigator';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { Vendor } from '../../utils/canonicalModel';
+import { useAuth } from '../../utils/AuthContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../../store/store';
+import { fetchUserAddresses, ApiAddress } from '../../services/userAddressSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 interface PaymentSummaryScreenProps {
@@ -47,16 +47,17 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
   isCartEmpty,
   closeCartModal,
 }) => {
-  const {vendorEndPoint} = vendor || {};
+  const { vendorEndPoint } = vendor || {};
   const webUrl = vendorEndPoint ? `${vendorEndPoint}/cart` : '';
   const navigation = useNavigation<VendorCardsNavigationProp>();
-  const {authData} = useAuth();
+  const { authData } = useAuth();
   const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState(false);
   const [isAddressSectionExpanded, setIsAddressSectionExpanded] =
     useState(false);
+  const [hasAddress, setHasAddress] = useState<boolean | null>(null);
 
-  const {addresses, loadingList} = useSelector(
+  const { addresses, loadingList } = useSelector(
     (state: RootState) => state.userAddresses,
   );
 
@@ -71,7 +72,7 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
 
     try {
       setIsLoading(true);
-      const resultAction = await dispatch(fetchUserAddresses({authData}));
+      const resultAction = await dispatch(fetchUserAddresses({ authData }));
 
       const result = unwrapResult(resultAction);
       return result?.length > 0;
@@ -82,35 +83,37 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
       setIsLoading(false);
     }
   }, [authData, dispatch]);
-
+  const showAddressRequiredAlert = useCallback(() => {
+    Alert.alert(
+      'Address Required',
+      'Please add a delivery address before checkout',
+      [
+        {
+          text: 'Add Address',
+          onPress: () => {
+            navigation.navigate('AddAddress');
+          },
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ],
+    );
+  }, []);
   useEffect(() => {
     const checkAddresses = async () => {
-      const hasAddress = await loadAddresses();
-
-      if (!hasAddress) {
-        Alert.alert(
-          'Address Required',
-          'Please add a delivery address before checkout',
-          [
-            {
-              text: 'Add Address',
-              onPress: () => {
-                navigation.navigate('AddAddress');
-              },
-            },
-            {
-              text: 'Cancel',
-              style: 'cancel',
-            },
-          ],
-        );
+      const result = await loadAddresses();
+      setHasAddress(result);
+      if (!result) {
+        showAddressRequiredAlert();
       }
     };
 
     checkAddresses();
   }, [loadAddresses, navigation]);
 
-  const renderAddressItem = ({item}: {item: ApiAddress}) => {
+  const renderAddressItem = ({ item }: { item: ApiAddress }) => {
     // Concatenate address fields for a compact display
     const addressLine = [
       item.addressLine1,
@@ -148,9 +151,12 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
       Alert.alert('Error', 'Please login to proceed to checkout');
       return;
     }
-
-    navigation.navigate('WebView', {url: webUrl});
-    closeCartModal();
+    if (hasAddress) {
+      navigation.navigate('WebView', { url: webUrl });
+      closeCartModal();
+      return;
+    }
+    showAddressRequiredAlert();
   };
 
   return (
@@ -163,59 +169,64 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
               Available Addresses ({addresses.length}){' '}
             </Text>
             <View style={styles.addressHeaderActions}>
-              <TouchableOpacity
-                onPress={() =>
-                  setIsAddressSectionExpanded(expanded => !expanded)
-                }
-                activeOpacity={0.7}
-                style={styles.dropdownIconButton}>
-                <MaterialIcons
-                  name={
-                    isAddressSectionExpanded
-                      ? 'keyboard-arrow-up'
-                      : 'keyboard-arrow-down'
-                  }
-                  size={28}
-                  color={theme.colors.secondary}
-                  // style={{ transform: [{ rotate: isAddressSectionExpanded ? '0deg' : '180deg' }] }}
-                />
-              </TouchableOpacity>
-              {isAddressSectionExpanded && (
+              {addresses.length > 0 ? (
                 <TouchableOpacity
-                  style={styles.addAddressHeaderButton}
-                  onPress={() => navigation.navigate('AddAddress')}
-                  activeOpacity={0.7}>
+                  onPress={() =>
+                    setIsAddressSectionExpanded(isAddressSectionExpanded => !isAddressSectionExpanded)
+                  }
+                  activeOpacity={0.7}
+                  style={styles.dropdownIconButton}>
                   <MaterialIcons
-                    name="add"
-                    size={22}
+                    name={
+                      isAddressSectionExpanded
+                        ? 'keyboard-arrow-up'
+                        : 'keyboard-arrow-down'
+                    }
+                    size={28}
                     color={theme.colors.secondary}
                   />
-                  <Text style={styles.addAddressHeaderButtonText}>Add</Text>
                 </TouchableOpacity>
-              )}
+              ) : <TouchableOpacity
+                style={styles.addAddressHeaderButton}
+                onPress={() => navigation.navigate('AddAddress')}
+                activeOpacity={0.7}>
+                <MaterialIcons
+                  name="add"
+                  size={22}
+                  color={theme.colors.secondary}
+                />
+                <Text style={styles.addAddressHeaderButtonText}>Add</Text>
+              </TouchableOpacity>}
             </View>
           </View>
-          {isAddressSectionExpanded &&
-            (loadingList ? (
-              <ActivityIndicator size="small" color={theme.colors.secondary} />
-            ) : addresses.length > 0 ? (
-              <FlatList
-                data={addresses}
-                renderItem={renderAddressItem}
-                keyExtractor={item => item.addressID}
-                scrollEnabled={false}
-                style={styles.addressList}
-              />
-            ) : (
-              <View style={styles.noAddressContainer}>
-                <Text style={styles.noAddressText}>No addresses found</Text>
-                <TouchableOpacity
-                  style={styles.addAddressButton}
-                  onPress={() => navigation.navigate('AddAddress')}>
-                  <Text style={styles.addAddressButtonText}>Add Address</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
+          {isAddressSectionExpanded && (
+            <>
+              {loadingList ? (
+                <ActivityIndicator size="small" color={theme.colors.secondary} />
+              ) : addresses.length > 0 ? (
+                <FlatList
+                  data={addresses}
+                  renderItem={renderAddressItem}
+                  keyExtractor={item => item.addressID}
+                  scrollEnabled={false}
+                  style={styles.addressList}
+                />
+              ) : (
+                <Text style={styles.noAddressText}>No addresses found.</Text>
+              )}
+              <TouchableOpacity
+                style={styles.addAddressHeaderButton}
+                onPress={() => navigation.navigate('AddAddress')}
+                activeOpacity={0.7}>
+                <MaterialIcons
+                  name="add"
+                  size={22}
+                  color={theme.colors.secondary}
+                />
+                <Text style={styles.addAddressHeaderButtonText}>Add</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
 
         {/* Payment Summary Section */}
@@ -279,7 +290,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: {width: 0, height: 4},
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 5,
       },
@@ -305,6 +316,7 @@ const styles = StyleSheet.create({
   addAddressHeaderButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#f0f0f0',
     borderRadius: 6,
     paddingHorizontal: 8,
@@ -378,7 +390,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: {width: 0, height: 4},
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 5,
       },
@@ -395,7 +407,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: {width: 0, height: 4},
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 5,
       },

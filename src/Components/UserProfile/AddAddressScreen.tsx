@@ -55,6 +55,7 @@ const AddAddressScreen: React.FC = () => {
     });
 
     if (!permission) {
+      Alert.alert('Permission Error', 'Unable to determine location permission type for this device.');
       return false;
     }
 
@@ -72,9 +73,17 @@ const AddAddressScreen: React.FC = () => {
         }
       }
       setIsLocationPermissionGranted(false);
+      Alert.alert(
+        'Location Permission Denied',
+        'Location permission is required to select your current location. You can still search for a location manually.'
+      );
       return false;
     } catch (err) {
       console.error('Error requesting location permission:', err);
+      Alert.alert(
+        'Permission Error',
+        'An error occurred while requesting location permission. You can still search for a location manually.'
+      );
       return false;
     }
   };
@@ -95,6 +104,10 @@ const AddAddressScreen: React.FC = () => {
         setTimeout(() => {
           isProgrammaticMove.current = false;
         }, 100);
+        Alert.alert(
+          'Location Error',
+          'Unable to fetch your current location. Showing default location. You can search or move the map manually.'
+        );
       };
 
       if (hasPermission) {
@@ -212,7 +225,7 @@ const AddAddressScreen: React.FC = () => {
           ) : (
             <>
               <MapView
-                provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
+                provider={ PROVIDER_GOOGLE }
                 style={styles.mapView}
                 region={mapRegion}
                 onRegionChangeComplete={onRegionChangeComplete}

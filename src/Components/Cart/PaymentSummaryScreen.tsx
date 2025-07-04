@@ -55,6 +55,7 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isAddressSectionExpanded, setIsAddressSectionExpanded] =
     useState(false);
+  const [hasAddress, setHasAddress] = useState<boolean | null>(null);
 
   const { addresses, loadingList } = useSelector(
     (state: RootState) => state.userAddresses,
@@ -82,28 +83,31 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
       setIsLoading(false);
     }
   }, [authData, dispatch]);
-
+  const showAddressRequiredAlert = useCallback(() => {
+    Alert.alert(
+      'Address Required',
+      'Please add a delivery address before checkout',
+      [
+        {
+          text: 'Add Address',
+          onPress: () => {
+            navigation.navigate('AddAddress');
+            closeCartModal();
+          },
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ],
+    );
+  }, []);
   useEffect(() => {
     const checkAddresses = async () => {
-      const hasAddress = await loadAddresses();
-
-      if (!hasAddress) {
-        Alert.alert(
-          'Address Required',
-          'Please add a delivery address before checkout',
-          [
-            {
-              text: 'Add Address',
-              onPress: () => {
-                navigation.navigate('AddAddress');
-              },
-            },
-            {
-              text: 'Cancel',
-              style: 'cancel',
-            },
-          ],
-        );
+      const result = await loadAddresses();
+      setHasAddress(result);
+      if (!result) {
+        showAddressRequiredAlert();
       }
     };
 
@@ -148,9 +152,18 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
       Alert.alert('Error', 'Please login to proceed to checkout');
       return;
     }
-
+    if (!hasAddress) {
+      showAddressRequiredAlert();
+      return;
+    }
     navigation.navigate('WebView', { url: webUrl });
     closeCartModal();
+  };
+
+  const handleAddAddress = () => {
+    setIsAddressSectionExpanded(false);
+    closeCartModal();
+    navigation.navigate('AddAddress');
   };
 
   return (
@@ -163,63 +176,67 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
               Available Addresses ({addresses.length})
             </Text>
             <View style={styles.addressHeaderActions}>
-
-              <TouchableOpacity
-                onPress={() => setIsAddressSectionExpanded(expanded => !expanded)}
-                activeOpacity={0.7}
-                style={styles.dropdownIconButton}>
-                <MaterialIcons
-                  name={
-                    isAddressSectionExpanded
-                      ? 'keyboard-arrow-up'
-                      : 'keyboard-arrow-down'
-                  }
-                  size={28}
-                  color={theme.colors.secondary}
-                />
-              </TouchableOpacity>
-
+              {addresses.length > 0 ? (
+                <TouchableOpacity
+                  onPress={() => setIsAddressSectionExpanded(expanded => !expanded)}
+                  activeOpacity={0.7}
+                  style={styles.dropdownIconButton}>
+                  <MaterialIcons
+                    name={
+                      isAddressSectionExpanded
+                        ? 'keyboard-arrow-up'
+                        : 'keyboard-arrow-down'
+                    }
+                    size={28}
+                    color={theme.colors.secondary}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.addAddressHeaderButton}
+                  onPress={handleAddAddress}
+                  activeOpacity={0.7}>
+                  <MaterialIcons
+                    name="add"
+                    size={22}
+                    color={theme.colors.secondary}
+                  />
+                  <Text style={styles.addAddressHeaderButtonText}>Add</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
           {isAddressSectionExpanded && (
-            loadingList ? (
-              <ActivityIndicator size="small" color={theme.colors.secondary} />
-            ) : addresses.length > 0 ? (
-              <FlatList
-                data={addresses}
-                renderItem={renderAddressItem}
-                keyExtractor={item => item.addressID}
-                scrollEnabled={false}
-                style={styles.addressList}
-                contentContainerStyle={{ paddingBottom: 10 }}
-              />
-            ) : (
-              <View style={styles.noAddressContainer}>
-                <Text style={styles.noAddressText}>No addresses found</Text>
+            <>
+              {loadingList ? (
+                <ActivityIndicator size="small" color={theme.colors.secondary} />
+              ) : addresses.length > 0 ? (
+                <FlatList
+                  data={addresses}
+                  renderItem={renderAddressItem}
+                  keyExtractor={item => item.addressID}
+                  scrollEnabled={false}
+                  style={styles.addressList}
+                  contentContainerStyle={{ paddingBottom: 10 }}
+                />
+              ) : (
+                <Text style={styles.noAddressText}>No addresses found. Please add one.</Text>
+              )}
+              <View style={{ marginTop: 10 }}>
                 <TouchableOpacity
-                  style={styles.addAddressButton}
-                  onPress={() => navigation.navigate('AddAddress')}>
-                  <Text style={styles.addAddressButtonText}>Add Address</Text>
+                  style={styles.addAddressHeaderButton}
+                  onPress={handleAddAddress}
+                  activeOpacity={0.7}>
+                  <MaterialIcons
+                    name="add"
+                    size={22}
+                    color={theme.colors.secondary}
+                  />
+                  <Text style={styles.addAddressHeaderButtonText}>Add</Text>
                 </TouchableOpacity>
               </View>
-            )
+            </>
           )}
-          {isAddressSectionExpanded && <TouchableOpacity
-            style={styles.addAddressHeaderButton}
-            onPress={() => {
-              setIsAddressSectionExpanded(false);
-              closeCartModal();
-              navigation.navigate('AddAddress');
-            }}
-            activeOpacity={0.7}
-            disabled={!isAddressSectionExpanded}>
-            <MaterialIcons
-              name="add"
-              size={22}
-              color={theme.colors.secondary}
-            />
-            <Text style={styles.addAddressHeaderButtonText}>Add</Text>
-          </TouchableOpacity>}
         </View>
 
         {/* Payment Summary Section */}
@@ -245,12 +262,12 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
             style={[
               styles.placeOrderButton,
               {
-                backgroundColor: isPlaceOrderButtonDisabled
+                backgroundColor: isPlaceOrderButtonDisabled || isLoading
                   ? 'gray'
                   : theme.colors.secondary,
               },
             ]}
-            disabled={isPlaceOrderButtonDisabled || isLoading}
+            disabled={isPlaceOrderButtonDisabled || isLoading || loadingList}
             onPress={handleProceedToCheckout}>
             {isLoading ? (
               <ActivityIndicator color={theme.colors.primary} />
@@ -266,7 +283,7 @@ const PaymentSummaryScreen: React.FC<PaymentSummaryScreenProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     marginBottom: 20,
@@ -314,7 +331,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#f0f0f0',
     borderRadius: 8,
-    paddingHorizontal: 4,
+    paddingHorizontal: 6,
     paddingVertical: 4,
     // marginLeft: 3,
   },

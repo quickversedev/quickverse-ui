@@ -15,6 +15,7 @@ import {
   Linking,
   RefreshControl,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import theme from '../../theme';
 import HomeScreenVendors from './homeVendors/HomeScreenVendors';
@@ -234,7 +235,7 @@ const HomeScreen: React.FC = () => {
           <View style={styles.campusSelector}>
             <TouchableOpacity
               style={styles.touchableOpacity}
-              onPress={() => setClicked(!clicked)}>
+              onPress={() => setClicked(true)}>
               <MaterialCommunityIcons
                 name={'navigation-variant'}
                 size={18}
@@ -245,97 +246,14 @@ const HomeScreen: React.FC = () => {
                 <Text style={styles.touchableText}>
                   {selectedCampusId === '' ? 'Select Campus' : selectedCampusId}
                 </Text>
-                <Text style={{display: 'none'}}>{'campus address'}</Text>
               </View>
               <MaterialCommunityIcons
-                name={clicked ? 'menu-up' : 'menu-down'}
+                name={'chevron-down'}
                 size={28}
                 color={theme.colors.ternary}
                 style={{marginTop: -2}}
               />
             </TouchableOpacity>
-
-            {clicked && (
-              <View style={styles.dropdownContainer}>
-                {loading ? (
-                  <ActivityIndicator
-                    style={{margin: 20}}
-                    size="small"
-                    color={theme.colors.secondary}
-                  />
-                ) : campusError ? (
-                  <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>
-                      Failed to fetch campuses. Please try again.
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.retryButton}
-                      onPress={fetchCampus}>
-                      <Text style={styles.retryButtonText}>Retry</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <>
-                    <View style={styles.searchContainer}>
-                      <MaterialCommunityIcons
-                        name="magnify"
-                        size={20}
-                        color={theme.colors.ternary}
-                        style={styles.searchIcon}
-                      />
-                      <TextInput
-                        style={styles.searchInput}
-                        placeholder="Search campus..."
-                        placeholderTextColor={theme.colors.ternary}
-                        value={searchText}
-                        onChangeText={text => setSearchText(text)}
-                      />
-                      {searchText.length > 0 && (
-                        <TouchableOpacity
-                          onPress={() => setSearchText('')}
-                          style={styles.clearIcon}>
-                          <MaterialCommunityIcons
-                            name="close-circle"
-                            size={20}
-                            color={theme.colors.ternary}
-                          />
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                    <FlatList
-                      data={campusOptions?.filter(item => {
-                        const searchTerm = searchText.toLowerCase();
-                        return (
-                          item.value.toLowerCase().includes(searchTerm) ||
-                          (item.displayName &&
-                            item.displayName
-                              .toLowerCase()
-                              .includes(searchTerm)) ||
-                          (item.label &&
-                            item.label.toLowerCase().includes(searchTerm))
-                        );
-                      })}
-                      keyExtractor={item => item.value}
-                      renderItem={({item}) => (
-                        <TouchableOpacity
-                          style={styles.listItem}
-                          onPress={() => {
-                            setSelectedCampusId(item.value);
-                            setCampusToastName(item.displayName);
-                            setCampusToastVisible(true);
-                            setClicked(false);
-                            setSearchText('');
-                          }}>
-                          <Text style={styles.listItemText}>
-                            {item.displayName}
-                          </Text>
-                        </TouchableOpacity>
-                      )}
-                    />
-                  </>
-                )}
-              </View>
-            )}
           </View>
           <TouchableOpacity
             style={styles.cartButton}
@@ -356,6 +274,7 @@ const HomeScreen: React.FC = () => {
         {isFirstTimeLogin && <LoginDetails />}
         <ScrollView
           style={styles.scrollView}
+          scrollEnabled={!clicked}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -386,6 +305,122 @@ const HomeScreen: React.FC = () => {
           </View>
         )}
       </SafeAreaView>
+      
+      {/* Campus Selection Modal */}
+      <Modal
+        visible={clicked}
+        transparent={true}
+        animationType='fade'
+        onRequestClose={() => {
+          setClicked(false);
+          setSearchText('');
+        }}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Campus</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => {
+                  setClicked(false);
+                  setSearchText('');
+                }}>
+                <MaterialCommunityIcons
+                  name="close"
+                  size={24}
+                  color={theme.colors.ternary}
+                />
+              </TouchableOpacity>
+            </View>
+            
+            {loading ? (
+              <View style={styles.modalLoadingContainer}>
+                <ActivityIndicator
+                  size="large"
+                  color={theme.colors.secondary}
+                />
+                <Text style={styles.loadingText}>Loading campuses...</Text>
+              </View>
+            ) : campusError ? (
+              <View style={styles.modalErrorContainer}>
+                <Text style={styles.modalErrorText}>
+                  Failed to fetch campuses. Please try again.
+                </Text>
+                <TouchableOpacity
+                  style={styles.modalRetryButton}
+                  onPress={fetchCampus}>
+                  <Text style={styles.modalRetryButtonText}>Retry</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <>
+                <View style={styles.modalSearchContainer}>
+                  <MaterialCommunityIcons
+                    name="magnify"
+                    size={20}
+                    color={theme.colors.ternary}
+                    style={styles.modalSearchIcon}
+                  />
+                  <TextInput
+                    style={styles.modalSearchInput}
+                    placeholder="Search campus..."
+                    placeholderTextColor={theme.colors.ternary}
+                    value={searchText}
+                    onChangeText={text => setSearchText(text)}
+                  />
+                  {searchText.length > 0 && (
+                    <TouchableOpacity
+                      onPress={() => setSearchText('')}
+                      style={styles.modalClearIcon}>
+                      <MaterialCommunityIcons
+                        name="close-circle"
+                        size={20}
+                        color={theme.colors.ternary}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+                
+                <ScrollView 
+                  style={styles.modalScrollView}
+                  showsVerticalScrollIndicator={true}
+                  nestedScrollEnabled={true}>
+                  {campusOptions
+                    ?.filter((item: any) => {
+                      const searchTerm = searchText.toLowerCase();
+                      return (
+                        item.value.toLowerCase().includes(searchTerm) ||
+                        (item.displayName &&
+                          item.displayName
+                            .toLowerCase()
+                            .includes(searchTerm)) ||
+                        (item.label &&
+                          item.label.toLowerCase().includes(searchTerm))
+                      );
+                    })
+                    .map((item: any) => (
+                      <TouchableOpacity
+                        key={item.value}
+                        style={styles.modalListItem}
+                        onPress={() => {
+                          setSelectedCampusId(item.value);
+                          setCampusToastName(item.displayName);
+                          setCampusToastVisible(true);
+                          setClicked(false);
+                          setSearchText('');
+                        }}>
+                        <Text style={styles.modalListItemText}>
+                          {item.displayName}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                </ScrollView>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+      
       <CartScreen modalVisible={modalVisible} closeCartModal={closeCartModal} />
     </>
   );
@@ -427,31 +462,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: theme.colors.ternary,
   },
-  dropdownContainer: {
-    elevation: 5,
-    marginTop: 10,
-    maxHeight: 500,
-    alignSelf: 'center',
-    width: '90%',
-    borderWidth: 0.9,
-    backgroundColor: theme.colors.primary,
-    borderRadius: 15,
-    position: 'absolute',
-    top: 60,
-    zIndex: 10,
-  },
-  listItem: {
-    width: '85%',
-    alignSelf: 'center',
-    height: 50,
-    justifyContent: 'center',
-    borderBottomWidth: 0.5,
-    borderColor: theme.colors.ternary,
-  },
-  listItemText: {
-    fontWeight: '600',
-    color: theme.colors.ternary,
-  },
+
   scrollView: {
     zIndex: 1,
   },
@@ -581,6 +592,120 @@ const styles = StyleSheet.create({
   retryButtonText: {
     color: theme.colors.primary,
     fontWeight: '600',
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingTop: 70,
+  },
+  modalContainer: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: 20,
+    padding: 20,
+    width: '90%',
+    minHeight: '60%',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.ternary,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.ternary,
+  },
+  closeButton: {
+    padding: 5,
+  },
+  modalLoadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: theme.colors.ternary,
+  },
+  modalErrorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  modalErrorText: {
+    color: 'red',
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalRetryButton: {
+    paddingHorizontal: 25,
+    paddingVertical: 12,
+    backgroundColor: theme.colors.secondary,
+    borderRadius: 12,
+  },
+  modalRetryButtonText: {
+    color: theme.colors.primary,
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  modalSearchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    position: 'relative',
+  },
+  modalSearchIcon: {
+    position: 'absolute',
+    left: 15,
+    zIndex: 1,
+  },
+  modalClearIcon: {
+    position: 'absolute',
+    right: 15,
+    zIndex: 1,
+  },
+  modalSearchInput: {
+    flex: 1,
+    height: 45,
+    paddingLeft: 45,
+    paddingRight: 40,
+    borderWidth: 1,
+    borderColor: theme.colors.ternary,
+    borderRadius: 12,
+    backgroundColor: theme.colors.primary,
+    fontSize: 16,
+    color: theme.colors.ternary,
+  },
+  modalListItem: {
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    borderBottomWidth: 0.5,
+    borderBottomColor: theme.colors.ternary,
+  },
+  modalListItemText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: theme.colors.ternary,
+  },
+  modalScrollView: {
+    flex: 1,
+    maxHeight: 400,
   },
 });
 

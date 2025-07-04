@@ -217,6 +217,9 @@ const AddAddressScreen: React.FC = () => {
                 region={mapRegion}
                 onRegionChangeComplete={onRegionChangeComplete}
                 showsUserLocation={isLocationPermissionGranted}
+                onMapReady={() => {
+                  console.log('Map is ready, region:', mapRegion);
+                }}
               />
               <View style={styles.mapCenterMarkerContainer}>
                 <Icon name="pin" size={34} color={COLORS.buttonBackground} />

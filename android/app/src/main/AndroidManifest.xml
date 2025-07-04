@@ -16,7 +16,7 @@
 
     <meta-data
       android:name="com.google.android.geo.API_KEY"
-      android:value="@string/google_maps_api_key" />
+      android:value="AIzaSyBu0CGCx2_HfAJVWbsuv4vgwD2V8qiGckE" />
 
     <meta-data
       android:name="com.google.firebase.messaging.default_notification_icon"

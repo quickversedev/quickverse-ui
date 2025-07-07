@@ -11,6 +11,7 @@ import {
   Alert,
   // Dimensions,
   Platform,
+  Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
@@ -47,7 +48,7 @@ const AddAddressScreen: React.FC = () => {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isLocationPermissionGranted, setIsLocationPermissionGranted] =
     useState(false);
-  console.log('add addess screen');
+
   const requestLocationPermission = async (): Promise<boolean> => {
     const permission = Platform.select({
       ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
@@ -180,6 +181,10 @@ const AddAddressScreen: React.FC = () => {
     });
   }, [mapRegion, navigation]);
 
+  const handleMapInteraction = () => {
+    Keyboard.dismiss();
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar
@@ -197,16 +202,19 @@ const AddAddressScreen: React.FC = () => {
           <View style={styles.backButtonPlaceholder} />
         </View>
 
-        {mapRegion?.latitude && (
-          <OlaPlaceAutocomplete
-            apiKey={OLA_MAPS_API_KEY}
-            onPlaceSelected={handleSuggestionPress}
-            placeholder="Search for area, street name..."
-            latitude={mapRegion?.latitude}
-            longitude={mapRegion?.longitude}
-          />
-        )}
         <View style={styles.mapContainer}>
+          {/* Absolutely position the autocomplete above the map */}
+          {mapRegion?.latitude && (
+            <View style={styles.autocompleteWrapper}>
+              <OlaPlaceAutocomplete
+                apiKey={OLA_MAPS_API_KEY}
+                onPlaceSelected={handleSuggestionPress}
+                placeholder="Search for area, street name..."
+                latitude={mapRegion?.latitude}
+                longitude={mapRegion?.longitude}
+              />
+            </View>
+          )}
           {isInitialLoading || !mapRegion ? (
             <ActivityIndicator size="large" color={COLORS.buttonBackground} />
           ) : (
@@ -217,6 +225,11 @@ const AddAddressScreen: React.FC = () => {
                 region={mapRegion}
                 onRegionChangeComplete={onRegionChangeComplete}
                 showsUserLocation={isLocationPermissionGranted}
+                onMapReady={() => {
+                  console.log('Map is ready, region:', mapRegion);
+                }}
+                onPress={handleMapInteraction}
+                onPanDrag={handleMapInteraction}
               />
               <View style={styles.mapCenterMarkerContainer}>
                 <Icon name="pin" size={34} color={COLORS.buttonBackground} />
@@ -282,6 +295,14 @@ const styles = StyleSheet.create({
     color: COLORS.buttonText,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  autocompleteWrapper: {
+    position: 'absolute',
+    top: 10,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    elevation: 10,
   },
 });
 

@@ -15,6 +15,7 @@ import {
 import axios from 'axios';
 import {debounce} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const OLA_MAPS_AUTOCOMPLETE_ENDPOINT =
   'https://api.olamaps.io/places/v1/autocomplete';
@@ -193,23 +194,30 @@ const OlaPlaceAutocomplete: React.FC<OlaPlaceAutocompleteProps> = ({
 
   return (
     <View style={styles.wrapper}>
-      <TextInput
-        style={[styles.input, inputStyle]}
-        placeholder={placeholder}
-        value={query}
-        onChangeText={handleInputChange}
-        placeholderTextColor="#888"
-        autoCorrect={false}
-        spellCheck={false}
-        keyboardType="visible-password" //to disable suggestions
-      />
-      {/* {loading && (
-        <ActivityIndicator
-          style={[styles.loader, loaderStyle]}
-          size="small"
-          color="#007AFF"
+      <View style={styles.inputRow}>
+        <TextInput
+          style={[styles.input, inputStyle]}
+          placeholder={placeholder}
+          value={query}
+          onChangeText={handleInputChange}
+          placeholderTextColor="#888"
+          autoCorrect={false}
+          spellCheck={false}
+          keyboardType="visible-password" //to disable suggestions
         />
-      )} */}
+        {query.length > 0 && (
+          <TouchableOpacity
+            onPress={() => {
+              setQuery('');
+              setSuggestions([]);
+            }}
+            style={styles.clearIcon}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Icon name="close-circle" size={22} color="#888" />
+          </TouchableOpacity>
+        )}
+      </View>
       {error && <Text style={[styles.errorText, errorTextStyle]}>{error}</Text>}
       {suggestions.length > 0 && !loading && (
         <View style={[styles.suggestionsContainer, listContainerStyle]}>
@@ -231,16 +239,18 @@ const OlaPlaceAutocomplete: React.FC<OlaPlaceAutocompleteProps> = ({
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: '100%',
-    position: 'relative', // <-- add this
+    width: '95%',
+    position: 'relative',
   },
   input: {
+    width: '100%',
     color: '#000',
     height: 45,
     borderColor: '#D1D1D1',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 15,
+    paddingRight: 40, // ensures text does not overlap the clear icon
     fontSize: 16,
     backgroundColor: '#FFFFFF',
     marginHorizontal: 12,
@@ -260,7 +270,7 @@ const styles = StyleSheet.create({
   suggestionsContainer: {
     position: 'absolute', // <-- ensure this is absolute
     top: 57, // <-- adjust this to be just below your input (input height + margin)
-    left: 12, // <-- match input's marginHorizontal
+    left: 1, // <-- match input's marginHorizontal
     right: 12, // <-- match input's marginHorizontal
     zIndex: 100, // <-- ensure it's above the map
     backgroundColor: '#FFFFFF',
@@ -286,6 +296,19 @@ const styles = StyleSheet.create({
   listItemText: {
     fontSize: 15,
     color: '#333333',
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  clearIcon: {
+    position: 'absolute',
+    right: 1,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    zIndex: 10,
   },
 });
 

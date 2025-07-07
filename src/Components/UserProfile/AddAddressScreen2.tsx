@@ -123,7 +123,6 @@ const AddAddressScreen2: React.FC<Props> = ({route, navigation}) => {
       !addressForm.name ||
       !addressForm.addressLine1 ||
       !addressForm.addressLine2 ||
-      !addressForm.addressLine3 ||
       !addressForm.city ||
       !addressForm.state ||
       !addressForm.pincode
@@ -229,7 +228,7 @@ const AddAddressScreen2: React.FC<Props> = ({route, navigation}) => {
               />
             </View>
             <View style={styles.formField}>
-              <Text style={styles.label}>Address Line 3*</Text>
+              <Text style={styles.label}>Address Line 3</Text>
               <TextInput
                 value={addressForm.addressLine3}
                 onChangeText={value =>

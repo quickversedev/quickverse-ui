@@ -11,10 +11,13 @@ import {
   setCampus,
   setIsNewUser,
   storage,
+  clearFCMToken,
 } from './Storage';
 import {authService} from '../services/AuthService';
 import {fetchConfigs} from '../services/configService';
 import {config} from './canonicalModel';
+import messaging from '@react-native-firebase/messaging';
+import { setFCMToken } from './Storage';
 
 type AuthContextData = {
   loggedInDate: string;
@@ -118,6 +121,19 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
         const date = new Date();
         storage.set('@loginDate', date.toISOString());
+
+        // Store FCM token in local storage after login
+        try {
+          const fcmToken = await messaging().getToken();
+          if (fcmToken) {
+            setFCMToken(fcmToken);
+            console.log('✅ FCM token stored after login:', fcmToken);
+          } else {
+            console.warn('❌ No FCM token available to store after login');
+          }
+        } catch (err) {
+          console.error('❌ Error fetching FCM token after login:', err);
+        }
       }
     } catch (error) {
       throw error; // Rethrow the error to propagate it to the caller
@@ -146,6 +162,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     storage.delete('@loginDate');
     storage.delete('@isNewUser');
     storage.delete('@skipLogin');
+    clearFCMToken(); // Clear FCM token from local storage
   };
 
   return (

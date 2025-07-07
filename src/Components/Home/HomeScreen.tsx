@@ -50,6 +50,7 @@ const HomeScreen: React.FC = () => {
   const isFirstTimeLogin = getIsNewUser();
   const {selectedCampus} = useAuth();
   const animationValue = useRef(new Animated.Value(1000)).current;
+  const toastAnimation = useRef(new Animated.Value(0)).current;
   const cart = useSelector(selectCart);
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
 
@@ -165,7 +166,7 @@ const HomeScreen: React.FC = () => {
           setSelectedCampusId(campusId);
           setCampus(campusId);
           setCampusToastName(campusId);
-          setCampusToastVisible(true);
+          showToast();
         } else {
           setSelectedCampusId('IIMU-313001'); // Default campus
           setCampus('IIMU-313001'); // Save default campus to storage
@@ -204,11 +205,32 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     selectedCampus && setSelectedCampusId(selectedCampus);
   }, [selectedCampus]);
+  // Toast animation functions
+  const showToast = () => {
+    setCampusToastVisible(true);
+    Animated.spring(toastAnimation, {
+      toValue: 1,
+      useNativeDriver: true,
+      tension: 100,
+      friction: 8,
+    }).start();
+  };
+
+  const hideToast = () => {
+    Animated.timing(toastAnimation, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setCampusToastVisible(false);
+    });
+  };
+
   useEffect(() => {
     if (campusToastVisible) {
       const timer = setTimeout(() => {
-        setCampusToastVisible(false);
-      }, 5000); // Hide after 3 seconds
+        hideToast();
+      }, 5000); // Hide after 5 seconds
       return () => clearTimeout(timer);
     }
   }, [campusToastVisible]);
@@ -298,11 +320,25 @@ const HomeScreen: React.FC = () => {
           <CampusBuzz campus={selectedCampusId} key={`buzz-${refreshKey}`} />
         </ScrollView>
         {campusToastVisible && (
-          <View style={styles.toastContainer}>
+          <Animated.View 
+            style={[
+              styles.toastContainer,
+              {
+                opacity: toastAnimation,
+                transform: [
+                  {
+                    translateY: toastAnimation.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-50, 0],
+                    }),
+                  },
+                ],
+              },
+            ]}>
             <Text style={styles.toastText}>
               Currently showing vendors for {campusToastName}
             </Text>
-          </View>
+          </Animated.View>
         )}
       </SafeAreaView>
       
@@ -405,7 +441,7 @@ const HomeScreen: React.FC = () => {
                         onPress={() => {
                           setSelectedCampusId(item.value);
                           setCampusToastName(item.displayName);
-                          setCampusToastVisible(true);
+                          showToast();
                           setClicked(false);
                           setSearchText('');
                         }}>
@@ -553,7 +589,7 @@ const styles = StyleSheet.create({
   },
   toastContainer: {
     position: 'absolute',
-    top: 80,
+    top: 100,
     left: 20,
     right: 20,
     backgroundColor: theme.colors.secondary,
@@ -566,6 +602,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 4,
+    zIndex: 1000,
   },
   toastText: {
     color: theme.colors.primary,

@@ -41,9 +41,9 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Need the location access for Address</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Need the location access for Address</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Need the location access for Address</string>
 	<key>UIAppFonts</key>
 	<array>
@@ -63,6 +63,12 @@
 		<string>Octicons.ttf</string>
 		<string>SimpleLineIcons.ttf</string>
 		<string>Zocial.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>processing</string>
+		<string>fetch</string>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen.storyboard</string>

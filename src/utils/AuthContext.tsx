@@ -11,6 +11,7 @@ import {
   setCampus,
   setIsNewUser,
   storage,
+  clearFCMToken,
 } from './Storage';
 import {authService} from '../services/AuthService';
 import {fetchConfigs} from '../services/configService';
@@ -146,6 +147,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     storage.delete('@loginDate');
     storage.delete('@isNewUser');
     storage.delete('@skipLogin');
+    clearFCMToken(); // Clear FCM token from local storage
   };
 
   return (

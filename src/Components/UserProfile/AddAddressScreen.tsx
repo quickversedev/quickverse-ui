@@ -197,16 +197,19 @@ const AddAddressScreen: React.FC = () => {
           <View style={styles.backButtonPlaceholder} />
         </View>
 
-        {mapRegion?.latitude && (
-          <OlaPlaceAutocomplete
-            apiKey={OLA_MAPS_API_KEY}
-            onPlaceSelected={handleSuggestionPress}
-            placeholder="Search for area, street name..."
-            latitude={mapRegion?.latitude}
-            longitude={mapRegion?.longitude}
-          />
-        )}
         <View style={styles.mapContainer}>
+          {/* Absolutely position the autocomplete above the map */}
+          {mapRegion?.latitude && (
+            <View style={styles.autocompleteWrapper}>
+              <OlaPlaceAutocomplete
+                apiKey={OLA_MAPS_API_KEY}
+                onPlaceSelected={handleSuggestionPress}
+                placeholder="Search for area, street name..."
+                latitude={mapRegion?.latitude}
+                longitude={mapRegion?.longitude}
+              />
+            </View>
+          )}
           {isInitialLoading || !mapRegion ? (
             <ActivityIndicator size="large" color={COLORS.buttonBackground} />
           ) : (
@@ -285,6 +288,14 @@ const styles = StyleSheet.create({
     color: COLORS.buttonText,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  autocompleteWrapper: {
+    position: 'absolute',
+    top: 10,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    elevation: 10,
   },
 });
 

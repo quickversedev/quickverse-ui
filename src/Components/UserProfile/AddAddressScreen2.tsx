@@ -123,7 +123,6 @@ const AddAddressScreen2: React.FC<Props> = ({route, navigation}) => {
       !addressForm.name ||
       !addressForm.addressLine1 ||
       !addressForm.addressLine2 ||
-      !addressForm.addressLine3 ||
       !addressForm.city ||
       !addressForm.state ||
       !addressForm.pincode

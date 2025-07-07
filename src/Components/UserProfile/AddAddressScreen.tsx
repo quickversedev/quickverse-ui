@@ -11,6 +11,7 @@ import {
   Alert,
   // Dimensions,
   Platform,
+  Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
@@ -180,6 +181,10 @@ const AddAddressScreen: React.FC = () => {
     });
   }, [mapRegion, navigation]);
 
+  const handleMapInteraction = () => {
+    Keyboard.dismiss();
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar
@@ -223,6 +228,8 @@ const AddAddressScreen: React.FC = () => {
                 onMapReady={() => {
                   console.log('Map is ready, region:', mapRegion);
                 }}
+                onPress={handleMapInteraction}
+                onPanDrag={handleMapInteraction}
               />
               <View style={styles.mapCenterMarkerContainer}>
                 <Icon name="pin" size={34} color={COLORS.buttonBackground} />

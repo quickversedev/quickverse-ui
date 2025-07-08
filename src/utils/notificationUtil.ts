@@ -7,6 +7,7 @@ import notifee, {
 } from '@notifee/react-native';
 import {Platform} from 'react-native';
 import {PermissionsAndroid} from 'react-native';
+import {getFCMToken as getStoredFCMToken, setFCMToken} from './Storage';
 
 // Notification channel IDs
 export const NOTIFICATION_CHANNELS = {
@@ -31,11 +32,19 @@ const isAndroid33OrHigher = (): boolean => {
 
 /**
  * Get FCM token for the device
+ * First tries to get from storage, if not available fetches from Firebase
  */
 export const getFCMToken = async (): Promise<string> => {
   try {
     const token = await messaging().getToken();
-    console.log('FCM Token:', token);
+
+    if (!token) {
+      throw new Error('Failed to get FCM token from Firebase');
+    }
+
+    // Store the token for future use
+    setFCMToken(token);
+
     return token;
   } catch (error) {
     console.error('Error getting FCM token:', error);
@@ -114,7 +123,7 @@ export const displayForegroundNotification = async (
       },
     });
 
-    console.log('Foreground notification displayed with ID:', notificationId);
+    // console.log('Foreground notification displayed with ID:', notificationId);
     return notificationId;
   } catch (error) {
     console.error('Error displaying foreground notification:', error);
@@ -169,7 +178,7 @@ export const displayCustomNotification = async (
       },
     });
 
-    console.log('Custom notification displayed with ID:', notificationId);
+    // console.log('Custom notification displayed with ID:', notificationId);
     return notificationId;
   } catch (error) {
     console.error('Error displaying custom notification:', error);
@@ -261,7 +270,7 @@ export const requestNotificationPermissions = async (): Promise<boolean> => {
         authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
         authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-      console.log('iOS Notification permission status:', authStatus);
+      // console.log('iOS Notification permission status:', authStatus);
       return enabled;
     } else {
       // For Android
@@ -322,10 +331,10 @@ export const checkNotificationPermissions = async (): Promise<boolean> => {
       enabled = enabled && granted;
     }
 
-    console.log(
-      `${Platform.OS.toUpperCase()} Current notification permission status:`,
-      {messagingStatus: authStatus, enabled},
-    );
+    // console.log(
+    //   `${Platform.OS.toUpperCase()} Current notification permission status:`,
+    //   {messagingStatus: authStatus, enabled},
+    // );
     return enabled;
   } catch (error) {
     console.error('Error checking notification permissions:', error);

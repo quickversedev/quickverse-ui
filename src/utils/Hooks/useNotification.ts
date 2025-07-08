@@ -16,6 +16,7 @@ import {
   NOTIFICATION_TYPES,
 } from '../notificationUtil';
 import {Platform} from 'react-native';
+import {setFCMToken} from '../Storage';
 
 interface NotificationData {
   title: string;
@@ -54,13 +55,53 @@ export const useNotification = (): UseNotificationReturn => {
   const foregroundUnsubscribe = useRef<(() => void) | null>(null);
   const backgroundUnsubscribe = useRef<(() => void) | null>(null);
   const isHandlingNotification = useRef(false);
+  const tokenRefreshUnsubscribe = useRef<(() => void) | null>(null);
+
+  /**
+   * Get FCM token with refresh handling
+   */
+  const getToken = useCallback(async (): Promise<string> => {
+    try {
+      // Get token from Firebase (this will first check storage)
+      const token = await getFCMToken();
+      fcmToken.current = token;
+
+      // Clean up previous token refresh listener if exists
+      if (tokenRefreshUnsubscribe.current) {
+        tokenRefreshUnsubscribe.current();
+      }
+
+      // Set up token refresh listener
+      tokenRefreshUnsubscribe.current = messaging().onTokenRefresh(
+        async newToken => {
+          // console.log('FCM token refreshed:', newToken);
+          fcmToken.current = newToken;
+          setFCMToken(newToken);
+        },
+      );
+
+      return token;
+    } catch (error) {
+      console.error('Error in getToken:', error);
+      throw error;
+    }
+  }, []);
+
+  // Clean up token refresh listener on unmount
+  useEffect(() => {
+    return () => {
+      if (tokenRefreshUnsubscribe.current) {
+        tokenRefreshUnsubscribe.current();
+      }
+    };
+  }, []);
 
   /**
    * Initialize notifications
    */
   const initializeNotifications = useCallback(async (): Promise<void> => {
     try {
-      console.log('Initializing notifications...');
+      // console.log('Initializing notifications...');
 
       // Create notification channels for Android
       if (Platform.OS === 'android') {
@@ -74,13 +115,13 @@ export const useNotification = (): UseNotificationReturn => {
       if (permissionGranted) {
         try {
           // Get FCM token
-          const token = await getFCMToken();
+          const token = await getToken();
           fcmToken.current = token;
 
           // Set up foreground message handler
           foregroundUnsubscribe.current = messaging().onMessage(
             async remoteMessage => {
-              console.log('Foreground message received:', remoteMessage);
+              // console.log('Foreground message received:', remoteMessage);
 
               // Prevent duplicate notifications
               if (isHandlingNotification.current) {
@@ -104,13 +145,13 @@ export const useNotification = (): UseNotificationReturn => {
                   isHandlingNotification.current = false;
                 }
               }
-            }
+            },
           );
 
           // Set up background message handler - only for data-only messages
           if (Platform.OS === 'android') {
             messaging().setBackgroundMessageHandler(async remoteMessage => {
-              console.log('Background message received:', remoteMessage);
+              // console.log('Background message received:', remoteMessage);
 
               // Prevent duplicate notifications
               if (isHandlingNotification.current) {
@@ -148,12 +189,12 @@ export const useNotification = (): UseNotificationReturn => {
       }
 
       isInitialized.current = true;
-      console.log('Notifications initialized successfully');
+      // console.log('Notifications initialized successfully');
     } catch (error) {
       console.error('Error initializing notifications:', error);
       throw error;
     }
-  }, []);
+  }, [getToken]);
 
   /**
    * Request notification permissions
@@ -162,7 +203,7 @@ export const useNotification = (): UseNotificationReturn => {
     try {
       // Check if already initialized
       if (!isInitialized.current) {
-        console.log('Notifications not initialized, initializing first...');
+        // console.log('Notifications not initialized, initializing first...');
         await initializeNotifications();
         return hasPermission.current;
       }
@@ -173,7 +214,7 @@ export const useNotification = (): UseNotificationReturn => {
 
       if (granted) {
         try {
-          const token = await getFCMToken();
+          const token = await getToken();
           fcmToken.current = token;
         } catch (tokenError) {
           console.error(
@@ -189,7 +230,7 @@ export const useNotification = (): UseNotificationReturn => {
       console.error('Error requesting permissions:', error);
       return false;
     }
-  }, [initializeNotifications]);
+  }, [initializeNotifications, getToken]);
 
   /**
    * Display a notification
@@ -246,20 +287,6 @@ export const useNotification = (): UseNotificationReturn => {
     },
     [],
   );
-
-  /**
-   * Get FCM token
-   */
-  const getToken = useCallback(async (): Promise<string> => {
-    try {
-      const token = await getFCMToken();
-      fcmToken.current = token;
-      return token;
-    } catch (error) {
-      console.error('Error getting FCM token:', error);
-      throw error;
-    }
-  }, []);
 
   /**
    * Set up background notification press handlers

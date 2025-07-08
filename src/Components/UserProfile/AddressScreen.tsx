@@ -19,6 +19,7 @@ import {RootStackParamList} from './profileNavigation';
 import {AppDispatch, RootState} from '../../store/store';
 import {ApiAddress, fetchUserAddresses} from '../../services/userAddressSlice';
 import {useAuth} from '../../utils/AuthContext';
+import theme from '../../theme';
 
 const COLORS = {
   backgroundPrimary: '#FAEA7B',
@@ -114,7 +115,7 @@ const AddressScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'right', 'left']}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor={COLORS.backgroundPrimary}
@@ -189,7 +190,7 @@ const AddressScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.backgroundPrimary,
+    backgroundColor: theme.colors.primary,
   },
   container: {
     flex: 1,

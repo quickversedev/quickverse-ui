@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   ScrollView,
   Animated,
+  StyleSheet,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../store/store';
@@ -22,11 +23,40 @@ import {fetchLaundryProductsList} from '../../services/laundryProductsSlice';
 import {Loading} from '../util/Loading';
 import LaundryItem from './LaundryItems';
 import CartModal from './CartModel/CartModel';
-import styles from './styles';
 import CartSummary from './CartSummary';
 import AppHeader from '../util/AppHeader';
 import {useAuth} from '../../utils/AuthContext';
 import LoginCard from '../util/MandatoryLoginButton';
+import theme from '../../theme';
+import {SafeAreaView as SafeAreaViewContext} from 'react-native-safe-area-context';
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.primary,
+  },
+  header: {
+    height: 50,
+    backgroundColor: theme.colors.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollViewContainer: {
+    padding: 10,
+  },
+  cartButton: {
+    backgroundColor: theme.colors.secondary,
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  cartButtonText: {
+    color: theme.colors.buttonText,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
 
 const Laundry: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -109,7 +139,7 @@ const Laundry: React.FC = () => {
   if (loading) return <Loading />;
 
   return (
-    <SafeAreaView style={styles.safeView}>
+    <SafeAreaViewContext style={styles.safeArea} edges={['top', 'right', 'left']}>
       <View style={styles.header}>
         <AppHeader headerText="Laundry" />
       </View>
@@ -148,7 +178,7 @@ const Laundry: React.FC = () => {
           <CartSummary cart={cart} onPress={openCartModal} />
         </>
       )}
-    </SafeAreaView>
+    </SafeAreaViewContext>
   );
 };
 

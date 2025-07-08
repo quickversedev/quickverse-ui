@@ -48,7 +48,7 @@ const Feedback = () => {
   }, []);
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={['top', 'right', 'left']}>
         <ScrollView
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps="always">
@@ -113,8 +113,8 @@ const Feedback = () => {
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: theme.colors.primary,
     flex: 1,
+    backgroundColor: theme.colors.primary,
   },
   container: {
     flex: 1,

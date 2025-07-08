@@ -42,6 +42,7 @@ import {setSkipLoginFlow} from '../../utils/Storage';
 import {AppDispatch} from '../../store/store';
 import {debounce} from 'lodash';
 import VariantDrawer from './SubVeriant';
+import {SafeAreaView as SafeAreaViewContext} from 'react-native-safe-area-context';
 
 type CategoriesScreenProps = {
   route: RouteProp<RootStackParamList, 'Categories'>;
@@ -436,7 +437,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   }
 
   return (
-    <SafeAreaView style={styles.main}>
+    <SafeAreaViewContext style={styles.safeArea} edges={['top', 'right', 'left']}>
       <View style={[styles.bannerContainer]}>
         {!storeOpen && (
           <TouchableOpacity
@@ -597,15 +598,14 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         onConfirm={handleConfirmAddToCart}
         onCancel={handleCancelAddToCart}
       />
-    </SafeAreaView>
+    </SafeAreaViewContext>
   );
 };
 
 const styles = StyleSheet.create({
-  main: {
+  safeArea: {
     flex: 1,
     backgroundColor: theme.colors.primary,
-    paddingTop: Platform.OS === 'ios' ? 40 : 10,
   },
   loaderContainer: {
     flex: 1,

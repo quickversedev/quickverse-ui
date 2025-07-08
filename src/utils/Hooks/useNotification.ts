@@ -15,6 +15,7 @@ import {
   NOTIFICATION_CHANNELS,
   NOTIFICATION_TYPES,
 } from '../notificationUtil';
+import {Platform} from 'react-native';
 
 interface NotificationData {
   title: string;
@@ -35,9 +36,15 @@ interface UseNotificationReturn {
   initializeNotifications: () => Promise<void>;
   requestPermissions: () => Promise<boolean>;
   displayNotification: (notification: NotificationData) => Promise<string>;
-  displayCustomNotification: (notification: NotificationData) => Promise<string>;
-  onNotificationPress: (callback: (notification: any) => void) => (() => void) | void;
-  onBackgroundNotificationPress: (callback: (notification: any) => void) => void;
+  displayCustomNotification: (
+    notification: NotificationData,
+  ) => Promise<string>;
+  onNotificationPress: (
+    callback: (notification: any) => void,
+  ) => (() => void) | void;
+  onBackgroundNotificationPress: (
+    callback: (notification: any) => void,
+  ) => void;
 }
 
 export const useNotification = (): UseNotificationReturn => {
@@ -49,82 +56,97 @@ export const useNotification = (): UseNotificationReturn => {
   const isHandlingNotification = useRef(false);
 
   /**
-   * Initialize notification channels and permissions
+   * Initialize notifications
    */
   const initializeNotifications = useCallback(async (): Promise<void> => {
     try {
       console.log('Initializing notifications...');
-      
+
       // Create notification channels for Android
-      await createNotificationChannels();
-      
-      // Request permissions
+      if (Platform.OS === 'android') {
+        await createNotificationChannels();
+      }
+
+      // Request permissions with platform-specific handling
       const permissionGranted = await requestNotificationPermissions();
       hasPermission.current = permissionGranted;
-      
+
       if (permissionGranted) {
-        // Get FCM token
-        const token = await getFCMToken();
-        fcmToken.current = token;
-        
-        // Set up foreground message handler
-        foregroundUnsubscribe.current = messaging().onMessage(async remoteMessage => {
-          console.log('Foreground message received:', remoteMessage);
-          
-          // Prevent duplicate notifications
-          if (isHandlingNotification.current) {
-            console.log('Already handling notification, skipping...');
-            return;
-          }
-          
-          // Only handle messages that should be handled in foreground
-          if (shouldHandleInForeground(remoteMessage)) {
-            isHandlingNotification.current = true;
-            try {
-              await displayForegroundNotification(
-                remoteMessage.notification?.title || 'New Message',
-                remoteMessage.notification?.body || '',
-                remoteMessage.data,
-                NOTIFICATION_CHANNELS.HIGH_PRIORITY,
-              );
-            } finally {
-              isHandlingNotification.current = false;
+        try {
+          // Get FCM token
+          const token = await getFCMToken();
+          fcmToken.current = token;
+
+          // Set up foreground message handler
+          foregroundUnsubscribe.current = messaging().onMessage(
+            async remoteMessage => {
+              console.log('Foreground message received:', remoteMessage);
+
+              // Prevent duplicate notifications
+              if (isHandlingNotification.current) {
+                console.log('Already handling notification, skipping...');
+                return;
+              }
+
+              // Only handle messages that should be handled in foreground
+              if (shouldHandleInForeground(remoteMessage)) {
+                isHandlingNotification.current = true;
+                try {
+                  await displayForegroundNotification(
+                    remoteMessage.notification?.title || 'New Message',
+                    remoteMessage.notification?.body || '',
+                    remoteMessage.data,
+                    Platform.OS === 'android'
+                      ? NOTIFICATION_CHANNELS.HIGH_PRIORITY
+                      : undefined,
+                  );
+                } finally {
+                  isHandlingNotification.current = false;
+                }
+              }
             }
+          );
+
+          // Set up background message handler - only for data-only messages
+          if (Platform.OS === 'android') {
+            messaging().setBackgroundMessageHandler(async remoteMessage => {
+              console.log('Background message received:', remoteMessage);
+
+              // Prevent duplicate notifications
+              if (isHandlingNotification.current) {
+                console.log(
+                  'Already handling background notification, skipping...',
+                );
+                return;
+              }
+
+              // Only handle messages that should be handled in background
+              if (shouldHandleInBackground(remoteMessage)) {
+                isHandlingNotification.current = true;
+                try {
+                  // Extract notification info from data payload
+                  const data = remoteMessage.data as Record<string, any>;
+                  const title = data.title || 'New Message';
+                  const body = data.body || data.message || '';
+
+                  await displayForegroundNotification(
+                    title,
+                    body,
+                    data,
+                    NOTIFICATION_CHANNELS.DEFAULT,
+                  );
+                } finally {
+                  isHandlingNotification.current = false;
+                }
+              }
+            });
           }
-        });
-        
-        // Set up background message handler - only for data-only messages
-        messaging().setBackgroundMessageHandler(async remoteMessage => {
-          console.log('Background message received:', remoteMessage);
-          
-          // Prevent duplicate notifications
-          if (isHandlingNotification.current) {
-            console.log('Already handling background notification, skipping...');
-            return;
-          }
-          
-          // Only handle messages that should be handled in background
-          if (shouldHandleInBackground(remoteMessage)) {
-            isHandlingNotification.current = true;
-            try {
-              // Extract notification info from data payload
-              const data = remoteMessage.data as Record<string, any>;
-              const title = data.title || 'New Message';
-              const body = data.body || data.message || '';
-              
-              await displayForegroundNotification(
-                title,
-                body,
-                data,
-                NOTIFICATION_CHANNELS.DEFAULT,
-              );
-            } finally {
-              isHandlingNotification.current = false;
-            }
-          }
-        });
+        } catch (error) {
+          console.error('Error setting up notification handlers:', error);
+          throw error;
+        }
       }
-      
+
       isInitialized.current = true;
       console.log('Notifications initialized successfully');
     } catch (error) {
@@ -138,67 +160,92 @@ export const useNotification = (): UseNotificationReturn => {
    */
   const requestPermissions = useCallback(async (): Promise<boolean> => {
     try {
+      // Check if already initialized
+      if (!isInitialized.current) {
+        console.log('Notifications not initialized, initializing first...');
+        await initializeNotifications();
+        return hasPermission.current;
+      }
+
+      // Request permissions
       const granted = await requestNotificationPermissions();
       hasPermission.current = granted;
-      
+
       if (granted) {
-        const token = await getFCMToken();
-        fcmToken.current = token;
+        try {
+          const token = await getFCMToken();
+          fcmToken.current = token;
+        } catch (tokenError) {
+          console.error(
+            'Error getting FCM token after permission grant:',
+            tokenError,
+          );
+          // Don't fail the whole operation if token fetch fails
+        }
       }
-      
+
       return granted;
     } catch (error) {
       console.error('Error requesting permissions:', error);
       return false;
     }
-  }, []);
+  }, [initializeNotifications]);
 
   /**
    * Display a notification
    */
-  const displayNotification = useCallback(async (notification: NotificationData): Promise<string> => {
-    try {
-      return await displayForegroundNotification(
-        notification.title,
-        notification.body,
-        notification.data,
-        notification.channelId || NOTIFICATION_CHANNELS.DEFAULT,
-      );
-    } catch (error) {
-      console.error('Error displaying notification:', error);
-      throw error;
-    }
-  }, []);
+  const displayNotification = useCallback(
+    async (notification: NotificationData): Promise<string> => {
+      try {
+        return await displayForegroundNotification(
+          notification.title,
+          notification.body,
+          notification.data,
+          notification.channelId || NOTIFICATION_CHANNELS.DEFAULT,
+        );
+      } catch (error) {
+        console.error('Error displaying notification:', error);
+        throw error;
+      }
+    },
+    [],
+  );
 
   /**
    * Display a custom notification
    */
-  const displayCustomNotificationCallback = useCallback(async (notification: NotificationData): Promise<string> => {
-    try {
-      return await displayCustomNotification(
-        notification.title,
-        notification.body,
-        notification.data,
-        {
-          channelId: notification.channelId,
-          sound: notification.sound,
-          icon: notification.icon,
-          color: notification.color,
-          bigText: notification.bigText,
-        },
-      );
-    } catch (error) {
-      console.error('Error displaying custom notification:', error);
-      throw error;
-    }
-  }, []);
+  const displayCustomNotificationCallback = useCallback(
+    async (notification: NotificationData): Promise<string> => {
+      try {
+        return await displayCustomNotification(
+          notification.title,
+          notification.body,
+          notification.data,
+          {
+            channelId: notification.channelId,
+            sound: notification.sound,
+            icon: notification.icon,
+            color: notification.color,
+            bigText: notification.bigText,
+          },
+        );
+      } catch (error) {
+        console.error('Error displaying custom notification:', error);
+        throw error;
+      }
+    },
+    [],
+  );
 
   /**
    * Set up notification press handlers
    */
-  const setupNotificationPressHandlers = useCallback((callback: (notification: any) => void) => {
-    return onNotificationPress(callback);
-  }, []);
+  const setupNotificationPressHandlers = useCallback(
+    (callback: (notification: any) => void) => {
+      return onNotificationPress(callback);
+    },
+    [],
+  );
 
   /**
    * Get FCM token
@@ -217,9 +264,12 @@ export const useNotification = (): UseNotificationReturn => {
   /**
    * Set up background notification press handlers
    */
-  const setupBackgroundNotificationPressHandlers = useCallback((callback: (notification: any) => void) => {
-    return onBackgroundNotificationPress(callback);
-  }, []);
+  const setupBackgroundNotificationPressHandlers = useCallback(
+    (callback: (notification: any) => void) => {
+      return onBackgroundNotificationPress(callback);
+    },
+    [],
+  );
 
   /**
    * Cleanup on unmount
@@ -249,4 +299,4 @@ export const useNotification = (): UseNotificationReturn => {
   };
 };
 
-export {NOTIFICATION_CHANNELS, NOTIFICATION_TYPES}; 
+export {NOTIFICATION_CHANNELS, NOTIFICATION_TYPES};

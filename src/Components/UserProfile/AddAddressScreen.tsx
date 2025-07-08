@@ -20,6 +20,8 @@ import Geolocation from 'react-native-geolocation-service';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 // @ts-expect-error: TypeScript declaration for @env
 import {OLA_MAPS_API_KEY} from '@env';
+import {SafeAreaView as SafeAreaViewContext} from 'react-native-safe-area-context';
+import theme from '../../theme';
 
 import {AddressStackParamList} from './AddressScreen';
 import OlaPlaceAutocomplete from '../OlaPlaceAutocomplete';
@@ -186,7 +188,7 @@ const AddAddressScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaViewContext style={styles.safeArea} edges={['top', 'right', 'left']}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor={COLORS.backgroundPrimary}
@@ -245,12 +247,15 @@ const AddAddressScreen: React.FC = () => {
           <Text style={styles.confirmButtonText}>Confirm Location</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </SafeAreaViewContext>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {flex: 1, backgroundColor: COLORS.backgroundPrimary},
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.primary,
+  },
   container: {flex: 1, backgroundColor: '#FFFFFF'},
   header: {
     flexDirection: 'row',

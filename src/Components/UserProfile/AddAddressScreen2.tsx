@@ -19,6 +19,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import axios from 'axios';
+import {SafeAreaView as SafeAreaViewRN} from 'react-native-safe-area-context';
+import theme from '../../theme';
 
 import {AppDispatch, RootState} from '../../store/store';
 import {addUserAddress, ApiAddress} from '../../services/userAddressSlice';
@@ -166,7 +168,7 @@ const AddAddressScreen2: React.FC<Props> = ({route, navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaViewRN style={styles.safeArea} edges={['top', 'right', 'left']}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor={COLORS.backgroundPrimary}
@@ -320,12 +322,15 @@ const AddAddressScreen2: React.FC<Props> = ({route, navigation}) => {
           )}
         </TouchableOpacity>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </SafeAreaViewRN>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {flex: 1, backgroundColor: COLORS.backgroundPrimary},
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.primary,
+  },
   container: {flex: 1},
   header: {
     flexDirection: 'row',

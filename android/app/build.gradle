@@ -84,8 +84,8 @@ android {
         applicationId 'com.quickverse'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 20
-        versionName "2.2.0-SNAPSHOT"
+        versionCode 23
+        versionName "2.2.0"
 
     }
     signingConfigs {

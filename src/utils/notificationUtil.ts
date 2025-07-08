@@ -6,6 +6,7 @@ import notifee, {
   AndroidColor,
 } from '@notifee/react-native';
 import {Platform} from 'react-native';
+import {PermissionsAndroid} from 'react-native';
 
 // Notification channel IDs
 export const NOTIFICATION_CHANNELS = {
@@ -20,6 +21,13 @@ export const NOTIFICATION_TYPES = {
   PROMO: 'promo',
   GENERAL: 'general',
 } as const;
+
+// Helper function to check if Android version is 33 or higher
+const isAndroid33OrHigher = (): boolean => {
+  return (
+    Platform.OS === 'android' && parseInt(Platform.Version.toString(), 10) >= 33
+  );
+};
 
 /**
  * Get FCM token for the device
@@ -172,7 +180,9 @@ export const displayCustomNotification = async (
 /**
  * Cancel a specific notification
  */
-export const cancelNotification = async (notificationId: string): Promise<void> => {
+export const cancelNotification = async (
+  notificationId: string,
+): Promise<void> => {
   try {
     await notifee.cancelNotification(notificationId);
     console.log('Notification cancelled:', notificationId);
@@ -226,13 +236,67 @@ export const setBadgeCount = async (count: number): Promise<void> => {
  */
 export const requestNotificationPermissions = async (): Promise<boolean> => {
   try {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-    
-    console.log('Notification permission status:', authStatus);
-    return enabled;
+    // First check if we already have permission
+    const currentStatus = await messaging().hasPermission();
+    if (
+      currentStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      currentStatus === messaging.AuthorizationStatus.PROVISIONAL
+    ) {
+      return true;
+    }
+
+    // Platform specific handling
+    if (Platform.OS === 'ios') {
+      // For iOS, we use messaging().requestPermission with all options
+      const authStatus = await messaging().requestPermission({
+        sound: true,
+        announcement: true,
+        provisional: true, // Enable provisional authorization on iOS
+        badge: true,
+        alert: true,
+        carPlay: true,
+      });
+
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      console.log('iOS Notification permission status:', authStatus);
+      return enabled;
+    } else {
+      // For Android
+      // Add a small delay to ensure Activity is ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // On Android, we need to check for notification channel creation first
+      await createNotificationChannels();
+
+      // Then request permission
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (enabled) {
+        // On Android, we also need to request POST_NOTIFICATIONS permission for API 33+
+        if (isAndroid33OrHigher()) {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+            {
+              title: 'Notification Permission',
+              message: 'Allow QuickVerse to send you notifications',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            },
+          );
+          return granted === PermissionsAndroid.RESULTS.GRANTED;
+        }
+      }
+
+      console.log('Android Notification permission status:', authStatus);
+      return enabled;
+    }
   } catch (error) {
     console.error('Error requesting notification permissions:', error);
     return false;
@@ -244,8 +308,25 @@ export const requestNotificationPermissions = async (): Promise<boolean> => {
  */
 export const checkNotificationPermissions = async (): Promise<boolean> => {
   try {
+    // Check Firebase Messaging permission
     const authStatus = await messaging().hasPermission();
-    return authStatus === messaging.AuthorizationStatus.AUTHORIZED;
+    let enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    // Additional check for Android API 33+
+    if (isAndroid33OrHigher() && enabled) {
+      const granted = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+      );
+      enabled = enabled && granted;
+    }
+
+    console.log(
+      `${Platform.OS.toUpperCase()} Current notification permission status:`,
+      {messagingStatus: authStatus, enabled},
+    );
+    return enabled;
   } catch (error) {
     console.error('Error checking notification permissions:', error);
     return false;
@@ -267,7 +348,9 @@ export const onNotificationPress = (callback: (notification: any) => void) => {
 /**
  * Handle background notification events
  */
-export const onBackgroundNotificationPress = (callback: (notification: any) => void) => {
+export const onBackgroundNotificationPress = (
+  callback: (notification: any) => void,
+) => {
   notifee.onBackgroundEvent(async ({type, detail}) => {
     if (type === EventType.PRESS) {
       console.log('Background notification pressed:', detail.notification);

@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   ScrollView,
-  SafeAreaView,
   View,
   TextInput,
   FlatList,
@@ -17,6 +16,7 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import theme from '../../theme';
 import HomeScreenVendors from './homeVendors/HomeScreenVendors';
 import PromoDiscounts from './PromoAndDiscount/PromoDiscounts';
@@ -32,6 +32,13 @@ import {useSelector} from 'react-redux';
 import {selectCart} from '../../services/cart/productCartSlice';
 import {autoSelectCampus} from '../util/locationUtil';
 import Geolocation from 'react-native-geolocation-service';
+
+const Icon = MaterialCommunityIcons as unknown as React.ComponentType<{
+  name: string;
+  size: number;
+  color: string;
+  style?: any;
+}>;
 
 const HomeScreen: React.FC = () => {
   const [selectedCampusId, setSelectedCampusId] = useState<
@@ -86,6 +93,18 @@ const HomeScreen: React.FC = () => {
 
   const requestLocationPermissionAndroid = async () => {
     try {
+      // First check if we already have the permission
+      const alreadyGranted = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      );
+
+      if (alreadyGranted) {
+        return true;
+      }
+
+      // If not granted, request it with a delay to ensure Activity is ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         {
@@ -250,103 +269,94 @@ const HomeScreen: React.FC = () => {
   };
 
   return (
-    <>
-      <SafeAreaView style={styles.container}>
-        {/* Header with campus selector and cart */}
-        <View style={styles.headerContainer}>
-          <View style={styles.campusSelector}>
-            <TouchableOpacity
-              style={styles.touchableOpacity}
-              onPress={() => setClicked(true)}>
-              <MaterialCommunityIcons
-                name={'navigation-variant'}
-                size={18}
-                color={theme.colors.ternary}
-                style={{marginRight: 5, marginTop: 4}}
-              />
-              <View>
-                <Text style={styles.touchableText}>
-                  {selectedCampusId === '' ? 'Select Campus' : selectedCampusId}
-                </Text>
-              </View>
-              <MaterialCommunityIcons
-                name={'chevron-down'}
-                size={28}
-                color={theme.colors.ternary}
-                style={{marginTop: -2}}
-              />
-            </TouchableOpacity>
-          </View>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'right', 'left']}>
+      {/* Header with campus selector and cart */}
+      <View style={styles.headerContainer}>
+        <View style={styles.campusSelector}>
           <TouchableOpacity
-            style={styles.cartButton}
-            onPress={() => setModalVisible(true)}>
-            <MaterialCommunityIcons
-              name="cart-outline"
-              size={24}
-              color="#FFDC52"
+            style={styles.touchableOpacity}
+            onPress={() => setClicked(true)}>
+            <Icon
+              name="navigation-variant"
+              size={18}
+              color={theme.colors.ternary}
+              style={{marginRight: 5, marginTop: 4}}
             />
-            {totalCartItems > 0 && (
-              <View style={styles.cartBadge}>
-                <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
-              </View>
-            )}
+            <View>
+              <Text style={styles.touchableText}>
+                {selectedCampusId === '' ? 'Select Campus' : selectedCampusId}
+              </Text>
+            </View>
+            <Icon
+              name="chevron-down"
+              size={28}
+              color={theme.colors.ternary}
+              style={{marginTop: -2}}
+            />
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          style={styles.cartButton}
+          onPress={() => setModalVisible(true)}>
+          <Icon name="cart-outline" size={24} color="#FFDC52" />
+          {totalCartItems > 0 && (
+            <View style={styles.cartBadge}>
+              <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
 
-        {isFirstTimeLogin && <LoginDetails />}
-        <ScrollView
-          style={styles.scrollView}
-          scrollEnabled={!clicked}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={[theme.colors.secondary]} // Customize as needed
-              tintColor={theme.colors.secondary} // Customize as needed
-            />
-          }>
-          <PromoDiscounts
-            campus={selectedCampusId}
-            key={`promo-${refreshKey}`}
+      {isFirstTimeLogin && <LoginDetails />}
+      <ScrollView
+        style={styles.scrollView}
+        scrollEnabled={!clicked}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[theme.colors.secondary]} // Customize as needed
+            tintColor={theme.colors.secondary} // Customize as needed
           />
-          <FeaturedItems
-            campus={selectedCampusId}
-            key={`featured-${refreshKey}`}
-          />
-          <HomeScreenVendors
-            campus={selectedCampusId}
-            key={`vendors-${refreshKey}`}
-          />
-          <CampusBuzz campus={selectedCampusId} key={`buzz-${refreshKey}`} />
-        </ScrollView>
-        {campusToastVisible && (
-          <Animated.View 
-            style={[
-              styles.toastContainer,
-              {
-                opacity: toastAnimation,
-                transform: [
-                  {
-                    translateY: toastAnimation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [-50, 0],
-                    }),
-                  },
-                ],
-              },
-            ]}>
-            <Text style={styles.toastText}>
-              Currently showing vendors for {campusToastName}
-            </Text>
-          </Animated.View>
-        )}
-      </SafeAreaView>
-      
+        }>
+        <PromoDiscounts campus={selectedCampusId} key={`promo-${refreshKey}`} />
+        <FeaturedItems
+          campus={selectedCampusId}
+          key={`featured-${refreshKey}`}
+        />
+        <HomeScreenVendors
+          campus={selectedCampusId}
+          key={`vendors-${refreshKey}`}
+        />
+        <CampusBuzz campus={selectedCampusId} key={`buzz-${refreshKey}`} />
+      </ScrollView>
+      {campusToastVisible && (
+        <Animated.View
+          style={[
+            styles.toastContainer,
+            {
+              opacity: toastAnimation,
+              transform: [
+                {
+                  translateY: toastAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-50, 0],
+                  }),
+                },
+              ],
+            },
+          ]}>
+          <Text style={styles.toastText}>
+            Currently showing vendors for {campusToastName}
+          </Text>
+        </Animated.View>
+      )}
+
       {/* Campus Selection Modal */}
       <Modal
         visible={clicked}
         transparent={true}
-        animationType='fade'
+        animationType="fade"
         onRequestClose={() => {
           setClicked(false);
           setSearchText('');
@@ -361,14 +371,10 @@ const HomeScreen: React.FC = () => {
                   setClicked(false);
                   setSearchText('');
                 }}>
-                <MaterialCommunityIcons
-                  name="close"
-                  size={24}
-                  color={theme.colors.ternary}
-                />
+                <Icon name="close" size={24} color={theme.colors.ternary} />
               </TouchableOpacity>
             </View>
-            
+
             {loading ? (
               <View style={styles.modalLoadingContainer}>
                 <ActivityIndicator
@@ -391,7 +397,7 @@ const HomeScreen: React.FC = () => {
             ) : (
               <>
                 <View style={styles.modalSearchContainer}>
-                  <MaterialCommunityIcons
+                  <Icon
                     name="magnify"
                     size={20}
                     color={theme.colors.ternary}
@@ -408,7 +414,7 @@ const HomeScreen: React.FC = () => {
                     <TouchableOpacity
                       onPress={() => setSearchText('')}
                       style={styles.modalClearIcon}>
-                      <MaterialCommunityIcons
+                      <Icon
                         name="close-circle"
                         size={20}
                         color={theme.colors.ternary}
@@ -416,8 +422,8 @@ const HomeScreen: React.FC = () => {
                     </TouchableOpacity>
                   )}
                 </View>
-                
-                <ScrollView 
+
+                <ScrollView
                   style={styles.modalScrollView}
                   showsVerticalScrollIndicator={true}
                   nestedScrollEnabled={true}>
@@ -456,14 +462,14 @@ const HomeScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
-      
+
       <CartScreen modalVisible={modalVisible} closeCartModal={closeCartModal} />
-    </>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: theme.colors.primary,
   },

@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Platform,
   Linking,
+  Alert,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
@@ -21,6 +22,7 @@ import {AppDispatch, RootState} from '../../store/store';
 import {Loading} from '../util/Loading';
 import {fetchUserDetails} from '../../services/UserDetailsSlice';
 import LoginCard from '../util/MandatoryLoginButton';
+import {SafeAreaView as SafeAreaViewContext} from 'react-native-safe-area-context';
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -50,7 +52,9 @@ const ProfileScreen = () => {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaViewContext
+      style={styles.safeArea}
+      edges={['top', 'right', 'left']}>
       <View style={styles.container}>
         {authData ? (
           <>
@@ -168,15 +172,14 @@ const ProfileScreen = () => {
           <LoginCard />
         )}
       </View>
-    </SafeAreaView>
+    </SafeAreaViewContext>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: theme.colors.primary,
     flex: 1,
-    paddingTop: Platform.OS === 'android' ? 10 : 0,
+    backgroundColor: theme.colors.primary,
   },
   container: {
     backgroundColor: theme.colors.primary,

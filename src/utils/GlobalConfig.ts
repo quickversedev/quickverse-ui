@@ -1,5 +1,5 @@
 const globalConfig = {
-  apiBaseUrl: 'http://192.168.0.7:8080/quickVerse',
+  apiBaseUrl: 'http://prd.quickverse.in/quickVerse',
   OrderSummeryEnabled: false,
 };
 

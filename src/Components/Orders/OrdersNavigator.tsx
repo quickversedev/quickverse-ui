@@ -24,7 +24,7 @@ const Stack = createStackNavigator<OrderStackParamList>();
 
 const OrdersNavigation: React.FC = () => {
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
+    
       <Stack.Navigator initialRouteName="AllOrders">
         <Stack.Screen
           name="AllOrders"
@@ -47,7 +47,7 @@ const OrdersNavigation: React.FC = () => {
           }}
         />
       </Stack.Navigator>
-    </SafeAreaView>
+    
   );
 };
 

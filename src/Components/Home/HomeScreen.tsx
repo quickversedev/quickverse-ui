@@ -41,9 +41,7 @@ const Icon = MaterialCommunityIcons as unknown as React.ComponentType<{
 }>;
 
 const HomeScreen: React.FC = () => {
-  const [selectedCampusId, setSelectedCampusId] = useState<
-    string | undefined
-  >();
+  const [selectedCampusId, setSelectedCampusId] = useState<string | undefined>();
   const [campusToastVisible, setCampusToastVisible] = useState(false);
   const [campusToastName, setCampusToastName] = useState('');
   const [campusError, setCampusError] = useState(false);
@@ -87,122 +85,41 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  const requestLocationPermissionAndroid = async () => {
-    try {
-      // First check if we already have the permission
-      const alreadyGranted = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      );
-
-      if (alreadyGranted) {
-        return true;
-      }
-
-      // If not granted, request it with a delay to ensure Activity is ready
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: 'Location Permission',
-          message:
-            'This app needs access to your location to find nearby campuses.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    } catch (err) {
-      console.error('Error requesting location permission:', err);
-      return false;
-    }
-  };
-
-  const requestLocationPermissionIOS = async () => {
-    try {
-      const status = await Geolocation.requestAuthorization('whenInUse');
-      return status === 'granted';
-    } catch (err) {
-      console.error('Error requesting location permission:', err);
-      return false;
-    }
-  };
-
-  const checkAndRequestLocationPermission = async () => {
-    let hasPermission = false;
-
-    if (Platform.OS === 'android') {
-      hasPermission = await requestLocationPermissionAndroid();
-    } else if (Platform.OS === 'ios') {
-      hasPermission = await requestLocationPermissionIOS();
-    }
-
-    if (!hasPermission) {
-      Alert.alert(
-        'Permission Required',
-        'Please enable location permissions in settings to use this feature.',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: 'Open Settings',
-            onPress: () => Linking.openSettings(),
-          },
-        ],
-      );
-    }
-
-    return hasPermission;
-  };
-
   const getDeviceLocation = async (campuses: any[]) => {
-    const hasPermission = await checkAndRequestLocationPermission();
+    try {
+      Geolocation.getCurrentPosition(
+        position => {
+          const {latitude, longitude} = position.coords;
+          console.log('Device location:', latitude, longitude);
 
-    if (!hasPermission) {
-      Alert.alert(
-        'Permission Denied',
-        'Location permission is required to find nearby campuses.',
+          const campusId = autoSelectCampus(latitude, longitude, campuses);
+          if (campusId) {
+            setSelectedCampusId(campusId);
+            setCampus(campusId);
+            setCampusToastName(campusId);
+            showToast();
+            console.log('campusId***********************************', campusId);
+          } else {
+            setSelectedCampusId('IIMU-313001'); // Default campus
+            setCampus('IIMU-313001'); // Save default campus to storage
+          }
+        },
+        error => {
+          console.error('Error fetching location:', error);
+          Alert.alert(
+            'Error',
+            'Unable to fetch your location. Please try again later.',
+          );
+          setSelectedCampusId('IIMU-313001');
+          setCampus('IIMU-313001');
+        },
+        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
       );
-      setSelectedCampusId('IIMU-313001'); // Fallback to default campus
-      setCampus('IIMU-313001'); // Save default campus to storage
-      return;
+    } catch (error) {
+      console.error('Error in getDeviceLocation:', error);
+      setSelectedCampusId('IIMU-313001');
+      setCampus('IIMU-313001');
     }
-
-    Geolocation.getCurrentPosition(
-      position => {
-        const {latitude, longitude} = position.coords;
-        // console.log('Device location:', latitude, longitude);
-
-        const campusId = autoSelectCampus(latitude, longitude, campuses);
-        if (campusId) {
-          setSelectedCampusId(campusId);
-          setCampus(campusId);
-          setCampusToastName(campusId);
-          showToast();
-        } else {
-          setSelectedCampusId('IIMU-313001'); // Default campus
-          setCampus('IIMU-313001'); // Save default campus to storage
-          // console.log('No campus found within 5km radius.');
-        }
-
-        // const endTime = new Date();
-        // const elapsedTime = endTime.getTime() - startTime.getTime();
-        // console.log(`Time taken to complete: ${elapsedTime}ms`);
-      },
-      error => {
-        console.error('Error fetching location:', error);
-        Alert.alert(
-          'Error',
-          'Unable to fetch your location. Please try again later.',
-        );
-        setSelectedCampusId('IIMU-313001');
-        setCampus('IIMU-313001');
-      },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-    );
   };
 
   useEffect(() => {

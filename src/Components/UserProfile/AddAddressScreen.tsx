@@ -11,12 +11,17 @@ import {
   Alert,
   // Dimensions,
   Platform,
+  Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Geolocation from 'react-native-geolocation-service';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+// @ts-expect-error: TypeScript declaration for @env
+import {OLA_MAPS_API_KEY} from '@env';
+import {SafeAreaView as SafeAreaViewContext} from 'react-native-safe-area-context';
+import theme from '../../theme';
 
 import {AddressStackParamList} from './AddressScreen';
 import OlaPlaceAutocomplete from '../OlaPlaceAutocomplete';
@@ -40,7 +45,6 @@ type SelectLocationScreenNavigationProp = StackNavigationProp<
 >;
 
 const AddAddressScreen: React.FC = () => {
-  const OLA_MAPS_API_KEY = 'U3I3QUrUi1bjLCMQgtZGWzF2v0Wd7InexqwCaXhn';
   const navigation = useNavigation<SelectLocationScreenNavigationProp>();
   const [mapRegion, setMapRegion] = useState<Region | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -179,8 +183,12 @@ const AddAddressScreen: React.FC = () => {
     });
   }, [mapRegion, navigation]);
 
+  const handleMapInteraction = () => {
+    Keyboard.dismiss();
+  };
+
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaViewContext style={styles.safeArea} edges={['top', 'right', 'left']}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor={COLORS.backgroundPrimary}
@@ -196,16 +204,19 @@ const AddAddressScreen: React.FC = () => {
           <View style={styles.backButtonPlaceholder} />
         </View>
 
-        {mapRegion?.latitude && (
-          <OlaPlaceAutocomplete
-            apiKey={OLA_MAPS_API_KEY}
-            onPlaceSelected={handleSuggestionPress}
-            placeholder="Search for area, street name..."
-            latitude={mapRegion?.latitude}
-            longitude={mapRegion?.longitude}
-          />
-        )}
         <View style={styles.mapContainer}>
+          {/* Absolutely position the autocomplete above the map */}
+          {mapRegion?.latitude && (
+            <View style={styles.autocompleteWrapper}>
+              <OlaPlaceAutocomplete
+                apiKey={OLA_MAPS_API_KEY}
+                onPlaceSelected={handleSuggestionPress}
+                placeholder="Search for area, street name..."
+                latitude={mapRegion?.latitude}
+                longitude={mapRegion?.longitude}
+              />
+            </View>
+          )}
           {isInitialLoading || !mapRegion ? (
             <ActivityIndicator size="large" color={COLORS.buttonBackground} />
           ) : (
@@ -216,6 +227,11 @@ const AddAddressScreen: React.FC = () => {
                 region={mapRegion}
                 onRegionChangeComplete={onRegionChangeComplete}
                 showsUserLocation={isLocationPermissionGranted}
+                onMapReady={() => {
+                  console.log('Map is ready, region:', mapRegion);
+                }}
+                onPress={handleMapInteraction}
+                onPanDrag={handleMapInteraction}
               />
               <View style={styles.mapCenterMarkerContainer}>
                 <Icon name="pin" size={34} color={COLORS.buttonBackground} />
@@ -231,12 +247,15 @@ const AddAddressScreen: React.FC = () => {
           <Text style={styles.confirmButtonText}>Confirm Location</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </SafeAreaViewContext>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {flex: 1, backgroundColor: COLORS.backgroundPrimary},
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.primary,
+  },
   container: {flex: 1, backgroundColor: '#FFFFFF'},
   header: {
     flexDirection: 'row',
@@ -281,6 +300,14 @@ const styles = StyleSheet.create({
     color: COLORS.buttonText,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  autocompleteWrapper: {
+    position: 'absolute',
+    top: 10,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    elevation: 10,
   },
 });
 

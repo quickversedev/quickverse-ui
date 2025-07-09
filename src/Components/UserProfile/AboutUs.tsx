@@ -1,10 +1,11 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image, SafeAreaView} from 'react-native';
+import {SafeAreaView as SafeAreaViewContext} from 'react-native-safe-area-context';
 import theme from '../../theme';
 
 const AboutUs = () => {
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaViewContext style={styles.safeArea} edges={['top', 'right', 'left']}>
       <View style={styles.container}>
         <Image
           // eslint-disable-next-line prettier/prettier, no-useless-escape
@@ -17,18 +18,18 @@ const AboutUs = () => {
             campuses with advanced drone technology. We offer fast and reliable
             delivery of groceries, meals, books, and more. Our mission is to
             enhance campus life through swift, efficient, and eco-friendly
-            delivery solutions tailored to each community's unique needs.
+            delivery solutions tailored to each community's unique needs.
           </Text>
         </View>
       </View>
-    </SafeAreaView>
+    </SafeAreaViewContext>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: theme.colors.primary,
     flex: 1,
+    backgroundColor: theme.colors.primary,
   },
   container: {
     flex: 1,

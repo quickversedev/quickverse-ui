@@ -88,3 +88,16 @@ export const deleteAddressMMKV = (keyId: string) => {
   // Save the updated array back to storage
   storage.set('addresses', JSON.stringify(updatedAddressArray));
 };
+
+// FCM Token Storage Functions
+export const setFCMToken = (token: string): void => {
+  storage.set('@FCMToken', token);
+};
+
+export const getFCMToken = (): string | undefined => {
+  return storage.getString('@FCMToken');
+};
+
+export const clearFCMToken = (): void => {
+  storage.delete('@FCMToken');
+};

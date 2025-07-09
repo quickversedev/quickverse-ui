@@ -11,10 +11,13 @@ import {
   setCampus,
   setIsNewUser,
   storage,
+  clearFCMToken,
 } from './Storage';
 import {authService} from '../services/AuthService';
 import {fetchConfigs} from '../services/configService';
 import {config} from './canonicalModel';
+import messaging from '@react-native-firebase/messaging';
+import {setFCMToken} from './Storage';
 
 type AuthContextData = {
   loggedInDate: string;
@@ -97,6 +100,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       throw error; // Rethrow the error to propagate it to the caller
     }
   };
+
   const verifyOtp = async (
     _phoneNumber: string,
     otp: string,
@@ -109,7 +113,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         verificationId,
       );
       const {campus, token, newUser} = _authData?.session;
-      console.log('authdata', _authData);
+
       if (_authData) {
         setAuthData(token);
         storage.set('@AuthData', token);
@@ -146,6 +150,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     storage.delete('@loginDate');
     storage.delete('@isNewUser');
     storage.delete('@skipLogin');
+    clearFCMToken(); // Clear FCM token from local storage
   };
 
   return (

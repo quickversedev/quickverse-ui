@@ -73,6 +73,7 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -83,8 +84,9 @@ android {
         applicationId 'com.quickverse'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 20
-        versionName "2.2.0-SNAPSHOT"
+        versionCode 24
+        versionName "2.3.0-SNAPSHOT"
+
     }
     signingConfigs {
         debug {

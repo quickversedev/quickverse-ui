@@ -14,6 +14,34 @@ export type AuthData = {
     email: string;
   };
 };
+
+/**
+ * Update FCM token in the backend
+ */
+const updateFCMToken = async (
+  sessionToken: string,
+  oldToken: string,
+  newToken: string,
+): Promise<void> => {
+  try {
+    await axios.post(
+      `${globalConfig.apiBaseUrl}/v1/updateFcmToken`,
+      {
+        oldToken,
+        newToken,
+      },
+      {
+        headers: {
+          SessionKey: sessionToken,
+        },
+      },
+    );
+  } catch (error) {
+    console.error('Error updating FCM token:', error);
+    throw error;
+  }
+};
+
 const sendOtp = async (phoneNumber: string): Promise<any> => {
   //*********************mock****************
   // return new Promise(resolve => {
@@ -236,6 +264,7 @@ export const authService = {
   sendOtp,
   signUp,
   signOut,
+  updateFCMToken,
 };
 
 // const JWTTokenMock =

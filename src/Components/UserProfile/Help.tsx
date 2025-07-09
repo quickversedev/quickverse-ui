@@ -19,6 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useAuth} from '../../utils/AuthContext';
 import {Loading} from '../util/Loading';
 import fetchOptions from '../Login/getCampusList';
+import {SafeAreaView as SafeAreaViewContext} from 'react-native-safe-area-context';
 
 const Help = () => {
   const [email, setEmail] = useState('');
@@ -90,8 +91,8 @@ const Help = () => {
     setSelectedCampusId(result);
   };
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <SafeAreaView style={styles.safeArea}>
+    <SafeAreaViewContext style={styles.safeArea} edges={['top', 'right', 'left']}>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.container}>
           <Text style={styles.header}>Help</Text>
           <View style={styles.inputContainer}>
@@ -189,15 +190,15 @@ const Help = () => {
             />
           </View>
         </View>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </SafeAreaViewContext>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: theme.colors.primary,
     flex: 1,
+    backgroundColor: theme.colors.primary,
   },
   container: {
     flex: 1,

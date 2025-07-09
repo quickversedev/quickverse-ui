@@ -28,6 +28,7 @@ import {selectVendorDetailsByShopId} from '../../services/VendorListSlice';
 import {isStoreOpen} from '../util/vendorUtil';
 import LoginCard from '../util/MandatoryLoginButton';
 import {useAuth} from '../../utils/AuthContext';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 interface CartModalProps {
   modalVisible: boolean;
@@ -96,113 +97,119 @@ const CartScreen: React.FC<CartModalProps> = ({
   };
 
   return (
-    <Modal
-      transparent={true}
-      visible={modalVisible}
-      animationType="slide"
-      onRequestClose={closeCartModal}>
-      <TouchableWithoutFeedback onPress={closeCartModal}>
-        <View style={styles.modalOverlay} />
-      </TouchableWithoutFeedback>
-      <Animated.View
-        style={[
-          styles.modalContent,
-          {
-            transform: [
-              {
-                translateY: animationValue,
-              },
-            ],
-          },
-        ]}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.header}>Your Cart</Text>
-          <TouchableOpacity
-            onPress={closeCartModal}
-            style={styles.closeButton}
-            activeOpacity={0.6}>
-            <MaterialCommunityIcons
-              name="close"
-              size={24}
-              color={theme.colors.ternary}
-            />
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.subHeader}>
-          {cartItems.length} {cartItems.length === 1 ? 'Item' : 'Items'} in your
-          cart from
-        </Text>
-
-        <View style={styles.vendorRow}>
-          <Text
-            style={styles.vendorName}
-            numberOfLines={1}
-            ellipsizeMode="tail">
-            {vendor?.vendorName || 'Vendor'}
-          </Text>
-          {!isCartEmpty && (
+    <SafeAreaView style={styles.safeArea} edges={['top', 'right', 'left']}>
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={closeCartModal}>
+        <TouchableWithoutFeedback onPress={closeCartModal}>
+          <View style={styles.modalOverlay} />
+        </TouchableWithoutFeedback>
+        <Animated.View
+          style={[
+            styles.modalContent,
+            {
+              transform: [
+                {
+                  translateY: animationValue,
+                },
+              ],
+            },
+          ]}>
+          <View style={styles.headerContainer}>
+            <Text style={styles.header}>Your Cart</Text>
             <TouchableOpacity
-              style={styles.clearCartButton}
-              onPress={handleClearCart}
+              onPress={closeCartModal}
+              style={styles.closeButton}
               activeOpacity={0.6}>
-              <Text style={styles.clearCartButtonText}>Clear Cart</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {!isCartEmpty && !isStoreOpened && (
-          <View style={styles.storeClosedCard}>
-            <Text style={styles.storeClosedText}>
-              Store is Closed, Can't Place the Order
-            </Text>
-            <TouchableOpacity
-              style={[styles.clearCartButton, styles.storeClosedButton]}
-              onPress={handleClearCart}
-              activeOpacity={0.6}>
-              <Text style={styles.clearCartButtonText}>Clear Cart</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {authData ? (
-          <View style={styles.scrollContainer}>
-            <ScrollView
-              contentContainerStyle={styles.scrollContent}
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled">
-              <CartListScreen
-                cartItems={cartItems}
-                handleIncrement={handleIncrement}
-                handleDecrement={handleDecrement}
-                handleDelete={handleDelete}
+              <MaterialCommunityIcons
+                name="close"
+                size={24}
+                color={theme.colors.ternary}
               />
-              {!isCartEmpty ? (
-                <PaymentSummaryScreen
-                  getTotalPrice={pricesObject}
-                  vendor={vendor}
-                  isStoreOpened={isStoreOpened}
-                  isCartEmpty={isCartEmpty}
-                  closeCartModal={closeCartModal}
-                />
-              ) : (
-                <View style={styles.emptyCartContainer}>
-                  <Text style={styles.emptyCartText}>
-                    Your cart is empty. Add items to continue.
-                  </Text>
-                </View>
-              )}
-            </ScrollView>
+            </TouchableOpacity>
           </View>
-        ) : (
-          <LoginCard feature="Cart" />
-        )}
-      </Animated.View>
-    </Modal>
+
+          <Text style={styles.subHeader}>
+            {cartItems.length} {cartItems.length === 1 ? 'Item' : 'Items'} in your
+            cart from
+          </Text>
+
+          <View style={styles.vendorRow}>
+            <Text
+              style={styles.vendorName}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              {vendor?.vendorName || 'Vendor'}
+            </Text>
+            {!isCartEmpty && (
+              <TouchableOpacity
+                style={styles.clearCartButton}
+                onPress={handleClearCart}
+                activeOpacity={0.6}>
+                <Text style={styles.clearCartButtonText}>Clear Cart</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {!isCartEmpty && !isStoreOpened && (
+            <View style={styles.storeClosedCard}>
+              <Text style={styles.storeClosedText}>
+                Store is Closed, Can't Place the Order
+              </Text>
+              <TouchableOpacity
+                style={[styles.clearCartButton, styles.storeClosedButton]}
+                onPress={handleClearCart}
+                activeOpacity={0.6}>
+                <Text style={styles.clearCartButtonText}>Clear Cart</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {authData ? (
+            <View style={styles.scrollContainer}>
+              <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled">
+                <CartListScreen
+                  cartItems={cartItems}
+                  handleIncrement={handleIncrement}
+                  handleDecrement={handleDecrement}
+                  handleDelete={handleDelete}
+                />
+                {!isCartEmpty ? (
+                  <PaymentSummaryScreen
+                    getTotalPrice={pricesObject}
+                    vendor={vendor}
+                    isStoreOpened={isStoreOpened}
+                    isCartEmpty={isCartEmpty}
+                    closeCartModal={closeCartModal}
+                  />
+                ) : (
+                  <View style={styles.emptyCartContainer}>
+                    <Text style={styles.emptyCartText}>
+                      Your cart is empty. Add items to continue.
+                    </Text>
+                  </View>
+                )}
+              </ScrollView>
+            </View>
+          ) : (
+            <LoginCard feature="Cart" />
+          )}
+        </Animated.View>
+      </Modal>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.primary,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

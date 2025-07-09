@@ -57,6 +57,25 @@ PODS:
     - nanopb (~> 3.30910.0)
   - fmt (9.1.0)
   - glog (0.3.5)
+  - Google-Maps-iOS-Utils (4.2.2):
+    - Google-Maps-iOS-Utils/Clustering (= 4.2.2)
+    - Google-Maps-iOS-Utils/Geometry (= 4.2.2)
+    - Google-Maps-iOS-Utils/GeometryUtils (= 4.2.2)
+    - Google-Maps-iOS-Utils/Heatmap (= 4.2.2)
+    - Google-Maps-iOS-Utils/QuadTree (= 4.2.2)
+    - GoogleMaps (~> 7.3)
+  - Google-Maps-iOS-Utils/Clustering (4.2.2):
+    - Google-Maps-iOS-Utils/QuadTree
+    - GoogleMaps (~> 7.3)
+  - Google-Maps-iOS-Utils/Geometry (4.2.2):
+    - GoogleMaps (~> 7.3)
+  - Google-Maps-iOS-Utils/GeometryUtils (4.2.2):
+    - GoogleMaps (~> 7.3)
+  - Google-Maps-iOS-Utils/Heatmap (4.2.2):
+    - Google-Maps-iOS-Utils/QuadTree
+    - GoogleMaps (~> 7.3)
+  - Google-Maps-iOS-Utils/QuadTree (4.2.2):
+    - GoogleMaps (~> 7.3)
   - GoogleAppMeasurement (11.8.0):
     - GoogleAppMeasurement/AdIdSupport (= 11.8.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 8.0)
@@ -80,52 +99,57 @@ PODS:
   - GoogleDataTransport (10.1.0):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
-  - GoogleUtilities (8.0.2):
-    - GoogleUtilities/AppDelegateSwizzler (= 8.0.2)
-    - GoogleUtilities/Environment (= 8.0.2)
-    - GoogleUtilities/Logger (= 8.0.2)
-    - GoogleUtilities/MethodSwizzler (= 8.0.2)
-    - GoogleUtilities/Network (= 8.0.2)
-    - "GoogleUtilities/NSData+zlib (= 8.0.2)"
-    - GoogleUtilities/Privacy (= 8.0.2)
-    - GoogleUtilities/Reachability (= 8.0.2)
-    - GoogleUtilities/SwizzlerTestHelpers (= 8.0.2)
-    - GoogleUtilities/UserDefaults (= 8.0.2)
-  - GoogleUtilities/AppDelegateSwizzler (8.0.2):
+  - GoogleMaps (7.4.0):
+    - GoogleMaps/Maps (= 7.4.0)
+  - GoogleMaps/Base (7.4.0)
+  - GoogleMaps/Maps (7.4.0):
+    - GoogleMaps/Base
+  - GoogleUtilities (8.1.0):
+    - GoogleUtilities/AppDelegateSwizzler (= 8.1.0)
+    - GoogleUtilities/Environment (= 8.1.0)
+    - GoogleUtilities/Logger (= 8.1.0)
+    - GoogleUtilities/MethodSwizzler (= 8.1.0)
+    - GoogleUtilities/Network (= 8.1.0)
+    - "GoogleUtilities/NSData+zlib (= 8.1.0)"
+    - GoogleUtilities/Privacy (= 8.1.0)
+    - GoogleUtilities/Reachability (= 8.1.0)
+    - GoogleUtilities/SwizzlerTestHelpers (= 8.1.0)
+    - GoogleUtilities/UserDefaults (= 8.1.0)
+  - GoogleUtilities/AppDelegateSwizzler (8.1.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
     - GoogleUtilities/Network
     - GoogleUtilities/Privacy
-  - GoogleUtilities/Environment (8.0.2):
+  - GoogleUtilities/Environment (8.1.0):
     - GoogleUtilities/Privacy
-  - GoogleUtilities/Logger (8.0.2):
+  - GoogleUtilities/Logger (8.1.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Privacy
-  - GoogleUtilities/MethodSwizzler (8.0.2):
+  - GoogleUtilities/MethodSwizzler (8.1.0):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
-  - GoogleUtilities/Network (8.0.2):
+  - GoogleUtilities/Network (8.1.0):
     - GoogleUtilities/Logger
     - "GoogleUtilities/NSData+zlib"
     - GoogleUtilities/Privacy
     - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (8.0.2)":
+  - "GoogleUtilities/NSData+zlib (8.1.0)":
     - GoogleUtilities/Privacy
-  - GoogleUtilities/Privacy (8.0.2)
-  - GoogleUtilities/Reachability (8.0.2):
+  - GoogleUtilities/Privacy (8.1.0)
+  - GoogleUtilities/Reachability (8.1.0):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
-  - GoogleUtilities/SwizzlerTestHelpers (8.0.2):
+  - GoogleUtilities/SwizzlerTestHelpers (8.1.0):
     - GoogleUtilities/MethodSwizzler
-  - GoogleUtilities/UserDefaults (8.0.2):
+  - GoogleUtilities/UserDefaults (8.1.0):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
   - hermes-engine (0.74.1):
     - hermes-engine/Pre-built (= 0.74.1)
   - hermes-engine/Pre-built (0.74.1)
-  - MMKV (1.3.5):
-    - MMKVCore (~> 1.3.5)
-  - MMKVCore (1.3.5)
+  - MMKV (2.2.2):
+    - MMKVCore (~> 2.2.2)
+  - MMKVCore (2.2.2)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
     - nanopb/encode (= 3.30910.0)
@@ -1064,6 +1088,10 @@ PODS:
     - React-Core
   - react-native-geolocation-service (5.3.1):
     - React
+  - react-native-get-random-values (1.11.0):
+    - React-Core
+  - react-native-maps (1.9.0):
+    - React-Core
   - react-native-mmkv (2.12.2):
     - DoubleConversion
     - glog
@@ -1402,7 +1430,7 @@ PODS:
     - RNNotifee/NotifeeCore (= 9.1.8)
   - RNNotifee/NotifeeCore (9.1.8):
     - React-Core
-  - RNPermissions (5.3.0):
+  - RNPermissions (5.4.1):
     - React-Core
   - RNReanimated (3.16.1):
     - DoubleConversion
@@ -1547,6 +1575,8 @@ DEPENDENCIES:
   - FirebaseCoreInternal
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - Google-Maps-iOS-Utils
+  - GoogleMaps
   - GoogleUtilities
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -1577,6 +1607,8 @@ DEPENDENCIES:
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - "react-native-cookies (from `../node_modules/@react-native-cookies/cookies`)"
   - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
+  - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
+  - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-mmkv (from `../node_modules/react-native-mmkv`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-webview (from `../node_modules/react-native-webview`)
@@ -1612,7 +1644,7 @@ DEPENDENCIES:
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
-  - RNPermissions (from `../node_modules/react-native-permissions`)
+  - RNPermissions (from `../node_modules/react-native-permissions/RNPermissions.podspec`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -1628,8 +1660,10 @@ SPEC REPOS:
     - FirebaseCoreInternal
     - FirebaseInstallations
     - FirebaseMessaging
+    - Google-Maps-iOS-Utils
     - GoogleAppMeasurement
     - GoogleDataTransport
+    - GoogleMaps
     - GoogleUtilities
     - MMKV
     - MMKVCore
@@ -1705,6 +1739,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-cookies/cookies"
   react-native-geolocation-service:
     :path: "../node_modules/react-native-geolocation-service"
+  react-native-get-random-values:
+    :path: "../node_modules/react-native-get-random-values"
+  react-native-maps:
+    :path: "../node_modules/react-native-maps"
   react-native-mmkv:
     :path: "../node_modules/react-native-mmkv"
   react-native-safe-area-context:
@@ -1776,7 +1814,7 @@ EXTERNAL SOURCES:
   RNNotifee:
     :path: "../node_modules/@notifee/react-native"
   RNPermissions:
-    :path: "../node_modules/react-native-permissions"
+    :path: "../node_modules/react-native-permissions/RNPermissions.podspec"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -1801,12 +1839,14 @@ SPEC CHECKSUMS:
   FirebaseMessaging: 487b634ccdf6f7b7ff180fdcb2a9935490f764e8
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
+  Google-Maps-iOS-Utils: f77eab4c4326d7e6a277f8e23a0232402731913a
   GoogleAppMeasurement: fc0817122bd4d4189164f85374e06773b9561896
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
-  GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
+  GoogleMaps: 032f676450ba0779bd8ce16840690915f84e57ac
+  GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   hermes-engine: 16b8530de1b383cdada1476cf52d1b52f0692cbc
-  MMKV: 506311d0494023c2f7e0b62cc1f31b7370fa3cfb
-  MMKVCore: 9e2e5fd529b64a9fe15f1a7afb3d73b2e27b4db9
+  MMKV: b4802ebd5a7c68fc0c4a5ccb4926fbdfb62d68e0
+  MMKVCore: a255341a3746955f50da2ad9121b18cb2b346e61
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 02617c592a293bd6d418e0a88ff4ee1f88329b47
@@ -1835,6 +1875,8 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 11029dcd47c5c9e057a4092ab9c2a8d10a496a33
   react-native-cookies: f54fcded06bb0cda05c11d86788020b43528a26c
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
+  react-native-get-random-values: 21325b2244dfa6b58878f51f9aa42821e7ba3d06
+  react-native-maps: 084fccedd6785bd41e85a13a26e8e6252a45b594
   react-native-mmkv: 8c9a677e64a1ac89b0c6cf240feea528318b3074
   react-native-safe-area-context: 4532f1a0c5d34a46b9324ccaaedcb5582a302b7d
   react-native-webview: 445e447f227f775d8dd2b4823bca55c458d4eff7
@@ -1870,13 +1912,13 @@ SPEC CHECKSUMS:
   RNGestureHandler: 4d82e79c24b18e83040ed9d6f1a178267c5c6aa8
   RNKeychain: 95a325506750dd120c71fbf9ba5de01c36294ba5
   RNNotifee: 4a6ee5c7deaf00e005050052d73ee6315dff7ec9
-  RNPermissions: 8bccf82d4caa70a90ca6cf7f419c75f8c8c725c9
+  RNPermissions: 020c1290b0aca35226ac04f7f58d4fc6d2e6fd29
   RNReanimated: af4e059a8fd0fb7a9cdf5ad35ead4699598a9447
   RNScreens: 6b641f232990a9d505a6d139fd18c3c759c9d290
   RNVectorIcons: 845eda5c7819bd29699cafd0fc98c9d4afe28c96
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  Yoga: b9a182ab00cf25926e7f79657d08c5d23c2d03b0
+  Yoga: 348f8b538c3ed4423eb58a8e5730feec50bce372
 
-PODFILE CHECKSUM: 7a681f9cc0fcdea6dc303568005d316c2f9cf157
+PODFILE CHECKSUM: 2119bc599fca4e6cf3205570ca44cdbbcc9dd069
 
 COCOAPODS: 1.16.2

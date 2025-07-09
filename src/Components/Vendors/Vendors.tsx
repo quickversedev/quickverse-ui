@@ -15,6 +15,7 @@ import theme from '../../theme';
 import CartScreen from '../Cart/CartScreen';
 import {useSelector} from 'react-redux';
 import {selectCart} from '../../services/cart/productCartSlice';
+import {SafeAreaView as SafeAreaViewContext} from 'react-native-safe-area-context';
 
 const Vendors: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -22,7 +23,9 @@ const Vendors: React.FC = () => {
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <SafeAreaView style={styles.safeView}>
+    <SafeAreaViewContext
+      style={styles.safeView}
+      edges={['top', 'right', 'left']}>
       <View style={styles.container}>
         {/* Header with Cart Icon */}
         <View style={styles.headerContainer}>
@@ -58,7 +61,7 @@ const Vendors: React.FC = () => {
           closeCartModal={() => setModalVisible(false)}
         />
       </View>
-    </SafeAreaView>
+    </SafeAreaViewContext>
   );
 };
 

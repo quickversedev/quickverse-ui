@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect, useRef} from 'react';
+import React, {useState, useCallback, useEffect, useRef, useMemo} from 'react';
 import {
   View,
   TextInput,
@@ -15,6 +15,7 @@ import {
 import axios from 'axios';
 import {debounce} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const OLA_MAPS_AUTOCOMPLETE_ENDPOINT =
   'https://api.olamaps.io/places/v1/autocomplete';
@@ -92,57 +93,56 @@ const OlaPlaceAutocomplete: React.FC<OlaPlaceAutocompleteProps> = ({
 
   const isSelectionMade = useRef(false);
 
-  const fetchAutocompleteSuggestions = useCallback(
-    debounce(async (currentSearchQuery: string) => {
-      if (!currentSearchQuery.trim()) {
-        setSuggestions([]);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-      const requestId = uuidv4();
-
-      try {
-        const response = await axios.get(OLA_MAPS_AUTOCOMPLETE_ENDPOINT, {
-          params: {
-            input: currentSearchQuery,
-            api_key: apiKey,
-            location: `${Number(latitude)},${Number(longitude)}`,
-          },
-          headers: {
-            Accept: 'application/json',
-            'X-Request-Id': requestId,
-          },
-        });
-
-        if (response.data && Array.isArray(response.data.predictions)) {
-          setSuggestions(response.data.predictions);
-        } else {
-          console.warn(
-            'OlaPlaceAutocomplete: Unexpected response structure',
-            response.data,
-          );
+  const fetchAutocompleteSuggestions = useMemo(
+    () =>
+      debounce(async (currentSearchQuery: string) => {
+        if (!currentSearchQuery.trim()) {
           setSuggestions([]);
+          setLoading(false);
+          return;
         }
-      } catch (err: any) {
-        console.warn(
-          'Error during Ola Maps autocomplete:',
-          err.response?.data || err.message || err,
-        );
-        setError(err.message || 'Failed to fetch suggestions.');
-        setSuggestions([]);
-      } finally {
-        setLoading(false);
-      }
-    }, debounceTime),
-    [apiKey, debounceTime],
+
+        setLoading(true);
+        setError(null);
+        const requestId = uuidv4();
+
+        try {
+          const response = await axios.get(OLA_MAPS_AUTOCOMPLETE_ENDPOINT, {
+            params: {
+              input: currentSearchQuery,
+              api_key: apiKey,
+              location: `${Number(latitude)},${Number(longitude)}`,
+            },
+            headers: {
+              Accept: 'application/json',
+              'X-Request-Id': requestId,
+            },
+          });
+
+          if (response.data && Array.isArray(response.data.predictions)) {
+            setSuggestions(response.data.predictions);
+          } else {
+            console.warn(
+              'OlaPlaceAutocomplete: Unexpected response structure',
+              response.data,
+            );
+            setSuggestions([]);
+          }
+        } catch (err: any) {
+          console.warn(
+            'Error during Ola Maps autocomplete:',
+            err.response?.data || err.message || err,
+          );
+          setError(err.message || 'Failed to fetch suggestions.');
+          setSuggestions([]);
+        } finally {
+          setLoading(false);
+        }
+      }, debounceTime),
+    [apiKey, debounceTime, latitude, longitude],
   );
 
   useEffect(() => {
-    // If a selection was just made, do not fetch new suggestions.
-    // Reset the flag for the next user input.
     if (isSelectionMade.current) {
       isSelectionMade.current = false;
       return;
@@ -152,15 +152,14 @@ const OlaPlaceAutocomplete: React.FC<OlaPlaceAutocompleteProps> = ({
       fetchAutocompleteSuggestions(query);
     } else {
       setSuggestions([]);
-      if (loading) {
-        setLoading(false);
-      }
+      if (loading) setLoading(false);
     }
 
     return () => {
       fetchAutocompleteSuggestions.cancel();
     };
-  }, [query, fetchAutocompleteSuggestions, loading]);
+    // Only depend on query and the debounced function
+  }, [query, fetchAutocompleteSuggestions]);
 
   const handleInputChange = (text: string) => {
     setQuery(text);
@@ -182,26 +181,43 @@ const OlaPlaceAutocomplete: React.FC<OlaPlaceAutocompleteProps> = ({
       </Text>
     </TouchableOpacity>
   );
+  const renderFooter = () => {
+    if (!loading) return null;
+    return (
+      <ActivityIndicator
+        style={[styles.loader, loaderStyle]}
+        size="small"
+        color="#007AFF"
+      />
+    );
+  };
 
   return (
     <View style={styles.wrapper}>
-      <TextInput
-        style={[styles.input, inputStyle]}
-        placeholder={placeholder}
-        value={query}
-        onChangeText={handleInputChange}
-        placeholderTextColor="#888"
-        autoCorrect={false}
-        spellCheck={false}
-        keyboardType="visible-password" //to disable suggestions
-      />
-      {loading && (
-        <ActivityIndicator
-          style={[styles.loader, loaderStyle]}
-          size="small"
-          color="#007AFF"
+      <View style={styles.inputRow}>
+        <TextInput
+          style={[styles.input, inputStyle]}
+          placeholder={placeholder}
+          value={query}
+          onChangeText={handleInputChange}
+          placeholderTextColor="#888"
+          autoCorrect={false}
+          spellCheck={false}
+          keyboardType="visible-password" //to disable suggestions
         />
-      )}
+        {query.length > 0 && (
+          <TouchableOpacity
+            onPress={() => {
+              setQuery('');
+              setSuggestions([]);
+            }}
+            style={styles.clearIcon}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Icon name="close-circle" size={22} color="#888" />
+          </TouchableOpacity>
+        )}
+      </View>
       {error && <Text style={[styles.errorText, errorTextStyle]}>{error}</Text>}
       {suggestions.length > 0 && !loading && (
         <View style={[styles.suggestionsContainer, listContainerStyle]}>
@@ -213,6 +229,7 @@ const OlaPlaceAutocomplete: React.FC<OlaPlaceAutocompleteProps> = ({
             }
             keyboardShouldPersistTaps="handled"
             style={styles.list}
+            ListFooterComponent={renderFooter}
           />
         </View>
       )}
@@ -222,21 +239,25 @@ const OlaPlaceAutocomplete: React.FC<OlaPlaceAutocompleteProps> = ({
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: '100%',
+    width: '95%',
+    position: 'relative',
   },
   input: {
+    width: '100%',
     color: '#000',
     height: 45,
     borderColor: '#D1D1D1',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 15,
+    paddingRight: 40, // ensures text does not overlap the clear icon
     fontSize: 16,
     backgroundColor: '#FFFFFF',
     marginHorizontal: 12,
     marginVertical: 12,
   },
   loader: {
+    position: 'absolute',
     marginVertical: 8,
     alignSelf: 'center',
   },
@@ -247,11 +268,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   suggestionsContainer: {
+    position: 'absolute', // <-- ensure this is absolute
+    top: 57, // <-- adjust this to be just below your input (input height + margin)
+    left: 1, // <-- match input's marginHorizontal
+    right: 12, // <-- match input's marginHorizontal
+    zIndex: 100, // <-- ensure it's above the map
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
-    marginHorizontal: 12,
     marginBottom: 5,
-    marginTop: 0,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
@@ -272,6 +296,19 @@ const styles = StyleSheet.create({
   listItemText: {
     fontSize: 15,
     color: '#333333',
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  clearIcon: {
+    position: 'absolute',
+    right: 1,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    zIndex: 10,
   },
 });
 

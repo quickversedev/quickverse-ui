@@ -1,87 +1,43 @@
-// // import {createStackNavigator} from '@react-navigation/stack';
-// // import {HomeScreen} from '../screens/HomeScreen';
-// // import App from '../../App';
-// // const Stack = createStackNavigator();
-// import React, {useEffect} from 'react';
-// import LoggedIn from '../Components/Login/LoggedIn';
-// import {
-//   initializeNotificationChannel,
-//   initializeForegroundMessageHandler,
-//   initializeBackgroundMessageHandler,
-// } from '../utils/notificationUtil';
 
-// export const AppStack = () => {
-//   useEffect(() => {
-//     const initializeNotifications = async () => {
-//       await initializeNotificationChannel();
-//       const unsubscribe = initializeForegroundMessageHandler();
-//       initializeBackgroundMessageHandler();
-
-//       return () => unsubscribe();
-//     };
-
-//     initializeNotifications();
-//   }, []);
-//   return <LoggedIn />;
-// };
-import React, {useEffect, useState} from 'react';
+import React, { useEffect } from 'react';
 import LoggedIn from '../Components/Login/LoggedIn';
-import {
-  initializeNotificationChannel,
-  initializeForegroundMessageHandler,
-  initializeBackgroundMessageHandler,
-  checkNotificationPermissions,
-  requestNotificationPermissions,
-} from '../utils/notificationUtil';
-import {View, Text, ActivityIndicator, Platform} from 'react-native';
+import { useNotification } from '../utils/Hooks/useNotification';
+import { useFCMTokenHandler } from '../utils/Hooks/useFCMTokenHandler';
 
 export const AppStack = () => {
-  const [hasNotificationPermission, setHasNotificationPermission] = useState<
-    boolean | null
-  >(null);
+  const {
+    initializeNotifications,
+    onNotificationPress,
+    onBackgroundNotificationPress,
+  } = useNotification();
+
+  const { refreshFCMToken } = useFCMTokenHandler();
 
   useEffect(() => {
-    const initializeNotifications = async () => {
-      try {
-        // Initialize notification channel (Android)
-        await initializeNotificationChannel();
+    // Initialize notifications when the app starts
+    initializeNotifications().catch(error => {
+      console.error('Failed to initialize notifications:', error);
+    });
 
-        // Check or request permissions
-        if (Platform.OS === 'ios') {
-          const hasPermission = await checkNotificationPermissions();
-          if (!hasPermission) {
-            await requestNotificationPermissions();
-          }
-          setHasNotificationPermission(true); // Proceed regardless of permission decision
-        } else {
-          // For Android, we proceed after initializing the channel
-          setHasNotificationPermission(true);
-        }
+    // Set up notification press handlers
+    const foregroundUnsubscribe = onNotificationPress((notification) => {
+      console.log('Notification pressed:', notification);
+      // Handle notification press - you can navigate to specific screens here
+      // Example: navigation.navigate('OrderDetails', { orderId: notification.data?.orderId });
+    });
 
-        // Set up message handlers
-        const unsubscribe = initializeForegroundMessageHandler();
-        initializeBackgroundMessageHandler();
+    onBackgroundNotificationPress((notification) => {
+      console.log('Background notification pressed:', notification);
+      // Handle background notification press
+    });
 
-        return () => unsubscribe();
-      } catch (error) {
-        console.error('Notification initialization error:', error);
-        setHasNotificationPermission(true); // Still proceed to app even if notifications fail
+    // Cleanup on unmount
+    return () => {
+      if (typeof foregroundUnsubscribe === 'function') {
+        foregroundUnsubscribe();
       }
     };
+  }, [initializeNotifications, onNotificationPress, onBackgroundNotificationPress]);
 
-    initializeNotifications();
-  }, []);
-  // console.log('hasNotificationPermission:', hasNotificationPermission);
-  // Show loading indicator while checking permissions
-  if (hasNotificationPermission === null) {
-    return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size="large" />
-        <Text style={{marginTop: 10}}>Checking notifications...</Text>
-      </View>
-    );
-  }
-
-  // Render the app once we have permission status (whether granted or not)
   return <LoggedIn />;
 };

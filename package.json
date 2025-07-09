@@ -1,6 +1,6 @@
 {
   "name": "quickverse",
-  "version": "2.2.0-SNAPSHOT",
+  "version": "2.3.0-SNAPSHOT",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -27,6 +27,7 @@
     "react": "18.2.0",
     "react-native": "0.74.1",
     "react-native-device-info": "^14.0.4",
+    "react-native-dotenv": "^3.4.11",
     "react-native-geolocation-service": "^5.3.1",
     "react-native-gesture-handler": "^2.24.0",
     "react-native-get-random-values": "^1.11.0",
@@ -35,7 +36,7 @@
     "react-native-maps": "^1.9.0",
     "react-native-mmkv": "^2.12.2",
     "react-native-paper": "^5.12.3",
-    "react-native-permissions": "^5.2.6",
+    "react-native-permissions": "^5.4.1",
     "react-native-picker-select": "^9.2.0",
     "react-native-reanimated": "^3.12.0",
     "react-native-reanimated-carousel": "^4.0.2",

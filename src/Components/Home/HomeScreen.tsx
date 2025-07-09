@@ -51,7 +51,6 @@ const HomeScreen: React.FC = () => {
   const [campusOptions, setCampusOptions] = useState<any>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [clicked, setClicked] = useState(false);
-  const [loading, setLoading] = useState(false); // Proper loading state
   const [searchText, setSearchText] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const isFirstTimeLogin = getIsNewUser();
@@ -70,7 +69,6 @@ const HomeScreen: React.FC = () => {
   };
 
   const fetchCampus = async () => {
-    setLoading(true);
     setCampusError(false);
     try {
       const response = await fetchCampusIds();
@@ -86,8 +84,6 @@ const HomeScreen: React.FC = () => {
     } catch (error) {
       console.error('Error fetching campuses:', error);
       setCampusError(true);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -375,15 +371,7 @@ const HomeScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
 
-            {loading ? (
-              <View style={styles.modalLoadingContainer}>
-                <ActivityIndicator
-                  size="large"
-                  color={theme.colors.secondary}
-                />
-                <Text style={styles.loadingText}>Loading campuses...</Text>
-              </View>
-            ) : campusError ? (
+            {campusError ? (
               <View style={styles.modalErrorContainer}>
                 <Text style={styles.modalErrorText}>
                   Failed to fetch campuses. Please try again.
@@ -472,11 +460,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.primary,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   headerContainer: {
     flexDirection: 'row',
@@ -672,17 +655,6 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 5,
-  },
-  modalLoadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: theme.colors.ternary,
   },
   modalErrorContainer: {
     flex: 1,

@@ -76,7 +76,13 @@ const LoginScreen: React.FC = () => {
     // eslint-disable-next-line react-native/no-inline-styles
     <GestureHandlerRootView style={{flex: 1}}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <SafeAreaView style={styles.safeArea}>
+        <View style={styles.safeArea}>
+          <TouchableOpacity
+            onPress={handleSkipLogin}
+            style={styles.skipButton}>
+            <Text style={styles.skipButtonText}>Skip</Text>
+          </TouchableOpacity>
+          
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.keyboardAvoidingView}
@@ -136,15 +142,9 @@ const LoginScreen: React.FC = () => {
                   )}
                 </TouchableOpacity>
               </ScrollView>
-
-              <TouchableOpacity
-                onPress={handleSkipLogin}
-                style={styles.skipButton}>
-                <Text style={styles.skipButtonText}>Skip</Text>
-              </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
-        </SafeAreaView>
+        </View>
       </TouchableWithoutFeedback>
     </GestureHandlerRootView>
   );
@@ -228,10 +228,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 30,
     right: 30,
+    padding: 10,  // Add padding to increase touch area
+    zIndex: 999,  // Ensure it's above other elements
   },
   skipButtonText: {
     color: '#8B0000',
     fontSize: 20,
+    fontWeight: 'bold',  // Make text more visible
   },
   error: {
     color: 'red',

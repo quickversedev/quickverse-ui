@@ -13,34 +13,37 @@ export const useFCMTokenHandler = () => {
     try {
       console.log('🔄 Refreshing FCM token...');
 
-      // First try to get token from storage
+      // Get the stored token
       const storedToken = getFCMToken();
-      // console.log('Stored token:', storedToken ? '✅ Present' : '❌ Missing');
+      console.log('Stored token:', storedToken ? '✅ Present' : '❌ Missing');
 
-      // If no stored token, fetch directly from Firebase
-      let currentToken = storedToken;
-      if (!currentToken) {
-        // console.log('📱 No stored token, fetching from Firebase...');
-        try {
-          currentToken = await messaging().getToken();
-          if (currentToken) {
-            console.log('✅ Got new token from Firebase');
-            setFCMToken(currentToken);
-          } else {
-            console.warn('❌ Firebase returned null token');
-            return;
-          }
-        } catch (err) {
-          console.error('❌ Error fetching token from Firebase:', err);
+      // Always fetch fresh token from Firebase
+      let currentToken;
+      try {
+        currentToken = await messaging().getToken();
+        if (!currentToken) {
+          console.warn('❌ Firebase returned null token');
           return;
         }
+        console.log('✅ Got token from Firebase');
+      } catch (err) {
+        console.error('❌ Error fetching token from Firebase:', err);
+        return;
       }
 
-      // Only send to backend if user is logged in
-      if (authData) {
-        // console.log('📤 Sending FCM token to backend...');
-        await sendFCMToken(storedToken || '', currentToken, authData);
-        // console.log('✅ FCM token updated in backend');
+      // Compare tokens and update storage if needed
+      if (currentToken !== storedToken) {
+        console.log('📝 Token changed, updating storage');
+        setFCMToken(currentToken);
+
+        // Only send to backend if user is logged in
+        if (authData && storedToken && currentToken) {
+          console.log('📤 Sending new FCM token to backend...');
+          await sendFCMToken(storedToken, currentToken, authData);
+          console.log('✅ FCM token updated in backend');
+        }
+      } else {
+        console.log('✓ Token unchanged, skipping backend update');
       }
     } catch (error) {
       console.error('❌ Error in refreshFCMToken:', error);

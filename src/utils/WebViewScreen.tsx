@@ -3,7 +3,7 @@ import {WebView} from 'react-native-webview';
 import CookieManager from '@react-native-cookies/cookies';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {View, Text, StyleSheet, SafeAreaView} from 'react-native';
+import {View, Text, StyleSheet, SafeAreaView, Platform} from 'react-native';
 import {Loading} from '../Components/util/Loading';
 import {useAuth} from './AuthContext';
 
@@ -103,10 +103,10 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
             version: cookie.version,
           })
             .then(done => {
-              console.log('CookieManager.set =>', done);
+              console.log(`[CookieManager.set] Success for ${cookie.name} on ${Platform.OS}:`, done);
             })
             .catch(error => {
-              console.log('error setting up thje cookie', error);
+              console.log(`[CookieManager.set] Error for ${cookie.name} on ${Platform.OS}:`, error);
             });
         }
         setLoading(false);
@@ -171,7 +171,12 @@ const WebViewScreen: React.FC<WebViewScreenProps> = ({
         source={{uri: Url}}
         style={styles.webview}
         sharedCookiesEnabled={true}
+        thirdPartyCookiesEnabled={true}
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
         injectedJavaScript={`
+          document.cookie = "X_AMZ_JWT=${authData}; path=/; domain=${extractHostname(Url)}";
+          document.cookie = "REQUEST_ORIGIN=QUICKVERSE; path=/; domain=${extractHostname(Url)}";
           (function() {
             window.addEventListener("close-webview", function() {
               window.ReactNativeWebView.postMessage("close-webview");

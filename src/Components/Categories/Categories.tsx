@@ -101,8 +101,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   );
 
   const categoriesWithProducts = useMemo(() => {
-    const bestSellerProducts = (products || []).filter(p => p.bestSeller);
-
     const baseCategories = (categories || []).filter(category =>
       (products || []).some(product => product.category === category.id),
     );
@@ -111,35 +109,22 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
       product => !baseCategories.some(cat => cat.id === product.category),
     );
 
-    const finalCategories: Category[] = [];
-
-    if (bestSellerProducts.length > 0) {
-      finalCategories.push({
-        id: 'best-sellers',
-        name: 'Best Sellers',
-        imageURLs: ['https://i.postimg.cc/3w1f5gvj/best-Seller.png'], // You can use a custom image
-        description: 'Best selling products',
-        type: '',
-        parentCategory: null,
-        countOfSkus: bestSellerProducts.length,
-      });
-    }
-
-    finalCategories.push(...baseCategories);
-
     if (productsWithoutCategory.length > 0) {
-      finalCategories.push({
-        id: 'other',
-        name: 'Other',
-        imageURLs: ['https://img.icons8.com/color/96/box.png'],
-        description: 'other',
-        type: '',
-        parentCategory: null,
-        countOfSkus: productsWithoutCategory.length,
-      });
+      return [
+        ...baseCategories,
+        {
+          id: 'other',
+          name: 'Other',
+          imageURLs: ['https://via.placeholder.com/150'],
+          description: 'other',
+          type: '',
+          parentCategory: null,
+          countOfSkus: 0,
+        },
+      ];
     }
 
-    return finalCategories;
+    return baseCategories;
   }, [categories, products]);
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>();
@@ -170,16 +155,11 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
           product.title.toLowerCase().includes(searchQuery.toLowerCase()),
         )
       : selectedCategory
-      ? (products || []).filter(product => {
-          if (selectedCategory === 'other') {
-            return !categoriesWithProducts.some(
-              cat => cat.id === product.category,
-            );
-          } else if (selectedCategory === 'best-sellers') {
-            return product.bestSeller;
-          }
-          return product.category === selectedCategory;
-        })
+      ? (products || []).filter(product =>
+          selectedCategory === 'other'
+            ? !categoriesWithProducts.some(cat => cat.id === product.category)
+            : product.category === selectedCategory,
+        )
       : products || []
   )
     .slice()
@@ -303,8 +283,6 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
   }) => {
     const isSelected = item.id === selectedCategory;
     const isLastItem = index === filteredCategories.length - 1; // Check if it's the last item
-    const image =
-      item?.imageURLs?.[0] || 'https://i.postimg.cc/xCfHJ1Rn/application.png';
     return (
       <TouchableOpacity
         style={[
@@ -316,7 +294,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         onPress={() => handleCategoryPress(item.id)}
         disabled={loading || error}>
         <Image
-          source={{uri: image}}
+          source={{uri: item?.imageURLs?.[0]}}
           style={styles.categoryImage}
           resizeMode="cover"
         />
@@ -343,8 +321,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
 
     // Check if it's the last item in the filteredProducts array
     const isLastProductItem = index === filteredProducts.length - 1;
-    const image =
-      product.image || 'https://i.postimg.cc/6qdyMszY/new-product.png';
+
     return (
       <View
         style={[
@@ -354,7 +331,7 @@ const Categories: React.FC<CategoriesScreenProps> = ({route}) => {
         ]}>
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
           <Image
-            source={{uri: image}}
+            source={{uri: product.image}}
             style={styles.productImage}
             resizeMode="cover"
           />
